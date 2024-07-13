@@ -1,5 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-layout',
@@ -9,13 +10,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class LayoutPage implements OnInit {
   selectionProfile: any;
 
-  public folder!: string;
   private activatedRoute = inject(ActivatedRoute);
   private router = inject(Router);
   user = {
     name: 'John Doe',
     email: 'john@gmail.com',
   }
+
+  segments: any[] = [];
 
   
   constructor() { }
@@ -25,11 +27,24 @@ export class LayoutPage implements OnInit {
   }
 
   ngOnInit() {
-    this.folder = this.activatedRoute.snapshot.paramMap.get('id') as string;
+     // Suscribirse a los eventos del router para capturar cambios en la URL
+  this.router.events
+  .pipe(
+    filter((event:any) => event instanceof NavigationEnd) // Filtrar solo los eventos de finalización de navegación
+  )
+  .subscribe(() => {
+    const url = this.router.url; // Obtener la URL actual
+    this.segments = url.split('/'); // Dividir la URL en segmentos
+    //Eliminar primeros dos elementos del array
+    this.segments = this.segments.slice(2);
 
-    if (!this.folder) {
-      this.folder = 'Bienvenido';
+    //Si el segmento es igual a home eliminarlo
+    if (this.segments[0] === 'home') {
+      this.segments = [];
     }
+    
+    console.log('Segments: ', this.segments); // Loguear los segmentos
+  });
   }
 
   logout() {

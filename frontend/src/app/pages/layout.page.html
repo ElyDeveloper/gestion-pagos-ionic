@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title>{{ folder }}</ion-title>
+    <ion-title size="large">Sistema de Gestión de Pagos</ion-title>
     <!-- Visualizar foto de usuario -->
     <ion-avatar slot="end">
       <img src="https://ionicframework.com/docs/demos/api/avatar/avatar.svg" />
@@ -24,14 +24,16 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">{{ folder }}</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
+  <ion-breadcrumbs>
+    <ion-breadcrumb>
+      <ion-icon slot="start" name="home"></ion-icon>
+      Inicio
+    </ion-breadcrumb>
+    <ion-breadcrumb  *ngFor="let segment of segments">
+      {{ segment }}
+    </ion-breadcrumb>
+  </ion-breadcrumbs>
   <div id="container">
-    <strong class="capitalize">{{ folder }}</strong>
     <ion-router-outlet></ion-router-outlet>
   </div>
 </ion-content>

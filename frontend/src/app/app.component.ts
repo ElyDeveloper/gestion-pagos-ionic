@@ -9,13 +9,15 @@ export class AppComponent {
   darkMode: boolean = true;
 
   public appPages = [
-    { title: "Inbox", url: "/layout/home", icon: "mail" },
-    { title: "Outbox", url: "/layout/outbox", icon: "paper-plane" },
-    { title: "Favorites", url: "/layout/favorites", icon: "heart" },
-    { title: "Archived", url: "/layout/archived", icon: "archive" },
-    { title: "Trash", url: "/layout/trash", icon: "trash" },
-    { title: "Spam", url: "/layout/spam", icon: "warning" },
+    { title: "Inicio", url: "/layout/home", icon: "home" },
+    { title: "Usuarios", url: "/layout/usuarios", icon: "people" },
+    { title: "Clientes", url: "/layout/clientes", icon: "person" },
+    { title: "Contratos Pagos", url: "/layout/contratos-pago", icon: "document-text" },
+    { title: "Préstamos", url: "/layout/prestamos", icon: "cash" },
+    { title: "Pagos", url: "/layout/pagos", icon: "card" },
+    { title: "Reportes", url: "/layout/reportes-pagos", icon: "stats-chart" },
   ];
+  
   public labels = ["Family", "Friends", "Notes", "Work", "Travel", "Reminders"];
 
   constructor(private platform: Platform) {
