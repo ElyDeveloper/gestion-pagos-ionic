@@ -1,5 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { SplashScreen } from '@capacitor/splash-screen';
 
 @Component({
   selector: 'app-login',
@@ -15,8 +16,13 @@ export class LoginPage implements OnInit {
   ngOnInit() {
   }
 
-  login() {
+  async login() {
     //Redirection a la home
+    await SplashScreen.show({
+      showDuration: 2000,
+      autoHide: true,
+    });
+
     this.router.navigate(['/layout']);
 
   }

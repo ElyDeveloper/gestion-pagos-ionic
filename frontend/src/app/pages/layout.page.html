@@ -13,7 +13,8 @@
       <ion-select
         placeholder="{{user.name}}"
         interface="popover"
-        (ionChange)="getSelection($event)">
+        [(ngModel)]="selectionProfile"
+        (ionChange)="getSelection()">
         <ion-select-option value="logout" (click)="logout()"
           >Cerrar Sesión</ion-select-option
         >

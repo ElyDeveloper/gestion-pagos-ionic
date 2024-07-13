@@ -8,22 +8,26 @@
   <!-- Crear login -->
   <div class="container" id="container">
     <div class="row d-flex justify-content-center align-content-center">
-      <ion-card style="max-width: 350px; background-color: rgba(220, 220, 220, 0.749);" >
+      <ion-card style="max-width: 350px; background-color: #616161;" >
         <ion-card-header>
-          <ion-card-title class="text-black">Iniciar Sesión</ion-card-title>
+          <ion-card-title class="text-white">Iniciar Sesión</ion-card-title>
         </ion-card-header>
         <ion-card-content>
           <!-- Logo de la app -->
           <div class="d-flex justify-content-center">
-            <img width="250" src="assets/logo.png" alt="logo" />
+            <div class="rounded rounded-pill justify-content-center align-content-center align-items-center " style="height: 150px; width: 150px; background-color: rgb(255, 255, 255);">
+              <img width="250" src="assets/logo.png" alt="logo" />
+            </div>
           </div>
-          <ion-item>
+          <ion-item class="text-white">
             <ion-label position="floating">Email</ion-label>
             <ion-input type="email" [(ngModel)]="user.email"></ion-input>
           </ion-item>
-          <ion-item>
+          <ion-item class="text-white">
             <ion-label position="floating">Password</ion-label>
-            <ion-input type="password" [(ngModel)]="user.password"></ion-input>
+            <ion-input type="password" [(ngModel)]="user.password">
+              <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+            </ion-input>
           </ion-item>
           <ion-button class="mt-2" expand="block" (click)="login()"
             >Entrar</ion-button

@@ -7,6 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
   styleUrls: ['./layout.page.scss'],
 })
 export class LayoutPage implements OnInit {
+  selectionProfile: any;
 
   public folder!: string;
   private activatedRoute = inject(ActivatedRoute);
@@ -15,7 +16,13 @@ export class LayoutPage implements OnInit {
     name: 'John Doe',
     email: 'john@gmail.com',
   }
-  constructor() {}
+
+  
+  constructor() { }
+  
+  ionViewWillEnter() {
+    this.selectionProfile = '';
+  }
 
   ngOnInit() {
     this.folder = this.activatedRoute.snapshot.paramMap.get('id') as string;
@@ -30,10 +37,8 @@ export class LayoutPage implements OnInit {
     this.router.navigate(['/login']);
   }
 
-  getSelection(event:any) {
-    const selection = event.detail.value;
-
-    switch (selection) {
+  getSelection() {
+    switch (this.selectionProfile) {
       case 'logout':
         this.logout();
         break;
