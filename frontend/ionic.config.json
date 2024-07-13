@@ -1,0 +1,7 @@
+{
+  "name": "gestion-pagos",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
