@@ -72,3 +72,8 @@ ion-avatar {
   width: 40px;
   height: 40px;
 }
+
+ion-item{
+  //Transparente
+  --ion-item-background: transparent;
+}

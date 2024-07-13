@@ -30,8 +30,16 @@ export class AppComponent {
 
   checkDarkMode() {
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+    console.log(prefersDark);
     this.darkMode = prefersDark.matches;
-    if (prefersDark.matches) {
+    //Verificar si hay una configuración previa
+    const darkMode = localStorage.getItem("themeApp");
+    if (darkMode) {
+      this.darkMode = darkMode === "dark";
+      console.log(this.darkMode);
+    }
+
+    if (this.darkMode) {
       document.body.classList.toggle("dark");
     }
   }
@@ -39,5 +47,8 @@ export class AppComponent {
   cambioApariencia() {
     this.darkMode = !this.darkMode;
     document.body.classList.toggle("dark");
+    //Guardar en localstorage
+    localStorage.setItem("themeApp", this.darkMode ? "dark" : "light");
+
   }
 }

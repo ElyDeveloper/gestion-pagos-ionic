@@ -8,19 +8,14 @@
   <!-- Crear login -->
   <div class="container" id="container">
     <div class="row d-flex justify-content-center align-content-center">
-      <ion-card style="max-width: 350px">
+      <ion-card style="max-width: 350px; background-color: rgba(220, 220, 220, 0.749);" >
         <ion-card-header>
-          <ion-card-title>Iniciar Sesión</ion-card-title>
+          <ion-card-title class="text-black">Iniciar Sesión</ion-card-title>
         </ion-card-header>
         <ion-card-content>
           <!-- Logo de la app -->
           <div class="d-flex justify-content-center">
-            <img
-              class="rounded rounded-pill p-2"
-              width="200"
-              src="https://static.vecteezy.com/system/resources/thumbnails/013/760/506/small_2x/abstract-square-logo-illustration-in-trendy-and-minimal-style-png.png"
-              alt="logo"
-              style="width: 100px" />
+            <img width="250" src="assets/logo.png" alt="logo" />
           </div>
           <ion-item>
             <ion-label position="floating">Email</ion-label>
@@ -30,7 +25,9 @@
             <ion-label position="floating">Password</ion-label>
             <ion-input type="password" [(ngModel)]="user.password"></ion-input>
           </ion-item>
-          <ion-button class="mt-2" expand="block" (click)="login()">Entrar</ion-button>
+          <ion-button class="mt-2" expand="block" (click)="login()"
+            >Entrar</ion-button
+          >
         </ion-card-content>
       </ion-card>
     </div>
