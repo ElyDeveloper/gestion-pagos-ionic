@@ -1,0 +1,38 @@
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large"></ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Crear login -->
+  <div class="container" id="container">
+    <div class="row d-flex justify-content-center align-content-center">
+      <ion-card style="max-width: 350px">
+        <ion-card-header>
+          <ion-card-title>Iniciar Sesión</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <!-- Logo de la app -->
+          <div class="d-flex justify-content-center">
+            <img
+              class="rounded rounded-pill p-2"
+              width="200"
+              src="https://static.vecteezy.com/system/resources/thumbnails/013/760/506/small_2x/abstract-square-logo-illustration-in-trendy-and-minimal-style-png.png"
+              alt="logo"
+              style="width: 100px" />
+          </div>
+          <ion-item>
+            <ion-label position="floating">Email</ion-label>
+            <ion-input type="email" [(ngModel)]="user.email"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Password</ion-label>
+            <ion-input type="password" [(ngModel)]="user.password"></ion-input>
+          </ion-item>
+          <ion-button class="mt-2" expand="block" (click)="login()">Entrar</ion-button>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+</ion-content>

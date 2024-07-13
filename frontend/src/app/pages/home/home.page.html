@@ -8,10 +8,10 @@
     <ion-avatar slot="end">
       <img src="https://ionicframework.com/docs/demos/api/avatar/avatar.svg">
     </ion-avatar>
-    <!-- Desplegable para cerrar sesion -->
+    <!-- Desplegable para cerrar sesión -->
     <ion-buttons slot="end">
-      <ion-select placeholder="{{user.email}}" interface="popover" (ionChange)="getSelection($event)">
-        <ion-select-option value="logout" (click)="logout()">Cerrar Sesion</ion-select-option>
+      <ion-select placeholder="{{user.name}}" interface="popover" (ionChange)="getSelection($event)">
+        <ion-select-option value="logout" (click)="logout()">Cerrar Sesión</ion-select-option>
       </ion-select>
     </ion-buttons>
 

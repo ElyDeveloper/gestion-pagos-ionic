@@ -1,14 +1,16 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
-  selector: 'app-folder',
-  templateUrl: './folder.page.html',
-  styleUrls: ['./folder.page.scss'],
+  selector: 'app-home',
+  templateUrl: './home.page.html',
+  styleUrls: ['./home.page.scss'],
 })
-export class FolderPage implements OnInit {
+export class HomePage implements OnInit {
+
   public folder!: string;
   private activatedRoute = inject(ActivatedRoute);
+  private router = inject(Router);
   user = {
     name: 'John Doe',
     email: 'john@gmail.com',
@@ -17,10 +19,15 @@ export class FolderPage implements OnInit {
 
   ngOnInit() {
     this.folder = this.activatedRoute.snapshot.paramMap.get('id') as string;
+
+    if (!this.folder) {
+      this.folder = 'Bienvenido';
+    }
   }
 
   logout() {
     console.log('logout');
+    this.router.navigate(['/login']);
   }
 
   getSelection(event:any) {
@@ -35,5 +42,5 @@ export class FolderPage implements OnInit {
     }
     
   }
-  
+
 }
