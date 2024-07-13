@@ -1,0 +1,36 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ folder }}</ion-title>
+    <!-- Visualizar foto de usuario -->
+    <ion-avatar slot="end">
+      <img src="https://ionicframework.com/docs/demos/api/avatar/avatar.svg" />
+    </ion-avatar>
+    <!-- Desplegable para cerrar sesión -->
+    <ion-buttons slot="end">
+      <ion-select
+        placeholder="{{user.name}}"
+        interface="popover"
+        (ionChange)="getSelection($event)">
+        <ion-select-option value="logout" (click)="logout()"
+          >Cerrar Sesión</ion-select-option
+        >
+      </ion-select>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">{{ folder }}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div id="container">
+    <strong class="capitalize">{{ folder }}</strong>
+    <ion-router-outlet></ion-router-outlet>
+  </div>
+</ion-content>

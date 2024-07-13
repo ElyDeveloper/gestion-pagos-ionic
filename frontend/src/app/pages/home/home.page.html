@@ -1,32 +1,43 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <ion-title>{{ folder }}</ion-title>
-    <!-- Visualizar foto de usuario -->
-    <ion-avatar slot="end">
-      <img src="https://ionicframework.com/docs/demos/api/avatar/avatar.svg">
-    </ion-avatar>
-    <!-- Desplegable para cerrar sesión -->
-    <ion-buttons slot="end">
-      <ion-select placeholder="{{user.name}}" interface="popover" (ionChange)="getSelection($event)">
-        <ion-select-option value="logout" (click)="logout()">Cerrar Sesión</ion-select-option>
-      </ion-select>
-    </ion-buttons>
-
-  </ion-toolbar>
-</ion-header>
-
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">{{ folder }}</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <div id="container">
-    <strong class="capitalize">{{ folder }}</strong>
-    <p>Explore <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-  </div>
-</ion-content>
+<section class="container">
+    <div class="table-responsive">
+      <table class="table table-striped table-bordered table-hover">
+        <thead>
+          <tr>
+            <th>Header 1</th>
+            <th>Header 2</th>
+            <th>Header 3</th>
+            <th>Header 4</th>
+            <th>Header 5</th>
+            <th>Header 6</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Row 1, Cell 1</td>
+            <td>Row 1, Cell 2</td>
+            <td>Row 1, Cell 3</td>
+            <td>Row 1, Cell 4</td>
+            <td>Row 1, Cell 5</td>
+            <td>Row 1, Cell 6</td>
+          </tr>
+          <tr>
+            <td>Row 2, Cell 1</td>
+            <td>Row 2, Cell 2</td>
+            <td>Row 2, Cell 3</td>
+            <td>Row 2, Cell 4</td>
+            <td>Row 2, Cell 5</td>
+            <td>Row 2, Cell 6</td>
+          </tr>
+          <tr>
+            <td>Row 3, Cell 1</td>
+            <td>Row 3, Cell 2</td>
+            <td>Row 3, Cell 3</td>
+            <td>Row 3, Cell 4</td>
+            <td>Row 3, Cell 5</td>
+            <td>Row 3, Cell 6</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  
+</section>

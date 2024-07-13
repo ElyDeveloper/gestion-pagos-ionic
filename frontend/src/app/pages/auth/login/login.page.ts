@@ -17,7 +17,7 @@ export class LoginPage implements OnInit {
 
   login() {
     //Redirection a la home
-    this.router.navigate(['/home']);
+    this.router.navigate(['/layout']);
 
   }
 

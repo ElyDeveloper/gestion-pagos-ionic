@@ -9,12 +9,12 @@ export class AppComponent {
   darkMode: boolean = true;
 
   public appPages = [
-    { title: "Inbox", url: "/home/inbox", icon: "mail" },
-    { title: "Outbox", url: "/home/outbox", icon: "paper-plane" },
-    { title: "Favorites", url: "/home/favorites", icon: "heart" },
-    { title: "Archived", url: "/home/archived", icon: "archive" },
-    { title: "Trash", url: "/home/trash", icon: "trash" },
-    { title: "Spam", url: "/home/spam", icon: "warning" },
+    { title: "Inbox", url: "/layout/home", icon: "mail" },
+    { title: "Outbox", url: "/layout/outbox", icon: "paper-plane" },
+    { title: "Favorites", url: "/layout/favorites", icon: "heart" },
+    { title: "Archived", url: "/layout/archived", icon: "archive" },
+    { title: "Trash", url: "/layout/trash", icon: "trash" },
+    { title: "Spam", url: "/layout/spam", icon: "warning" },
   ];
   public labels = ["Family", "Friends", "Notes", "Work", "Travel", "Reminders"];
 
