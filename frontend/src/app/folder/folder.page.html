@@ -4,6 +4,17 @@
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-title>{{ folder }}</ion-title>
+    <!-- Visualizar foto de usuario -->
+    <ion-avatar slot="end">
+      <img src="https://ionicframework.com/docs/demos/api/avatar/avatar.svg">
+    </ion-avatar>
+    <!-- Desplegable para cerrar sesion -->
+    <ion-buttons slot="end">
+      <ion-select placeholder="{{user.email}}" interface="popover" (ionChange)="getSelection($event)">
+        <ion-select-option value="logout" (click)="logout()">Cerrar Sesion</ion-select-option>
+      </ion-select>
+    </ion-buttons>
+
   </ion-toolbar>
 </ion-header>
 

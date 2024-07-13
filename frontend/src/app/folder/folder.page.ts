@@ -9,9 +9,31 @@ import { ActivatedRoute } from '@angular/router';
 export class FolderPage implements OnInit {
   public folder!: string;
   private activatedRoute = inject(ActivatedRoute);
+  user = {
+    name: 'John Doe',
+    email: 'john@gmail.com',
+  }
   constructor() {}
 
   ngOnInit() {
     this.folder = this.activatedRoute.snapshot.paramMap.get('id') as string;
   }
+
+  logout() {
+    console.log('logout');
+  }
+
+  getSelection(event:any) {
+    const selection = event.detail.value;
+
+    switch (selection) {
+      case 'logout':
+        this.logout();
+        break;
+      default:
+        break
+    }
+    
+  }
+  
 }
