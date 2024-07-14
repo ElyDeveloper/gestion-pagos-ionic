@@ -77,3 +77,32 @@ ion-item{
   //Transparente
   --ion-item-background: transparent;
 }
+
+.custom-table {
+  // Estilos completos para una tabla
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  border: 1px solid;
+
+  th {
+    // Estilos para las cabeceras
+    background-color: #253465;
+    color: #fff;
+    font-weight: bold;
+    padding: 5px;
+    // border: 1px solid;
+  }
+
+  td {
+    // Estilos para las celdas
+    border: 1px solid;
+    padding: 5px;
+  }
+}
+
+.page-link {
+  // Estilos para los enlaces de paginación
+  background-color: #9a8c50 !important;
+  color: #fff !important;
+}

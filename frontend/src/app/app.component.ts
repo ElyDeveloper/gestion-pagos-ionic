@@ -18,7 +18,6 @@ export class AppComponent {
     { title: "Reportes", url: "/layout/reportes-pagos", icon: "stats-chart" },
   ];
   
-  public labels = ["Family", "Friends", "Notes", "Work", "Travel", "Reminders"];
 
   constructor(private platform: Platform) {
     this.initializeApp();
