@@ -43,7 +43,7 @@ export class LayoutPage implements OnInit {
       this.segments = [];
     }
     
-    console.log('Segments: ', this.segments); // Loguear los segmentos
+    console.log('Segments: ', this.segments); // Loggear los segmentos
   });
   }
 
