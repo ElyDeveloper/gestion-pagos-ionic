@@ -2,16 +2,19 @@
   <ion-card>
     <ion-card-header>
       <ion-card-title>Card Title</ion-card-title>
-      <div class="row d-flex justify-content-end">
-        <!-- Boton de agregar Cliente -->
-        <div class="col-3">
-          <ion-button
-            expand="block"
-            color="primary"
-            >
+
+      <div class="row d-flex justify-content-md-end">
+        <div style="width: 150px">
+          <ion-button color="primary">
             Agregar Title <ion-icon name="add-outline"></ion-icon>
           </ion-button>
         </div>
+      </div>
+      <div class="row">
+        <ion-searchbar
+          placeholder="Buscar..."
+          [(ngModel)]="searchTerm"
+          (ionChange)="onSearchChange($event)"></ion-searchbar>
       </div>
     </ion-card-header>
 
@@ -56,16 +59,47 @@
           </tbody>
         </table>
       </div>
-      <div class="d-flex justify-content-end">
-        <nav aria-label="Page navigation example" class="mt-3">
-          <ul class="pagination">
-            <li class="page-item">
-              <a class="page-link" href="#">Previous</a>
+      <div class="d-flex justify-content-center">
+        <nav aria-label="Page navigation" class="mt-3">
+          <ul class="pagination justify-content-end">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <a
+                class="page-link"
+                (click)="previousPage()"
+                role="button"
+                tabindex="0"
+                ><ion-icon name="arrow-back-outline"></ion-icon
+              ></a>
             </li>
-            <li class="page-item"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item"><a class="page-link" href="#">Next</a></li>
+            <li class="page-item" *ngIf="visiblePages[0] > 1">
+              <span class="page-link">...</span>
+            </li>
+            <li
+              class="page-item"
+              *ngFor="let page of visiblePages"
+              [class.active]="page === currentPage">
+              <a
+                class="page-link"
+                (click)="goToPage(page)"
+                role="button"
+                tabindex="0"
+                >{{ page }}</a
+              >
+            </li>
+            <li
+              class="page-item"
+              *ngIf="visiblePages[visiblePages.length - 1] < totalPages">
+              <span class="page-link">...</span>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+              <a
+                class="page-link"
+                (click)="nextPage()"
+                role="button"
+                tabindex="0"
+                ><ion-icon name="arrow-forward-outline"></ion-icon
+              ></a>
+            </li>
           </ul>
         </nav>
       </div>

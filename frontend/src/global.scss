@@ -106,3 +106,26 @@ ion-item{
   background-color: #9a8c50 !important;
   color: #fff !important;
 }
+
+
+.pagination {
+  .page-item {
+    .page-link {
+      cursor: pointer;
+      user-select: none;
+
+      &:not(.disabled):hover {
+        background-color: #e9ecef;
+      }
+    }
+
+    &.active .page-link {
+      cursor: default;
+    }
+
+    &.disabled .page-link {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+}
