@@ -4,18 +4,22 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { LayoutPageRoutingModule } from './layout-routing.module';
-
-import { LayoutPage } from './layout.page';
+import { TableDataComponent } from './table-data/table-data.component';
 
 @NgModule({
+  declarations: [
+    TableDataComponent
+  ],
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    LayoutPageRoutingModule
   ],
-  declarations: [LayoutPage],
-  exports: []
+  exports: [
+    TableDataComponent,
+    CommonModule,
+    FormsModule,
+    IonicModule
+  ]
 })
-export class LayoutPageModule {}
+export class SharedModule { }
