@@ -1,8 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-
-import { IonicModule } from '@ionic/angular';
+import { SharedModule } from 'src/app/shared/components/shared.module';
 
 import { UsuariosPageRoutingModule } from './usuarios-routing.module';
 
@@ -10,9 +7,7 @@ import { UsuariosPage } from './usuarios.page';
 
 @NgModule({
   imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
+    SharedModule,
     UsuariosPageRoutingModule
   ],
   declarations: [UsuariosPage]

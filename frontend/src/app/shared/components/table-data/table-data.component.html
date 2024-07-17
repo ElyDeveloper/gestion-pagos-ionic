@@ -1,11 +1,11 @@
 <ion-card>
   <ion-card-header>
-    <ion-card-title>Card Title</ion-card-title>
+    <ion-card-title>{{title}} </ion-card-title>
 
     <div class="row d-flex justify-content-md-end">
       <div style="width: 150px">
-        <ion-button color="primary">
-          Agregar Title <ion-icon name="add-outline"></ion-icon>
+        <ion-button color="primary" (click)="onAddButtonClick()">
+          Agregar <ion-icon name="add-outline"></ion-icon>
         </ion-button>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 @Component({
   selector: 'app-table-data',
@@ -10,12 +10,20 @@ export class TableDataComponent  implements OnInit {
   @Input() totalPages: number = 10; // Esto debería ser dinámico basado en tus datos
   @Input() visiblePages: number[] = [];
   @Input() searchTerm: string = '';
+  @Input() data: any[] = []; // Aquí deberías recibir los datos a mostrar en la tabla
+  @Input() title: string = 'Sin titulo'; // Aquí deberías recibir los datos a mostrar en la tabla
+  @Output() addButtonClicked = new EventEmitter<void>();
+
 
 
   constructor() { }
 
   ngOnInit() {
     this.updateVisiblePages();
+  }
+
+  onAddButtonClick() {
+    this.addButtonClicked.emit();
   }
 
   onSearchChange(event: any) {
