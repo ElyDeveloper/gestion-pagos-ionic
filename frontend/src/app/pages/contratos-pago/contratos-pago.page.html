@@ -1,3 +1,38 @@
-<section>
-  <h5>Contratos Pagos</h5>
+<section class="container">
+  <app-table-data
+    [currentPage]="1"
+    [totalPages]="10"
+    [title]="'Contratos Pago'"
+    (addButtonClicked)="onAddButtonClicked()">
+  </app-table-data>
+
+  <app-reusable-modal
+    [(isOpen)]="isModalOpen"
+    [content]="modalContent"
+    (saveData)="handleSave($event)">
+  </app-reusable-modal>
+
+  <ng-template #modalContent let-close="close" let-save="save">
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Formulario de Contratos - Pago</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="close()">Cerrar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">
+      <form [formGroup]="form" (ngSubmit)="save(form.value)">
+        <ion-item>
+          <ion-label position="floating">Nombre</ion-label>
+          <ion-input formControlName="name"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Email</ion-label>
+          <ion-input type="email" formControlName="email"></ion-input>
+        </ion-item>
+        <ion-button expand="block" type="submit" [disabled]="!form.valid">Guardar</ion-button>
+      </form>
+    </ion-content>
+  </ng-template>
 </section>

@@ -2,7 +2,7 @@
   <app-table-data
     [currentPage]="1"
     [totalPages]="10"
-    [title]="'Mi Tabla'"
+    [title]="'Usuarios'"
     (addButtonClicked)="onAddButtonClicked()">
   </app-table-data>
 
@@ -15,7 +15,7 @@
   <ng-template #modalContent let-close="close" let-save="save">
     <ion-header>
       <ion-toolbar>
-        <ion-title>Formulario</ion-title>
+        <ion-title>Formulario de Usuarios</ion-title>
         <ion-buttons slot="end">
           <ion-button (click)="close()">Cerrar</ion-button>
         </ion-buttons>

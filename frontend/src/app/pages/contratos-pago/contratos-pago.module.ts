@@ -1,18 +1,14 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-
-import { IonicModule } from '@ionic/angular';
+SharedModule
 
 import { ContratosPagoPageRoutingModule } from './contratos-pago-routing.module';
 
 import { ContratosPagoPage } from './contratos-pago.page';
+import { SharedModule } from 'src/app/shared/components/shared.module';
 
 @NgModule({
   imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
+    SharedModule,
     ContratosPagoPageRoutingModule
   ],
   declarations: [ContratosPagoPage]

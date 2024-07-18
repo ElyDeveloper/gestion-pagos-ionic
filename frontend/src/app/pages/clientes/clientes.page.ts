@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-clientes',
@@ -6,51 +7,30 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./clientes.page.scss'],
 })
 export class ClientesPage implements OnInit {
-  currentPage: number = 1;
-  totalPages: number = 10; // Esto debería ser dinámico basado en tus datos
-  visiblePages: number[] = [];
-  searchTerm: string = '';
+  isModalOpen = false;
+  @ViewChild("modalContent", { static: true }) modalContent!: TemplateRef<any>;
+  form: FormGroup;
+
+  constructor(private fb: FormBuilder) {
+    this.form = this.fb.group({
+      name: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]]
+    });
+  }
+
+  
+
+  onAddButtonClicked() {
+    this.isModalOpen = true;
+  }
 
 
-  constructor() { }
+  handleSave(data: any) {
+    console.log('Datos guardados:', data);
+    // Aquí puedes procesar los datos como necesites
+  }
 
   ngOnInit() {
-    this.updateVisiblePages();
   }
 
-  onSearchChange(event: any) {
-    console.log('Búsqueda:', this.searchTerm);
-    // Aquí puedes implementar la lógica de búsqueda
-    // Por ejemplo, filtrar los datos y actualizar la tabla
-  }
-
-  updateVisiblePages() {
-    this.visiblePages = [];
-    let startPage = Math.max(1, this.currentPage - 2);
-    let endPage = Math.min(this.totalPages, startPage + 4);
-
-    if (endPage - startPage < 4) {
-      startPage = Math.max(1, endPage - 4);
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      this.visiblePages.push(i);
-    }
-  }
-
-  goToPage(page: number) {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-      this.updateVisiblePages();
-      // Aquí deberías cargar los datos correspondientes a la página seleccionada
-    }
-  }
-
-  nextPage() {
-    this.goToPage(this.currentPage + 1);
-  }
-
-  previousPage() {
-    this.goToPage(this.currentPage - 1);
-  }
 }
