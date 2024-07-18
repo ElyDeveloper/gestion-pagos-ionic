@@ -71,10 +71,10 @@ export class TableDataComponent implements OnInit {
   updateVisiblePages() {
     this.visiblePages = [];
     let startPage = Math.max(1, this.currentPage - 2);
-    let endPage = Math.min(this.totalPages, startPage + 4);
+    let endPage = Math.min(this.totalPages, startPage + 3);
 
-    if (endPage - startPage < 4) {
-      startPage = Math.max(1, endPage - 4);
+    if (endPage - startPage < 3) {
+      startPage = Math.max(1, endPage - 3);
     }
 
     for (let i = startPage; i <= endPage; i++) {
