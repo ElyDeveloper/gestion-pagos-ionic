@@ -1,14 +1,29 @@
 <ion-card>
   <ion-card-header>
-    <ion-card-title>{{title}} </ion-card-title>
+    <ion-card-title>{{ title }} </ion-card-title>
 
-    <div class="row d-flex justify-content-md-end">
+    <div class="row d-flex justify-content-md-end" *ngIf="showAdd">
       <div style="width: 150px">
         <ion-button color="primary" (click)="onAddButtonClick()">
           Agregar <ion-icon name="add-outline"></ion-icon>
         </ion-button>
       </div>
     </div>
+    <div class="row justify-content-center" *ngIf="showCalendar">
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3" style="max-width: 250px">
+        <label for="monthPicker">Seleccionar Mes</label>
+        <div class="d-flex">
+          <select id="monthPicker" class="form-control me-2" [(ngModel)]="selectedMonth" (change)="onMonthChange()">
+            <option *ngFor="let month of months" [value]="month.value">{{ month.name }}</option>
+          </select>
+          <select class="form-control" [(ngModel)]="selectedYear" (change)="onMonthChange()">
+            <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    
+    
     <div class="row">
       <ion-searchbar
         placeholder="Buscar..."
@@ -91,11 +106,7 @@
             <span class="page-link">...</span>
           </li>
           <li class="page-item" [class.disabled]="currentPage === totalPages">
-            <a
-              class="page-link"
-              (click)="nextPage()"
-              role="button"
-              tabindex="0"
+            <a class="page-link" (click)="nextPage()" role="button" tabindex="0"
               ><ion-icon name="arrow-forward-outline"></ion-icon
             ></a>
           </li>

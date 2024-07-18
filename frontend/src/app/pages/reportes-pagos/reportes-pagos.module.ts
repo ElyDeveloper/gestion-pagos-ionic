@@ -1,8 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-
-import { IonicModule } from '@ionic/angular';
+import { SharedModule } from 'src/app/shared/components/shared.module';
 
 import { ReportesPagosPageRoutingModule } from './reportes-pagos-routing.module';
 
@@ -10,9 +7,7 @@ import { ReportesPagosPage } from './reportes-pagos.page';
 
 @NgModule({
   imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
+    SharedModule,
     ReportesPagosPageRoutingModule
   ],
   declarations: [ReportesPagosPage]
