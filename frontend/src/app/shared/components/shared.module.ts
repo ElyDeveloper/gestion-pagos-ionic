@@ -8,11 +8,15 @@ import { IonicModule } from '@ionic/angular';
 
 import { TableDataComponent } from './table-data/table-data.component';
 import { ReusableModalComponent } from './reusable-modal/reusable-modal.component';
+import { NavbarComponent } from './navbar/navbar.component';
+import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 
 @NgModule({
   declarations: [
     TableDataComponent,
-    ReusableModalComponent
+    ReusableModalComponent,
+    NavbarComponent,
+    BreadcrumbComponent
   ],
   imports: [
     CommonModule,
@@ -23,6 +27,8 @@ import { ReusableModalComponent } from './reusable-modal/reusable-modal.componen
   exports: [
     TableDataComponent,
     ReusableModalComponent,
+    NavbarComponent,
+    BreadcrumbComponent,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,

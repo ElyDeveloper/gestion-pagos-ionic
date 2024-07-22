@@ -1,5 +1,6 @@
 import { formatDate } from "@angular/common";
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { Column } from "../../interfaces/table";
 
 @Component({
   selector: "app-table-data",
@@ -12,9 +13,10 @@ export class TableDataComponent implements OnInit {
   @Input() currentPage: number = 1;
   @Input() totalPages: number = 10; // Esto debería ser dinámico basado en tus datos
   @Input() visiblePages: number[] = [];
-  @Input() searchTerm: string = "";
   @Input() data: any[] = []; // Aquí deberías recibir los datos a mostrar en la tabla
+  @Input() columnsData: Column[] = []; // Aquí deberías recibir los datos a mostrar en la tabla (cabeceras)
   @Input() title: string = "Sin titulo"; // Aquí deberías recibir los datos a mostrar en la tabla
+  @Input() searchTerm: string = "";
   @Output() addButtonClicked = new EventEmitter<void>();
 
   selectedMonth: number | null = null;
@@ -35,37 +37,112 @@ export class TableDataComponent implements OnInit {
   ];
   years: number[] = [];
 
-  constructor() {
-    
-  }
+  constructor() {}
 
   ngOnInit() {
     this.initCalendar();
+    this.getDataTest();
     this.updateVisiblePages();
+  }
+
+  getDataTest() {
+    //Rellenar columnas de prueba, total de 6 columnas
+    this.columnsData = [
+      {
+        key: "name",
+        alias: "Nombre",
+      },
+      {
+        key: "lastName",
+        alias: "Apellido",
+      },
+      {
+        key: "age",
+        alias: "Edad",
+      },
+      {
+        key: "birthDate",
+        alias: "Fecha de nacimiento",
+      },
+      {
+        key: "address",
+        alias: "Dirección",
+      },
+      {
+        key: "phone",
+        alias: "Teléfono",
+      },
+      {
+        key: "actions",
+        alias: "Acciones",
+      },
+    ];
+    //Rellenar datos de prueba
+    for (let i = 0; i < 15; i++) {
+      this.data.push({
+        name: "Nombre " + i,
+        lastName: "Apellido " + i,
+        age: Math.floor(Math.random() * 100),
+        birthDate: formatDate(new Date(), "dd/MM/yyyy", "en"),
+        address: "Dirección " + i,
+        phone: "Teléfono " + i,
+      });
+    }
   }
 
   initCalendar() {
     this.selectedMonth = new Date().getMonth() + 1;
     this.selectedYear = new Date().getFullYear();
     const currentYear = new Date().getFullYear();
+
+    // this.getYears();
     for (let year = currentYear - 10; year <= currentYear + 10; year++) {
       this.years.push(year);
     }
   }
 
+  getYears() {
+    //TODO: Consultar años desde el backend
+    return this.years;
+  }
+
+  sortData(column: Column) {
+    //TODO: Implementar lógica de ordenamiento
+    // Aquí deberías implementar la lógica de ordenamiento
+    // Por ejemplo, ordenar los datos y actualizar la tabla
+  }
+
   onMonthChange() {
-    console.log('Selected month and year:', this.selectedMonth, this.selectedYear);
+    console.log(
+      "Selected month and year:",
+      this.selectedMonth,
+      this.selectedYear
+    );
     // Realiza aquí la lógica necesaria al cambiar el mes y el año
+    //TODO: Consultar datos desde el backend
   }
 
   onAddButtonClick() {
     this.addButtonClicked.emit();
   }
 
+  onEditButtonClick(data: any) {
+    console.log("Editar:", data);
+    // Aquí deberías abrir un modal o navegar a otra página para editar el elemento
+    //TODO: Implementar lógica de edición
+  }
+
+  onDeleteButtonClick(data: any) {
+    console.log("Eliminar:", data);
+    // Aquí deberías abrir un modal para confirmar la eliminación del elemento
+    //TODO: Implementar lógica de eliminación
+  }
+
   onSearchChange(event: any) {
     console.log("Búsqueda:", this.searchTerm);
     // Aquí puedes implementar la lógica de búsqueda
     // Por ejemplo, filtrar los datos y actualizar la tabla
+    //TODO: Implementar lógica de búsqueda
   }
 
   updateVisiblePages() {

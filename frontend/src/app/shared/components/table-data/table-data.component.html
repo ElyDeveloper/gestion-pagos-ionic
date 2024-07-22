@@ -37,39 +37,41 @@
       <table class="custom-table">
         <thead>
           <tr>
-            <th>Header 1</th>
-            <th>Header 2</th>
-            <th>Header 3</th>
-            <th>Header 4</th>
-            <th>Header 5</th>
-            <th>Header 6</th>
+            <th *ngFor="let column of columnsData">
+              {{ column.alias }}
+              <ion-icon
+                *ngIf="column"
+                name="chevron-down-outline"
+                (click)="sortData(column)"
+                class="sort-icon"
+              ></ion-icon>
+            </th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>Row 1, Cell 1</td>
-            <td>Row 1, Cell 2</td>
-            <td>Row 1, Cell 3</td>
-            <td>Row 1, Cell 4</td>
-            <td>Row 1, Cell 5</td>
-            <td>Row 1, Cell 6</td>
+          <tr *ngFor="let row of data">
+            <td *ngFor="let column of columnsData">
+              <ng-container *ngIf="column.key === 'actions'">
+                <ion-button
+                  color="primary"
+                  (click)="onEditButtonClick(row)"
+                  class="me-2"
+                >
+                  Editar
+                </ion-button>
+                <ion-button
+                  color="danger"
+                  (click)="onDeleteButtonClick(row)"
+                >
+                  Eliminar
+                </ion-button>
+              </ng-container>
+              <ng-container *ngIf="column.key !== 'actions'">
+                {{ row[column.key] }}
+              </ng-container>
+            </td>
           </tr>
-          <tr>
-            <td>Row 2, Cell 1</td>
-            <td>Row 2, Cell 2</td>
-            <td>Row 2, Cell 3</td>
-            <td>Row 2, Cell 4</td>
-            <td>Row 2, Cell 5</td>
-            <td>Row 2, Cell 6</td>
-          </tr>
-          <tr>
-            <td>Row 3, Cell 1</td>
-            <td>Row 3, Cell 2</td>
-            <td>Row 3, Cell 3</td>
-            <td>Row 3, Cell 4</td>
-            <td>Row 3, Cell 5</td>
-            <td>Row 3, Cell 6</td>
-          </tr>
+          
         </tbody>
       </table>
     </div>

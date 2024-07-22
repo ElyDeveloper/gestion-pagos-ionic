@@ -1,0 +1,9 @@
+<ion-breadcrumbs class="mt-5 pt-3">
+  <ion-breadcrumb>
+    <ion-icon slot="start" name="home"></ion-icon>
+    Inicio
+  </ion-breadcrumb>
+  <ion-breadcrumb *ngFor="let segment of segments">
+    {{ segment }}
+  </ion-breadcrumb>
+</ion-breadcrumbs>
