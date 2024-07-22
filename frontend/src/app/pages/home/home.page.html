@@ -1,40 +1,4 @@
-<section>
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Crear cuenta</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-button (click)="setOpen(true)">Open</ion-button>
-
-      <app-reusable-modal
-        [(isOpen)]="isModalOpen"
-        [content]="modalContent"
-        (saveData)="handleSave($event)">
-      </app-reusable-modal>
-
-      <ng-template #modalContent let-close="close" let-save="save">
-        <ion-header>
-          <ion-toolbar>
-            <ion-title>Formulario</ion-title>
-            <ion-buttons slot="end">
-              <ion-button (click)="close()">Cerrar</ion-button>
-            </ion-buttons>
-          </ion-toolbar>
-        </ion-header>
-        <ion-content class="ion-padding">
-          <form [formGroup]="form" (ngSubmit)="save(form.value)">
-            <ion-item>
-              <ion-label position="floating">Nombre</ion-label>
-              <ion-input formControlName="name"></ion-input>
-            </ion-item>
-            <ion-item>
-              <ion-label position="floating">Email</ion-label>
-              <ion-input type="email" formControlName="email"></ion-input>
-            </ion-item>
-            <ion-button expand="block" type="submit" [disabled]="!form.valid">Guardar</ion-button>
-          </form>
-        </ion-content>
-      </ng-template>
-    </ion-card-content>
-  </ion-card>
-</section>
+<ion-content [fullscreen]="false">
+  <app-breadcrumb></app-breadcrumb>
+  Hello World, Welcome to the Home Page!
+</ion-content>
