@@ -18,6 +18,7 @@ export class BreadcrumbComponent implements OnInit {
 
   ngOnInit() {
     // Suscribirse a los eventos del router para capturar cambios en la URL
+    this.subscriptions = [];
     this.subscriptions.push(
       this.router.events
         .pipe(
@@ -33,13 +34,14 @@ export class BreadcrumbComponent implements OnInit {
           if (this.segments[0] === "home") {
             this.segments = [];
           }
-
-          console.log("Segments: ", this.segments); // Loggear los segmentos
         })
     );
+
   }
 
   ngOnDestroy() {
+    //Ver cantidad de suscripciones
+    console.log('Suscripciones activas: ',this.subscriptions.length);
     // Desuscribirse de todos los eventos al destruir el componente
     this.subscriptions.forEach((s) => s.unsubscribe());
   }

@@ -13,17 +13,27 @@
       <div class="col-12 col-sm-6 col-md-4 col-lg-3" style="max-width: 250px">
         <label for="monthPicker">Seleccionar Mes</label>
         <div class="d-flex">
-          <select id="monthPicker" class="form-control me-2" [(ngModel)]="selectedMonth" (change)="onMonthChange()">
-            <option *ngFor="let month of months" [value]="month.value">{{ month.name }}</option>
+          <select
+            id="monthPicker"
+            class="form-control me-2"
+            [(ngModel)]="selectedMonth"
+            (change)="onMonthChange()">
+            <option *ngFor="let month of months" [value]="month.value">
+              {{ month.name }}
+            </option>
           </select>
-          <select class="form-control" [(ngModel)]="selectedYear" (change)="onMonthChange()">
-            <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+          <select
+            class="form-control"
+            [(ngModel)]="selectedYear"
+            (change)="onMonthChange()">
+            <option *ngFor="let year of years" [value]="year">
+              {{ year }}
+            </option>
           </select>
         </div>
       </div>
     </div>
-    
-    
+
     <div class="row">
       <ion-searchbar
         placeholder="Buscar..."
@@ -37,14 +47,13 @@
       <table class="custom-table">
         <thead>
           <tr>
-            <th *ngFor="let column of columnsData">
+            <th *ngFor="let column of columnsData" class="text-center">
               {{ column.alias }}
               <ion-icon
                 *ngIf="column"
                 name="chevron-down-outline"
                 (click)="sortData(column)"
-                class="sort-icon"
-              ></ion-icon>
+                class="sort-icon"></ion-icon>
             </th>
           </tr>
         </thead>
@@ -52,26 +61,23 @@
           <tr *ngFor="let row of data">
             <td *ngFor="let column of columnsData">
               <ng-container *ngIf="column.key === 'actions'">
-                <ion-button
-                  color="primary"
-                  (click)="onEditButtonClick(row)"
-                  class="me-2"
-                >
-                  Editar
-                </ion-button>
-                <ion-button
-                  color="danger"
-                  (click)="onDeleteButtonClick(row)"
-                >
-                  Eliminar
-                </ion-button>
+                <div class="d-flex justify-content-around">
+                  <ion-button
+                    color="primary"
+                    (click)="onEditButtonClick(row)"
+                    class="me-2">
+                    Editar
+                  </ion-button>
+                  <ion-button color="danger" (click)="onDeleteButtonClick(row)">
+                    Eliminar
+                  </ion-button>
+                </div>
               </ng-container>
               <ng-container *ngIf="column.key !== 'actions'">
                 {{ row[column.key] }}
               </ng-container>
             </td>
           </tr>
-          
         </tbody>
       </table>
     </div>
