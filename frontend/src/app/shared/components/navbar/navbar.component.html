@@ -10,15 +10,17 @@
     </ion-avatar>
     <!-- Desplegable para cerrar sesión -->
     <ion-buttons slot="end">
-      <ion-select
-        placeholder="{{user.name}}"
-        interface="popover"
-        [(ngModel)]="selectionProfile"
-        (ionChange)="getSelection()">
-        <ion-select-option value="logout" (click)="logout()"
-          >Cerrar Sesión</ion-select-option
-        >
-      </ion-select>
+      <ion-button (click)="setOpen(true)">
+        {{user.name}}
+        <ion-icon slot="icon-only" name="log-out"></ion-icon>
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
+
+<ion-action-sheet
+  [isOpen]="isActionSheetOpen"
+  header="Opciones"
+  [buttons]="actionSheetButtons"
+  (didDismiss)="setOpen(false)"
+></ion-action-sheet>

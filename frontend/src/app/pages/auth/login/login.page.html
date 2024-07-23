@@ -8,7 +8,7 @@
   <!-- Crear login -->
   <div class="container" id="container">
     <div class="row d-flex justify-content-center align-content-center">
-      <ion-card style="max-width: 350px; background-color: #616161;" >
+      <ion-card style="max-width: 350px; background-color: #b3b3b3;" >
         <ion-card-header>
           <ion-card-title class="text-white">Iniciar Sesión</ion-card-title>
         </ion-card-header>
@@ -21,14 +21,21 @@
           </div>
           <ion-item class="text-white">
             <ion-label position="floating">Email</ion-label>
-            <ion-input type="email" [(ngModel)]="user.email"></ion-input>
+            <ion-input type="email" [(ngModel)]="user.email" (ionBlur)="validateForm()"></ion-input>
           </ion-item>
+          <ion-text color="danger" *ngIf="formErrors.email">
+            {{ formErrors.email }}
+          </ion-text>
+          
           <ion-item class="text-white">
             <ion-label position="floating">Password</ion-label>
-            <ion-input type="password" [(ngModel)]="user.password">
+            <ion-input type="password" [(ngModel)]="user.password" (ionBlur)="validateForm()">
               <ion-input-password-toggle slot="end"></ion-input-password-toggle>
             </ion-input>
           </ion-item>
+          <ion-text color="danger" *ngIf="formErrors.password">
+            {{ formErrors.password }}
+          </ion-text>
           <ion-button class="mt-2" expand="block" (click)="login()">Entrar</ion-button>
           <ion-button class="mt-2" expand="block" fill="clear" color="light" (click)="goToForgotPassword()">
             ¿Olvidaste tu contraseña?
@@ -37,4 +44,11 @@
       </ion-card>
     </div>
   </div>
+
+  <ion-toast
+    [isOpen]="isToastOpen"
+    message= "{{toastMessage}}"
+    [duration]="5000"
+    (didDismiss)="setOpenedToast(false)"
+  ></ion-toast>
 </ion-content>

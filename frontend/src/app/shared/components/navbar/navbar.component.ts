@@ -15,7 +15,27 @@ export class NavbarComponent implements OnInit {
     email: "john@gmail.com",
   };
 
-  segments: any[] = [];
+  isActionSheetOpen = false;
+
+  public actionSheetButtons = [
+    {
+      text: "Cerrar Sesión",
+      role: "destructive",
+      handler: () => {
+        this.logout();
+      },
+      data: {
+        action: "logout",
+      },
+    },
+    {
+      text: "Cancel",
+      role: "cancel",
+      data: {
+        action: "cancel",
+      },
+    },
+  ];
 
   constructor() {}
 
@@ -25,18 +45,12 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit() {}
 
+  setOpen(isOpen: boolean) {
+    this.isActionSheetOpen = isOpen;
+  }
+
   logout() {
     console.log("logout");
     this.router.navigate(["/login"]);
-  }
-
-  getSelection() {
-    switch (this.selectionProfile) {
-      case "logout":
-        this.logout();
-        break;
-      default:
-        break;
-    }
   }
 }
