@@ -11,7 +11,7 @@ export class NavbarComponent implements OnInit {
   selectionProfile: any;
   private router = inject(Router);
   user = {
-    name: "John Doe",
+    name: "Gerson Rivera",
     email: "john@gmail.com",
   };
 
