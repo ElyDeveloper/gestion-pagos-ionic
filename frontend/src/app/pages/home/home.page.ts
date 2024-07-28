@@ -1,5 +1,11 @@
-import { Component, ViewChild, TemplateRef } from "@angular/core";
+import { Component, ViewChild, TemplateRef, inject } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { NavController } from "@ionic/angular";
+
+interface Folder {
+  name: string;
+  count: number;
+}
 
 @Component({
   selector: "app-home",
@@ -7,23 +13,34 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms";
   styleUrls: ["./home.page.scss"],
 })
 export class HomePage {
-  isModalOpen = false;
-  @ViewChild("modalContent", { static: true }) modalContent!: TemplateRef<any>;
-  form: FormGroup;
+  folders: Folder[] = [
+    { name: "Usuarios", count: 0 },
+    { name: "Clientes", count: 0 },
+    { name: "Contratos Pago", count: 0 },
+    { name: "Prestamos", count: 0 },
+    { name: "Pagos", count: 0 },
+    { name: "Reportes", count: 0 },
+  ];
 
-  constructor(private fb: FormBuilder) {
-    this.form = this.fb.group({
-      name: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]]
-    });
+  private navCtrl = inject(NavController);
+
+  constructor() {}
+
+  ngOnInit(): void {
+    this.updateFolderCounts();
   }
 
-  setOpen(isOpen: boolean) {
-    this.isModalOpen = isOpen;
+  async updateFolderCounts() {
+    // Aquí deberías llamar a tu servicio o API para obtener los conteos reales
+    // Por ahora, usaremos números aleatorios como ejemplo
+    for (let folder of this.folders) {
+      folder.count = Math.floor(Math.random() * 100);
+    }
   }
 
-  handleSave(data: any) {
-    console.log('Datos guardados:', data);
-    // Aquí puedes procesar los datos como necesites
+  openFolder(folderName: string) {
+    console.log(`Abriendo carpeta: ${folderName}`);
+    // Aquí puedes agregar la lógica para abrir cada carpeta
+    // this.navCtrl.navigateForward(`/${folderName.toLowerCase()}`);
   }
 }

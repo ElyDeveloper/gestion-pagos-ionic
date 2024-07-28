@@ -1,4 +1,23 @@
 <ion-content [fullscreen]="false">
   <app-breadcrumb></app-breadcrumb>
-  Hello World, Welcome to the Home Page!
+
+  <ion-grid>
+    <ion-row>
+      <ion-col size="6" size-md="2" *ngFor="let folder of folders">
+        <ion-card (click)="openFolder(folder.name)" class="folder-card">
+          <ion-card-header>
+            <div class="d-flex justify-content-between">
+              <ion-icon name="folder" size="large"></ion-icon>
+              <div>
+                <ion-badge color="primary">{{ folder.count }}</ion-badge>
+              </div>
+            </div>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-label>{{ folder.name }}</ion-label>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>
