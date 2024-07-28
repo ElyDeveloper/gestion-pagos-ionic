@@ -18,8 +18,6 @@ export class ClientesPage implements OnInit {
     });
   }
 
-  
-
   onAddButtonClicked() {
     this.isModalOpen = true;
   }

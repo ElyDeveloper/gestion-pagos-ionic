@@ -8,7 +8,7 @@
   <!-- Crear login -->
   <div class="container" id="container">
     <div class="row d-flex justify-content-center align-content-center">
-      <ion-card style="max-width: 350px; background-color: #b3b3b3;" >
+      <ion-card style="max-width: 350px;" >
         <ion-card-header>
           <ion-card-title class="text-white">Iniciar Sesión</ion-card-title>
         </ion-card-header>
@@ -21,7 +21,7 @@
           </div>
           <ion-item class="text-white">
             <ion-label position="floating">Email</ion-label>
-            <ion-input type="email" [(ngModel)]="user.email" (ionBlur)="validateForm()"></ion-input>
+            <ion-input type="email" [(ngModel)]="user.identificator" (ionBlur)="validateForm()" (keyup)="goToLogin($event)"></ion-input>
           </ion-item>
           <ion-text color="danger" *ngIf="formErrors.email">
             {{ formErrors.email }}
@@ -29,7 +29,7 @@
           
           <ion-item class="text-white">
             <ion-label position="floating">Password</ion-label>
-            <ion-input type="password" [(ngModel)]="user.password" (ionBlur)="validateForm()">
+            <ion-input type="password" [(ngModel)]="user.password" (ionBlur)="validateForm()" (keyup)="goToLogin($event)">
               <ion-input-password-toggle slot="end"></ion-input-password-toggle>
             </ion-input>
           </ion-item>
