@@ -1,4 +1,5 @@
 <ion-content [fullscreen]="true">
+  <app-loader [textLoader]="textLoader"></app-loader>
   <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large"></ion-title>
@@ -8,36 +9,57 @@
   <!-- Crear login -->
   <div class="container" id="container">
     <div class="row d-flex justify-content-center align-content-center">
-      <ion-card style="max-width: 350px;" >
+      <ion-card style="max-width: 350px">
         <ion-card-header>
-          <ion-card-title class="text-white">Iniciar Sesión</ion-card-title>
+          <ion-card-title>Iniciar Sesión</ion-card-title>
         </ion-card-header>
         <ion-card-content>
           <!-- Logo de la app -->
           <div class="d-flex justify-content-center">
-            <div class="rounded rounded-pill justify-content-center align-content-center align-items-center " style="height: 150px; width: 150px; background-color: rgb(255, 255, 255);">
+            <div
+              class="rounded rounded-pill justify-content-center align-content-center align-items-center"
+              style="
+                height: 150px;
+                width: 150px;
+                background-color: rgb(255, 255, 255);
+              ">
               <img width="250" src="assets/logo.png" alt="logo" />
             </div>
           </div>
-          <ion-item class="text-white">
+          <ion-item>
             <ion-label position="floating">Email</ion-label>
-            <ion-input type="email" [(ngModel)]="user.identificator" (ionBlur)="validateForm()" (keyup)="goToLogin($event)"></ion-input>
+            <ion-input
+              type="email"
+              [(ngModel)]="user.identificator"
+              (ionBlur)="validateForm()"
+              (keyup)="goToLogin($event)"></ion-input>
           </ion-item>
           <ion-text color="danger" *ngIf="formErrors.email">
             {{ formErrors.email }}
           </ion-text>
-          
-          <ion-item class="text-white">
+
+          <ion-item>
             <ion-label position="floating">Password</ion-label>
-            <ion-input type="password" [(ngModel)]="user.password" (ionBlur)="validateForm()" (keyup)="goToLogin($event)">
+            <ion-input
+              type="password"
+              [(ngModel)]="user.password"
+              (ionBlur)="validateForm()"
+              (keyup)="goToLogin($event)">
               <ion-input-password-toggle slot="end"></ion-input-password-toggle>
             </ion-input>
           </ion-item>
           <ion-text color="danger" *ngIf="formErrors.password">
             {{ formErrors.password }}
           </ion-text>
-          <ion-button class="mt-2" expand="block" (click)="login()">Entrar</ion-button>
-          <ion-button class="mt-2" expand="block" fill="clear" color="light" (click)="goToForgotPassword()">
+          <ion-button class="mt-2" expand="block" (click)="login()"
+            >Entrar</ion-button
+          >
+          <ion-button
+            class="mt-2"
+            expand="block"
+            fill="clear"
+            color="light"
+            (click)="goToForgotPassword()">
             ¿Olvidaste tu contraseña?
           </ion-button>
         </ion-card-content>
@@ -47,8 +69,7 @@
 
   <ion-toast
     [isOpen]="isToastOpen"
-    message= "{{toastMessage}}"
+    message="{{toastMessage}}"
     [duration]="5000"
-    (didDismiss)="setOpenedToast(false)"
-  ></ion-toast>
+    (didDismiss)="setOpenedToast(false)"></ion-toast>
 </ion-content>

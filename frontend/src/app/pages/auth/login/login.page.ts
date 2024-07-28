@@ -1,10 +1,11 @@
-import { Component, inject, OnInit } from "@angular/core";
+import { Component, inject, OnInit, ViewChild } from "@angular/core";
 import { Router } from "@angular/router";
 import { SplashScreen } from "@capacitor/splash-screen";
 import { ValidatorFn, AbstractControl } from "@angular/forms";
 import { GlobalService } from "src/app/shared/services/global.service";
 import { CookieService } from "ngx-cookie-service";
 import { key } from "src/app/libraries/key.library";
+import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
 
 interface Login {
   identificator: string;
@@ -17,6 +18,8 @@ interface Login {
   styleUrls: ["./login.page.scss"],
 })
 export class LoginPage implements OnInit {
+  @ViewChild(LoaderComponent) loaderComponent!: LoaderComponent;
+  textLoader: string = "Cargando";
   user: Login = {
     identificator: "",
     password: "",
@@ -46,6 +49,8 @@ export class LoginPage implements OnInit {
         autoHide: true,
       });
 
+      this.textLoader = "Iniciando Sesión";
+      this.loaderComponent.show();
       //TODO: Conectar con el Backend
       this._globalService.Post("login", this.user).subscribe((result: any) => {
         if (result?.token) {
@@ -57,12 +62,16 @@ export class LoginPage implements OnInit {
           );
           localStorage.setItem("user", result.usuario);
           localStorage.setItem("rol", result.rol);
+          //Set timeout de 2 segundos
           setTimeout(() => {
+            this.loaderComponent.hide();
             this.toastMessage = "Bienvenido " + this.user.identificator;
             this.setOpenedToast(true);
             this._router.navigate(["/layout"]);
           }, 2000);
         } else {
+          this.loaderComponent.hide();
+
           this.toastMessage = "Usuario o contraseña incorrectos.";
           this.setOpenedToast(true);
         }
@@ -86,7 +95,7 @@ export class LoginPage implements OnInit {
     this._router.navigate(["/forgot-password"]);
   }
 
-  goToLogin(event:any) {
+  goToLogin(event: any) {
     //verificar si presiono enter
     if (event.type === "keyup" && event.keyCode === 13) {
       this.login();
