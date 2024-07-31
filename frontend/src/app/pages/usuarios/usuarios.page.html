@@ -5,7 +5,13 @@
       [currentPage]="1"
       [totalPages]="10"
       [title]="'Usuarios'"
-      (addButtonClicked)="onAddButtonClicked()">
+      [data]="elements"
+      [columnsData]="columnsData"
+      [currentPage]="currentPage"
+      [totalPages]="totalPages"
+      (addButtonClicked)="onAddButtonClicked()"
+      (currentPageOut)="onPageChange($event)">
+      >
     </app-table-data>
 
     <app-reusable-modal
@@ -25,17 +31,108 @@
       </ion-header>
       <ion-content class="ion-padding">
         <form [formGroup]="form" (ngSubmit)="save(form.value)">
-          <ion-item>
-            <ion-label position="floating">Nombre</ion-label>
-            <ion-input formControlName="name"></ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-label position="floating">Email</ion-label>
-            <ion-input type="email" formControlName="email"></ion-input>
-          </ion-item>
-          <ion-button expand="block" type="submit" [disabled]="!form.valid"
-            >Guardar</ion-button
-          >
+          <ion-grid>
+            <ion-row>
+              <ion-col size-xs="12" size-sm="6" size-md="4">
+                <ion-item>
+                  <ion-select formControlName="rolid" label="Rol">
+                    <!-- Opciones de roles aquí -->
+                    @for (item of roles; track item.id) {
+                    <ion-select-option value="item.id"
+                      >{{item.nombre}}
+                    </ion-select-option>
+
+                    } @empty {
+                    <ion-select-option value="0"
+                      >No hay roles</ion-select-option
+                    >
+                    }
+                  </ion-select>
+                </ion-item>
+              </ion-col>
+
+              <ion-col size-xs="12" size-sm="6" size-md="4">
+                <ion-item>
+                  <ion-input
+                    label="Nombre:"
+                    formControlName="nombre"></ion-input>
+                </ion-item>
+              </ion-col>
+
+              <ion-col size-xs="12" size-sm="6" size-md="4">
+                <ion-item>
+                  <ion-input
+                    label="Apellido:"
+                    formControlName="apellido"></ion-input>
+                </ion-item>
+              </ion-col>
+
+              <ion-col size-xs="12" size-sm="6" size-md="4">
+                <ion-item>
+                  <ion-input
+                    label="Télefono:"
+                    type="tel"
+                    formControlName="telefono"></ion-input>
+                </ion-item>
+              </ion-col>
+
+              <ion-col size-xs="12" size-sm="6" size-md="4">
+                <ion-item>
+                  <ion-input
+                    label="Correo:"
+                    type="email"
+                    formControlName="correo"></ion-input>
+                </ion-item>
+              </ion-col>
+
+              <ion-col size-xs="12" size-sm="6" size-md="4">
+                <ion-item>
+                  <ion-select
+                    label="Tipo de Usuario"
+                    formControlName="tipoUsuario">
+                    <!-- Opciones de tipos de usuario aquí -->
+                  </ion-select>
+                </ion-item>
+              </ion-col>
+
+              <ion-col size-xs="12" size-md="6">
+                <ion-item>
+                  <ion-textarea
+                    label="Observación:"
+                    formControlName="observacion"
+                    rows="3"></ion-textarea>
+                </ion-item>
+              </ion-col>
+
+              <ion-col size-xs="6" size-md="3">
+                <ion-item lines="none">
+                  <ion-label>AD</ion-label>
+                  <ion-toggle formControlName="ad"></ion-toggle>
+                </ion-item>
+              </ion-col>
+
+              <ion-col size-xs="6" size-md="3">
+                <ion-item lines="none">
+                  <ion-label>Estado</ion-label>
+                  <ion-toggle formControlName="estado"></ion-toggle>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+
+          <ion-grid>
+            <ion-row class="ion-justify-content-center">
+              <ion-col size-xs="12" size-sm="8" size-md="6" size-lg="4">
+                <ion-button
+                  expand="block"
+                  type="submit"
+                  [disabled]="!form.valid"
+                  class="ion-margin-top">
+                  Guardar
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
         </form>
       </ion-content>
     </ng-template>

@@ -1,6 +1,6 @@
 <ion-card>
   <ion-card-header>
-    <ion-card-title>{{ title }} </ion-card-title>
+    <ion-card-title>{{ title }}</ion-card-title>
 
     <div class="row d-flex justify-content-end" *ngIf="showAdd">
       <div style="width: 150px">
@@ -49,11 +49,6 @@
           <tr>
             <th *ngFor="let column of columnsData" class="text-center">
               {{ column.alias }}
-              <ion-icon
-                *ngIf="column"
-                name="chevron-down-outline"
-                (click)="sortData(column)"
-                class="sort-icon"></ion-icon>
             </th>
           </tr>
         </thead>
@@ -74,7 +69,20 @@
                 </div>
               </ng-container>
               <ng-container *ngIf="column.key !== 'actions'">
-                {{ row[column.key] }}
+                <ng-container
+                  *ngIf="column.type === 'boolean'; else defaultContent">
+                  <span
+                    class="badge"
+                    [ngClass]="{
+                      'text-bg-success': row[column.key],
+                      'text-bg-secondary': !row[column.key]
+                    }">
+                    {{ row[column.key] ? "Activo" : "Inactivo" }}
+                  </span>
+                </ng-container>
+                <ng-template #defaultContent>
+                  {{ row[column.key] }}
+                </ng-template>
               </ng-container>
             </td>
           </tr>

@@ -18,6 +18,9 @@ export class TableDataComponent implements OnInit {
   @Input() title: string = "Sin titulo"; // Aquí deberías recibir los datos a mostrar en la tabla
   @Input() searchTerm: string = "";
   @Output() addButtonClicked = new EventEmitter<void>();
+  @Output() editButtonClicked = new EventEmitter<any>();
+  @Output() deleteButtonClicked = new EventEmitter<any>();
+  @Output() currentPageOut = new EventEmitter<number>();
 
   selectedMonth: number | null = null;
   selectedYear: number | null = null;
@@ -45,49 +48,12 @@ export class TableDataComponent implements OnInit {
     this.updateVisiblePages();
   }
 
+  changePage(page: number) {
+    this.currentPageOut.emit(page);
+  }
+
   getDataTest() {
-    //Rellenar columnas de prueba, total de 6 columnas
-    this.columnsData = [
-      {
-        key: "name",
-        alias: "Nombre",
-      },
-      {
-        key: "lastName",
-        alias: "Apellido",
-      },
-      {
-        key: "age",
-        alias: "Edad",
-      },
-      {
-        key: "birthDate",
-        alias: "Fecha de nacimiento",
-      },
-      {
-        key: "address",
-        alias: "Dirección",
-      },
-      {
-        key: "phone",
-        alias: "Teléfono",
-      },
-      {
-        key: "actions",
-        alias: "Acciones",
-      },
-    ];
-    //Rellenar datos de prueba
-    for (let i = 0; i < 15; i++) {
-      this.data.push({
-        name: "Nombre " + i,
-        lastName: "Apellido " + i,
-        age: Math.floor(Math.random() * 100),
-        birthDate: formatDate(new Date(), "dd/MM/yyyy", "en"),
-        address: "Dirección " + i,
-        phone: "Teléfono " + i,
-      });
-    }
+    console.log("Data deste el componente de tabla:", this.data);
   }
 
   initCalendar() {
@@ -162,6 +128,7 @@ export class TableDataComponent implements OnInit {
   goToPage(page: number) {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
+      this.currentPageOut.emit(this.currentPage);
       this.updateVisiblePages();
       // Aquí deberías cargar los datos correspondientes a la página seleccionada
     }

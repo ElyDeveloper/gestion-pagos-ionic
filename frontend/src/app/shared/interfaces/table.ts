@@ -6,6 +6,7 @@ export interface Table {
 export interface Column{
   key: string;
   alias: string;
+  type?: string;
 }
 
 export interface Row {
