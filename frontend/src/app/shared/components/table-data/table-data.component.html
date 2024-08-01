@@ -54,7 +54,7 @@
         </thead>
         <tbody>
           <tr *ngFor="let row of data">
-            <td *ngFor="let column of columnsData">
+            <td *ngFor="let column of columnsData" class="text-center">
               <ng-container *ngIf="column.key === 'actions'">
                 <div class="d-flex justify-content-around">
                   <ion-button
@@ -68,21 +68,37 @@
                   </ion-button>
                 </div>
               </ng-container>
-              <ng-container *ngIf="column.key !== 'actions'">
-                <ng-container
-                  *ngIf="column.type === 'boolean'; else defaultContent">
+              <ng-container [ngSwitch]="column.type">
+                <ng-container *ngSwitchCase="'actions'">
+                  <div class="d-flex justify-content-around">
+                    <ion-button
+                      color="primary"
+                      (click)="onEditButtonClick(row)"
+                      class="me-2">
+                      Editar
+                    </ion-button>
+                    <ion-button
+                      color="danger"
+                      (click)="onDeleteButtonClick(row)">
+                      Eliminar
+                    </ion-button>
+                  </div>
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'boolean'">
                   <span
                     class="badge"
                     [ngClass]="{
-                      'text-bg-success': row[column.key],
-                      'text-bg-secondary': !row[column.key]
+                      'text-bg-success': getCellValue(row, column.key),
+                      'text-bg-secondary': !getCellValue(row, column.key)
                     }">
-                    {{ row[column.key] ? "Activo" : "Inactivo" }}
+                    {{ getCellValue(row, column.key) ? "Activo" : "Inactivo" }}
                   </span>
                 </ng-container>
-                <ng-template #defaultContent>
-                  {{ row[column.key] }}
-                </ng-template>
+
+                <ng-container *ngSwitchDefault>
+                  {{ getCellValue(row, column.key) }}
+                </ng-container>
               </ng-container>
             </td>
           </tr>

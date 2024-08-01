@@ -1,5 +1,5 @@
 import { formatDate } from "@angular/common";
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from "@angular/core";
 import { Column } from "../../interfaces/table";
 
 @Component({
@@ -44,16 +44,21 @@ export class TableDataComponent implements OnInit {
 
   ngOnInit() {
     this.initCalendar();
-    this.getDataTest();
     this.updateVisiblePages();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['totalPages']) {
+      this.updateVisiblePages();
+    }
+  }
+
+  getCellValue(row: any, key: string): any {
+    return key.split('.').reduce((o, k) => (o || {})[k], row);
   }
 
   changePage(page: number) {
     this.currentPageOut.emit(page);
-  }
-
-  getDataTest() {
-    console.log("Data deste el componente de tabla:", this.data);
   }
 
   initCalendar() {

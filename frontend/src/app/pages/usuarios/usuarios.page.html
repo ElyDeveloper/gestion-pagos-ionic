@@ -1,4 +1,11 @@
 <ion-content [fullscreen]="false">
+  <app-loader [textLoader]="textLoader"></app-loader>
+  <ion-toast
+    [isOpen]="isToastOpen"
+    message="{{toastMessage}}"
+    [duration]="5000"
+    (didDismiss)="setOpenedToast(false)"></ion-toast>
+
   <app-breadcrumb></app-breadcrumb>
   <section class="container">
     <app-table-data
@@ -33,17 +40,17 @@
         <form [formGroup]="form" (ngSubmit)="save(form.value)">
           <ion-grid>
             <ion-row>
-              <ion-col size-xs="12" size-sm="6" size-md="4">
+              <ion-col size-xs="12" size-sm="6" size-md="6">
                 <ion-item>
                   <ion-select formControlName="rolid" label="Rol">
                     <!-- Opciones de roles aquí -->
                     @for (item of roles; track item.id) {
-                    <ion-select-option value="item.id"
+                    <ion-select-option [value]="item.id"
                       >{{item.nombre}}
                     </ion-select-option>
 
                     } @empty {
-                    <ion-select-option value="0"
+                    <ion-select-option [value]="0"
                       >No hay roles</ion-select-option
                     >
                     }
@@ -51,7 +58,7 @@
                 </ion-item>
               </ion-col>
 
-              <ion-col size-xs="12" size-sm="6" size-md="4">
+              <ion-col size-xs="12" size-sm="6" size-md="6">
                 <ion-item>
                   <ion-input
                     label="Nombre:"
@@ -59,7 +66,7 @@
                 </ion-item>
               </ion-col>
 
-              <ion-col size-xs="12" size-sm="6" size-md="4">
+              <ion-col size-xs="12" size-sm="6" size-md="6">
                 <ion-item>
                   <ion-input
                     label="Apellido:"
@@ -67,7 +74,7 @@
                 </ion-item>
               </ion-col>
 
-              <ion-col size-xs="12" size-sm="6" size-md="4">
+              <ion-col size-xs="12" size-sm="6" size-md="6">
                 <ion-item>
                   <ion-input
                     label="Télefono:"
@@ -76,22 +83,12 @@
                 </ion-item>
               </ion-col>
 
-              <ion-col size-xs="12" size-sm="6" size-md="4">
+              <ion-col size-xs="12" size-sm="6" size-md="6">
                 <ion-item>
                   <ion-input
                     label="Correo:"
                     type="email"
                     formControlName="correo"></ion-input>
-                </ion-item>
-              </ion-col>
-
-              <ion-col size-xs="12" size-sm="6" size-md="4">
-                <ion-item>
-                  <ion-select
-                    label="Tipo de Usuario"
-                    formControlName="tipoUsuario">
-                    <!-- Opciones de tipos de usuario aquí -->
-                  </ion-select>
                 </ion-item>
               </ion-col>
 

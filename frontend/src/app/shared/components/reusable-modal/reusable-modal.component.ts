@@ -3,7 +3,7 @@ import { Component, EventEmitter, Input, Output, TemplateRef } from "@angular/co
 @Component({
   selector: "app-reusable-modal",
   template: `
-    <ion-modal [isOpen]="isOpen" (didDismiss)="onDidDismiss()">
+    <ion-modal [isOpen]="isOpen" (didDismiss)="onDidDismiss()" >
       <ng-container *ngIf="content">
         <ng-container
           *ngTemplateOutlet="content; context: { close: close, save: save }">

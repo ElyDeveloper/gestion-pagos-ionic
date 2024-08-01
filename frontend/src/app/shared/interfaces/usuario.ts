@@ -1,3 +1,5 @@
+import { Rol } from "./rol";
+
 export interface Usuario {
   id?: number;
   rolid?: number;
@@ -7,7 +9,7 @@ export interface Usuario {
   observacion?: string;
   ad?: boolean;
   correo?: string;
-  tipoUsuario?: number;
   estado?: boolean;
   changedPassword?: boolean;
+  rolesUsuario?:Rol;
 }

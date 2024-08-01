@@ -6,7 +6,11 @@ import {
   ViewChild,
 } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { SplashScreen } from "@capacitor/splash-screen";
 import { debounceTime, distinctUntilChanged, Subject } from "rxjs";
+import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
+import { ReusableModalComponent } from "src/app/shared/components/reusable-modal/reusable-modal.component";
+import { TableDataComponent } from "src/app/shared/components/table-data/table-data.component";
 import { Rol } from "src/app/shared/interfaces/rol";
 import { Column } from "src/app/shared/interfaces/table";
 import { Usuario } from "src/app/shared/interfaces/usuario";
@@ -19,6 +23,8 @@ import { FormModels } from "src/app/shared/utils/forms-models";
   styleUrls: ["./usuarios.page.scss"],
 })
 export class UsuariosPage implements OnInit {
+  @ViewChild(LoaderComponent) loaderComponent!: LoaderComponent;
+
   elements: Usuario[] = [];
   currentPage = 1;
   currentPageSize = 10;
@@ -30,8 +36,12 @@ export class UsuariosPage implements OnInit {
   formModels: FormModels;
 
   searchTerm$ = new Subject<string>();
-  search: string = "";
   isModalOpen = false;
+  isToastOpen = false;
+
+  search: string = "";
+  textLoader: string = "Cargando...";
+  toastMessage: string = "Usuario guardado correctamente";
 
   private _globalService = inject(GlobalService);
   @ViewChild("modalContent", { static: true }) modalContent!: TemplateRef<any>;
@@ -50,6 +60,16 @@ export class UsuariosPage implements OnInit {
     this.getCountElements();
     this.buildColumns();
   }
+
+  setOpenedToast(value: boolean) {
+    this.isToastOpen = value;
+  }
+
+  cleanForm() {
+    this.form.reset();
+    this.form = this.formModels.usuarioForm();
+  }
+
   buildColumns() {
     this.columnsData = [
       {
@@ -61,7 +81,7 @@ export class UsuariosPage implements OnInit {
         alias: "Apellido",
       },
       {
-        key: "rolid",
+        key: "rolesUsuario.nombre",
         alias: "Rol",
       },
       {
@@ -71,10 +91,6 @@ export class UsuariosPage implements OnInit {
       {
         key: "correo",
         alias: "Correo Electrónico",
-      },
-      {
-        key: "tipoUsuario",
-        alias: "Tipo de Usuario",
       },
       {
         key: "observacion",
@@ -100,8 +116,34 @@ export class UsuariosPage implements OnInit {
     this.isModalOpen = true;
   }
 
-  handleSave(data: any) {
+  async handleSave(data: any) {
     console.log("Datos guardados:", data);
+    //Eliminar la propiedad id del objeto
+    delete data.id;
+
+    await SplashScreen.show({
+      showDuration: 2000,
+      autoHide: true,
+    });
+
+    this.textLoader = "Guardando Usuario";
+    this.loaderComponent.show();
+    this._globalService.Post("usuarios", data).subscribe({
+      next: (response: any) => {
+        console.log("Usuario guardado:", response);
+        this.isModalOpen = false;
+        this.loaderComponent.hide();
+        this.toastMessage = "Usuario guardado correctamente";
+        this.setOpenedToast(true);
+        this.cleanForm();
+        this.getCountElements();
+      },
+      error: (error) => {
+        console.error("Error al guardar el usuario:", error);
+        this.loaderComponent.hide();
+        this.toastMessage = "Error al guardar el usuario";
+      },
+    });
     // Aquí puedes procesar los datos como necesites
   }
 
@@ -137,15 +179,17 @@ export class UsuariosPage implements OnInit {
     const skip = this.currentPage * this.currentPageSize - this.currentPageSize;
     const limit = this.currentPageSize;
 
-    this._globalService.Get(`usuarios?skip=${skip}&limit=${limit}`).subscribe({
-      next: (response: any) => {
-        this.elements = response;
-        console.log("Elementos obtenidos:", this.elements);
-      },
-      error: (error) => {
-        console.error("Error al obtener los elementos:", error);
-      },
-    });
+    this._globalService
+      .Get(`usuarios/paginated?skip=${skip}&limit=${limit}`)
+      .subscribe({
+        next: (response: any) => {
+          this.elements = response;
+          console.log("Elementos obtenidos:", response);
+        },
+        error: (error) => {
+          console.error("Error al obtener los elementos:", error);
+        },
+      });
   }
 
   getCountElements() {

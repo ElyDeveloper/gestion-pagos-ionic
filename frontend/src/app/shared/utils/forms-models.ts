@@ -91,7 +91,6 @@ export class FormModels {
       observacion: [''],
       ad: [false],
       correo: ['', [Validators.required, Validators.email]],
-      tipoUsuario: [null, Validators.required],
       estado: [true],
       changedPassword: [false]
     });

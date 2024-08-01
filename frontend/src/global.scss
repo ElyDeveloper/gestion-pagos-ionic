@@ -36,7 +36,6 @@
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 // @import "@ionic/angular/css/palettes/dark.system.css";
 
-
 ion-menu-button {
   color: var(--ion-color-primary);
 }
@@ -73,7 +72,7 @@ ion-avatar {
   height: 40px;
 }
 
-ion-item{
+ion-item {
   //Transparente
   --ion-item-background: transparent;
 }
@@ -107,7 +106,6 @@ ion-item{
   color: #fff !important;
 }
 
-
 .pagination {
   .page-item {
     .page-link {
@@ -128,4 +126,8 @@ ion-item{
       opacity: 0.6;
     }
   }
+}
+
+.badge {
+  font-size: 14px !important;
 }
