@@ -44,11 +44,7 @@ export class LoginPage implements OnInit {
 
   async login() {
     if (this.validateForm()) {
-      await SplashScreen.show({
-        showDuration: 2000,
-        autoHide: true,
-      });
-
+    
       this.textLoader = "Iniciando Sesión";
       this.loaderComponent.show();
       //TODO: Conectar con el Backend
@@ -76,15 +72,6 @@ export class LoginPage implements OnInit {
           this.setOpenedToast(true);
         }
       });
-
-      // return;
-      // this.toastMessage = 'Bienvenido ' + this.user.email;
-      // this.setOpenedToast(true);
-
-      // setTimeout(() => {
-      //   this.setOpenedToast(false);
-      //   this._router.navigate(['/layout']);
-      // }, 2000);
     } else {
       this.toastMessage = "Por favor, corrija los errores en el formulario.";
       this.setOpenedToast(true);

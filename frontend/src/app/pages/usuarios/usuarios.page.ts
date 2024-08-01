@@ -7,7 +7,7 @@ import {
 } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { SplashScreen } from "@capacitor/splash-screen";
-import { debounceTime, distinctUntilChanged, Subject } from "rxjs";
+import { debounceTime, distinctUntilChanged, Observable, Subject } from "rxjs";
 import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
 import { ReusableModalComponent } from "src/app/shared/components/reusable-modal/reusable-modal.component";
 import { TableDataComponent } from "src/app/shared/components/table-data/table-data.component";
@@ -32,26 +32,34 @@ export class UsuariosPage implements OnInit {
 
   columnsData: Column[] = []; // Aquí deberías recibir los datos a mostrar en la tabla (cabeceras)
 
-  form: FormGroup;
+  formUser: FormGroup;
+  formResetPswd: FormGroup;
   formModels: FormModels;
 
   searchTerm$ = new Subject<string>();
   isModalOpen = false;
   isToastOpen = false;
+  isEdit = false;
 
   search: string = "";
   textLoader: string = "Cargando...";
   toastMessage: string = "Usuario guardado correctamente";
 
   private _globalService = inject(GlobalService);
-  @ViewChild("modalContent", { static: true }) modalContent!: TemplateRef<any>;
+  @ViewChild("modalAddUser", { static: true }) modalAddUser!: TemplateRef<any>;
+  @ViewChild("modalResetPswd", { static: true })
+  modalResetPswd!: TemplateRef<any>;
 
-  // TODO: Especificos
+  modalSelected: TemplateRef<any> = this.modalAddUser;
+
+  // TODO: Atributos Especificos
   roles: Rol[] = [];
+  isResetPswd = false;
 
   constructor(private fb: FormBuilder) {
     this.formModels = new FormModels(this.fb);
-    this.form = this.formModels.usuarioForm();
+    this.formUser = this.formModels.usuarioForm();
+    this.formResetPswd = this.formModels.resetPswdForm();
   }
 
   ngOnInit() {
@@ -66,8 +74,10 @@ export class UsuariosPage implements OnInit {
   }
 
   cleanForm() {
-    this.form.reset();
-    this.form = this.formModels.usuarioForm();
+    this.formUser.reset();
+    this.formResetPswd.reset();
+    this.formUser = this.formModels.usuarioForm();
+    this.formResetPswd = this.formModels.resetPswdForm();
   }
 
   buildColumns() {
@@ -90,7 +100,7 @@ export class UsuariosPage implements OnInit {
       },
       {
         key: "correo",
-        alias: "Correo Electrónico",
+        alias: "Correo",
       },
       {
         key: "observacion",
@@ -109,42 +119,113 @@ export class UsuariosPage implements OnInit {
       {
         key: "actions",
         alias: "Acciones",
+        type: "pswd",
       },
     ];
   }
-  onAddButtonClicked() {
+
+  private setModalState(
+    isEdit: boolean,
+    isResetPswd: boolean,
+    modalTemplate: any,
+    formData?: any
+  ) {
+    this.isEdit = isEdit;
+    this.isResetPswd = isResetPswd;
+    this.modalSelected = modalTemplate;
     this.isModalOpen = true;
+
+    if (isEdit && formData && !isResetPswd) {
+      this.formUser.patchValue(formData);
+    } else if (!isEdit && !isResetPswd) {
+      this.cleanForm();
+    } else if (isResetPswd) {
+      this.formResetPswd.patchValue(formData);
+    }
   }
 
-  async handleSave(data: any) {
-    console.log("Datos guardados:", data);
-    //Eliminar la propiedad id del objeto
-    delete data.id;
+  onAddButtonClicked() {
+    this.setModalState(false, false, this.modalAddUser);
+  }
 
-    await SplashScreen.show({
-      showDuration: 2000,
-      autoHide: true,
-    });
+  onEditButtonClicked(data: any) {
+    this.setModalState(true, false, this.modalAddUser, data);
+  }
 
-    this.textLoader = "Guardando Usuario";
+  onResetPasswordButtonClicked(data: any) {
+    this.setModalState(false, true, this.modalResetPswd, data);
+  }
+
+  onDeleteButtonClicked(data: any) {
+    console.log("Eliminar usuario Obtenido:", data);
+    this.textLoader = "Eliminando Usuario";
     this.loaderComponent.show();
-    this._globalService.Post("usuarios", data).subscribe({
+    this._globalService.Delete("usuarios", data.id).subscribe({
       next: (response: any) => {
-        console.log("Usuario guardado:", response);
+        console.log("Usuario eliminado:", response);
+        this.getCountElements();
+        this.loaderComponent.hide();
+        this.toastMessage = "Usuario eliminado correctamente";
+        this.setOpenedToast(true);
+      },
+      error: (error: any) => {
+        console.error("Error al eliminar el usuario:", error);
+        this.loaderComponent.hide();
+        this.toastMessage = "Error al eliminar el usuario";
+        this.setOpenedToast(true);
+      },
+    });
+  }
+
+  handleUserOperation(operation: "edit" | "create" | "resetPswd", data: any) {
+    let operationText: string;
+    let apiCall: Observable<any>;
+  
+    switch (operation) {
+      case "edit":
+        operationText = "Editando";
+        apiCall = this._globalService.PutId("usuarios", data.id, data);
+        break;
+      case "create":
+        operationText = "Guardando";
+        apiCall = this._globalService.Post("usuarios", data);
+        break;
+      case "resetPswd":
+        operationText = "Restableciendo contraseña de";
+        apiCall = this._globalService.Post("reset-password", data);
+        break;
+    }
+  
+    this.textLoader = `${operationText} Usuario`;
+    this.loaderComponent.show();
+  
+    apiCall.subscribe({
+      next: (response: any) => {
+        console.log(`Usuario ${operationText.toLowerCase()}:`, response);
         this.isModalOpen = false;
         this.loaderComponent.hide();
-        this.toastMessage = "Usuario guardado correctamente";
+        this.toastMessage = `Usuario ${operationText.toLowerCase()} correctamente`;
         this.setOpenedToast(true);
         this.cleanForm();
         this.getCountElements();
       },
-      error: (error) => {
-        console.error("Error al guardar el usuario:", error);
+      error: (error: any) => {
+        console.error(`Error al ${operationText.toLowerCase()} el usuario:`, error);
         this.loaderComponent.hide();
-        this.toastMessage = "Error al guardar el usuario";
+        this.toastMessage = `Error al ${operationText.toLowerCase()} el usuario`;
       },
     });
-    // Aquí puedes procesar los datos como necesites
+  }
+
+  async handleSave(data: any) {
+    if (this.isEdit && !this.isResetPswd) {
+      this.handleUserOperation("edit", data);
+    } else if (!this.isResetPswd && !this.isEdit) {
+      delete data.id;
+      this.handleUserOperation("create", data);
+    } else if (this.isResetPswd) {
+      this.handleUserOperation("resetPswd", data);
+    }
   }
 
   initSearcher() {

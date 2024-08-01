@@ -1,6 +1,7 @@
 import { Component, ViewChild, TemplateRef, inject } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { NavController } from "@ionic/angular";
+import { GlobalService } from "src/app/shared/services/global.service";
 
 interface Folder {
   name: string;
@@ -24,6 +25,7 @@ export class HomePage {
   ];
 
   private navCtrl = inject(NavController);
+  private _globalService = inject(GlobalService);
 
   constructor() {}
 
@@ -32,11 +34,15 @@ export class HomePage {
   }
 
   async updateFolderCounts() {
-    // Aquí deberías llamar a tu servicio o API para obtener los conteos reales
-    // Por ahora, usaremos números aleatorios como ejemplo
-    for (let folder of this.folders) {
-      folder.count = Math.floor(Math.random() * 100);
-    }
+    this._globalService.Get("usuarios/count").subscribe({
+      next: (data: any) => {
+        this.folders[0].count = data.count;
+      },
+      error: (error) => {
+        console.error("Error al obtener la cantidad de usuarios", error);
+      },
+    });
+    
   }
 
   openFolder(folderName: string) {

@@ -95,4 +95,11 @@ export class FormModels {
       changedPassword: [false]
     });
   }
+
+  resetPswdForm(): FormGroup {
+    return this.fb.group({
+      identificator: ['', Validators.required],
+      newPassword: ['', Validators.required]
+    });
+  }
 }

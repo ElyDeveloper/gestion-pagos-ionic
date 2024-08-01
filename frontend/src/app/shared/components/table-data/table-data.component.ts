@@ -1,6 +1,15 @@
 import { formatDate } from "@angular/common";
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from "@angular/core";
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from "@angular/core";
 import { Column } from "../../interfaces/table";
+import { AlertController } from "@ionic/angular";
 
 @Component({
   selector: "app-table-data",
@@ -20,6 +29,7 @@ export class TableDataComponent implements OnInit {
   @Output() addButtonClicked = new EventEmitter<void>();
   @Output() editButtonClicked = new EventEmitter<any>();
   @Output() deleteButtonClicked = new EventEmitter<any>();
+  @Output() resetPasswordButtonClicked = new EventEmitter<any>();
   @Output() currentPageOut = new EventEmitter<number>();
 
   selectedMonth: number | null = null;
@@ -40,6 +50,7 @@ export class TableDataComponent implements OnInit {
   ];
   years: number[] = [];
 
+  private _alertController = inject(AlertController);
   constructor() {}
 
   ngOnInit() {
@@ -48,13 +59,13 @@ export class TableDataComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['totalPages']) {
+    if (changes["totalPages"]) {
       this.updateVisiblePages();
     }
   }
 
   getCellValue(row: any, key: string): any {
-    return key.split('.').reduce((o, k) => (o || {})[k], row);
+    return key.split(".").reduce((o, k) => (o || {})[k], row);
   }
 
   changePage(page: number) {
@@ -77,12 +88,6 @@ export class TableDataComponent implements OnInit {
     return this.years;
   }
 
-  sortData(column: Column) {
-    //TODO: Implementar lógica de ordenamiento
-    // Aquí deberías implementar la lógica de ordenamiento
-    // Por ejemplo, ordenar los datos y actualizar la tabla
-  }
-
   onMonthChange() {
     console.log(
       "Selected month and year:",
@@ -93,20 +98,49 @@ export class TableDataComponent implements OnInit {
     //TODO: Consultar datos desde el backend
   }
 
+  hasActionsColumn(): boolean {
+    return this.columnsData.some((col) => col.key === "actions");
+  }
+
+  hasResetPswdColumn(): boolean {
+    return this.columnsData.some((col) => col.type === "pswd");
+  }
+
   onAddButtonClick() {
     this.addButtonClicked.emit();
   }
 
   onEditButtonClick(data: any) {
-    console.log("Editar:", data);
-    // Aquí deberías abrir un modal o navegar a otra página para editar el elemento
-    //TODO: Implementar lógica de edición
+    this.editButtonClicked.emit(data);
   }
 
-  onDeleteButtonClick(data: any) {
-    console.log("Eliminar:", data);
-    // Aquí deberías abrir un modal para confirmar la eliminación del elemento
-    //TODO: Implementar lógica de eliminación
+  async onDeleteButtonClick(data: any) {
+    const alert = await this._alertController.create({
+      header: "Eliminar elemento",
+      message: "¿Realmente deseas eliminar este elemento?",
+      buttons: [
+        {
+          text: "Cancelar",
+          role: "cancel",
+          cssClass: "secondary",
+          handler: () => {
+            console.log("Eliminación cancelada");
+          },
+        },
+        {
+          text: "Eliminar",
+          handler: () => {
+            this.deleteButtonClicked.emit(data);
+          },
+        },
+      ],
+    });
+
+    await alert.present();
+  }
+
+  onResetPassword(data: any) { 
+    this.resetPasswordButtonClicked.emit(data);
   }
 
   onSearchChange(event: any) {

@@ -1,7 +1,6 @@
 <ion-card>
   <ion-card-header>
-    <ion-card-title>{{ title }}</ion-card-title>
-
+    <ion-card-title class="d-none d-md-block">{{ title }}</ion-card-title>
     <div class="row d-flex justify-content-end" *ngIf="showAdd">
       <div style="width: 150px">
         <ion-button color="primary" (click)="onAddButtonClick()">
@@ -43,8 +42,14 @@
   </ion-card-header>
 
   <ion-card-content>
-    <div class="table-responsive">
+    <div class="table-responsive d-none d-md-block">
       <table class="custom-table">
+        <caption>
+          Lista de
+          {{
+            title
+          }}
+        </caption>
         <thead>
           <tr>
             <th *ngFor="let column of columnsData" class="text-center">
@@ -66,6 +71,14 @@
                   <ion-button color="danger" (click)="onDeleteButtonClick(row)">
                     Eliminar
                   </ion-button>
+                  <ion-button
+                    expand="block"
+                    (click)="onResetPassword(row)"
+                    *ngIf="hasResetPswdColumn()"
+                    color="tertiary">
+                    <ion-icon class="pe-1" name="key"></ion-icon>
+                    <ion-label>Restablecer Contraseña</ion-label>
+                  </ion-button>
                 </div>
               </ng-container>
               <ng-container [ngSwitch]="column.type">
@@ -81,6 +94,14 @@
                       color="danger"
                       (click)="onDeleteButtonClick(row)">
                       Eliminar
+                    </ion-button>
+                    <ion-button
+                      expand="block"
+                      (click)="onResetPassword(row)"
+                      *ngIf="hasResetPswdColumn()"
+                      color="tertiary">
+                      <ion-icon class="pe-1" name="key"></ion-icon>
+                      <ion-label>Restablecer Contraseña</ion-label>
                     </ion-button>
                   </div>
                 </ng-container>
@@ -105,45 +126,91 @@
         </tbody>
       </table>
     </div>
-    <div class="d-flex justify-content-center">
-      <nav aria-label="Page navigation" class="mt-3">
-        <ul class="pagination justify-content-end">
-          <li class="page-item" [class.disabled]="currentPage === 1">
-            <a
-              class="page-link"
-              (click)="previousPage()"
-              role="button"
-              tabindex="0"
-              ><ion-icon name="arrow-back-outline"></ion-icon
-            ></a>
-          </li>
-          <li class="page-item" *ngIf="visiblePages[0] > 1">
-            <span class="page-link">...</span>
-          </li>
-          <li
-            class="page-item"
-            *ngFor="let page of visiblePages"
-            [class.active]="page === currentPage">
-            <a
-              class="page-link"
-              (click)="goToPage(page)"
-              role="button"
-              tabindex="0"
-              >{{ page }}</a
-            >
-          </li>
-          <li
-            class="page-item"
-            *ngIf="visiblePages[visiblePages.length - 1] < totalPages">
-            <span class="page-link">...</span>
-          </li>
-          <li class="page-item" [class.disabled]="currentPage === totalPages">
-            <a class="page-link" (click)="nextPage()" role="button" tabindex="0"
-              ><ion-icon name="arrow-forward-outline"></ion-icon
-            ></a>
-          </li>
-        </ul>
-      </nav>
-    </div>
   </ion-card-content>
 </ion-card>
+
+<!-- Seccion de vista movil -->
+<section class="d-md-none">
+  <ion-card *ngFor="let row of data">
+    <ion-card-content>
+      <ion-item *ngFor="let column of columnsData" lines="none">
+        <ng-container *ngIf="column.key !== 'actions'">
+          <ion-label>{{ column.alias }}</ion-label>
+          <ng-container [ngSwitch]="column.type">
+            <ng-container *ngSwitchCase="'boolean'">
+              <ion-badge
+                [color]="getCellValue(row, column.key) ? 'success' : 'medium'">
+                {{ getCellValue(row, column.key) ? "Activo" : "Inactivo" }}
+              </ion-badge>
+            </ng-container>
+            <ng-container *ngSwitchDefault>
+              <ion-note slot="end">{{
+                getCellValue(row, column.key)
+              }}</ion-note>
+            </ng-container>
+          </ng-container>
+        </ng-container>
+      </ion-item>
+    </ion-card-content>
+    <ion-card-content *ngIf="hasActionsColumn()">
+      <ion-button
+        expand="block"
+        color="primary"
+        (click)="onEditButtonClick(row)"
+        >Editar</ion-button
+      >
+      <ion-button
+        expand="block"
+        color="danger"
+        (click)="onDeleteButtonClick(row)">
+        Eliminar</ion-button
+      >
+      <ion-button
+        expand="block"
+        (click)="onResetPassword(row)"
+        *ngIf="hasResetPswdColumn()"
+        color="tertiary">
+        <ion-icon class="pe-1" name="key"></ion-icon>
+        <ion-label>Restablecer Contraseña</ion-label>
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+</section>
+
+<!-- Seccion de paginacion -->
+<section class="d-flex justify-content-center">
+  <nav aria-label="Page navigation" class="mt-3">
+    <ul class="pagination justify-content-end">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <a class="page-link" (click)="previousPage()" role="button" tabindex="0"
+          ><ion-icon name="arrow-back-outline"></ion-icon
+        ></a>
+      </li>
+      <li class="page-item" *ngIf="visiblePages[0] > 1">
+        <span class="page-link">...</span>
+      </li>
+      <li
+        class="page-item"
+        *ngFor="let page of visiblePages"
+        [class.active]="page === currentPage">
+        <a
+          class="page-link"
+          (click)="goToPage(page)"
+          role="button"
+          tabindex="0"
+          >{{ page }}</a
+        >
+      </li>
+      <li
+        class="page-item"
+        *ngIf="visiblePages[visiblePages.length - 1] < totalPages">
+        <span class="page-link">...</span>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <a class="page-link" (click)="nextPage()" role="button" tabindex="0"
+          ><ion-icon name="arrow-forward-outline"></ion-icon
+        ></a>
+      </li>
+    </ul>
+  </nav>
+</section>

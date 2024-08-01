@@ -17,17 +17,20 @@
       [currentPage]="currentPage"
       [totalPages]="totalPages"
       (addButtonClicked)="onAddButtonClicked()"
+      (editButtonClicked)="onEditButtonClicked($event)"
+      (deleteButtonClicked)="onDeleteButtonClicked($event)"
+      (resetPasswordButtonClicked)="onResetPasswordButtonClicked($event)"
       (currentPageOut)="onPageChange($event)">
       >
     </app-table-data>
 
     <app-reusable-modal
       [(isOpen)]="isModalOpen"
-      [content]="modalContent"
+      [content]="modalSelected"
       (saveData)="handleSave($event)">
     </app-reusable-modal>
 
-    <ng-template #modalContent let-close="close" let-save="save">
+    <ng-template #modalAddUser let-close="close" let-save="save">
       <ion-header>
         <ion-toolbar>
           <ion-title>Formulario de Usuarios</ion-title>
@@ -37,7 +40,7 @@
         </ion-toolbar>
       </ion-header>
       <ion-content class="ion-padding">
-        <form [formGroup]="form" (ngSubmit)="save(form.value)">
+        <form [formGroup]="formUser" (ngSubmit)="save(formUser.value)">
           <ion-grid>
             <ion-row>
               <ion-col size-xs="12" size-sm="6" size-md="6">
@@ -123,9 +126,64 @@
                 <ion-button
                   expand="block"
                   type="submit"
-                  [disabled]="!form.valid"
+                  [disabled]="!formUser.valid"
                   class="ion-margin-top">
                   Guardar
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </form>
+      </ion-content>
+    </ng-template>
+
+    <ng-template #modalResetPswd let-close="close" let-save="save">
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Restablecer Contraseña</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="close()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <form
+          [formGroup]="formResetPswd"
+          (ngSubmit)="save(formResetPswd.value)">
+          <ion-grid>
+            <ion-row>
+              <ion-col size-xs="12" size-sm="12" size-md="12">
+                <ion-item>
+                  <ion-input
+                    label="Identificador"
+                    labelPlacement="floating"
+                    formControlName="identificator"
+                    placeholder="Correo electrónico o nombre de usuario">
+                  </ion-input>
+                </ion-item>
+              </ion-col>
+
+              <ion-col size-xs="12" size-sm="12" size-md="12">
+                <ion-item>
+                  <ion-label position="floating">Nueva Contraseña</ion-label>
+                  <ion-input type="password" formControlName="newPassword">
+                    <ion-input-password-toggle
+                      slot="end"></ion-input-password-toggle>
+                  </ion-input>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+
+          <ion-grid>
+            <ion-row class="ion-justify-content-center">
+              <ion-col size-xs="12" size-sm="8" size-md="6" size-lg="4">
+                <ion-button
+                  expand="block"
+                  type="submit"
+                  [disabled]="!formResetPswd.valid"
+                  class="ion-margin-top">
+                  Restablecer Contraseña
                 </ion-button>
               </ion-col>
             </ion-row>
