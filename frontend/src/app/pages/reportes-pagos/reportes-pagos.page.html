@@ -1,14 +1,14 @@
 <ion-content [fullscreen]="false">
   <app-breadcrumb></app-breadcrumb>
   <section class="container">
-    <app-table-data
+    <app-view-data
       [currentPage]="1"
       [totalPages]="10"
       [title]="'Reportes'"
       [showAdd]="false"
       [showCalendar]="true"
       (addButtonClicked)="onAddButtonClicked()">
-    </app-table-data>
+    </app-view-data>
 
     <app-reusable-modal
       [(isOpen)]="isModalOpen"

@@ -10,13 +10,14 @@ import {
 } from "@angular/core";
 import { Column } from "../../interfaces/table";
 import { AlertController } from "@ionic/angular";
+import { debounceTime, distinctUntilChanged, Subject } from "rxjs";
 
 @Component({
-  selector: "app-table-data",
-  templateUrl: "./table-data.component.html",
-  styleUrls: ["./table-data.component.scss"],
+  selector: "app-view-data",
+  templateUrl: "./view-data.component.html",
+  styleUrls: ["./view-data.component.scss"],
 })
-export class TableDataComponent implements OnInit {
+export class ViewDataComponent implements OnInit {
   @Input() showAdd: boolean = true;
   @Input() showCalendar: boolean = false;
   @Input() currentPage: number = 1;
@@ -25,12 +26,16 @@ export class TableDataComponent implements OnInit {
   @Input() data: any[] = []; // Aquí deberías recibir los datos a mostrar en la tabla
   @Input() columnsData: Column[] = []; // Aquí deberías recibir los datos a mostrar en la tabla (cabeceras)
   @Input() title: string = "Sin titulo"; // Aquí deberías recibir los datos a mostrar en la tabla
-  @Input() searchTerm: string = "";
   @Output() addButtonClicked = new EventEmitter<void>();
   @Output() editButtonClicked = new EventEmitter<any>();
   @Output() deleteButtonClicked = new EventEmitter<any>();
+  @Output() infoButtonClicked = new EventEmitter<any>();
   @Output() resetPasswordButtonClicked = new EventEmitter<any>();
   @Output() currentPageOut = new EventEmitter<number>();
+  @Output() searchOut = new EventEmitter<string>();
+
+  search: string = "";
+  searchTerm$ = new Subject<string>();
 
   selectedMonth: number | null = null;
   selectedYear: number | null = null;
@@ -54,6 +59,7 @@ export class TableDataComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {
+    this.initSearcher();
     this.initCalendar();
     this.updateVisiblePages();
   }
@@ -62,6 +68,26 @@ export class TableDataComponent implements OnInit {
     if (changes["totalPages"]) {
       this.updateVisiblePages();
     }
+  }
+
+  initSearcher() {
+    this.searchTerm$
+      .pipe(
+        debounceTime(800), // Espera 300 ms después de que el usuario deja de escribir
+        distinctUntilChanged() // Asegura que solo se realice una búsqueda si el valor ha cambiado
+      )
+      .subscribe(() => {
+        this.searchData();
+        // this.searchEmpleado(); // Llama a la función de búsqueda cuando se cumplan las condiciones
+      });
+  }
+
+  searchData() {
+    this.searchOut.emit(this.search);
+  }
+
+  searchValueChanged(event: any) {
+    this.searchTerm$.next(event);
   }
 
   getCellValue(row: any, key: string): any {
@@ -114,6 +140,10 @@ export class TableDataComponent implements OnInit {
     this.editButtonClicked.emit(data);
   }
 
+  onInfoButtonClick(data: any) {
+    this.infoButtonClicked.emit(data);
+  }
+
   async onDeleteButtonClick(data: any) {
     const alert = await this._alertController.create({
       header: "Eliminar elemento",
@@ -139,15 +169,8 @@ export class TableDataComponent implements OnInit {
     await alert.present();
   }
 
-  onResetPassword(data: any) { 
+  onResetPassword(data: any) {
     this.resetPasswordButtonClicked.emit(data);
-  }
-
-  onSearchChange(event: any) {
-    console.log("Búsqueda:", this.searchTerm);
-    // Aquí puedes implementar la lógica de búsqueda
-    // Por ejemplo, filtrar los datos y actualizar la tabla
-    //TODO: Implementar lógica de búsqueda
   }
 
   updateVisiblePages() {

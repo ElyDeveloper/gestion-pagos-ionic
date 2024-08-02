@@ -6,11 +6,8 @@ import {
   ViewChild,
 } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { SplashScreen } from "@capacitor/splash-screen";
 import { debounceTime, distinctUntilChanged, Observable, Subject } from "rxjs";
 import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
-import { ReusableModalComponent } from "src/app/shared/components/reusable-modal/reusable-modal.component";
-import { TableDataComponent } from "src/app/shared/components/table-data/table-data.component";
 import { Rol } from "src/app/shared/interfaces/rol";
 import { Column } from "src/app/shared/interfaces/table";
 import { Usuario } from "src/app/shared/interfaces/usuario";
@@ -26,44 +23,63 @@ export class UsuariosPage implements OnInit {
   @ViewChild(LoaderComponent) loaderComponent!: LoaderComponent;
 
   elements: Usuario[] = [];
+  element: Usuario = {
+    nombre: "",
+    apellido: "",
+    telefono: "",
+    correo: "",
+    observacion: "",
+    ad: false,
+    estado: false,
+    rolesUsuario: {
+      id: 0,
+      nombre: "",
+    },
+  };
+
   currentPage = 1;
   currentPageSize = 10;
   totalPages = 0;
 
   columnsData: Column[] = []; // Aquí deberías recibir los datos a mostrar en la tabla (cabeceras)
 
-  formUser: FormGroup;
-  formResetPswd: FormGroup;
+  formAdd: FormGroup;
   formModels: FormModels;
 
-  searchTerm$ = new Subject<string>();
   isModalOpen = false;
   isToastOpen = false;
   isEdit = false;
 
-  search: string = "";
   textLoader: string = "Cargando...";
   toastMessage: string = "Usuario guardado correctamente";
 
+  @ViewChild("modalAdd", { static: true }) modalAdd!: TemplateRef<any>;
+  @ViewChild("modalViewInfo", { static: true })
+  modalViewInfo!: TemplateRef<any>;
+
+  modalSelected: TemplateRef<any> = this.modalAdd;
+  formSelected: FormGroup;
+
   private _globalService = inject(GlobalService);
-  @ViewChild("modalAddUser", { static: true }) modalAddUser!: TemplateRef<any>;
+
+  // TODO: Atributos Especificos
   @ViewChild("modalResetPswd", { static: true })
   modalResetPswd!: TemplateRef<any>;
 
-  modalSelected: TemplateRef<any> = this.modalAddUser;
-
-  // TODO: Atributos Especificos
+  formResetPswd: FormGroup;
   roles: Rol[] = [];
   isResetPswd = false;
 
   constructor(private fb: FormBuilder) {
     this.formModels = new FormModels(this.fb);
-    this.formUser = this.formModels.usuarioForm();
+    this.formAdd = this.formModels.usuarioForm();
+    this.formSelected = this.formAdd;
+
+    //TODO ESPECIFICO
     this.formResetPswd = this.formModels.resetPswdForm();
   }
 
   ngOnInit() {
-    this.initSearcher();
     this.getRoles();
     this.getCountElements();
     this.buildColumns();
@@ -74,9 +90,9 @@ export class UsuariosPage implements OnInit {
   }
 
   cleanForm() {
-    this.formUser.reset();
+    this.formAdd.reset();
     this.formResetPswd.reset();
-    this.formUser = this.formModels.usuarioForm();
+    this.formAdd = this.formModels.usuarioForm();
     this.formResetPswd = this.formModels.resetPswdForm();
   }
 
@@ -91,6 +107,10 @@ export class UsuariosPage implements OnInit {
         alias: "Apellido",
       },
       {
+        key: "correo",
+        alias: "Correo",
+      },
+      {
         key: "rolesUsuario.nombre",
         alias: "Rol",
       },
@@ -98,10 +118,7 @@ export class UsuariosPage implements OnInit {
         key: "telefono",
         alias: "Teléfono",
       },
-      {
-        key: "correo",
-        alias: "Correo",
-      },
+
       {
         key: "observacion",
         alias: "Observación",
@@ -124,6 +141,18 @@ export class UsuariosPage implements OnInit {
     ];
   }
 
+  getCellValue(row: any, key: string): any {
+    return key.split(".").reduce((o, k) => (o || {})[k], row);
+  }
+
+  getObjectValue(row: any, key: string): string {
+    const obj = row[key];
+    if (obj && typeof obj === "object") {
+      return obj.nombre || JSON.stringify(obj);
+    }
+    return "";
+  }
+
   private setModalState(
     isEdit: boolean,
     isResetPswd: boolean,
@@ -133,10 +162,11 @@ export class UsuariosPage implements OnInit {
     this.isEdit = isEdit;
     this.isResetPswd = isResetPswd;
     this.modalSelected = modalTemplate;
+    this.formSelected = isResetPswd ? this.formResetPswd : this.formAdd;
     this.isModalOpen = true;
 
     if (isEdit && formData && !isResetPswd) {
-      this.formUser.patchValue(formData);
+      this.formAdd.patchValue(formData);
     } else if (!isEdit && !isResetPswd) {
       this.cleanForm();
     } else if (isResetPswd) {
@@ -145,15 +175,23 @@ export class UsuariosPage implements OnInit {
   }
 
   onAddButtonClicked() {
-    this.setModalState(false, false, this.modalAddUser);
+    this.setModalState(false, false, this.modalAdd);
   }
 
   onEditButtonClicked(data: any) {
-    this.setModalState(true, false, this.modalAddUser, data);
+    this.setModalState(true, false, this.modalAdd, data);
   }
 
+  //TODO ESPECIFICO
   onResetPasswordButtonClicked(data: any) {
     this.setModalState(false, true, this.modalResetPswd, data);
+  }
+
+  onInfoButtonClicked(data: any) {
+    // console.log("Información del usuario:", data);
+    this.element = data;
+    this.modalSelected = this.modalViewInfo;
+    this.isModalOpen = true;
   }
 
   onDeleteButtonClicked(data: any) {
@@ -180,7 +218,7 @@ export class UsuariosPage implements OnInit {
   handleUserOperation(operation: "edit" | "create" | "resetPswd", data: any) {
     let operationText: string;
     let apiCall: Observable<any>;
-  
+
     switch (operation) {
       case "edit":
         operationText = "Editando";
@@ -195,10 +233,10 @@ export class UsuariosPage implements OnInit {
         apiCall = this._globalService.Post("reset-password", data);
         break;
     }
-  
+
     this.textLoader = `${operationText} Usuario`;
     this.loaderComponent.show();
-  
+
     apiCall.subscribe({
       next: (response: any) => {
         console.log(`Usuario ${operationText.toLowerCase()}:`, response);
@@ -210,7 +248,10 @@ export class UsuariosPage implements OnInit {
         this.getCountElements();
       },
       error: (error: any) => {
-        console.error(`Error al ${operationText.toLowerCase()} el usuario:`, error);
+        console.error(
+          `Error al ${operationText.toLowerCase()} el usuario:`,
+          error
+        );
         this.loaderComponent.hide();
         this.toastMessage = `Error al ${operationText.toLowerCase()} el usuario`;
       },
@@ -228,31 +269,27 @@ export class UsuariosPage implements OnInit {
     }
   }
 
-  initSearcher() {
-    this.searchTerm$
-      .pipe(
-        debounceTime(800), // Espera 300 ms después de que el usuario deja de escribir
-        distinctUntilChanged() // Asegura que solo se realice una búsqueda si el valor ha cambiado
-      )
-      .subscribe(() => {
-        this.search === "" ? this.getElementsPag() : this.searchElements();
-        // this.searchEmpleado(); // Llama a la función de búsqueda cuando se cumplan las condiciones
-      });
-  }
-
-  searchValueChanged(event: any) {
-    const target = event?.target as HTMLInputElement;
-    if (target) {
-      this.searchTerm$.next(target.value);
-    }
-  }
-
-  searchElements() {}
-
   onPageChange(event: any) {
     console.log("Evento de cambio de página:", event);
     this.currentPage = event;
     this.getElementsPag();
+  }
+
+  onSearchData(event: any) {
+    console.log("Evento de búsqueda:", event);
+    if (event === "") {
+      this.getCountElements();
+    } else {
+      this._globalService.Get(`usuarios/search?query=${event}`).subscribe({
+        next: (response: any) => {
+          this.elements = response;
+          console.log("Elementos obtenidos:", response);
+        },
+        error: (error) => {
+          console.error("Error al obtener los elementos:", error);
+        },
+      });
+    }
   }
 
   getElementsPag() {
@@ -288,8 +325,7 @@ export class UsuariosPage implements OnInit {
     });
   }
 
-  // TODO: Funcionalidades Especificas
-
+  // TODO: ESPECIFICO
   getRoles() {
     this._globalService.Get("roles").subscribe({
       next: (roles: any) => {

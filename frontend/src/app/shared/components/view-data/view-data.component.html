@@ -36,20 +36,14 @@
     <div class="row">
       <ion-searchbar
         placeholder="Buscar..."
-        [(ngModel)]="searchTerm"
-        (ionChange)="onSearchChange($event)"></ion-searchbar>
+        [(ngModel)]="search"
+        (ngModelChange)="searchValueChanged($event)"></ion-searchbar>
     </div>
   </ion-card-header>
 
   <ion-card-content>
     <div class="table-responsive d-none d-md-block">
       <table class="custom-table">
-        <caption>
-          Lista de
-          {{
-            title
-          }}
-        </caption>
         <thead>
           <tr>
             <th *ngFor="let column of columnsData" class="text-center">
@@ -77,35 +71,11 @@
                     *ngIf="hasResetPswdColumn()"
                     color="tertiary">
                     <ion-icon class="pe-1" name="key"></ion-icon>
-                    <ion-label>Restablecer Contraseña</ion-label>
+                    <ion-label>Restablecer</ion-label>
                   </ion-button>
                 </div>
               </ng-container>
               <ng-container [ngSwitch]="column.type">
-                <ng-container *ngSwitchCase="'actions'">
-                  <div class="d-flex justify-content-around">
-                    <ion-button
-                      color="primary"
-                      (click)="onEditButtonClick(row)"
-                      class="me-2">
-                      Editar
-                    </ion-button>
-                    <ion-button
-                      color="danger"
-                      (click)="onDeleteButtonClick(row)">
-                      Eliminar
-                    </ion-button>
-                    <ion-button
-                      expand="block"
-                      (click)="onResetPassword(row)"
-                      *ngIf="hasResetPswdColumn()"
-                      color="tertiary">
-                      <ion-icon class="pe-1" name="key"></ion-icon>
-                      <ion-label>Restablecer Contraseña</ion-label>
-                    </ion-button>
-                  </div>
-                </ng-container>
-
                 <ng-container *ngSwitchCase="'boolean'">
                   <span
                     class="badge"
@@ -115,6 +85,15 @@
                     }">
                     {{ getCellValue(row, column.key) ? "Activo" : "Inactivo" }}
                   </span>
+                </ng-container>
+                <ng-container *ngSwitchCase="'date'">
+                  {{
+                    getCellValue(row, column.key)
+                      | customDate : 6 : "dd/MM/yyyy HH:mm:ss"
+                  }}
+                </ng-container>
+                <ng-container *ngSwitchCase="'dni'">
+                  {{ getCellValue(row, column.key) | formatDni }}
                 </ng-container>
 
                 <ng-container *ngSwitchDefault>
@@ -131,54 +110,70 @@
 
 <!-- Seccion de vista movil -->
 <section class="d-md-none">
-  <ion-card *ngFor="let row of data">
-    <ion-card-content>
-      <ion-item *ngFor="let column of columnsData" lines="none">
-        <ng-container *ngIf="column.key !== 'actions'">
-          <ion-label>{{ column.alias }}</ion-label>
-          <ng-container [ngSwitch]="column.type">
-            <ng-container *ngSwitchCase="'boolean'">
-              <ion-badge
-                [color]="getCellValue(row, column.key) ? 'success' : 'medium'">
-                {{ getCellValue(row, column.key) ? "Activo" : "Inactivo" }}
-              </ion-badge>
-            </ng-container>
-            <ng-container *ngSwitchDefault>
-              <ion-note slot="end">{{
-                getCellValue(row, column.key)
-              }}</ion-note>
-            </ng-container>
+  <ion-list>
+    @for (row of data; track row.id) {
+    <ion-item>
+      <ion-thumbnail slot="start">
+        <img
+          alt="Usuario"
+          src="https://ionicframework.com/docs/demos/api/avatar/avatar.svg" />
+      </ion-thumbnail>
+      <ion-label>
+        <ng-container *ngFor="let column of columnsData" class="text-center">
+        </ng-container>
+        <h2>
+          {{ getCellValue(row, columnsData[0].key) }}
+          {{ getCellValue(row, columnsData[1].key) }}
+        </h2>
+        <ng-container [ngSwitch]="columnsData[2].type">
+          <ng-container *ngSwitchCase="'dni'">
+            <p>{{ getCellValue(row, columnsData[2].key) | formatDni }}</p>
+          </ng-container>
+          <ng-container *ngSwitchDefault>
+            <p>{{ getCellValue(row, columnsData[2].key) }}</p>
           </ng-container>
         </ng-container>
-      </ion-item>
-    </ion-card-content>
-    <ion-card-content *ngIf="hasActionsColumn()">
-      <ion-button
-        expand="block"
-        color="primary"
-        (click)="onEditButtonClick(row)"
-        >Editar</ion-button
-      >
-      <ion-button
-        expand="block"
-        color="danger"
-        (click)="onDeleteButtonClick(row)">
-        Eliminar</ion-button
-      >
-      <ion-button
-        expand="block"
-        (click)="onResetPassword(row)"
-        *ngIf="hasResetPswdColumn()"
-        color="tertiary">
-        <ion-icon class="pe-1" name="key"></ion-icon>
-        <ion-label>Restablecer Contraseña</ion-label>
-      </ion-button>
-    </ion-card-content>
-  </ion-card>
+        <div
+          class="d-flex justify-content-between align-content-center align-items-center">
+          <ion-badge [color]="row.estado ? 'success' : 'tertiary'">
+            {{ row.estado ? "Activo" : "Inactivo" }}
+          </ion-badge>
+          <ion-buttons>
+            <ion-button
+              shape="round"
+              color="primary"
+              (click)="onInfoButtonClick(row)">
+              <ion-icon name="open-outline" size="medium"></ion-icon>
+            </ion-button>
+            <ion-button
+              shape="round"
+              color="primary"
+              *ngIf="hasResetPswdColumn()"
+              (click)="onResetPassword(row)">
+              <ion-icon name="key-outline" size="medium"></ion-icon>
+            </ion-button>
+            <ion-button
+              shape="round"
+              color="primary"
+              (click)="onEditButtonClick(row)">
+              <ion-icon name="create-outline" size="medium"></ion-icon>
+            </ion-button>
+            <ion-button
+              shape="round"
+              color="danger"
+              (click)="onDeleteButtonClick(row)">
+              <ion-icon name="trash-outline" size="medium"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </div>
+      </ion-label>
+    </ion-item>
+    }
+  </ion-list>
 </section>
 
 <!-- Seccion de paginacion -->
-<section class="d-flex justify-content-center">
+<section class="d-flex justify-content-center" *ngIf="search === ''">
   <nav aria-label="Page navigation" class="mt-3">
     <ul class="pagination justify-content-end">
       <li class="page-item" [class.disabled]="currentPage === 1">
