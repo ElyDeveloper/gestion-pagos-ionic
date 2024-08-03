@@ -1,9 +1,9 @@
-<ion-breadcrumbs class="mt-5 pt-3">
-  <ion-breadcrumb>
+<ion-breadcrumbs class="mt-5 pt-3 ">
+  <ion-breadcrumb (click)="goTo('/home')" class="breadcrumb-clickable">
     <ion-icon slot="start" name="home"></ion-icon>
     Inicio
   </ion-breadcrumb>
-  <ion-breadcrumb *ngFor="let segment of segments">
+  <ion-breadcrumb *ngFor="let segment of segments;" (click)="goTo(segment)" class="breadcrumb-clickable">
     {{ segment }}
   </ion-breadcrumb>
 </ion-breadcrumbs>

@@ -36,12 +36,15 @@ export class BreadcrumbComponent implements OnInit {
           }
         })
     );
+  }
 
+  goTo(url: string) {
+    this.router.navigateByUrl("/layout/" + url);
   }
 
   ngOnDestroy() {
     //Ver cantidad de suscripciones
-    console.log('Suscripciones activas: ',this.subscriptions.length);
+    console.log("Suscripciones activas: ", this.subscriptions.length);
     // Desuscribirse de todos los eventos al destruir el componente
     this.subscriptions.forEach((s) => s.unsubscribe());
   }

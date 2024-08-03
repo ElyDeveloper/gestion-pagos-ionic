@@ -1,13 +1,23 @@
 import { formatDate } from "@angular/common";
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from "@angular/core";
 import { Column } from "../../interfaces/table";
+import { AlertController } from "@ionic/angular";
+import { debounceTime, distinctUntilChanged, Subject } from "rxjs";
 
 @Component({
-  selector: "app-table-data",
-  templateUrl: "./table-data.component.html",
-  styleUrls: ["./table-data.component.scss"],
+  selector: "app-view-data",
+  templateUrl: "./view-data.component.html",
+  styleUrls: ["./view-data.component.scss"],
 })
-export class TableDataComponent implements OnInit {
+export class ViewDataComponent implements OnInit {
   @Input() showAdd: boolean = true;
   @Input() showCalendar: boolean = false;
   @Input() currentPage: number = 1;
@@ -16,8 +26,16 @@ export class TableDataComponent implements OnInit {
   @Input() data: any[] = []; // Aquí deberías recibir los datos a mostrar en la tabla
   @Input() columnsData: Column[] = []; // Aquí deberías recibir los datos a mostrar en la tabla (cabeceras)
   @Input() title: string = "Sin titulo"; // Aquí deberías recibir los datos a mostrar en la tabla
-  @Input() searchTerm: string = "";
   @Output() addButtonClicked = new EventEmitter<void>();
+  @Output() editButtonClicked = new EventEmitter<any>();
+  @Output() deleteButtonClicked = new EventEmitter<any>();
+  @Output() infoButtonClicked = new EventEmitter<any>();
+  @Output() resetPasswordButtonClicked = new EventEmitter<any>();
+  @Output() currentPageOut = new EventEmitter<number>();
+  @Output() searchOut = new EventEmitter<string>();
+
+  search: string = "";
+  searchTerm$ = new Subject<string>();
 
   selectedMonth: number | null = null;
   selectedYear: number | null = null;
@@ -37,57 +55,47 @@ export class TableDataComponent implements OnInit {
   ];
   years: number[] = [];
 
+  private _alertController = inject(AlertController);
   constructor() {}
 
   ngOnInit() {
+    this.initSearcher();
     this.initCalendar();
-    this.getDataTest();
     this.updateVisiblePages();
   }
 
-  getDataTest() {
-    //Rellenar columnas de prueba, total de 6 columnas
-    this.columnsData = [
-      {
-        key: "name",
-        alias: "Nombre",
-      },
-      {
-        key: "lastName",
-        alias: "Apellido",
-      },
-      {
-        key: "age",
-        alias: "Edad",
-      },
-      {
-        key: "birthDate",
-        alias: "Fecha de nacimiento",
-      },
-      {
-        key: "address",
-        alias: "Dirección",
-      },
-      {
-        key: "phone",
-        alias: "Teléfono",
-      },
-      {
-        key: "actions",
-        alias: "Acciones",
-      },
-    ];
-    //Rellenar datos de prueba
-    for (let i = 0; i < 15; i++) {
-      this.data.push({
-        name: "Nombre " + i,
-        lastName: "Apellido " + i,
-        age: Math.floor(Math.random() * 100),
-        birthDate: formatDate(new Date(), "dd/MM/yyyy", "en"),
-        address: "Dirección " + i,
-        phone: "Teléfono " + i,
-      });
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes["totalPages"]) {
+      this.updateVisiblePages();
     }
+  }
+
+  initSearcher() {
+    this.searchTerm$
+      .pipe(
+        debounceTime(800), // Espera 300 ms después de que el usuario deja de escribir
+        distinctUntilChanged() // Asegura que solo se realice una búsqueda si el valor ha cambiado
+      )
+      .subscribe(() => {
+        this.searchData();
+        // this.searchEmpleado(); // Llama a la función de búsqueda cuando se cumplan las condiciones
+      });
+  }
+
+  searchData() {
+    this.searchOut.emit(this.search);
+  }
+
+  searchValueChanged(event: any) {
+    this.searchTerm$.next(event);
+  }
+
+  getCellValue(row: any, key: string): any {
+    return key.split(".").reduce((o, k) => (o || {})[k], row);
+  }
+
+  changePage(page: number) {
+    this.currentPageOut.emit(page);
   }
 
   initCalendar() {
@@ -106,12 +114,6 @@ export class TableDataComponent implements OnInit {
     return this.years;
   }
 
-  sortData(column: Column) {
-    //TODO: Implementar lógica de ordenamiento
-    // Aquí deberías implementar la lógica de ordenamiento
-    // Por ejemplo, ordenar los datos y actualizar la tabla
-  }
-
   onMonthChange() {
     console.log(
       "Selected month and year:",
@@ -122,27 +124,53 @@ export class TableDataComponent implements OnInit {
     //TODO: Consultar datos desde el backend
   }
 
+  hasActionsColumn(): boolean {
+    return this.columnsData.some((col) => col.key === "actions");
+  }
+
+  hasResetPswdColumn(): boolean {
+    return this.columnsData.some((col) => col.type === "pswd");
+  }
+
   onAddButtonClick() {
     this.addButtonClicked.emit();
   }
 
   onEditButtonClick(data: any) {
-    console.log("Editar:", data);
-    // Aquí deberías abrir un modal o navegar a otra página para editar el elemento
-    //TODO: Implementar lógica de edición
+    this.editButtonClicked.emit(data);
   }
 
-  onDeleteButtonClick(data: any) {
-    console.log("Eliminar:", data);
-    // Aquí deberías abrir un modal para confirmar la eliminación del elemento
-    //TODO: Implementar lógica de eliminación
+  onInfoButtonClick(data: any) {
+    this.infoButtonClicked.emit(data);
   }
 
-  onSearchChange(event: any) {
-    console.log("Búsqueda:", this.searchTerm);
-    // Aquí puedes implementar la lógica de búsqueda
-    // Por ejemplo, filtrar los datos y actualizar la tabla
-    //TODO: Implementar lógica de búsqueda
+  async onDeleteButtonClick(data: any) {
+    const alert = await this._alertController.create({
+      header: "Eliminar elemento",
+      message: "¿Realmente deseas eliminar este elemento?",
+      buttons: [
+        {
+          text: "Cancelar",
+          role: "cancel",
+          cssClass: "secondary",
+          handler: () => {
+            console.log("Eliminación cancelada");
+          },
+        },
+        {
+          text: "Eliminar",
+          handler: () => {
+            this.deleteButtonClicked.emit(data);
+          },
+        },
+      ],
+    });
+
+    await alert.present();
+  }
+
+  onResetPassword(data: any) {
+    this.resetPasswordButtonClicked.emit(data);
   }
 
   updateVisiblePages() {
@@ -162,6 +190,7 @@ export class TableDataComponent implements OnInit {
   goToPage(page: number) {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
+      this.currentPageOut.emit(this.currentPage);
       this.updateVisiblePages();
       // Aquí deberías cargar los datos correspondientes a la página seleccionada
     }
