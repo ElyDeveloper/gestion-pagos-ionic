@@ -74,6 +74,7 @@ export class UsuariosPage implements OnInit {
     this.formModels = new FormModels(this.fb);
     this.formAdd = this.formModels.usuarioForm();
     this.formSelected = this.formAdd;
+    console.log("Formulario de usuario:", this.formAdd);
 
     //TODO ESPECIFICO
     this.formResetPswd = this.formModels.resetPswdForm();
@@ -90,8 +91,6 @@ export class UsuariosPage implements OnInit {
   }
 
   cleanForm() {
-    this.formAdd.reset();
-    this.formResetPswd.reset();
     this.formAdd = this.formModels.usuarioForm();
     this.formResetPswd = this.formModels.resetPswdForm();
   }
@@ -163,8 +162,7 @@ export class UsuariosPage implements OnInit {
     this.isResetPswd = isResetPswd;
     this.modalSelected = modalTemplate;
     this.formSelected = isResetPswd ? this.formResetPswd : this.formAdd;
-    this.isModalOpen = true;
-
+    
     if (isEdit && formData && !isResetPswd) {
       this.formAdd.patchValue(formData);
     } else if (!isEdit && !isResetPswd) {
@@ -172,6 +170,8 @@ export class UsuariosPage implements OnInit {
     } else if (isResetPswd) {
       this.formResetPswd.patchValue(formData);
     }
+
+    this.isModalOpen = true;
   }
 
   onAddButtonClicked() {
