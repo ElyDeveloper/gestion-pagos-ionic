@@ -94,7 +94,6 @@ export class ClientesPage implements OnInit {
 
   buildColumns() {
     this.columnsData = [
-      
       {
         key: "Nombres",
         alias: "Nombres",
@@ -158,7 +157,7 @@ export class ClientesPage implements OnInit {
     this.isEdit = isEdit;
     this.modalSelected = modalTemplate;
     this.formSelected = this.formAdd;
-    
+
     if (isEdit && formData) {
       this.formAdd.patchValue(formData);
     } else if (!isEdit) {
@@ -204,6 +203,10 @@ export class ClientesPage implements OnInit {
   }
 
   handleUserOperation(operation: "edit" | "create", data: any) {
+    if (data.FechaBaja == "") {
+      data.FechaBaja = null;
+    }
+
     let operationText: string;
     let apiCall: Observable<any>;
 
@@ -213,6 +216,7 @@ export class ClientesPage implements OnInit {
         apiCall = this._globalService.PutId("Clientes", data.id, data);
         break;
       case "create":
+        delete data.Id;
         operationText = "Guardando";
         apiCall = this._globalService.Post("Clientes", data);
         break;
