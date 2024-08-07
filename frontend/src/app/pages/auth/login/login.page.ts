@@ -6,6 +6,8 @@ import { GlobalService } from "src/app/shared/services/global.service";
 import { CookieService } from "ngx-cookie-service";
 import { key } from "src/app/libraries/key.library";
 import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
+import { AuthService } from "src/app/shared/services/auth.service";
+import { Usuario } from "src/app/shared/interfaces/usuario";
 
 interface Login {
   identificator: string;
@@ -34,6 +36,7 @@ export class LoginPage implements OnInit {
   _router = inject(Router);
   _globalService = inject(GlobalService);
   _cookieService = inject(CookieService);
+  _authService = inject(AuthService);
   constructor() {}
 
   ngOnInit() {}
@@ -44,10 +47,9 @@ export class LoginPage implements OnInit {
 
   async login() {
     if (this.validateForm()) {
-    
       this.textLoader = "Iniciando Sesión";
       this.loaderComponent.show();
-      //TODO: Conectar con el Backend
+
       this._globalService.Post("login", this.user).subscribe((result: any) => {
         if (result?.token) {
           this._cookieService.set(
@@ -56,9 +58,10 @@ export class LoginPage implements OnInit {
             key.TOKEN_EXPIRATION_TIME,
             ""
           );
-          localStorage.setItem("user", result.usuario);
-          localStorage.setItem("rol", result.rol);
-          //Set timeout de 2 segundos
+
+          // Usar el AuthService para almacenar la información del usuario
+          this._authService.setUserInfo(result.usuario);
+
           setTimeout(() => {
             this.loaderComponent.hide();
             this.toastMessage = "Bienvenido " + this.user.identificator;
@@ -67,7 +70,6 @@ export class LoginPage implements OnInit {
           }, 2000);
         } else {
           this.loaderComponent.hide();
-
           this.toastMessage = "Usuario o contraseña incorrectos.";
           this.setOpenedToast(true);
         }

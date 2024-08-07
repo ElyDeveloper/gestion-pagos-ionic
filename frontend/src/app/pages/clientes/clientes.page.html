@@ -151,6 +151,11 @@
               <ion-note slot="end"
                 >{{ getObjectValue(element, column.key) }}</ion-note
               >
+              } @case ('date') {
+              <ion-note slot="end"
+                >{{ getDateValue(element, column.key) |customDate : 6 :
+                "dd/MM/yyyy" }}</ion-note
+              >
               } @default {
               <ion-note slot="end"
                 >{{ getCellValue(element, column.key) }}</ion-note
