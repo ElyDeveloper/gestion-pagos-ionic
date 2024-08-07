@@ -1,12 +1,12 @@
 export interface Cliente {
-  Id?: number;
-  DNI?: string;
-  Nombres?: string;
-  Apellidos?: string;
-  Cel?: string;
-  Direccion?: string;
-  Email?: string;
-  FechaIngreso?: string | Date;
-  FechaBaja?: string | Date;
-  Estado?: boolean;
+  id?: number;
+  dni?: string;
+  nombres?: string;
+  apellidos?: string;
+  cel?: string;
+  direccion?: string;
+  email?: string;
+  fechaIngreso?: string | Date;
+  fechaBaja?: string | Date;
+  estado?: boolean;
 }

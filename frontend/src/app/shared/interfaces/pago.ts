@@ -1,7 +1,7 @@
 export interface Pago {
-  Id?: number;
-  IdPrestamo?: number;
-  FechaPago?: string;
-  Monto?: number;
-  Estado?: boolean;
+  id?: number;
+  idPrestamo?: number;
+  fechaPago?: string;
+  monto?: number;
+  estado?: boolean;
 }
