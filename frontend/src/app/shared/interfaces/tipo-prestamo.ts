@@ -1,5 +1,5 @@
 export interface TipoPrestamo {
-  Id?: number;
-  Nombre?: string;
-  Estado?: boolean;
+  id?: number;
+  nombre?: string;
+  estado?: boolean;
 }

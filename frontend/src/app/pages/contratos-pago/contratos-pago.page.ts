@@ -1,4 +1,10 @@
-import { Component, inject, OnInit, TemplateRef, ViewChild } from "@angular/core";
+import {
+  Component,
+  inject,
+  OnInit,
+  TemplateRef,
+  ViewChild,
+} from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Observable } from "rxjs";
 import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
@@ -147,15 +153,21 @@ export class ContratosPagoPage implements OnInit {
 
   private setModalState(isEdit: boolean, modalTemplate: any, formData?: any) {
     this.isEdit = isEdit;
-    this.modalSelected = modalTemplate;
-    this.formSelected = this.formAdd;
-    this.isModalOpen = true;
 
     if (isEdit && formData) {
       this.formAdd.patchValue(formData);
     } else if (!isEdit) {
       this.cleanForm();
     }
+
+    this.modalSelected = modalTemplate;
+    this.formSelected = this.formAdd;
+    this.isModalOpen = true;
+  }
+
+  formatDateForInput(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
   }
 
   onAddButtonClicked() {

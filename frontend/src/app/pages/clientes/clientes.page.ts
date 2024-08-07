@@ -21,30 +21,17 @@ import { FormModels } from "src/app/shared/utils/forms-models";
 export class ClientesPage implements OnInit {
   @ViewChild(LoaderComponent) loaderComponent!: LoaderComponent;
 
-  // export interface Cliente {
-  //   Id?: number;
-  //   DNI?: string;
-  //   Nombres?: string;
-  //   Apellidos?: string;
-  //   Cel?: string;
-  //   Direccion?: string;
-  //   Email?: string;
-  //   FechaIngreso?: string;
-  //   FechaBaja?: string;
-  //   Estado?: boolean;
-  // }
-
   elements: Cliente[] = [];
   element: Cliente = {
-    DNI: "",
-    Nombres: "",
-    Apellidos: "",
-    Cel: "",
-    Direccion: "",
-    Email: "",
-    FechaIngreso: "",
-    FechaBaja: "",
-    Estado: false,
+    dni: "",
+    nombres: "",
+    apellidos: "",
+    cel: "",
+    direccion: "",
+    email: "",
+    fechaIngreso: "",
+    fechaBaja: "",
+    estado: false,
   };
 
   currentPage = 1;
@@ -89,48 +76,49 @@ export class ClientesPage implements OnInit {
   }
 
   cleanForm() {
+    this.formAdd.reset();
     this.formAdd = this.formModels.clienteForm();
   }
 
   buildColumns() {
     this.columnsData = [
       {
-        key: "Nombres",
+        key: "nombres",
         alias: "Nombres",
       },
       {
-        key: "Apellidos",
+        key: "apellidos",
         alias: "Apellidos",
       },
       {
-        key: "DNI",
+        key: "dni",
         alias: "DNI",
         type: "dni",
       },
       {
-        key: "Cel",
+        key: "cel",
         alias: "Celular",
       },
       {
-        key: "Direccion",
+        key: "direccion",
         alias: "Dirección",
       },
       {
-        key: "Email",
+        key: "email",
         alias: "Correo",
       },
       {
-        key: "FechaIngreso",
+        key: "fechaIngreso",
         alias: "Fecha de Ingreso",
         type: "date",
       },
       {
-        key: "FechaBaja",
+        key: "fechaBaja",
         alias: "Fecha de Baja",
         type: "date",
       },
       {
-        key: "Estado",
+        key: "estado",
         alias: "Estado",
         type: "boolean",
       },
@@ -155,15 +143,28 @@ export class ClientesPage implements OnInit {
 
   private setModalState(isEdit: boolean, modalTemplate: any, formData?: any) {
     this.isEdit = isEdit;
-    this.modalSelected = modalTemplate;
-    this.formSelected = this.formAdd;
+    
+    if (formData) {
+      formData.fechaIngreso = this.formatDateForInput(formData.fechaIngreso);
+      if (formData.fechaBaja) {
+        formData.fechaBaja = this.formatDateForInput(formData.fechaBaja);
+      }
+    }
+    console.log("Form Data:", formData);
 
     if (isEdit && formData) {
       this.formAdd.patchValue(formData);
     } else if (!isEdit) {
       this.cleanForm();
     }
+
+    this.modalSelected = modalTemplate;
+    this.formSelected = this.formAdd;
     this.isModalOpen = true;
+  }
+
+  formatDateForInput(dateString: string): string {
+    return dateString.split('T')[0];
   }
 
   onAddButtonClicked() {
@@ -203,10 +204,11 @@ export class ClientesPage implements OnInit {
   }
 
   handleUserOperation(operation: "edit" | "create", data: any) {
-    if (data.FechaBaja == "") {
-      data.FechaBaja = null;
-    }
+    
+    data.fechaIngreso = new Date(data.fechaIngreso);
+    console.log("Datos del cliente:", data);
 
+    // return;
     let operationText: string;
     let apiCall: Observable<any>;
 

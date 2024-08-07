@@ -9,16 +9,16 @@ export class FormModels {
 
   clienteForm(): FormGroup {
     return this.fb.group({
-      Id: [null],
-      DNI: ["", Validators.required],
-      Nombres: ["", Validators.required],
-      Apellidos: ["", Validators.required],
-      Cel: ["", Validators.required],
-      Direccion: ["", Validators.required],
-      Email: ["", [Validators.required, Validators.email]],
-      FechaIngreso: ["", Validators.required],
-      FechaBaja: [null],
-      Estado: [true],
+      id: [null],
+      dni: ["", Validators.required],
+      nombres: ["", Validators.required],
+      apellidos: ["", Validators.required],
+      cel: ["", Validators.required],
+      direccion: ["", Validators.required],
+      email: ["", [Validators.required, Validators.email]],
+      fechaIngreso: ["", Validators.required],
+      fechaBaja: [undefined],
+      estado: [true],
     });
   }
 
@@ -42,28 +42,28 @@ export class FormModels {
 
   pagoForm(): FormGroup {
     return this.fb.group({
-      Id: [null],
-      IdPrestamo: [null, Validators.required],
-      FechaPago: ["", Validators.required],
-      Monto: [null, [Validators.required, Validators.min(0)]],
-      Estado: [true],
+      id: [null],
+      idPrestamo: [null, Validators.required],
+      fechaPago: ["", Validators.required],
+      monto: [null, [Validators.required, Validators.min(0)]],
+      estado: [true],
     });
   }
 
   prestamoForm(): FormGroup {
     return this.fb.group({
-      Id: [null],
-      IdCliente: [null, Validators.required],
-      IdTipoPrestamo: [null, Validators.required],
-      Monto: [null, [Validators.required, Validators.min(0)]],
-      TasaInteres: [
+      id: [null],
+      idCliente: [null, Validators.required],
+      idTipoPrestamo: [null, Validators.required],
+      monto: [null, [Validators.required, Validators.min(0)]],
+      tasaInteres: [
         null,
         [Validators.required, Validators.min(0), Validators.max(100)],
       ],
-      TotalMonto: [null, [Validators.required, Validators.min(0)]],
-      FechaInicial: ["", Validators.required],
-      FechaFinal: ["", Validators.required],
-      Estado: [true],
+      totalMonto: [null, [Validators.required, Validators.min(0)]],
+      fechaInicial: ["", Validators.required],
+      fechaFinal: ["", Validators.required],
+      estado: [true],
     });
   }
 
@@ -78,9 +78,9 @@ export class FormModels {
 
   tipoPrestamoForm(): FormGroup {
     return this.fb.group({
-      Id: [null],
-      Nombre: ["", Validators.required],
-      Estado: [true],
+      id: [null],
+      nombre: ["", Validators.required],
+      estado: [true],
     });
   }
 

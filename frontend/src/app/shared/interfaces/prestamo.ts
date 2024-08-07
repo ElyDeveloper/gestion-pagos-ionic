@@ -1,11 +1,11 @@
 export interface Prestamo {
-  Id?: number;
-  IdCliente?: number;
-  IdTipoPrestamo?: number;
-  Monto?: number;
-  TasaInteres?: number;
-  TotalMonto?: number;
-  FechaInicial?: string;
-  FechaFinal?: string;
-  Estado?: boolean;
+  id?: number;
+  idCliente?: number;
+  idTipoPrestamo?: number;
+  monto?: number;
+  tasaInteres?: number;
+  totalMonto?: number;
+  fechaInicial?: string;
+  fechaFinal?: string;
+  estado?: boolean;
 }
