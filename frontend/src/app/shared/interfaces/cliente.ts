@@ -6,7 +6,7 @@ export interface Cliente {
   Cel?: string;
   Direccion?: string;
   Email?: string;
-  FechaIngreso?: string;
-  FechaBaja?: string;
+  FechaIngreso?: string | Date;
+  FechaBaja?: string | Date;
   Estado?: boolean;
 }

@@ -89,6 +89,7 @@ export class ClientesPage implements OnInit {
   }
 
   cleanForm() {
+    this.formAdd.reset();
     this.formAdd = this.formModels.clienteForm();
   }
 
@@ -155,15 +156,29 @@ export class ClientesPage implements OnInit {
 
   private setModalState(isEdit: boolean, modalTemplate: any, formData?: any) {
     this.isEdit = isEdit;
-    this.modalSelected = modalTemplate;
-    this.formSelected = this.formAdd;
+    
+    if (formData) {
+      formData.FechaIngreso = this.formatDateForInput(formData.FechaIngreso);
+      if (formData.FechaBaja) {
+        formData.FechaBaja = this.formatDateForInput(formData.FechaBaja);
+      }
+    }
+    console.log("Form Data:", formData);
 
     if (isEdit && formData) {
       this.formAdd.patchValue(formData);
     } else if (!isEdit) {
       this.cleanForm();
     }
+
+    this.modalSelected = modalTemplate;
+    this.formSelected = this.formAdd;
     this.isModalOpen = true;
+  }
+
+  formatDateForInput(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
   }
 
   onAddButtonClicked() {
@@ -207,6 +222,9 @@ export class ClientesPage implements OnInit {
       data.FechaBaja = null;
     }
 
+    console.log("Datos del cliente:", data);
+
+    // return;
     let operationText: string;
     let apiCall: Observable<any>;
 

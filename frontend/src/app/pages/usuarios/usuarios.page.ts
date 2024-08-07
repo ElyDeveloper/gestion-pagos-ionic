@@ -91,6 +91,9 @@ export class UsuariosPage implements OnInit {
   }
 
   cleanForm() {
+    this.formAdd.reset();
+    this.formResetPswd.reset();
+
     this.formAdd = this.formModels.usuarioForm();
     this.formResetPswd = this.formModels.resetPswdForm();
   }
@@ -160,8 +163,7 @@ export class UsuariosPage implements OnInit {
   ) {
     this.isEdit = isEdit;
     this.isResetPswd = isResetPswd;
-    this.modalSelected = modalTemplate;
-    this.formSelected = isResetPswd ? this.formResetPswd : this.formAdd;
+    
     
     if (isEdit && formData && !isResetPswd) {
       this.formAdd.patchValue(formData);
@@ -171,6 +173,8 @@ export class UsuariosPage implements OnInit {
       this.formResetPswd.patchValue(formData);
     }
 
+    this.modalSelected = modalTemplate;
+    this.formSelected = isResetPswd ? this.formResetPswd : this.formAdd;
     this.isModalOpen = true;
   }
 
