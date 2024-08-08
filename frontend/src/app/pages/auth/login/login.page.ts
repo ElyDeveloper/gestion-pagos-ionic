@@ -111,11 +111,12 @@ export class LoginPage implements OnInit {
     if (!this.user.password) {
       this.formErrors.password = "La contraseña es requerida.";
       isValid = false;
-    } else if (this.user.password.length < 6) {
-      this.formErrors.password =
-        "La contraseña debe tener al menos 6 caracteres.";
-      isValid = false;
     }
+    //  else if (this.user.password.length < 6) {
+    //   this.formErrors.password =
+    //     "La contraseña debe tener al menos 6 caracteres.";
+    //   isValid = false;
+    // }
 
     return isValid;
   }
