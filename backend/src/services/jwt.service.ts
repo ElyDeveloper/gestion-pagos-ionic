@@ -2,20 +2,21 @@ import {BindingScope, injectable, service} from '@loopback/core/dist';
 import {repository} from '@loopback/repository';
 import {HttpErrors, operation} from '@loopback/rest';
 import {LoginInterface} from '../core/interfaces/models/Login.interface';
-import {keys} from "../env/interfaces/Servicekeys.interface";
+import {keys} from '../env/interfaces/Servicekeys.interface';
 import {Credenciales} from '../models/credenciales.model';
 import {CodigoVerificacionRepository} from '../repositories/codigo-verificacion.repository';
 import {CredencialesRepository} from '../repositories/credenciales.repository';
 import {UsuarioRepository} from '../repositories/usuario.repository';
 import {EncriptDecryptService} from './encript-decrypt.service';
-import {UserService} from "./user.service";
+import {UserService} from './user.service';
+import {VerifyCodeInfo} from '../core/interfaces/models/gCode.interface';
 const jsonwebtoken = require('jsonwebtoken');
 var shortid = require('shortid-36');
 
 interface token {
-  exp: number,
-  data: {UserID: number, UserNAME: string, Role: number},
-  iat: number
+  exp: number;
+  data: {UserID: number; UserNAME: string; Role: number};
+  iat: number;
 }
 
 @injectable({scope: BindingScope.TRANSIENT})
@@ -29,48 +30,55 @@ export class JWTService {
     @repository(CodigoVerificacionRepository)
     private codigoVerificacionRepository: CodigoVerificacionRepository,
     @repository(UsuarioRepository)
-    private usuarioRepository: UsuarioRepository
-  ) {
-  }
-
+    private usuarioRepository: UsuarioRepository,
+  ) {}
 
   createToken(credentials: any, user: any) {
-
     try {
-      let token = jsonwebtoken.sign({
-        // exp: keys.TOKEN_EXPIRATION_TIME,
-        data: {
-          UserID: credentials.id,
-          UserNAME: credentials.username,
-          Role: user.rolid
-        }
-      }, keys.JWT_SECRET_KEY, {expiresIn: 300});
+      let token = jsonwebtoken.sign(
+        {
+          // exp: keys.TOKEN_EXPIRATION_TIME,
+          data: {
+            UserID: credentials.id,
+            UserNAME: credentials.username,
+            Role: user.rolid,
+          },
+        },
+        keys.JWT_SECRET_KEY,
+        {expiresIn: 300},
+      );
       return token;
-
     } catch (error) {
-      console.log("Error al generar el token: ", error);
-
+      console.log('Error al generar el token: ', error);
     }
   }
 
   VerifyToken(token: string) {
-    if (!token)
-      throw new HttpErrors[401]("Token vacio")
+    if (!token) throw new HttpErrors[401]('Token vacio');
     let decoded = jsonwebtoken.verify(token, keys.JWT_SECRET_KEY);
-    if (decoded)
-      return decoded;
-    else
-      throw new HttpErrors[401]("Token invalido");
+    if (decoded) return decoded;
+    else throw new HttpErrors[401]('Token invalido');
   }
 
-  async IdentifyToken(credentials: LoginInterface): Promise<Credenciales | false> {
-    let user = await this.credencialesRepository.findOne({where: {correo: credentials.identificator}});
+  async IdentifyToken(
+    credentials: LoginInterface,
+  ): Promise<Credenciales | false> {
+    let user = await this.credencialesRepository.findOne({
+      where: {correo: credentials.identificator},
+    });
 
     if (!user)
-      user = await this.credencialesRepository.findOne({where: {username: credentials.identificator}});
+      user = await this.credencialesRepository.findOne({
+        where: {username: credentials.identificator},
+      });
 
-    if (user?.correo === credentials.identificator || user?.username === credentials.identificator) {
-      let cryptPass = await this.encriptDecryptService.Encrypt(credentials.password);
+    if (
+      user?.correo === credentials.identificator ||
+      user?.username === credentials.identificator
+    ) {
+      let cryptPass = await this.encriptDecryptService.Encrypt(
+        credentials.password,
+      );
       if (user.hash === cryptPass) {
         return user;
       }
@@ -78,10 +86,17 @@ export class JWTService {
     return false;
   }
 
-  async ResetPassword(identificator: string, newpassword: string): Promise<string | false> {
-    let user = await this.credencialesRepository.findOne({where: {correo: identificator}});
+  async ResetPassword(
+    identificator: string,
+    newpassword: string,
+  ): Promise<string | false> {
+    let user = await this.credencialesRepository.findOne({
+      where: {correo: identificator},
+    });
     if (!user)
-      user = await this.credencialesRepository.findOne({where: {username: identificator}});
+      user = await this.credencialesRepository.findOne({
+        where: {username: identificator},
+      });
 
     if (user?.correo === identificator || user?.username === identificator) {
       // Verifica que el usuario correcto se esté actualizando
@@ -116,19 +131,18 @@ export class JWTService {
   // }
 
   generateVerificationCode(): string {
-    let code = shortid.generate()
+    let code = shortid.generate();
     if (code.length > 6) {
-      return code.slice(0, 6)
+      return code.slice(0, 6);
     } else if (code.length < 6) {
-      return code.padEnd(6, 'A')
+      return code.padEnd(6, 'A');
     }
-    return code
+    return code;
   }
 
   async generateCode(userExist: Credenciales) {
-
     let verificationCode: string = this.generateVerificationCode();
-    let expTIME = new Date((Date.now() + (1000 * 120))).toISOString();
+    let expTIME = new Date(Date.now() + 1000 * 120).toISOString();
 
     //fehca y Hora de incio del dia
     const startDate = new Date();
@@ -139,33 +153,31 @@ export class JWTService {
 
     //Verificar si ya existen al menos 3 codigos de verificacion para el usuario
     const codes = await this.codigoVerificacionRepository.find({
-      where:{
+      where: {
         userdId: userExist.id,
-        exp:{
-          between: [startDate.toISOString(), endDate.toISOString()]
-        }
-      }
+        exp: {
+          between: [startDate.toISOString(), endDate.toISOString()],
+        },
+      },
     });
 
     console.log('codes: ', codes);
 
-    if(codes.length >= 3){
+    if (codes.length >= 3) {
       return {operation: false, content: 'limit'};
     }
 
-    const bodyCode = {
-      userId: userExist.id,
+    const bodyCode: VerifyCodeInfo = {
+      userId: Number(userExist.id),
       codigo: verificationCode,
       exp: expTIME,
-    }
+    };
 
     await this.codigoVerificacionRepository.create(bodyCode);
 
     return {
       operation: true,
-      content: verificationCode
+      content: bodyCode,
     };
   }
 }
-
-

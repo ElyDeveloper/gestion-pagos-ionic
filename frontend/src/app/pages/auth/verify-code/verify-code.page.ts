@@ -4,6 +4,7 @@ import { interval, Subscription, takeWhile } from "rxjs";
 import { NgxOtpInputComponentOptions } from "ngx-otp-input";
 import { GlobalService } from "src/app/shared/services/global.service";
 import { Router } from "@angular/router";
+import { CookieService } from "ngx-cookie-service";
 
 @Component({
   selector: "app-verify-code",
@@ -36,11 +37,32 @@ export class VerifyCodePage implements OnInit {
 
   private countdownSubscription!: Subscription;
   private _globalService = inject(GlobalService);
+  _cookieService = inject(CookieService);
   private router = inject(Router);
   constructor() {}
 
-  ngOnInit() {
-    this.startCountdown(5 * 60); // 5 minutes countdown
+  ngOnInit() {}
+
+  ionViewWillEnter() {
+    //Tomar el expiracion-code de la cookie
+    const expirationCode = this._cookieService.get("expiration-code");
+    if (!expirationCode) {
+      this.router.navigate(["forgot-password"]);
+    }
+
+    //Verificar si el tiempo de expiracion ha pasado
+    const expirationDate = new Date(expirationCode);
+    // console.log("Expiracion code: ", expirationDate);
+    if (expirationDate.getTime() < new Date().getTime()) {
+      this.router.navigate(["forgot-password"]);
+    } else {
+      //Mostrar el tiempo restante
+      const durationInSeconds = Math.floor(
+        (expirationDate.getTime() - new Date().getTime()) / 1000
+      );
+
+      this.startCountdown(durationInSeconds);
+    }
   }
 
   ngOnDestroy() {
@@ -82,6 +104,17 @@ export class VerifyCodePage implements OnInit {
         this.remainingTime = `${minutes}:${seconds
           .toString()
           .padStart(2, "0")}`;
+
+        // console.log("Remaining time: ", this.remainingTime);
+        //Si llega a 0 redirigir a la pagina de inicio
+        if (this.remainingTime == "0:00") {
+          this.toastMessage = "El tiempo de verificación ha expirado";
+          this.isToastOpen = true;
+          //esperar 3 segundos antes de redirigir
+          setTimeout(() => {
+            this.router.navigate(["forgot-password"]);
+          }, 3000);
+        }
       });
   }
 }

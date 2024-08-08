@@ -81,11 +81,12 @@ export class AuthController {
     console.log('desde frontend', reset);
 
     // Obtener todos los usuarios
-    let users = await this.credencialesRepository.find();
-    console.log('Usuarios', users);
+    let user = await this.credencialesRepository.findOne({
+      where: {correo: reset.identificator},
+    });
+    console.log('Usuarios', user);
 
-    let user = users.find(u => u.id === reset.identificator);
-    console.log('Usuario', user);
+    
 
     if (!user) {
       return {error: 'Usuario no encontrado'};
@@ -99,7 +100,9 @@ export class AuthController {
     if (!result) {
       return {error: 'Error al cambiar la contraseña'};
     } else {
-      return true;
+      return {
+        message: 'Contraseña cambiada correctamente',
+      };
     }
   }
 
