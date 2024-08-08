@@ -1,0 +1,123 @@
+import { Component, inject, OnInit } from "@angular/core";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { ActivatedRoute, Router } from "@angular/router";
+import { AlertController } from "@ionic/angular";
+import { AuthService } from "src/app/shared/services/auth.service";
+import { GlobalService } from "src/app/shared/services/global.service";
+
+@Component({
+  selector: "app-reset-password",
+  templateUrl: "./reset-password.page.html",
+  styleUrls: ["./reset-password.page.scss"],
+})
+export class ResetPasswordPage implements OnInit {
+  validateForm!: FormGroup;
+  userId: string = "";
+
+  isToastOpen: boolean = false;
+  toastMessage: string = "";
+
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private _globalService = inject(GlobalService);
+  private _alertController = inject(AlertController);
+
+
+  constructor(private fb: FormBuilder) {
+    this.validateForm = this.fb.group({
+      identificator: ["", [Validators.required, Validators.email]],
+      newPassword: ["", [Validators.required, Validators.minLength(6)]],
+    });
+  }
+
+  ngOnInit() {}
+
+  ionViewWillEnter() {
+    console.log("ForgotPasswordPage");
+    this.route.paramMap.subscribe((params) => {
+      const id = params.get("id");
+      if (id !== null) {
+        this.userId = id;
+        this.consultarCredenciales(id);
+      } else {
+        console.log('El parametro "id" no esta presente en la URL');
+      }
+    });
+  }
+
+  setOpenedToast(value: boolean) {
+    this.isToastOpen = value;
+  }
+
+  consultarCredenciales(id: string): void {
+    this._globalService.Get("credenciales/" + id).subscribe((result: any) => {
+      if (result.error) {
+        //Mostrar toast
+        this.toastMessage = result.error;
+        this.isToastOpen = true;
+      } else {
+        this.validateForm.patchValue({
+          identificator: result.correo,
+        });
+
+        //Mostrar toast
+        this.toastMessage = "Se ha encontrado su correo electrónico";
+        this.isToastOpen = true;
+      }
+    });
+  }
+
+  resetPassword() {
+    if (this.validateForm.valid) {
+      console.log("Form submitted", this.validateForm.value);
+      // Implement your form submission logic here
+      this._globalService
+        .Post("reset-password", this.validateForm.value)
+        .subscribe({
+          next: (response) => {
+            this.validateForm.reset();
+            this.toastMessage = "Contraseña cambiada correctamente";
+            this.isToastOpen = true;
+            //Preguntar al usuario si quiere ser redirigido al login
+            this.questRedirect();
+
+          },
+          error: (error) => {
+            console.error("There was an error!", error);
+            this.toastMessage = "Ha ocurrido un error";
+            this.isToastOpen = true;
+          },
+        });
+    }
+  }
+
+  async questRedirect() {
+    const alert = await this._alertController.create({
+      header: "Iniciar sesión",
+      message: "¿Desea ir al Login?",
+      buttons: [
+        {
+          text: "Cancelar",
+          role: "cancel",
+          cssClass: "secondary",
+          handler: () => {
+            console.log("Redirección cancelada");
+          },
+        },
+        {
+          text: "Si",
+          handler: () => {
+            this.router.navigate(["/login"]);
+
+          },
+        },
+      ],
+    });
+
+    await alert.present();
+  }
+
+  goBackToLogin() {
+    this.router.navigate(["/login"]);
+  }
+}

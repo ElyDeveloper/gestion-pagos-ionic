@@ -81,27 +81,26 @@ export class AuthController {
     console.log('desde frontend', reset);
 
     // Obtener todos los usuarios
-   let users = await this.credencialesRepository.find();
-   console.log('Usuarios', users);
+    let users = await this.credencialesRepository.find();
+    console.log('Usuarios', users);
 
-   let user = users.find(u => u.id === reset.identificator);
-   console.log('Usuario', user);
+    let user = users.find(u => u.id === reset.identificator);
+    console.log('Usuario', user);
 
-   if(!user){
-     return {error: 'Usuario no encontrado'};
-   }
+    if (!user) {
+      return {error: 'Usuario no encontrado'};
+    }
 
-   let result = await this.jwtService.ResetPassword(
-    user.correo ?? '',
-    reset.newPassword
-   );
+    let result = await this.jwtService.ResetPassword(
+      user.correo ?? '',
+      reset.newPassword,
+    );
 
-   if(!result){
-     return {error: 'Error al cambiar la contraseña'};
-   }else{
+    if (!result) {
+      return {error: 'Error al cambiar la contraseña'};
+    } else {
       return true;
-   }
-
+    }
   }
 
   @post('/create-credentials')

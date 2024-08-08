@@ -115,9 +115,19 @@ export class JWTService {
 
   // }
 
+  generateVerificationCode(): string {
+    let code = shortid.generate()
+    if (code.length > 6) {
+      return code.slice(0, 6)
+    } else if (code.length < 6) {
+      return code.padEnd(6, 'A')
+    }
+    return code
+  }
+
   async generateCode(userExist: Credenciales) {
 
-    let verificationCode: string = shortid.generate();
+    let verificationCode: string = this.generateVerificationCode();
     let expTIME = new Date((Date.now() + (1000 * 120))).toISOString();
 
     //fehca y Hora de incio del dia
@@ -136,6 +146,8 @@ export class JWTService {
         }
       }
     });
+
+    console.log('codes: ', codes);
 
     if(codes.length >= 3){
       return {operation: false, content: 'limit'};

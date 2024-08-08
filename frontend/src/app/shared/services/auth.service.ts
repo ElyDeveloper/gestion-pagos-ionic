@@ -44,11 +44,11 @@ export class AuthService {
     this.userInfo.next(null);
   }
 
-  updateCredentials(body: any) {
-    return this._http.put(`${API_URL}update-credentials`, body);
+  updateCredentials(body: any, id: string) {
+    return this._http.put(`${API_URL}credenciales/${id}`, body);
   }
 
   createCredencials(body: any) {
-    return this._http.post(`${API_URL}create-credentials`, body);
+    return this._http.post(`${API_URL}credenciales`, body);
   }
 }

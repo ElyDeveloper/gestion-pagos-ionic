@@ -1,0 +1,58 @@
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div
+    class="h-100 d-flex justify-content-center align-content-center align-items-center">
+    <ion-card style="max-width: 350px; width: 100%">
+      <ion-card-header>
+        <ion-card-title>Verificar código</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <!-- Logo de la app -->
+        <div class="d-flex justify-content-center mb-2">
+          <div
+            class="rounded rounded-pill justify-content-center align-content-center align-items-center"
+            style="
+              height: 150px;
+              width: 150px;
+              background-color: rgb(255, 255, 255);
+            ">
+            <img width="250" src="assets/logo.png" alt="logo" />
+          </div>
+        </div>
+
+        <div
+          class="d-flex justify-content-center flex-column align-content-center align-items-center">
+          <h5 class="mb-2 text-center">Ingrese código de verificación</h5>
+          <!-- <ion-input type="text" formControlName="code"></ion-input> -->
+          <ngx-otp-input
+            class="text-white"
+            [options]="otpOptions"
+            (otpComplete)="submitForm($event)"></ngx-otp-input>
+        </div>
+
+        <ion-text color="danger" class="ion-text-center ion-padding-top">
+          <p>
+            <strong
+              >*Código enviado a su correo, favor revise su bandeja de
+              entrada.</strong
+            >
+          </p>
+        </ion-text>
+        <div class="ion-text-center ion-padding-top">
+          <ion-text>Código expira en: {{ remainingTime }}</ion-text>
+        </div>
+        <ion-button expand="block" fill="clear" routerLink="/login">
+          Iniciar sesión
+        </ion-button>
+        <ion-button expand="block" fill="clear" routerLink="/forgot-password">
+          Atrás
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+    <ion-toast
+      [isOpen]="isToastOpen"
+      message="{{toastMessage}}"
+      [duration]="5000"
+      color="danger"
+      (didDismiss)="setOpenedToast(false)"></ion-toast>
+  </div>
+</ion-content>
