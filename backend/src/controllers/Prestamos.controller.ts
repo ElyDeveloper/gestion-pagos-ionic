@@ -19,7 +19,7 @@ import {
 } from '@loopback/rest';
 import {viewOf} from '../core/library/views.library';
 import {Prestamos} from '../models';
-import {PrestamosRepository} from '../repositories/Prestamos.repository';
+import {PrestamosRepository} from '../repositories/prestamos.repository';
 
 // @authenticate('admin', 'owner')
 
@@ -29,7 +29,7 @@ export class PrestamosController {
     public PrestamosRepository: PrestamosRepository
   ) {}
 
-  @post('/Prestamos')
+  @post('/prestamos')
   @response(200, {
     description: 'Prestamos model instance',
     content: {'application/json': {schema: getModelSchemaRef(Prestamos)}},
@@ -50,7 +50,7 @@ export class PrestamosController {
     return this.PrestamosRepository.create(Prestamos);
   }
 
-  @get('/Prestamos/count')
+  @get('/prestamos/count')
   @response(200, {
     description: 'Prestamos model count',
     content: {'application/json': {schema: CountSchema}},
@@ -61,7 +61,7 @@ export class PrestamosController {
     return this.PrestamosRepository.count(where);
   }
 
-  @get('/Prestamos')
+  @get('/prestamos')
   @response(200, {
     description: 'Array of Prestamos model instances',
     content: {
@@ -83,7 +83,7 @@ export class PrestamosController {
     });
   }
 
-  @get('/Prestamos/paginated')
+  @get('/prestamos/paginated')
   @response(200, {
     description: 'List of Prestamos model',
     content: {
@@ -110,7 +110,7 @@ export class PrestamosController {
     });
   }
 
-  @patch('/Prestamos')
+  @patch('/prestamos')
   @response(200, {
     description: 'Prestamos PATCH success count',
     content: {'application/json': {schema: CountSchema}},
@@ -129,7 +129,7 @@ export class PrestamosController {
     return this.PrestamosRepository.updateAll(Prestamos, where);
   }
 
-  @get('/Prestamos/{id}')
+  @get('/prestamos/{id}')
   @response(200, {
     description: 'Prestamos model instance',
     content: {
@@ -150,7 +150,7 @@ export class PrestamosController {
     });
   }
 
-  @patch('/Prestamos/{id}')
+  @patch('/prestamos/{id}')
   @response(204, {
     description: 'Prestamos PATCH success',
   })
@@ -168,7 +168,7 @@ export class PrestamosController {
     await this.PrestamosRepository.updateById(id, Prestamos);
   }
 
-  @put('/Prestamos/{id}')
+  @put('/prestamos/{id}')
   @response(204, {
     description: 'Prestamos PUT success',
   })
@@ -179,7 +179,7 @@ export class PrestamosController {
     await this.PrestamosRepository.replaceById(id, Prestamos);
   }
 
-  @del('/Prestamos/{id}')
+  @del('/prestamos/{id}')
   @response(204, {
     description: 'Prestamos DELETE success',
   })
@@ -198,7 +198,7 @@ export class PrestamosController {
     );
   }
 
-  @get('/Prestamos/search')
+  @get('/prestamos/search')
   async dataPrestamosSearch(
     @param.query.string('search') search: string,
   ): Promise<any> {

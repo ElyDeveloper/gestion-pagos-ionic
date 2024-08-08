@@ -3,7 +3,7 @@ import {DefaultCrudRepository, HasManyRepositoryFactory, repository} from '@loop
 import {GestionEdboDataSource} from '../datasources';
 import {TipoPrestamos, TipoPrestamosRelations} from '../models';
 import { Prestamos } from '../models';
-import { PrestamosRepository } from './Prestamos.repository';
+import { PrestamosRepository } from './prestamos.repository';
 
 export class TipoPrestamosRepository extends DefaultCrudRepository<
   TipoPrestamos,

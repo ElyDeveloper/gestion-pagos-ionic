@@ -13,7 +13,7 @@ import {
 } from '@loopback/rest';
 import {viewOf} from '../core/library/views.library';
 import {Cuotas} from '../models';
-import {CuotasRepository} from '../repositories/Cuotas.repository';
+import {CuotasRepository} from '../repositories/cuotas.repository';
 
 // @authenticate('admin', 'owner')
 

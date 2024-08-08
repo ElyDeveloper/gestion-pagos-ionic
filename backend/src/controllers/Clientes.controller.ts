@@ -19,7 +19,7 @@ import {
 } from '@loopback/rest';
 import {viewOf} from '../core/library/views.library';
 
-import {ClientesRepository} from '../repositories/Clientes.repository';
+import {ClientesRepository} from '../repositories/clientes.repository';
 import { Clientes } from '../models';
 
 // @authenticate('admin', 'owner')
@@ -29,7 +29,7 @@ export class ClientesController {
     public ClientesRepository: ClientesRepository,
   ) {}
 
-  @post('/Clientes')
+  @post('/clientes')
   @response(200, {
     description: 'Clientes model instance',
     content: {'application/json': {schema: getModelSchemaRef(Clientes)}},
@@ -50,7 +50,7 @@ export class ClientesController {
     return this.ClientesRepository.create(Clientes);
   }
 
-  @get('/Clientes/count')
+  @get('/clientes/count')
   @response(200, {
     description: 'Clientes model count',
     content: {'application/json': {schema: CountSchema}},
@@ -59,7 +59,7 @@ export class ClientesController {
     return this.ClientesRepository.count(where);
   }
 
-  @get('/Clientes')
+  @get('/clientes')
   @response(200, {
     description: 'Array of Clientes model instances',
     content: {
@@ -77,7 +77,7 @@ export class ClientesController {
     return this.ClientesRepository.find();
   }
 
-  @get('/Clientes/paginated')
+  @get('/clientes/paginated')
   @response(200, {
     description: 'List of Clientes model',
     content: {
@@ -100,7 +100,7 @@ export class ClientesController {
     });
   }
 
-  @patch('/Clientes')
+  @patch('/clientes')
   @response(200, {
     description: 'Clientes PATCH success count',
     content: {'application/json': {schema: CountSchema}},
@@ -119,7 +119,7 @@ export class ClientesController {
     return this.ClientesRepository.updateAll(Clientes, where);
   }
 
-  @get('/Clientes/{id}')
+  @get('/clientes/{id}')
   @response(200, {
     description: 'Clientes model instance',
     content: {
@@ -136,7 +136,7 @@ export class ClientesController {
     return this.ClientesRepository.findById(id, filter);
   }
 
-  @patch('/Clientes/{id}')
+  @patch('/clientes/{id}')
   @response(204, {
     description: 'Clientes PATCH success',
   })
@@ -154,7 +154,7 @@ export class ClientesController {
     await this.ClientesRepository.updateById(id, Clientes);
   }
 
-  @put('/Clientes/{id}')
+  @put('/clientes/{id}')
   @response(204, {
     description: 'Clientes PUT success',
   })
@@ -165,7 +165,7 @@ export class ClientesController {
     await this.ClientesRepository.replaceById(id, Clientes);
   }
 
-  @del('/Clientes/{id}')
+  @del('/clientes/{id}')
   @response(204, {
     description: 'Clientes DELETE success',
   })
@@ -184,7 +184,7 @@ export class ClientesController {
     );
   }
 
-  @get('/Clientes/search')
+  @get('/clientes/search')
   async dataClientesSearch(
     @param.query.string('search') search: string,
   ): Promise<any> {

@@ -2,7 +2,7 @@ import {Getter, inject} from '@loopback/core';
 import {DefaultCrudRepository, HasManyRepositoryFactory, repository} from '@loopback/repository';
 import {GestionEdboDataSource} from '../datasources';
 import {Clientes, ClientesRelations, Prestamos} from '../models';
-import { PrestamosRepository } from './Prestamos.repository';
+import { PrestamosRepository } from './prestamos.repository';
 
 export class ClientesRepository extends DefaultCrudRepository<
   Clientes,

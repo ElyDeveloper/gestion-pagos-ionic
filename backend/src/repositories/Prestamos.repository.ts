@@ -2,10 +2,10 @@ import {Getter, inject} from '@loopback/core';
 import {BelongsToAccessor, DefaultCrudRepository, repository} from '@loopback/repository';
 import {GestionEdboDataSource} from '../datasources';
 import {Clientes, Cuotas, Prestamos, PrestamosRelations} from '../models';
-import { ClientesRepository } from './Clientes.repository';
+import { ClientesRepository } from './clientes.repository';
 import { TipoPrestamos } from '../models';
-import { TipoPrestamosRepository } from './TipoPrestamos.repository';
-import { CuotasRepository } from './Cuotas.repository';
+import { TipoPrestamosRepository } from './tipo-prestamos.repository';
+import { CuotasRepository } from './cuotas.repository';
 
 export class PrestamosRepository extends DefaultCrudRepository<
   Prestamos,

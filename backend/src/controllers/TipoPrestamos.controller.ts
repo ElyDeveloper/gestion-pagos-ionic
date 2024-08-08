@@ -19,7 +19,7 @@ import {
 } from '@loopback/rest';
 import {viewOf} from '../core/library/views.library';
 import {TipoPrestamos} from '../models';
-import {TipoPrestamosRepository} from '../repositories/TipoPrestamos.repository';
+import {TipoPrestamosRepository} from '../repositories/tipo-prestamos.repository';
 
 // @authenticate('admin', 'owner')
 

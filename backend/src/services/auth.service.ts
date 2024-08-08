@@ -66,8 +66,7 @@ export class AuthService {
 
     const auth = {
       token: await this.jwtService.createToken(matchCredencials, user),
-      usuario: JSON.stringify(user),
-      rol: user.rolid
+      usuario: JSON.stringify(user)
     }
 
     console.log('auth', auth)

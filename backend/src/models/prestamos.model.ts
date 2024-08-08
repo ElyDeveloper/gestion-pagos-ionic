@@ -1,7 +1,7 @@
 import {belongsTo, Entity, model, property} from '@loopback/repository';
-import { Clientes } from './Clientes.model';
+import { Clientes } from './clientes.model';
 import { TipoPrestamos } from './tipo-prestamos.model';
-import { Cuotas } from './Cuotas.model';
+import { Cuotas } from './cuotas.model';
 
 @model({settings: {idInjection: false, mssql: {schema: 'dbo', table: 'Prestamos'}}})
 export class Prestamos extends Entity {

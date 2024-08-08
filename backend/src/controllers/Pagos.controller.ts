@@ -18,8 +18,8 @@ import {
   response,
 } from '@loopback/rest';
 import {viewOf} from '../core/library/views.library';
-import {Pagos} from '../models/Pagos.model';
-import {PagosRepository} from '../repositories/Pagos.repository';
+import {Pagos} from '../models/pagos.model';
+import {PagosRepository} from '../repositories/pagos.repository';
 
 // @authenticate('admin', 'owner')
 
