@@ -68,16 +68,6 @@ export class Usuario extends Entity {
   correo?: string;
 
   @property({
-    type: 'number',
-    jsonSchema: {nullable: true},
-    precision: 10,
-    scale: 0,
-    generated: false,
-    mssql: {columnName: 'TipoUsuario', dataType: 'int', dataLength: null, dataPrecision: 10, dataScale: 0, nullable: 'YES', generated: false},
-  })
-  tipoUsuario?: number;
-
-  @property({
     type: 'boolean',
     jsonSchema: {nullable: true},
     generated: false,
