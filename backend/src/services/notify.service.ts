@@ -11,12 +11,12 @@ export class NotifyService {
     let isSend: boolean = false;
     var mailOptions: any;
     var transporter = nodemailer.createTransport({
-      service: 'smtp.gmail.com',
+      host: keys.SMTP_CLIENT,
       port: 587,
       secure: false,
       auth: {
         user: keys.SENDER_EMAIL,
-        pass: keys.Sender_Password,
+        pass: keys.SMTP_PSWD,
       },
     });
     if (atachment) {

@@ -6,8 +6,8 @@ export namespace keys {
   export const TOKEN_EXPIRATION_TIME = Date.now() + ONE_HOUR_SECONDS * 3;
   export const SENDER_EMAIL = 'elydeveloperhn@gmail.com';
   export const SMTP_CLIENT = 'smtp.gmail.com';
+  export const SMTP_PSWD = 'qxtf szbf iqse qrvs';
   export const SENDER_PHONE_NUMBER = '+50495206618';
-  export const Sender_Password = 'rjbe elxn wodf cwzq';
   export const GENERATE_NEW_VERIFY_CODE = require('codeid');
   export const TIME_OUT_NAME = 'timeout_event';
   export const VERIFICATION_CODE_NAME = 'code';

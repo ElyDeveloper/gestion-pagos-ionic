@@ -11,7 +11,7 @@ export class MailService {
       secure: false,
       auth: {
         user: keys.SENDER_EMAIL,
-        pass: keys.Sender_Password,
+        pass: keys.SMTP_PSWD,
       },
     });
   }

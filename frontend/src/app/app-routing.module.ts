@@ -17,6 +17,14 @@ const routes: Routes = [
     loadChildren: () => import('./pages/auth/forgot-password/forgot-password.module').then( m => m.ForgotPasswordPageModule)
   },
   {
+    path: 'reset-password/:id',
+    loadChildren: () => import('./pages/auth/reset-password/reset-password.module').then( m => m.ResetPasswordPageModule)
+  },
+  {
+    path: 'verify-code',
+    loadChildren: () => import('./pages/auth/verify-code/verify-code.module').then( m => m.VerifyCodePageModule)
+  },
+  {
     path: "register",
     loadChildren: () =>
       import("./pages/auth/register/register.module").then(
