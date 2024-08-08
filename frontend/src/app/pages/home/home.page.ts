@@ -42,6 +42,15 @@ export class HomePage {
         console.error("Error al obtener la cantidad de usuarios", error);
       },
     });
+
+    this._globalService.Get("clientes/count").subscribe({
+      next: (data: any) => {
+        this.folders[1].count = data.count;
+      },
+      error: (error) => {
+        console.error("Error al obtener la cantidad de clientes", error);
+      },
+    });
     
   }
 

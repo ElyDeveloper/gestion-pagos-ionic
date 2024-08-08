@@ -133,7 +133,16 @@ export class ClientesPage implements OnInit {
     return key.split(".").reduce((o, k) => (o || {})[k], row);
   }
 
-  getObjectValue(row: any, key: string): string {
+  getDateValue(row: any, key: string): any {
+    const element = key.split(".").reduce((o, k) => (o || {})[k], row);
+
+    if (element) {
+      return new Date(element);
+    }
+    return "";
+  }
+
+  getObjectValue(row: any, key: string): any {
     const obj = row[key];
     if (obj && typeof obj === "object") {
       return obj.nombre || JSON.stringify(obj);
@@ -143,7 +152,7 @@ export class ClientesPage implements OnInit {
 
   private setModalState(isEdit: boolean, modalTemplate: any, formData?: any) {
     this.isEdit = isEdit;
-    
+
     if (formData) {
       formData.fechaIngreso = this.formatDateForInput(formData.fechaIngreso);
       if (formData.fechaBaja) {
@@ -164,7 +173,7 @@ export class ClientesPage implements OnInit {
   }
 
   formatDateForInput(dateString: string): string {
-    return dateString.split('T')[0];
+    return dateString.split("T")[0];
   }
 
   onAddButtonClicked() {
@@ -204,7 +213,6 @@ export class ClientesPage implements OnInit {
   }
 
   handleUserOperation(operation: "edit" | "create", data: any) {
-    
     data.fechaIngreso = new Date(data.fechaIngreso);
     console.log("Datos del cliente:", data);
 
@@ -215,12 +223,12 @@ export class ClientesPage implements OnInit {
     switch (operation) {
       case "edit":
         operationText = "Editando";
-        apiCall = this._globalService.PutId("Clientes", data.id, data);
+        apiCall = this._globalService.PutId("clientes", data.id, data);
         break;
       case "create":
         delete data.Id;
         operationText = "Guardando";
-        apiCall = this._globalService.Post("Clientes", data);
+        apiCall = this._globalService.Post("clientes", data);
         break;
     }
 
@@ -268,7 +276,7 @@ export class ClientesPage implements OnInit {
     if (event === "") {
       this.getCountElements();
     } else {
-      this._globalService.Get(`Clientes/search?query=${event}`).subscribe({
+      this._globalService.Get(`clientes/search?query=${event}`).subscribe({
         next: (response: any) => {
           this.elements = response;
           console.log("Elementos obtenidos:", response);
@@ -286,7 +294,7 @@ export class ClientesPage implements OnInit {
     const limit = this.currentPageSize;
 
     this._globalService
-      .Get(`Clientes/paginated?skip=${skip}&limit=${limit}`)
+      .Get(`clientes/paginated?skip=${skip}&limit=${limit}`)
       .subscribe({
         next: (response: any) => {
           this.elements = response;
@@ -299,7 +307,7 @@ export class ClientesPage implements OnInit {
   }
 
   getCountElements() {
-    this._globalService.Get("Clientes/count").subscribe({
+    this._globalService.Get("clientes/count").subscribe({
       next: (response: any) => {
         console.log("Cantidad de elementos:", response.count);
         const totalElements = response.count;

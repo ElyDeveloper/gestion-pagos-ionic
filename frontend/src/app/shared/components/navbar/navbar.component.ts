@@ -1,6 +1,8 @@
 import { Component, inject, OnInit } from "@angular/core";
 import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { filter } from "rxjs";
+import { AuthService } from "../../services/auth.service";
+import { Usuario } from "../../interfaces/usuario";
 
 @Component({
   selector: "app-navbar",
@@ -9,11 +11,7 @@ import { filter } from "rxjs";
 })
 export class NavbarComponent implements OnInit {
   selectionProfile: any;
-  private router = inject(Router);
-  user = {
-    name: "Gerson Rivera",
-    email: "john@gmail.com",
-  };
+  user: Usuario = {};
 
   isActionSheetOpen = false;
 
@@ -37,13 +35,28 @@ export class NavbarComponent implements OnInit {
     },
   ];
 
+  private router = inject(Router);
+  private _authService = inject(AuthService);
   constructor() {}
 
   ionViewWillEnter() {
     this.selectionProfile = "";
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.getUserLogged();
+  }
+
+  getUserLogged() {
+    this._authService.getUserInfo().subscribe({
+      next: (user: any) => {
+        this.user = user;
+      },
+      error: (error) => {
+        console.error("Error al obtener usuario logueado", error);
+      },
+    });
+  }
 
   setOpen(isOpen: boolean) {
     this.isActionSheetOpen = isOpen;

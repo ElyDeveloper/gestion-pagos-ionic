@@ -283,7 +283,7 @@ export class ContratosPagoPage implements OnInit {
     const limit = this.currentPageSize;
 
     this._globalService
-      .Get(`Clientes/paginated?skip=${skip}&limit=${limit}`)
+      .Get(`clientes/paginated?skip=${skip}&limit=${limit}`)
       .subscribe({
         next: (response: any) => {
           this.elements = response;
@@ -296,7 +296,7 @@ export class ContratosPagoPage implements OnInit {
   }
 
   getCountElements() {
-    this._globalService.Get("Clientes/count").subscribe({
+    this._globalService.Get("clientes/count").subscribe({
       next: (response: any) => {
         console.log("Cantidad de elementos:", response.count);
         const totalElements = response.count;

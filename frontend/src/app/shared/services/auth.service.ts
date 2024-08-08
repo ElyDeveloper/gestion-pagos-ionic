@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { Usuario } from '../interfaces/usuario';
 
 const API_URL = environment.apiURL;
 
@@ -8,15 +10,45 @@ const API_URL = environment.apiURL;
   providedIn: 'root'
 })
 export class AuthService {
-
   private _http = inject(HttpClient);
-  constructor() { }
+  private userInfo = new BehaviorSubject<Usuario | null>(null);
 
-  updateCredentials(body:any){
-    return this._http.put(`${API_URL}update-credentials`,body)
+  constructor() {
+    this.loadUserFromStorage();
   }
 
-  createCredencials(body:any){
-    return this._http.post(`${API_URL}create-credentials`,body)
+  private loadUserFromStorage(): void {
+    const storedUser = localStorage.getItem('userInfo');
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        this.userInfo.next(user);
+      } catch (error) {
+        console.error('Error parsing stored user info:', error);
+        localStorage.removeItem('userInfo');
+      }
+    }
+  }
+
+  setUserInfo(user: Usuario): void {
+    localStorage.setItem('userInfo', JSON.stringify(user));
+    this.userInfo.next(user);
+  }
+
+  getUserInfo(): Observable<Usuario | null> {
+    return this.userInfo.asObservable();
+  }
+
+  clearUserInfo(): void {
+    localStorage.removeItem('userInfo');
+    this.userInfo.next(null);
+  }
+
+  updateCredentials(body: any) {
+    return this._http.put(`${API_URL}update-credentials`, body);
+  }
+
+  createCredencials(body: any) {
+    return this._http.post(`${API_URL}create-credentials`, body);
   }
 }

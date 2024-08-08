@@ -147,6 +147,15 @@ export class ClientesPage implements OnInit {
     return key.split(".").reduce((o, k) => (o || {})[k], row);
   }
 
+  getDateValue(row: any, key: string): any {
+    const element = key.split(".").reduce((o, k) => (o || {})[k], row);
+
+    if (element) {
+      return new Date(element);
+    }
+    return "";
+  }
+
   getObjectValue(row: any, key: string): string {
     const obj = row[key];
     if (obj && typeof obj === "object") {
@@ -269,7 +278,7 @@ export class ClientesPage implements OnInit {
     if (event === "") {
       this.getCountElements();
     } else {
-      this._globalService.Get(`Clientes/search?query=${event}`).subscribe({
+      this._globalService.Get(`clientes/search?query=${event}`).subscribe({
         next: (response: any) => {
           this.elements = response;
           console.log("Elementos obtenidos:", response);
@@ -287,7 +296,7 @@ export class ClientesPage implements OnInit {
     const limit = this.currentPageSize;
 
     this._globalService
-      .Get(`Clientes/paginated?skip=${skip}&limit=${limit}`)
+      .Get(`clientes/paginated?skip=${skip}&limit=${limit}`)
       .subscribe({
         next: (response: any) => {
           this.elements = response;
@@ -300,7 +309,7 @@ export class ClientesPage implements OnInit {
   }
 
   getCountElements() {
-    this._globalService.Get("Clientes/count").subscribe({
+    this._globalService.Get("clientes/count").subscribe({
       next: (response: any) => {
         console.log("Cantidad de elementos:", response.count);
         const totalElements = response.count;
