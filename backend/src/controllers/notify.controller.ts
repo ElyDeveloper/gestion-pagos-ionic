@@ -54,10 +54,7 @@ export class NotifyController {
       }
 
       //Genera el codigo de verificacion y envia el correo electronico
-      let verificationCode: any = await this.jwt.generateCode(userExist);
-      if (verificationCode.operation == 'error') {
-        return {error: 'Error al generar el codigo de verificacion'};
-      }
+      const {operation, content} = await this.jwt.generateCode(userExist);
 
       let rolId: any = await this.usuarioRepository.findOne({
         where: {correo: userExist.correo},
@@ -67,15 +64,29 @@ export class NotifyController {
         const rolUsuario = rolId.rolid;
         // console.log('RolUsuario: ', rolUsuario);
         if (rolUsuario == 1 || rolUsuario == 2) {
-          console.log('Codigo de verificacion enviado: ', verificationCode);
-          if (verificationCode.operation == true) {
-            await this.notify.EmailNotification(
+          console.log('Codigo de verificacion enviado: ', content);
+          if (operation == true) {
+            if (typeof content === 'string') {
+              return { error: 'Error al enviar el correo' };
+            }
+            const result = await this.notify.EmailNotification(
               userExist.correo ?? '',
               'Codigo de verificacion',
-              `Su codigo de verificacion es: ${verificationCode.content}`,
+              `Su codigo de verificacion es: ${content.codigo}`,
             );
+            console.log('Resultado de envio de correo: ', result);
+            if (result) {
+              return {
+                message: 'Codigo de verificacion enviado',
+                expiration: content.exp,
+              };
+            }
+            return {error: 'Error al enviar el correo'};
           } else {
-            return {error: 'Llego al limite de intentos diarios, espere 24 horas, o contacte al administrador.'};
+            return {
+              error:
+                'Llego al limite de intentos diarios, espere 24 horas, o contacte al administrador.',
+            };
           }
         } else {
           return {error: 'Usuario no autorizado'};
