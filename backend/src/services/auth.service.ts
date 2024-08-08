@@ -2,7 +2,10 @@ import {inject} from '@loopback/core';
 import {BindingScope, injectable, service} from '@loopback/core/dist';
 import {repository} from '@loopback/repository';
 import {LoginInterface} from '../core/interfaces/models/Login.interface';
-import {RegisterUserInterface, credentialShema} from '../core/interfaces/models/RegisterUser.interface';
+import {
+  RegisterUserInterface,
+  credentialShema,
+} from '../core/interfaces/models/RegisterUser.interface';
 import {error} from '../core/library/errors.library';
 import {Credenciales} from '../models/credenciales.model';
 import {Usuario} from '../models/usuario.model';
@@ -29,70 +32,70 @@ export class AuthService {
     private mailService: MailService,
     @service(EncriptDecryptService)
     private encriptDecryptService: EncriptDecryptService,
-
-  ) {
-  }
+  ) {}
 
   async Login(loginInterface: LoginInterface) {
+    if (!loginInterface) return error.EMTY_CREDENTIALS;
 
-    if (!loginInterface)
-      return error.EMTY_CREDENTIALS;
-
-    let credentials = await this.credencialesRepository.findOne({where: {correo: loginInterface.identificator}});
-    console.log('credentials', credentials)
-
-    if (!credentials)
-      credentials = await this.credencialesRepository.findOne({where: {username: loginInterface.identificator}});
-
+    let credentials = await this.credencialesRepository.findOne({
+      where: {correo: loginInterface.identificator},
+    });
+    console.log('credentials', credentials);
 
     if (!credentials)
-      return error.CREDENTIALS_NOT_REGISTER;
+      credentials = await this.credencialesRepository.findOne({
+        where: {username: loginInterface.identificator},
+      });
 
-    let user = await this.usuarioRepository.findOne({where: {correo: credentials.correo}});
-    console.log('user', user)
+    if (!credentials) return error.CREDENTIALS_NOT_REGISTER;
 
-    if (!user)
-      return error.CREDENTIALS_NOT_REGISTER;
+    let user = await this.usuarioRepository.findOne({
+      where: {correo: credentials.correo},
+    });
+    console.log('user', user);
 
+    if (!user) return error.CREDENTIALS_NOT_REGISTER;
 
-    if (!user.estado)
-      return error.DISABLE_USER;
+    if (!user.estado) return error.DISABLE_USER;
 
-    let matchCredencials = await this.jwtService.IdentifyToken(loginInterface)
+    let matchCredencials = await this.jwtService.IdentifyToken(loginInterface);
 
-
-    if (!matchCredencials)
-      return error.INVALID_PASSWORD;
+    if (!matchCredencials) return error.INVALID_PASSWORD;
 
     const auth = {
       token: await this.jwtService.createToken(matchCredencials, user),
-      usuario: JSON.stringify(user)
-    }
+      usuario: user,
+    };
 
-    console.log('auth', auth)
+    console.log('auth', auth);
     return auth;
   }
 
-  async RegisterUser(registerUser: RegisterUserInterface): Promise<boolean | any> {
-    let modelUser: Usuario = new Usuario;
-    let modelCredentials: Credenciales = new Credenciales;
+  async RegisterUser(
+    registerUser: RegisterUserInterface,
+  ): Promise<boolean | any> {
+    let modelUser: Usuario = new Usuario();
+    let modelCredentials: Credenciales = new Credenciales();
 
-    let userExist = await this.credencialesRepository.findOne({where: {correo: registerUser.email}});
+    let userExist = await this.credencialesRepository.findOne({
+      where: {correo: registerUser.email},
+    });
 
-    if (userExist)
-      return error.INVALID_EMAIL;
-
-    if (!userExist)
-      userExist = await this.credencialesRepository.findOne({where: {username: registerUser.username}});
-
-    if (userExist)
-      return error.INVALID_USERNAME;
+    if (userExist) return error.INVALID_EMAIL;
 
     if (!userExist)
-      userExist = await this.usuarioRepository.findOne({where: {telefono: registerUser.phoneNumber}});
+      userExist = await this.credencialesRepository.findOne({
+        where: {username: registerUser.username},
+      });
 
-    if (userExist)
-      return error.INVALID_PHONENUMBER;
+    if (userExist) return error.INVALID_USERNAME;
+
+    if (!userExist)
+      userExist = await this.usuarioRepository.findOne({
+        where: {telefono: registerUser.phoneNumber},
+      });
+
+    if (userExist) return error.INVALID_PHONENUMBER;
 
     modelUser.rolid = registerUser.rolId;
     modelUser.nombre = registerUser.firstName;
@@ -115,10 +118,11 @@ export class AuthService {
   }
 
   async createCredentials(credencialShema: credentialShema) {
-    let modelCredentials: Credenciales = new Credenciales;
+    let modelCredentials: Credenciales = new Credenciales();
 
-
-    let newHash = this.encriptDecryptService.Encrypt(credencialShema.newPassword);
+    let newHash = this.encriptDecryptService.Encrypt(
+      credencialShema.newPassword,
+    );
 
     modelCredentials.correo = credencialShema.correo;
     modelCredentials.username = credencialShema.username;
@@ -130,35 +134,44 @@ export class AuthService {
   }
 
   async updateCredencials(credencialShema: credentialShema) {
-    let modelCredentials: Credenciales = new Credenciales;
+    let modelCredentials: Credenciales = new Credenciales();
 
-
-    let credentialExist = await this.credencialesRepository.findOne({where: {correo: credencialShema.correo}});
+    let credentialExist = await this.credencialesRepository.findOne({
+      where: {correo: credencialShema.correo},
+    });
 
     if (!credentialExist) {
       return error.CREDENTIALS_ALREDY_EXIST;
     }
 
-    let newHash = this.encriptDecryptService.Encrypt(credencialShema.newPassword);
+    let newHash = this.encriptDecryptService.Encrypt(
+      credencialShema.newPassword,
+    );
 
     modelCredentials.correo = credencialShema.correo;
     modelCredentials.username = credencialShema.username;
     modelCredentials.hash = newHash;
 
-    await this.credencialesRepository.updateById(credentialExist.id, modelCredentials);
-    const usuario = await this.usuarioRepository.findOne({where: {correo: credencialShema.correo}});
+    await this.credencialesRepository.updateById(
+      credentialExist.id,
+      modelCredentials,
+    );
+    const usuario = await this.usuarioRepository.findOne({
+      where: {correo: credencialShema.correo},
+    });
 
     if (usuario) {
       usuario.changedPassword = true;
       await this.usuarioRepository.update(usuario);
     } else {
-      console.log("Usuario no encontrado")
+      console.log('Usuario no encontrado');
       return error.CREDENTIALS_ALREDY_EXIST;
     }
 
-    await this.mailService.sendChangePassword(modelCredentials.correo, credencialShema.newPassword);
+    await this.mailService.sendChangePassword(
+      modelCredentials.correo,
+      credencialShema.newPassword,
+    );
     return true;
   }
-
-
 }
