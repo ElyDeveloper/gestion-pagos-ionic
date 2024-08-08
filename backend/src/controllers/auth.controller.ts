@@ -68,7 +68,7 @@ export class AuthController {
           schema: {
             type: 'object',
             properties: {
-              identificator: {type: 'string'},
+              identificator: {type: 'number'},
               newPassword: {type: 'string'},
             },
             required: ['identificator', 'newPassword'],
