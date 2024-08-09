@@ -70,8 +70,7 @@ export class UserController {
       hash: newHash,
     });
 
-    //TODO DESCOMENTAR PARA ENVIO DE EMAILS
-    // await this.mailService.sendWelcomeEmail(newUser.correo, username, password);
+    await this.mailService.sendWelcomeEmail(newUser.correo || '', password);
 
     return newUser;
   }

@@ -16,12 +16,12 @@ export class MailService {
     });
   }
 
-  async sendWelcomeEmail(to: string, username: string, password: string) {
+  async sendWelcomeEmail(to: string, password: string) {
     const mailOptions = {
       from: keys.SENDER_EMAIL,
       to: to,
       subject: 'Bienvenido a nuestra aplicación',
-      text: `Tu nombre de usuario es: ${username} y tu contraseña temporal es: ${password}`,
+      text: `Tu contraseña temporal es: ${password}`,
     };
 
     try {

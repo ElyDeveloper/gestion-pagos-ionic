@@ -113,7 +113,7 @@ export class UsuariosPage implements OnInit {
         alias: "Correo",
       },
       {
-        key: "rolesUsuario.nombre",
+        key: "rol.nombre",
         alias: "Rol",
       },
       {
