@@ -69,6 +69,8 @@ export class LoginPage implements OnInit {
         }
 
         if (token) {
+          //Eliminar todas las cookies
+          this._cookieService.deleteAll();
           this._cookieService.set(
             "tokensession",
             result.token,

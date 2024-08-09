@@ -2,6 +2,7 @@ import { Component, inject, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
 import { AlertController } from "@ionic/angular";
+import { CookieService } from "ngx-cookie-service";
 import { AuthService } from "src/app/shared/services/auth.service";
 import { GlobalService } from "src/app/shared/services/global.service";
 
@@ -20,6 +21,7 @@ export class ResetPasswordPage implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private _globalService = inject(GlobalService);
+  private _cookieService = inject(CookieService);
   private _alertController = inject(AlertController);
 
   constructor(private fb: FormBuilder) {
@@ -89,6 +91,7 @@ export class ResetPasswordPage implements OnInit {
               // this.validateForm.reset();
               this.toastMessage = response.message;
               this.isToastOpen = true;
+              this._cookieService.delete("expiration-code");
               //Preguntar al usuario si quiere ser redirigido al login
               this.questRedirect();
             }

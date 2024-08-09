@@ -41,6 +41,11 @@ export class ForgotPasswordPage implements OnInit {
     //Tomar el expiracion-code de la cookie
     const expirationCode = this._cookieService.get("expiration-code");
 
+    if (expirationCode == "") {
+      this.isCodeActive = false;
+      return;
+    }
+
     //Verificar si el tiempo de expiracion ha pasado
     const expirationDate = new Date(expirationCode);
     // console.log("Expiracion code: ", expirationDate);
@@ -136,7 +141,6 @@ export class ForgotPasswordPage implements OnInit {
             this.toastMessage =
               "Ha ocurrido un error, por favor intente de nuevo.";
             this.isToastOpen = true;
-            
           },
           complete: () => {
             this.loaderComponent.hide();
