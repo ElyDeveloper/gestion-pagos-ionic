@@ -33,10 +33,10 @@ export class LoginPage implements OnInit {
     password: "",
   };
 
-  _router = inject(Router);
-  _globalService = inject(GlobalService);
-  _cookieService = inject(CookieService);
-  _authService = inject(AuthService);
+  private _router = inject(Router);
+  private _globalService = inject(GlobalService);
+  private _cookieService = inject(CookieService);
+  private _authService = inject(AuthService);
   constructor() {}
 
   ngOnInit() {}

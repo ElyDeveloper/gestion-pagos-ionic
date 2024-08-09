@@ -65,9 +65,10 @@ export class VerifyCodePage implements OnInit {
     }
   }
 
-  ngOnDestroy() {
+  ionViewDidLeave() {
     if (this.countdownSubscription) {
       this.countdownSubscription.unsubscribe();
+      console.log("Unsubscribed from countdown");
     }
   }
 
