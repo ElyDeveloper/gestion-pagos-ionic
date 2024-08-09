@@ -22,7 +22,6 @@ export class ResetPasswordPage implements OnInit {
   private _globalService = inject(GlobalService);
   private _alertController = inject(AlertController);
 
-
   constructor(private fb: FormBuilder) {
     this.validateForm = this.fb.group({
       identificator: ["", [Validators.required, Validators.email]],
@@ -74,13 +73,18 @@ export class ResetPasswordPage implements OnInit {
       this._globalService
         .Post("reset-password", this.validateForm.value)
         .subscribe({
-          next: (response) => {
-            this.validateForm.reset();
-            this.toastMessage = "Contraseña cambiada correctamente";
-            this.isToastOpen = true;
-            //Preguntar al usuario si quiere ser redirigido al login
-            this.questRedirect();
-
+          next: (response: any) => {
+            console.log("Response", response);
+            if (response.error) {
+              this.toastMessage = response.error;
+              this.isToastOpen = true;
+            } else {
+              this.validateForm.reset();
+              this.toastMessage = response.message;
+              this.isToastOpen = true;
+              //Preguntar al usuario si quiere ser redirigido al login
+              this.questRedirect();
+            }
           },
           error: (error) => {
             console.error("There was an error!", error);
@@ -93,8 +97,8 @@ export class ResetPasswordPage implements OnInit {
 
   async questRedirect() {
     const alert = await this._alertController.create({
-      header: "Iniciar sesión",
-      message: "¿Desea ir al Login?",
+      header: "Redirección",
+      message: "¿Desea ir a inicio de sesión?",
       buttons: [
         {
           text: "Cancelar",
@@ -108,7 +112,6 @@ export class ResetPasswordPage implements OnInit {
           text: "Si",
           handler: () => {
             this.router.navigate(["/login"]);
-
           },
         },
       ],
