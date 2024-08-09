@@ -104,6 +104,7 @@ export class PrestamosController {
         {relation: 'cliente'},
         {relation: 'tipoPrestamo'},
         {relation: 'cuotas'},
+        {relation: 'pagos'},
       ],
       skip,
       limit

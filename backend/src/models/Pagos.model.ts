@@ -1,4 +1,5 @@
-import {Entity, model, property} from '@loopback/repository';
+import {belongsTo, Entity, model, property} from '@loopback/repository';
+import { Prestamos } from './prestamos.model';
 
 @model({settings: {idInjection: false, mssql: {schema: 'dbo', table: 'Pagos'}}})
 export class Pagos extends Entity {
@@ -12,17 +13,6 @@ export class Pagos extends Entity {
     mssql: {columnName: 'Id', dataType: 'int', dataLength: null, dataPrecision: 10, dataScale: 0, nullable: 'NO', generated: 1},
   })
   id?: number;
-
-  @property({
-    type: 'number',
-    required: true,
-    jsonSchema: {nullable: false},
-    precision: 10,
-    scale: 0,
-    generated: false,
-    mssql: {columnName: 'IdPrestamo', dataType: 'int', dataLength: null, dataPrecision: 10, dataScale: 0, nullable: 'NO', generated: false},
-  })
-  idPrestamo: number;
 
   @property({
     type: 'date',
@@ -53,17 +43,9 @@ export class Pagos extends Entity {
   })
   estado: boolean;
 
-  @property({
-    type: 'number',
-    jsonSchema: {nullable: true},
-    precision: 10,
-    scale: 0,
-    generated: false,
-    mssql: {columnName: 'IdCuotas', dataType: 'int', dataLength: null, dataPrecision: 10, dataScale: 0, nullable: 'YES', generated: false},
-  })
-  idCuotas?: number;
-
   // Define well-known properties here
+  @belongsTo(() => Prestamos, {name: 'prestamos'})
+  idPrestamo:number;
 
   // Indexer property to allow additional data
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -29,7 +29,7 @@ export class PagosController {
     public PagosRepository: PagosRepository,
   ) {}
 
-  @post('/Pagos')
+  @post('/pagos')
   @response(200, {
     description: 'Pagos model instance',
     content: {'application/json': {schema: getModelSchemaRef(Pagos)}},
@@ -50,7 +50,7 @@ export class PagosController {
     return this.PagosRepository.create(Pagos);
   }
 
-  @get('/Pagos/count')
+  @get('/pagos/count')
   @response(200, {
     description: 'Pagos model count',
     content: {'application/json': {schema: CountSchema}},
@@ -59,7 +59,7 @@ export class PagosController {
     return this.PagosRepository.count(where);
   }
 
-  @get('/Pagos')
+  @get('/pagos')
   @response(200, {
     description: 'Array of Pagos model instances',
     content: {
@@ -75,7 +75,7 @@ export class PagosController {
     return this.PagosRepository.find();
   }
 
-  @get('/Pagos/paginated')
+  @get('/pagos/paginated')
   @response(200, {
     description: 'List of Pagos model',
     content: {
@@ -91,10 +91,16 @@ export class PagosController {
     @param.query.number('skip') skip: number,
     @param.query.number('limit') limit: number,
   ): Promise<Pagos[]> {
-    return this.PagosRepository.find({skip, limit});
+    return this.PagosRepository.find({
+      include:[
+        {relation: 'prestamos'},
+      ],
+      skip,
+      limit
+    });
   }
 
-  @patch('/Pagos')
+  @patch('/pagos')
   @response(200, {
     description: 'Pagos PATCH success count',
     content: {'application/json': {schema: CountSchema}},
@@ -113,7 +119,7 @@ export class PagosController {
     return this.PagosRepository.updateAll(Pagos, where);
   }
 
-  @get('/Pagos/{id}')
+  @get('/pagos/{id}')
   @response(200, {
     description: 'Pagos model instance',
     content: {
@@ -130,7 +136,7 @@ export class PagosController {
     return this.PagosRepository.findById(id, filter);
   }
 
-  @patch('/Pagos/{id}')
+  @patch('/pagos/{id}')
   @response(204, {
     description: 'Pagos PATCH success',
   })
@@ -148,7 +154,7 @@ export class PagosController {
     await this.PagosRepository.updateById(id, Pagos);
   }
 
-  @put('/Pagos/{id}')
+  @put('/pagos/{id}')
   @response(204, {
     description: 'Pagos PUT success',
   })
@@ -159,7 +165,7 @@ export class PagosController {
     await this.PagosRepository.replaceById(id, Pagos);
   }
 
-  @del('/Pagos/{id}')
+  @del('/pagos/{id}')
   @response(204, {
     description: 'Pagos DELETE success',
   })
@@ -167,7 +173,7 @@ export class PagosController {
     await this.PagosRepository.deleteById(id);
   }
 
-  @get('/get-Pagos/{id}')
+  @get('/get-pagos/{id}')
   async dataPagosId(@param.path.number('id') id: number): Promise<any> {
     let datos = await this.getPagosId(id);
     return datos;
@@ -178,7 +184,7 @@ export class PagosController {
     );
   }
 
-  @get('/Pagos/search')
+  @get('/pagos/search')
   async dataPagosSearch(
     @param.query.string('search') search: string,
   ): Promise<any> {
@@ -192,7 +198,7 @@ export class PagosController {
     );
   }
 
-  @get('/get-Pagos')
+  @get('/get-pagos')
   async dataPagos(): Promise<any> {
     let datos = await this.getPagos();
     return datos;
