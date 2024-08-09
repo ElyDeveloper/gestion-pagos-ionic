@@ -31,13 +31,13 @@ export class AppComponent {
 
   checkDarkMode() {
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
-    console.log(prefersDark);
+    // console.log(prefersDark);
     this.darkMode = prefersDark.matches;
     //Verificar si hay una configuración previa
     const darkMode = localStorage.getItem("themeApp");
     if (darkMode) {
       this.darkMode = darkMode === "dark";
-      console.log(this.darkMode);
+      // console.log(this.darkMode);
     }
 
     if (this.darkMode) {

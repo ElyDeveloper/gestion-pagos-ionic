@@ -52,22 +52,26 @@ export class AuthService {
     let user = await this.usuarioRepository.findOne({
       where: {correo: credentials.correo},
     });
-    console.log('user', user);
 
+    // console.log('user', user);
+    
     if (!user) return error.CREDENTIALS_NOT_REGISTER;
-
+    
     if (!user.estado) return error.DISABLE_USER;
-
+    
     let matchCredencials = await this.jwtService.IdentifyToken(loginInterface);
-
+    
     if (!matchCredencials) return error.INVALID_PASSWORD;
-
+    
+    const userReturn: any = user;
+    console.log('userReturn', userReturn);
+    userReturn.id = this.jwtService.encryptUserId(credentials.id || 0);
     const auth = {
       token: await this.jwtService.createToken(matchCredencials, user),
-      usuario: user,
+      usuario: userReturn,
     };
 
-    console.log('auth', auth);
+    // console.log('auth', auth);
     return auth;
   }
 

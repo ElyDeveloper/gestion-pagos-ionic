@@ -10,8 +10,12 @@ import {UsuarioRepository} from '../repositories/usuario.repository';
 import {EncriptDecryptService} from './encript-decrypt.service';
 import {UserService} from './user.service';
 import {VerifyCodeInfo} from '../core/interfaces/models/gCode.interface';
+import { AuthorizationError } from '../core/library/authorization-error';
 const jsonwebtoken = require('jsonwebtoken');
 var shortid = require('shortid-36');
+
+//importar dotenv
+require('dotenv').config();
 
 interface token {
   exp: number;
@@ -53,11 +57,37 @@ export class JWTService {
     }
   }
 
+  encryptUserId(userId: number): string {
+    return jsonwebtoken.sign(
+      {userId: userId},
+      process.env.JWT_SECRET_KEY || 'indeterminated',
+      {algorithm: 'HS256'},
+    );
+  }
+
+  decryptUserId(token: string): number {
+    try {
+      const decoded = jsonwebtoken.verify(
+        token,
+        process.env.JWT_SECRET_KEY || 'indeterminated'
+      ) as { userId: number };
+      
+      if (typeof decoded.userId !== 'number') {
+        throw new AuthorizationError('Token de id de usuario inválido');
+      }
+      
+      return decoded.userId;
+    } catch (error) {
+      console.error('Error al desencriptar token:', error);
+      throw new AuthorizationError('Token de id de usuario inválido');
+    }
+  }
+
   VerifyToken(token: string) {
-    if (!token) throw new HttpErrors[401]('Token vacio');
+    if (!token) throw new HttpErrors[401]('Token de id de usuario vacio');
     let decoded = jsonwebtoken.verify(token, keys.JWT_SECRET_KEY);
     if (decoded) return decoded;
-    else throw new HttpErrors[401]('Token invalido');
+    else throw new HttpErrors[401]('Token de id de usuario invalido');
   }
 
   async IdentifyToken(

@@ -19,7 +19,7 @@ export class ForgotPasswordPage implements OnInit {
   isToastOpen: boolean = false;
   isCodeActive: boolean = false;
 
-  remainingTime: string = "";
+  remainingTime: string = "0:00";
   toastMessage: string = "";
   textLoader: string = "Procesando";
 
@@ -47,6 +47,7 @@ export class ForgotPasswordPage implements OnInit {
     if (expirationDate.getTime() < new Date().getTime()) {
       this.isCodeActive = false;
     } else {
+      this.isCodeActive = true;
       //Mostrar el tiempo restante
       const durationInSeconds = Math.floor(
         (expirationDate.getTime() - new Date().getTime()) / 1000
@@ -84,6 +85,7 @@ export class ForgotPasswordPage implements OnInit {
           this.toastMessage =
             "El tiempo de verificación ha expirado, solicite un nuevo código.";
           this.isToastOpen = true;
+          this.isCodeActive = false;
         }
       });
   }
@@ -134,6 +136,7 @@ export class ForgotPasswordPage implements OnInit {
             this.toastMessage =
               "Ha ocurrido un error, por favor intente de nuevo.";
             this.isToastOpen = true;
+            
           },
           complete: () => {
             this.loaderComponent.hide();

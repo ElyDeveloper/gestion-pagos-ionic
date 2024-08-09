@@ -64,20 +64,20 @@ export class NotifyController {
         const rolUsuario = rolId.rolid;
         // console.log('RolUsuario: ', rolUsuario);
         if (rolUsuario == 1 || rolUsuario == 2) {
-          console.log('Codigo de verificacion enviado: ', content);
+          console.log('Código de verificación enviado: ', content);
           if (operation == true) {
             if (typeof content === 'string') {
-              return { error: 'Error al enviar el correo' };
+              return {error: 'Error al enviar el correo'};
             }
             const result = await this.notify.EmailNotification(
               userExist.correo ?? '',
-              'Codigo de verificacion',
-              `Su codigo de verificacion es: ${content.codigo}`,
+              'Código de verificación',
+              `Su código de verificación es: ${content.codigo}`,
             );
-            console.log('Resultado de envio de correo: ', result);
+            console.log('Resultado de envío de correo: ', result);
             if (result) {
               return {
-                message: 'Codigo de verificacion enviado',
+                message: 'Código de verificación enviado',
                 expiration: content.exp,
               };
             }
@@ -121,17 +121,19 @@ export class NotifyController {
     });
 
     if (!CodeExist) {
-      return {error: 'Codigo no registrado'};
+      return {error: 'Código no registrado'};
     }
 
     if (CodeExist.exp && Date.parse(CodeExist.exp) < Date.now()) {
-      return {error: 'Codigo expirado'};
+      return {error: 'Código expirado'};
     }
 
     if (CodeExist.codigo != identi.code) {
-      return {error: 'Codigo no coincide'};
+      return {error: 'Código no coincide'};
     }
 
-    return CodeExist.userId;
+    return {
+      userId: this.jwt.encryptUserId(CodeExist.userId ?? 0),
+    };
   }
 }

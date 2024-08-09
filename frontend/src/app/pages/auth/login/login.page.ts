@@ -8,6 +8,7 @@ import { key } from "src/app/libraries/key.library";
 import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
 import { AuthService } from "src/app/shared/services/auth.service";
 import { Usuario } from "src/app/shared/interfaces/usuario";
+import { AlertController } from "@ionic/angular";
 
 interface Login {
   identificator: string;
@@ -37,6 +38,8 @@ export class LoginPage implements OnInit {
   private _globalService = inject(GlobalService);
   private _cookieService = inject(CookieService);
   private _authService = inject(AuthService);
+  private _alertController = inject(AlertController);
+
   constructor() {}
 
   ngOnInit() {}
@@ -51,7 +54,21 @@ export class LoginPage implements OnInit {
       this.loaderComponent.show();
 
       this._globalService.Post("login", this.user).subscribe((result: any) => {
-        if (result?.token) {
+        console.log(result);
+
+        const { token, usuario } = result;
+
+        if (usuario && usuario.changedPassword === false) {
+          this.loaderComponent.hide();
+          this.toastMessage = "Por favor, cambie su contraseña.";
+          this.setOpenedToast(true);
+
+          //Preguntar si se redirige a la página de cambio de contraseña
+          this.questRedirect(usuario.id);
+          return;
+        }
+
+        if (token) {
           this._cookieService.set(
             "tokensession",
             result.token,
@@ -78,6 +95,34 @@ export class LoginPage implements OnInit {
       this.toastMessage = "Por favor, corrija los errores en el formulario.";
       this.setOpenedToast(true);
     }
+  }
+
+  async questRedirect(userId: string) {
+    const alert = await this._alertController.create({
+      header: "Cambiar contraseña",
+      message: "¡Estas usando una contraseña temporal! ¿Deseas cambiarla?",
+      buttons: [
+        {
+          text: "Cancelar",
+          role: "cancel",
+          cssClass: "secondary",
+          handler: () => {
+            console.log("Redirección cancelada");
+            this.toastMessage = "Por favor, cambie su contraseña.";
+            this.setOpenedToast(false);
+            this.setOpenedToast(true);
+          },
+        },
+        {
+          text: "Si",
+          handler: () => {
+            this._router.navigate(["/reset-password/" + userId]);
+          },
+        },
+      ],
+    });
+
+    await alert.present();
   }
 
   goToForgotPassword() {
