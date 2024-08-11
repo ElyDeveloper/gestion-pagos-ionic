@@ -171,7 +171,7 @@ export class UsuariosPage implements OnInit {
     } else if (!isEdit && !isResetPswd) {
       this.cleanForm();
     } else if (isResetPswd) {
-      this.formResetPswd.patchValue(formData);
+      this.formResetPswd.get("identificator")?.setValue(formData.correo);
     }
 
     this.modalSelected = modalTemplate;
@@ -189,6 +189,7 @@ export class UsuariosPage implements OnInit {
 
   //TODO ESPECIFICO
   onResetPasswordButtonClicked(data: any) {
+    console.log('Data: ', data)
     this.setModalState(false, true, this.modalResetPswd, data);
   }
 

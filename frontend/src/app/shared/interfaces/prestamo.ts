@@ -10,9 +10,9 @@ export interface Prestamos {
   fechaInicial: string;
   fechaFinal: string;
   estado: boolean;
-  IdCliente: number;
-  IdTipoPrestamo: number;
-  IdCuotas: number;
+  idCliente: number;
+  idTipoPrestamo: number;
+  idCuotas: number;
   pagos?: Pagos[];
   cliente?: Clientes;
   tipoPrestamo?: Prestamos;

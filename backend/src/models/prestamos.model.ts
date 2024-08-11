@@ -79,13 +79,13 @@ export class Prestamos extends Entity {
 
   // Define well-known properties here
   @belongsTo(() => Clientes, {name: 'cliente'})
-  IdCliente: number;
+  idCliente: number;
 
   @belongsTo(() => TipoPrestamos, {name: 'tipoPrestamo'})
-  IdTipoPrestamo: number;
+  idTipoPrestamo: number;
 
   @belongsTo(() => Cuotas, {name: 'cuotas'})
-  IdCuotas: number;
+  idCuotas: number;
 
   @hasMany(() => Pagos, {keyTo: 'idPrestamo'})
   pagos: Pagos[];

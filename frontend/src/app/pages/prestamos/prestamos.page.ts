@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { LoaderComponent } from 'src/app/shared/components/loader/loader.component';
 import { Clientes } from 'src/app/shared/interfaces/cliente';
+import { Prestamos } from 'src/app/shared/interfaces/prestamo';
 import { Column } from 'src/app/shared/interfaces/table';
 import { GlobalService } from 'src/app/shared/services/global.service';
 import { FormModels } from 'src/app/shared/utils/forms-models';
@@ -15,17 +16,33 @@ import { FormModels } from 'src/app/shared/utils/forms-models';
 export class PrestamosPage implements OnInit {
   @ViewChild(LoaderComponent) loaderComponent!: LoaderComponent;
 
-  elements: Clientes[] = [];
-  element: Clientes = {
-    dni: "",
-    nombres: "",
-    apellidos: "",
-    cel: "",
-    direccion: "",
-    email: "",
-    fechaIngreso: "",
-    fechaBaja: "",
-    estado: false,
+  // prestamoForm(): FormGroup {
+  //   return this.fb.group({
+  //     id: [null],
+  //     idCliente: [null, Validators.required],
+  //     idTipoPrestamo: [null, Validators.required],
+  //     monto: [null, [Validators.required, Validators.min(0)]],
+  //     tasaInteres: [
+  //       null,
+  //       [Validators.required, Validators.min(0), Validators.max(100)],
+  //     ],
+  //     totalMonto: [null, [Validators.required, Validators.min(0)]],
+  //     fechaInicial: ["", Validators.required],
+  //     fechaFinal: ["", Validators.required],
+  //     estado: [true],
+  //   });
+  // }
+  elements: Prestamos[] = [];
+  element: Prestamos = {
+    monto: 0,
+    tasaInteres: 0,
+    totalMonto: 0,
+    fechaInicial: "",
+    fechaFinal: "",
+    estado: true,
+    idCliente: 0,
+    idTipoPrestamo: 0,
+    idCuotas: 0,
   };
 
   currentPage = 1;
@@ -77,45 +94,41 @@ export class PrestamosPage implements OnInit {
   buildColumns() {
     this.columnsData = [
       {
-        key: "nombres",
-        alias: "Nombres",
+        key: "monto",
+        alias: "Monto",
       },
       {
-        key: "apellidos",
-        alias: "Apellidos",
+        key: "tasaInteres",
+        alias: "Tasa de Interés",
       },
       {
-        key: "dni",
-        alias: "DNI",
-        type: "dni",
+        key: "totalMonto",
+        alias: "Total Monto",
       },
       {
-        key: "cel",
-        alias: "Celular",
+        key: "fechaInicial",
+        alias: "Fecha Inicial",
       },
       {
-        key: "direccion",
-        alias: "Dirección",
-      },
-      {
-        key: "email",
-        alias: "Correo",
-      },
-      {
-        key: "fechaIngreso",
-        alias: "Fecha de Ingreso",
-        type: "date",
-      },
-      {
-        key: "fechaBaja",
-        alias: "Fecha de Baja",
-        type: "date",
+        key: "fechaFinal",
+        alias: "Fecha Final",
       },
       {
         key: "estado",
         alias: "Estado",
-        type: "boolean",
       },
+      {
+        key: "cliente.nombre",
+        alias: "Cliente",
+      },
+      {
+        key: "tipoPrestamo",
+        alias: "Tipo de Préstamo",
+      },
+      {
+        key: "cuotas",
+        alias: "Cuotas",
+      },  
       {
         key: "actions",
         alias: "Acciones",
