@@ -1,5 +1,6 @@
-import {Entity, model, property, belongsTo} from '@loopback/repository';
+import {Entity, model, property, belongsTo, hasMany} from '@loopback/repository';
 import {Roles} from './roles.model';
+import { UsuarioCliente } from './usuario-cliente.model';
 
 @model({settings: {idInjection: false, mssql: {schema: 'dbo', table: 'usuario'}}})
 export class Usuario extends Entity {
@@ -83,10 +84,14 @@ export class Usuario extends Entity {
     mssql: {columnName: 'changedPassword', dataType: 'bit', dataLength: null, dataPrecision: null, dataScale: null, nullable: 'NO', generated: false},
   })
   changedPassword: boolean;
+  
 
+  // Define well-known properties here
   @belongsTo(() => Roles, {name: 'rol'})
   rolid: number;
-  // Define well-known properties here
+
+  @hasMany(() => UsuarioCliente)
+  usuarioClientes: UsuarioCliente[];
 
   // Indexer property to allow additional data
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

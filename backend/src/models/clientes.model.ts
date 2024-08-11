@@ -1,5 +1,6 @@
-import {Entity, hasMany, model, property} from '@loopback/repository';
+import {Entity, hasMany, hasOne, model, property} from '@loopback/repository';
 import { Prestamos } from './prestamos.model';
+import { UsuarioCliente } from './usuario-cliente.model';
 
 @model({settings: {idInjection: false, mssql: {schema: 'dbo', table: 'Clientes'}}})
 export class Clientes extends Entity {
@@ -102,6 +103,9 @@ export class Clientes extends Entity {
   // Define well-known properties here
   @hasMany(() => Prestamos, {keyTo: 'IdCliente'})
   prestamos: Prestamos[];
+
+  @hasMany(() => UsuarioCliente)
+  usuarioCliente: UsuarioCliente[];
 
   // Indexer property to allow additional data
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

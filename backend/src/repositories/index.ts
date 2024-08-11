@@ -6,4 +6,4 @@ export * from './pagos.repository';
 export * from './prestamos.repository';
 export * from './roles.repository';
 export * from './usuario.repository';
-export * from './tipo-prestamos.repository';
+export * from './tipo-prestamos.repository';export * from './usuario-cliente.repository';
