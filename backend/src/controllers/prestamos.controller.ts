@@ -104,7 +104,6 @@ export class PrestamosController {
         {relation: 'cliente'},
         {relation: 'tipoPrestamo'},
         {relation: 'cuotas'},
-        {relation: 'pagos'},
       ],
       skip,
       limit
@@ -188,7 +187,7 @@ export class PrestamosController {
     await this.PrestamosRepository.deleteById(id);
   }
 
-  @get('/get-Prestamos/{id}')
+  @get('/get-prestamos-vista/{id}')
   async dataPrestamosId(@param.path.number('id') id: number): Promise<any> {
     let datos = await this.getPrestamosId(id);
     return datos;
@@ -213,7 +212,7 @@ export class PrestamosController {
     );
   }
 
-  @get('/get-Prestamos')
+  @get('/get-prestamos-vista')
   async dataPrestamos(): Promise<any> {
     let datos = await this.getPrestamos();
     return datos;
