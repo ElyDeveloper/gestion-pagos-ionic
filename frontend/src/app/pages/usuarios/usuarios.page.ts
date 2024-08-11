@@ -8,7 +8,7 @@ import {
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { debounceTime, distinctUntilChanged, Observable, Subject } from "rxjs";
 import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
-import { Rol } from "src/app/shared/interfaces/rol";
+import { Roles } from "src/app/shared/interfaces/rol";
 import { Column } from "src/app/shared/interfaces/table";
 import { Usuario } from "src/app/shared/interfaces/usuario";
 import { GlobalService } from "src/app/shared/services/global.service";
@@ -31,7 +31,9 @@ export class UsuariosPage implements OnInit {
     observacion: "",
     ad: false,
     estado: false,
-    rolesUsuario: {
+    changedPassword: false,
+    rolid: 0,
+    rol: {
       id: 0,
       nombre: "",
     },
@@ -67,7 +69,7 @@ export class UsuariosPage implements OnInit {
   modalResetPswd!: TemplateRef<any>;
 
   formResetPswd: FormGroup;
-  roles: Rol[] = [];
+  roles: Roles[] = [];
   isResetPswd = false;
 
   constructor(private fb: FormBuilder) {
@@ -163,8 +165,7 @@ export class UsuariosPage implements OnInit {
   ) {
     this.isEdit = isEdit;
     this.isResetPswd = isResetPswd;
-    
-    
+
     if (isEdit && formData && !isResetPswd) {
       this.formAdd.patchValue(formData);
     } else if (!isEdit && !isResetPswd) {

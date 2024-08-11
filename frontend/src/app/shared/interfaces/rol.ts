@@ -1,6 +1,7 @@
-export interface Rol {
+export interface Roles {
   id?: number;
   nombre?: string;
   descripcion?: string;
-  estado?: string;
+  estado?: boolean;
+  [prop: string]: any;
 }

@@ -28,7 +28,7 @@ import {EncriptDecryptService} from '../services/encript-decrypt.service';
 import {MailService} from '../services/mail.service';
 import { authenticate } from '@loopback/authentication';
 
-@authenticate('jwt')
+// @authenticate('jwt')
 export class UserController {
   constructor(
     @repository(UsuarioRepository)

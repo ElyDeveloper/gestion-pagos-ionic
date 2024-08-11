@@ -1,8 +1,8 @@
-import { Rol } from "./rol";
+import { Roles } from "./rol";
+import { UsuarioCliente } from "./usuario-cliente";
 
 export interface Usuario {
   id?: number;
-  rolid?: number;
   nombre?: string;
   apellido?: string;
   telefono?: string;
@@ -10,6 +10,9 @@ export interface Usuario {
   ad?: boolean;
   correo?: string;
   estado?: boolean;
-  changedPassword?: boolean;
-  rolesUsuario?:Rol;
+  changedPassword: boolean;
+  rolid: number;
+  rol?: Roles;
+  usuarioClientes?: UsuarioCliente[];
+  [prop: string]: any;
 }

@@ -8,7 +8,7 @@ import {
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Observable } from "rxjs";
 import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
-import { Cliente } from "src/app/shared/interfaces/cliente";
+import { Clientes } from "src/app/shared/interfaces/cliente";
 import { Column } from "src/app/shared/interfaces/table";
 import { GlobalService } from "src/app/shared/services/global.service";
 import { FormModels } from "src/app/shared/utils/forms-models";
@@ -21,8 +21,8 @@ import { FormModels } from "src/app/shared/utils/forms-models";
 export class ClientesPage implements OnInit {
   @ViewChild(LoaderComponent) loaderComponent!: LoaderComponent;
 
-  elements: Cliente[] = [];
-  element: Cliente = {
+  elements: Clientes[] = [];
+  element: Clientes = {
     dni: "",
     nombres: "",
     apellidos: "",
