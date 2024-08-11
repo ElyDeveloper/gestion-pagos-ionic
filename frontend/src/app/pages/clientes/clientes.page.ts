@@ -222,12 +222,12 @@ export class ClientesPage implements OnInit {
 
     switch (operation) {
       case "edit":
-        operationText = "Editando";
+        operationText = "Editado";
         apiCall = this._globalService.PutId("clientes", data.id, data);
         break;
       case "create":
         delete data.Id;
-        operationText = "Guardando";
+        operationText = "Guardado";
         apiCall = this._globalService.Post("clientes", data);
         break;
     }
