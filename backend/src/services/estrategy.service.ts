@@ -7,7 +7,7 @@ import {token} from '../core/interfaces/models/token.interface';
 export class EstrategyService {
   constructor(/* Add @inject to inject parameters */) { }
 
-  autheticate = async (decodedToken: token, role: number) => {
+  autheticate = async (decodedToken: token, role?: number) => {
 
     const {UserID, UserNAME, Role} = decodedToken.data;
     if (decodedToken.exp < Date.now()) {

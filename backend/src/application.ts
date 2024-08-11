@@ -33,7 +33,25 @@ export class gestionPagos extends BootMixin(
 
     // Customize @loopback/rest-explorer configuration here
     this.configure(RestExplorerBindings.COMPONENT).to({
-      path: '/explorer',
+      openapi: "3.0.0",
+      info: {
+        title: "API PROJECTS",
+        version: "1.0.0",
+      },
+      components: {
+        securitySchemes: {
+          jwt: {
+            type: "http",
+            scheme: "bearer",
+            bearerFormat: "JWT",
+          },
+        },
+      },
+      security: [
+        {
+          jwt: [],
+        },
+      ],
     });
     this.component(RestExplorerComponent);
 
@@ -50,7 +68,10 @@ export class gestionPagos extends BootMixin(
     registerAuthenticationStrategy(this, AdministradorStrategy);
     registerAuthenticationStrategy(this, OwnerStrategy);
     registerAuthenticationStrategy(this, ViewerStrategy);
+
+    
     this.component(AuthenticationComponent);
+    // this.component(JWTAutenticationComponent);
 
     this.configureFileUpload(options.fileStorageDirectory);
   }

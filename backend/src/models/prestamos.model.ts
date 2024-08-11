@@ -17,17 +17,6 @@ export class Prestamos extends Entity {
   })
   id?: number;
 
-  // @property({
-  //   type: 'number',
-  //   required: true,
-  //   jsonSchema: {nullable: false},
-  //   precision: 10,
-  //   scale: 0,
-  //   generated: false,
-  //   mssql: {columnName: 'IdTipoPrestamo', dataType: 'int', dataLength: null, dataPrecision: 10, dataScale: 0, nullable: 'NO', generated: false},
-  // })
-  // idTipoPrestamo: number;
-
   @property({
     type: 'number',
     required: true,
@@ -87,16 +76,6 @@ export class Prestamos extends Entity {
     mssql: {columnName: 'Estado', dataType: 'bit', dataLength: null, dataPrecision: null, dataScale: null, nullable: 'NO', generated: false},
   })
   estado: boolean;
-
-  // @property({
-  //   type: 'number',
-  //   jsonSchema: {nullable: true},
-  //   precision: 10,
-  //   scale: 0,
-  //   generated: false,
-  //   mssql: {columnName: 'IdCuotas', dataType: 'int', dataLength: null, dataPrecision: 10, dataScale: 0, nullable: 'YES', generated: false},
-  // })
-  // idCuotas?: number;
 
   // Define well-known properties here
   @belongsTo(() => Clientes, {name: 'cliente'})
