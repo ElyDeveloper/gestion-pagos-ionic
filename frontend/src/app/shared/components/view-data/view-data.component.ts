@@ -90,8 +90,43 @@ export class ViewDataComponent implements OnInit {
     this.searchTerm$.next(event);
   }
 
-  getCellValue(row: any, key: string): any {
-    return key.split(".").reduce((o, k) => (o || {})[k], row);
+  getEstadoColumn(): Column {
+    return this.columnsData.find(column => column.key === 'estado') || {
+      key: 'estado',
+      alias: 'Estado',
+      type: 'boolean'
+    };
+  }
+
+  getCellValue(row: any, column: Column): any {
+    const primaryValue = this.getNestedValue(row, column.key);
+    
+    if (column.combineWith) {
+      const secondaryValue = this.getNestedValue(row, column.combineWith);
+      if (column.combineFormat) {
+        return column.combineFormat(primaryValue, secondaryValue);
+      }
+      return `${this.formatValue(primaryValue)} ${this.formatValue(secondaryValue)}`;
+    }
+    
+    return this.formatValue(primaryValue);
+  }
+
+  private getNestedValue(obj: any, key: string): any {
+    return key.split(".").reduce((o, k) => (o || {})[k], obj);
+  }
+
+  private formatValue(value: any): string {
+    if (value && typeof value === "object") {
+      return value.nombre || JSON.stringify(value);
+    }
+    return value !== undefined && value !== null ? value.toString() : "";
+  }
+
+  // Este método ya no es necesario, pero lo mantenemos por compatibilidad
+  getObjectValue(row: any, key: string): any {
+    const value = this.getNestedValue(row, key);
+    return this.formatValue(value);
   }
 
   changePage(page: number) {

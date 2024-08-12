@@ -1,37 +1,27 @@
-import { Component, inject, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Observable } from 'rxjs';
-import { LoaderComponent } from 'src/app/shared/components/loader/loader.component';
-import { Clientes } from 'src/app/shared/interfaces/cliente';
-import { Prestamos } from 'src/app/shared/interfaces/prestamo';
-import { Column } from 'src/app/shared/interfaces/table';
-import { GlobalService } from 'src/app/shared/services/global.service';
-import { FormModels } from 'src/app/shared/utils/forms-models';
+import {
+  Component,
+  inject,
+  OnInit,
+  TemplateRef,
+  ViewChild,
+} from "@angular/core";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { Observable } from "rxjs";
+import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
+import { Clientes } from "src/app/shared/interfaces/cliente";
+import { Prestamos } from "src/app/shared/interfaces/prestamo";
+import { Column } from "src/app/shared/interfaces/table";
+import { GlobalService } from "src/app/shared/services/global.service";
+import { FormModels } from "src/app/shared/utils/forms-models";
 
 @Component({
-  selector: 'app-prestamos',
-  templateUrl: './prestamos.page.html',
-  styleUrls: ['./prestamos.page.scss'],
+  selector: "app-prestamos",
+  templateUrl: "./prestamos.page.html",
+  styleUrls: ["./prestamos.page.scss"],
 })
 export class PrestamosPage implements OnInit {
   @ViewChild(LoaderComponent) loaderComponent!: LoaderComponent;
 
-  // prestamoForm(): FormGroup {
-  //   return this.fb.group({
-  //     id: [null],
-  //     idCliente: [null, Validators.required],
-  //     idTipoPrestamo: [null, Validators.required],
-  //     monto: [null, [Validators.required, Validators.min(0)]],
-  //     tasaInteres: [
-  //       null,
-  //       [Validators.required, Validators.min(0), Validators.max(100)],
-  //     ],
-  //     totalMonto: [null, [Validators.required, Validators.min(0)]],
-  //     fechaInicial: ["", Validators.required],
-  //     fechaFinal: ["", Validators.required],
-  //     estado: [true],
-  //   });
-  // }
   elements: Prestamos[] = [];
   element: Prestamos = {
     monto: 0,
@@ -68,11 +58,15 @@ export class PrestamosPage implements OnInit {
   modalSelected: TemplateRef<any> = this.modalAdd;
   formSelected: FormGroup;
 
+  // TODO - Extras
+  clientes: Clientes[] = [];
+  tiposPrestamo: any[] = [];
+
   private _globalService = inject(GlobalService);
 
   constructor(private fb: FormBuilder) {
     this.formModels = new FormModels(this.fb);
-    this.formAdd = this.formModels.clienteForm();
+    this.formAdd = this.formModels.prestamoForm();
     this.formSelected = this.formAdd;
     console.log("Formulario de cliente:", this.formAdd);
   }
@@ -88,47 +82,56 @@ export class PrestamosPage implements OnInit {
 
   cleanForm() {
     this.formAdd.reset();
-    this.formAdd = this.formModels.clienteForm();
+    this.formAdd = this.formModels.prestamoForm();
   }
 
   buildColumns() {
     this.columnsData = [
       {
-        key: "monto",
-        alias: "Monto",
+        key: "cliente.nombres",
+        alias: "Nombre Completo",
+        type: "concat",
+        combineWith: "cliente.apellidos",
+        combineFormat: (nombre, apellido) => `${nombre} ${apellido}`,
       },
       {
         key: "tasaInteres",
         alias: "Tasa de Interés",
+        type: "percentage",
+      },
+      {
+        key: "monto",
+        alias: "Monto",
+        type: "currency",
       },
       {
         key: "totalMonto",
         alias: "Total Monto",
+        type: "currency",
       },
       {
         key: "fechaInicial",
         alias: "Fecha Inicial",
+        type: "date",
       },
       {
         key: "fechaFinal",
         alias: "Fecha Final",
+        type: "date",
       },
       {
         key: "estado",
         alias: "Estado",
       },
-      {
-        key: "cliente.nombre",
-        alias: "Cliente",
-      },
+
       {
         key: "tipoPrestamo",
         alias: "Tipo de Préstamo",
       },
       {
-        key: "cuotas",
+        key: "cuotas.cuotas",
         alias: "Cuotas",
-      },  
+      },
       {
         key: "actions",
         alias: "Acciones",
@@ -136,8 +139,37 @@ export class PrestamosPage implements OnInit {
     ];
   }
 
-  getCellValue(row: any, key: string): any {
-    return key.split(".").reduce((o, k) => (o || {})[k], row);
+  getCellValue(row: any, column: Column): any {
+    const primaryValue = this.getNestedValue(row, column.key);
+
+    if (column.combineWith) {
+      const secondaryValue = this.getNestedValue(row, column.combineWith);
+      if (column.combineFormat) {
+        return column.combineFormat(primaryValue, secondaryValue);
+      }
+      return `${this.formatValue(primaryValue)} ${this.formatValue(
+        secondaryValue
+      )}`;
+    }
+
+    return this.formatValue(primaryValue);
+  }
+
+  private getNestedValue(obj: any, key: string): any {
+    return key.split(".").reduce((o, k) => (o || {})[k], obj);
+  }
+
+  private formatValue(value: any): string {
+    if (value && typeof value === "object") {
+      return value.nombre || JSON.stringify(value);
+    }
+    return value !== undefined && value !== null ? value.toString() : "";
+  }
+
+  // Este método ya no es necesario, pero lo mantenemos por compatibilidad
+  getObjectValue(row: any, key: string): any {
+    const value = this.getNestedValue(row, key);
+    return this.formatValue(value);
   }
 
   getDateValue(row: any, key: string): any {
@@ -149,21 +181,13 @@ export class PrestamosPage implements OnInit {
     return "";
   }
 
-  getObjectValue(row: any, key: string): any {
-    const obj = row[key];
-    if (obj && typeof obj === "object") {
-      return obj.nombre || JSON.stringify(obj);
-    }
-    return "";
-  }
-
   private setModalState(isEdit: boolean, modalTemplate: any, formData?: any) {
     this.isEdit = isEdit;
 
     if (formData) {
-      formData.fechaIngreso = this.formatDateForInput(formData.fechaIngreso);
-      if (formData.fechaBaja) {
-        formData.fechaBaja = this.formatDateForInput(formData.fechaBaja);
+      formData.fechaInicial = this.formatDateForInput(formData.fechaInicial);
+      if (formData.fechaFinal) {
+        formData.fechaFinal = this.formatDateForInput(formData.fechaFinal);
       }
     }
     console.log("Form Data:", formData);
@@ -301,7 +325,7 @@ export class PrestamosPage implements OnInit {
     const limit = this.currentPageSize;
 
     this._globalService
-      .Get(`clientes/paginated?skip=${skip}&limit=${limit}`)
+      .Get(`prestamos/paginated?skip=${skip}&limit=${limit}`)
       .subscribe({
         next: (response: any) => {
           this.elements = response;
@@ -314,7 +338,7 @@ export class PrestamosPage implements OnInit {
   }
 
   getCountElements() {
-    this._globalService.Get("clientes/count").subscribe({
+    this._globalService.Get("prestamos/count").subscribe({
       next: (response: any) => {
         console.log("Cantidad de elementos:", response.count);
         const totalElements = response.count;
@@ -327,5 +351,4 @@ export class PrestamosPage implements OnInit {
       },
     });
   }
-
 }

@@ -54,7 +54,40 @@
         <tbody>
           <tr *ngFor="let row of data">
             <td *ngFor="let column of columnsData" class="text-center">
-              <ng-container *ngIf="column.key === 'actions'">
+              <ng-container
+                *ngIf="column.key !== 'actions'; else actionsTemplate">
+                <ng-container [ngSwitch]="column.type">
+                  <ng-container *ngSwitchCase="'boolean'">
+                    <span
+                      class="badge"
+                      [ngClass]="{
+                        'text-bg-success': getCellValue(row, column),
+                        'text-bg-secondary': !getCellValue(row, column)
+                      }">
+                      {{ getCellValue(row, column) ? "Activo" : "Inactivo" }}
+                    </span>
+                  </ng-container>
+                  <ng-container *ngSwitchCase="'date'">
+                    {{
+                      getCellValue(row, column) | customDate : 6 : "dd/MM/yyyy"
+                    }}
+                  </ng-container>
+                  <ng-container *ngSwitchCase="'percentage'">
+                    {{ getCellValue(row, column) | number : "1.2-2" }}%
+                  </ng-container>
+                  <ng-container *ngSwitchCase="'currency'">
+                    {{ getCellValue(row, column) | currency : "L" : "symbol" }}
+                  </ng-container>
+                  <ng-container *ngSwitchCase="'dni'">
+                    {{ getCellValue(row, column) | formatDni }}
+                  </ng-container>
+                  <ng-container *ngSwitchDefault>
+                    {{ getCellValue(row, column) }}
+                  </ng-container>
+                </ng-container>
+              </ng-container>
+              <ng-template #actionsTemplate>
+                <!-- Tu código existente para las acciones -->
                 <div class="d-flex justify-content-around">
                   <ion-button
                     color="primary"
@@ -74,32 +107,7 @@
                     <ion-label>Restablecer</ion-label>
                   </ion-button>
                 </div>
-              </ng-container>
-              <ng-container [ngSwitch]="column.type">
-                <ng-container *ngSwitchCase="'boolean'">
-                  <span
-                    class="badge"
-                    [ngClass]="{
-                      'text-bg-success': getCellValue(row, column.key),
-                      'text-bg-secondary': !getCellValue(row, column.key)
-                    }">
-                    {{ getCellValue(row, column.key) ? "Activo" : "Inactivo" }}
-                  </span>
-                </ng-container>
-                <ng-container *ngSwitchCase="'date'">
-                  {{
-                    getCellValue(row, column.key)
-                      | customDate : 6 : "dd/MM/yyyy"
-                  }}
-                </ng-container>
-                <ng-container *ngSwitchCase="'dni'">
-                  {{ getCellValue(row, column.key) | formatDni }}
-                </ng-container>
-
-                <ng-container *ngSwitchDefault>
-                  {{ getCellValue(row, column.key) }}
-                </ng-container>
-              </ng-container>
+              </ng-template>
             </td>
           </tr>
         </tbody>
@@ -108,7 +116,7 @@
   </ion-card-content>
 </ion-card>
 
-<!-- Seccion de vista movil -->
+<!-- Sección de vista móvil -->
 <section class="d-md-none">
   <ion-list>
     @for (row of data; track row.id) {
@@ -119,24 +127,42 @@
           src="https://ionicframework.com/docs/demos/api/avatar/avatar.svg" />
       </ion-thumbnail>
       <ion-label>
-        <ng-container *ngFor="let column of columnsData" class="text-center">
-        </ng-container>
-        <h2>
-          {{ getCellValue(row, columnsData[0].key) }}
-          {{ getCellValue(row, columnsData[1].key) }}
-        </h2>
-        <ng-container [ngSwitch]="columnsData[2].type">
-          <ng-container *ngSwitchCase="'dni'">
-            <p>{{ getCellValue(row, columnsData[2].key) | formatDni }}</p>
+        <ng-container [ngSwitch]="columnsData[0].type">
+          <ng-container *ngSwitchCase="'concat'">
+            <h2>
+              {{ getCellValue(row, columnsData[0]) }}
+            </h2>
           </ng-container>
           <ng-container *ngSwitchDefault>
-            <p>{{ getCellValue(row, columnsData[2].key) }}</p>
+            <h2>
+              {{ getCellValue(row, columnsData[0]) }}
+              {{ getCellValue(row, columnsData[1]) }}
+            </h2>
+          </ng-container>
+        </ng-container>
+
+        <ng-container [ngSwitch]="columnsData[2].type">
+          <ng-container *ngSwitchCase="'dni'">
+            <p>{{ getCellValue(row, columnsData[2]) | formatDni }}</p>
+          </ng-container>
+          <ng-container *ngSwitchCase="'currency'">
+            <p>
+              {{
+                getCellValue(row, columnsData[2]) | currency : "L" : "symbol"
+              }}
+            </p>
+          </ng-container>
+          <ng-container *ngSwitchDefault>
+            <p>{{ getCellValue(row, columnsData[2]) }}</p>
           </ng-container>
         </ng-container>
         <div
           class="d-flex justify-content-between align-content-center align-items-center">
-          <ion-badge [color]="row.estado ? 'success' : 'tertiary'">
-            {{ row.estado ? "Activo" : "Inactivo" }}
+          <ion-badge
+            [color]="
+              getCellValue(row, getEstadoColumn()) ? 'success' : 'tertiary'
+            ">
+            {{ getCellValue(row, getEstadoColumn()) ? "Activo" : "Inactivo" }}
           </ion-badge>
           <ion-buttons>
             <ion-button

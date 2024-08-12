@@ -34,7 +34,7 @@
     <ng-template #modalAdd let-close="close" let-save="save" let-form="form">
       <ion-header>
         <ion-toolbar>
-          <ion-title>Formulario de Prestamos</ion-title>
+          <ion-title>Formulario de Préstamos</ion-title>
           <ion-buttons slot="end">
             <ion-button (click)="close()">Cerrar</ion-button>
           </ion-buttons>
@@ -44,50 +44,78 @@
         <form [formGroup]="form" (ngSubmit)="save(form.value)">
           <ion-grid>
             <ion-row>
-              <ion-col size-xs="12" size-sm="6" size-md="6">
+              <ion-col size-xs="12" size-sm="6">
                 <ion-item>
-                  <ion-input label="DNI:" formControlName="DNI"></ion-input>
+                  <ion-select
+                    label="Cliente"
+                    formControlName="idCliente"
+                    placeholder="Seleccione un cliente">
+                    <ion-select-option
+                      *ngFor="let cliente of clientes"
+                      [value]="cliente.id">
+                      {{cliente.nombres}} {{cliente.apellidos}}
+                    </ion-select-option>
+                  </ion-select>
                 </ion-item>
               </ion-col>
-              <ion-col size-xs="12" size-sm="6" size-md="6">
+              <ion-col size-xs="12" size-sm="6">
                 <ion-item>
-                  <ion-input label="Nombres:" formControlName="Nombres"></ion-input>
+                  <ion-select
+                    label="Tipo de Préstamo"
+                    formControlName="idTipoPrestamo"
+                    placeholder="Seleccione el tipo">
+                    <ion-select-option
+                      *ngFor="let tipo of tiposPrestamo"
+                      [value]="tipo.id">
+                      {{tipo.nombre}}
+                    </ion-select-option>
+                  </ion-select>
                 </ion-item>
               </ion-col>
-              <ion-col size-xs="12" size-sm="6" size-md="6">
+              <ion-col size-xs="12" size-sm="6">
                 <ion-item>
-                  <ion-input label="Apellidos:" formControlName="Apellidos"></ion-input>
+                  <ion-input
+                    label="Monto"
+                    type="number"
+                    formControlName="monto"></ion-input>
                 </ion-item>
               </ion-col>
-              <ion-col size-xs="12" size-sm="6" size-md="6">
+              <ion-col size-xs="12" size-sm="6">
                 <ion-item>
-                  <ion-input label="Celular:" type="tel" formControlName="Cel"></ion-input>
+                  <ion-input
+                    label="Tasa de Interés (%)"
+                    type="number"
+                    formControlName="tasaInteres"></ion-input>
                 </ion-item>
               </ion-col>
-              <ion-col size-xs="12" size-sm="6" size-md="6">
+              <ion-col size-xs="12" size-sm="6">
                 <ion-item>
-                  <ion-input label="Dirección:" formControlName="Direccion"></ion-input>
+                  <ion-input
+                    label="Total Monto"
+                    type="number"
+                    formControlName="totalMonto"></ion-input>
                 </ion-item>
               </ion-col>
-              <ion-col size-xs="12" size-sm="6" size-md="6">
+              <ion-col size-xs="12" size-sm="6">
                 <ion-item>
-                  <ion-input label="Email:" type="email" formControlName="Email"></ion-input>
+                  <ion-input
+                    label="Fecha Inicial"
+                    type="date"
+                    formControlName="fechaInicial"></ion-input>
                 </ion-item>
               </ion-col>
-              <ion-col size-xs="12" size-sm="6" size-md="6">
+              <ion-col size-xs="12" size-sm="6">
                 <ion-item>
-                  <ion-input label="Fecha de Ingreso:" type="date" formControlName="FechaIngreso"></ion-input>
+                  <ion-input
+                    label="Fecha Final"
+                    type="date"
+                    formControlName="fechaFinal"></ion-input>
                 </ion-item>
               </ion-col>
-              <ion-col size-xs="12" size-sm="6" size-md="6">
-                <ion-item>
-                  <ion-input label="Fecha de Baja:" type="date" formControlName="FechaBaja"></ion-input>
-                </ion-item>
-              </ion-col>
-              <ion-col size-xs="12" size-md="6">
+              <ion-col size-xs="12">
                 <ion-item lines="none">
                   <ion-label>Estado</ion-label>
-                  <ion-toggle formControlName="Estado"></ion-toggle>
+                  <ion-toggle formControlName="estado"></ion-toggle>
                 </ion-item>
               </ion-col>
             </ion-row>
@@ -95,7 +123,11 @@
           <ion-grid>
             <ion-row class="ion-justify-content-center">
               <ion-col size-xs="12" size-sm="8" size-md="6" size-lg="4">
-                <ion-button expand="block" type="submit" class="ion-margin-top">
+                <ion-button
+                  expand="block"
+                  type="submit"
+                  [disabled]="form.invalid"
+                  class="ion-margin-top">
                   Guardar
                 </ion-button>
               </ion-col>
@@ -124,16 +156,16 @@
               @switch (column.type) { @case ('boolean') {
               <ion-badge
                 slot="end"
-                [color]="getCellValue(element, column.key) ? 'success' : 'medium'">
-                {{ getCellValue(element, column.key) ? "Activo" : "Inactivo" }}
+                [color]="getCellValue(element, column) ? 'success' : 'medium'">
+                {{ getCellValue(element, column) ? "Activo" : "Inactivo" }}
               </ion-badge>
               } @case ('object') {
               <ion-note slot="end"
-                >{{ getObjectValue(element, column.key) }}</ion-note
+                >{{ getCellValue(element, column) }}</ion-note
               >
               } @default {
               <ion-note slot="end"
-                >{{ getCellValue(element, column.key) }}</ion-note
+                >{{ getCellValue(element, column) }}</ion-note
               >
               } }
             </ion-item>

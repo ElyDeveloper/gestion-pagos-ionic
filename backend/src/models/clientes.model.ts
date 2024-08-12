@@ -101,7 +101,7 @@ export class Clientes extends Entity {
   estado: boolean;
 
   // Define well-known properties here
-  @hasMany(() => Prestamos, {keyTo: 'IdCliente'})
+  @hasMany(() => Prestamos, {keyTo: 'idCliente'})
   prestamos: Prestamos[];
 
   @hasMany(() => UsuarioCliente)
