@@ -73,8 +73,15 @@ export class PrestamosPage implements OnInit {
 
   ngOnInit() {
     this.getCountElements();
+    this.getTipoPrestamo();
     this.buildColumns();
   }
+
+  //TODO: ESPECIFICO
+  openTipoPrestamoModal() { }
+  
+  //TODO: ESPECIFICO
+  openClienteModal() { }
 
   setOpenedToast(value: boolean) {
     this.isToastOpen = value;
@@ -335,6 +342,19 @@ export class PrestamosPage implements OnInit {
           console.error("Error al obtener los elementos:", error);
         },
       });
+  }
+
+  // TODO: Metodo especifico
+  getTipoPrestamo() {
+    this._globalService.Get("tipo-prestamos").subscribe({
+      next: (response: any) => {
+        this.tiposPrestamo = response;
+        console.log("Tipos de préstamo:", response);
+      },
+      error: (error) => {
+        console.error("Error al obtener los tipos de préstamo:", error);
+      },
+    });
   }
 
   getCountElements() {

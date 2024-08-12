@@ -61,10 +61,11 @@
                     <span
                       class="badge"
                       [ngClass]="{
-                        'text-bg-success': getCellValue(row, column),
-                        'text-bg-secondary': !getCellValue(row, column)
+                        'text-bg-success': getCellValue(row, column) ==='true',
+                        'text-bg-secondary': getCellValue(row, column) === 'false'
                       }">
-                      {{ getCellValue(row, column) ? "Activo" : "Inactivo" }}
+                      {{ getCellValue(row, column) ==='true' ? "Activo" : "Inactivo" }}
+                      <!-- {{ getCellValue(row, column) }} -->
                     </span>
                   </ng-container>
                   <ng-container *ngSwitchCase="'date'">

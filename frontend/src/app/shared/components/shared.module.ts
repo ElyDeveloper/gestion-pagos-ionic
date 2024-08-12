@@ -13,6 +13,8 @@ import { CustomDatePipe } from "../pipes/date.pipe";
 import { FormatDniPipe } from "../pipes/dni.pipe";
 import { DatePipe } from "@angular/common";
 
+//INFO MODULES
+
 @NgModule({
   declarations: [
     ViewDataComponent,

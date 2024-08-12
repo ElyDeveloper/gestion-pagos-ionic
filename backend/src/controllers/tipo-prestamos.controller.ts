@@ -29,7 +29,7 @@ export class TipoPrestamoController {
     public TipoPrestamoRepository: TipoPrestamosRepository,
   ) {}
 
-  @post('/TipoPrestamos')
+  @post('/tipo-prestamos')
   @response(200, {
     description: 'TipoPrestamos model instance',
     content: {'application/json': {schema: getModelSchemaRef(TipoPrestamos)}},
@@ -50,7 +50,7 @@ export class TipoPrestamoController {
     return this.TipoPrestamoRepository.create(TipoPrestamos);
   }
 
-  @get('/TipoPrestamos/count')
+  @get('/tipo-prestamos/count')
   @response(200, {
     description: 'TipoPrestamos model count',
     content: {'application/json': {schema: CountSchema}},
@@ -61,7 +61,7 @@ export class TipoPrestamoController {
     return this.TipoPrestamoRepository.count(where);
   }
 
-  @get('/TipoPrestamos')
+  @get('/tipo-prestamos')
   @response(200, {
     description: 'Array of TipoPrestamos model instances',
     content: {
@@ -79,7 +79,7 @@ export class TipoPrestamoController {
     return this.TipoPrestamoRepository.find();
   }
 
-  @get('/TipoPrestamos/paginated')
+  @get('/tipo-prestamos/paginated')
   @response(200, {
     description: 'List of TipoPrestamos model',
     content: {
@@ -98,7 +98,7 @@ export class TipoPrestamoController {
     return this.TipoPrestamoRepository.find({skip, limit});
   }
 
-  @patch('/TipoPrestamos')
+  @patch('/tipo-prestamos')
   @response(200, {
     description: 'TipoPrestamos PATCH success count',
     content: {'application/json': {schema: CountSchema}},
@@ -117,7 +117,7 @@ export class TipoPrestamoController {
     return this.TipoPrestamoRepository.updateAll(TipoPrestamos, where);
   }
 
-  @get('/TipoPrestamos/{id}')
+  @get('/tipo-prestamos/{id}')
   @response(200, {
     description: 'TipoPrestamos model instance',
     content: {
@@ -134,7 +134,7 @@ export class TipoPrestamoController {
     return this.TipoPrestamoRepository.findById(id, filter);
   }
 
-  @patch('/TipoPrestamos/{id}')
+  @patch('/tipo-prestamos/{id}')
   @response(204, {
     description: 'TipoPrestamos PATCH success',
   })
@@ -152,7 +152,7 @@ export class TipoPrestamoController {
     await this.TipoPrestamoRepository.updateById(id, TipoPrestamos);
   }
 
-  @put('/TipoPrestamos/{id}')
+  @put('/tipo-prestamos/{id}')
   @response(204, {
     description: 'TipoPrestamos PUT success',
   })
@@ -163,7 +163,7 @@ export class TipoPrestamoController {
     await this.TipoPrestamoRepository.replaceById(id, TipoPrestamos);
   }
 
-  @del('/TipoPrestamos/{id}')
+  @del('/tipo-prestamos/{id}')
   @response(204, {
     description: 'TipoPrestamos DELETE success',
   })
@@ -182,7 +182,7 @@ export class TipoPrestamoController {
     );
   }
 
-  @get('/TipoPrestamos/search')
+  @get('/tipo-prestamos/search')
   async dataTipoPrestamoSearch(
     @param.query.string('search') search: string,
   ): Promise<any> {

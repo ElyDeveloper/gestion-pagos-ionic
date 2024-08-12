@@ -9,6 +9,7 @@
   <app-breadcrumb></app-breadcrumb>
   <section class="container">
     <app-view-data
+      [showAdd]="false"
       [currentPage]="1"
       [totalPages]="10"
       [title]="'Prestamos'"
@@ -46,30 +47,20 @@
             <ion-row>
               <ion-col size-xs="12" size-sm="6">
                 <ion-item>
-                  <ion-select
-                    label="Cliente"
-                    formControlName="idCliente"
-                    placeholder="Seleccione un cliente">
-                    <ion-select-option
-                      *ngFor="let cliente of clientes"
-                      [value]="cliente.id">
-                      {{cliente.nombres}} {{cliente.apellidos}}
-                    </ion-select-option>
-                  </ion-select>
+                  <ion-item>
+                    <ion-label position="floating">Cliente</ion-label>
+                    <ion-input formControlName="idCliente" readonly></ion-input>
+                    <ion-button slot="end" (click)="openClienteModal()">Buscar</ion-button>
+                  </ion-item>
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-sm="6">
                 <ion-item>
-                  <ion-select
-                    label="Tipo de Préstamo"
-                    formControlName="idTipoPrestamo"
-                    placeholder="Seleccione el tipo">
-                    <ion-select-option
-                      *ngFor="let tipo of tiposPrestamo"
-                      [value]="tipo.id">
-                      {{tipo.nombre}}
-                    </ion-select-option>
-                  </ion-select>
+                  <ion-item>
+                    <ion-label position="floating">Tipo de Préstamo</ion-label>
+                    <ion-input formControlName="idTipoPrestamo" readonly></ion-input>
+                    <ion-button slot="end" (click)="openTipoPrestamoModal()">Buscar</ion-button>
+                  </ion-item>
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-sm="6">
