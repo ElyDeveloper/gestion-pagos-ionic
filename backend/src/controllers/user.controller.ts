@@ -26,7 +26,7 @@ import {CredencialesRepository} from '../repositories/credenciales.repository';
 import {UsuarioRepository} from '../repositories/usuario.repository';
 import {EncriptDecryptService} from '../services/encript-decrypt.service';
 import {MailService} from '../services/mail.service';
-import { authenticate } from '@loopback/authentication';
+import {authenticate} from '@loopback/authentication';
 
 // @authenticate('jwt')
 export class UserController {
@@ -39,7 +39,7 @@ export class UserController {
     private mailService: MailService,
     @service(EncriptDecryptService)
     private encriptDecryptService: EncriptDecryptService,
-  ) { }
+  ) {}
 
   // Modifica el método create para generar credenciales y enviar correo
   @post('/usuarios')
@@ -132,9 +132,7 @@ export class UserController {
       },
     },
   })
-  async findById(
-    @param.path.number('id') id: number
-  ): Promise<Usuario> {
+  async findById(@param.path.number('id') id: number): Promise<Usuario> {
     return this.usuarioRepository.findById(id, {
       include: [{relation: 'rol'}],
     });

@@ -161,9 +161,9 @@
           class="d-flex justify-content-between align-content-center align-items-center">
           <ion-badge
             [color]="
-              getCellValue(row, getEstadoColumn()) ? 'success' : 'tertiary'
+              getCellValue(row, getEstadoColumn()) =='true' ? 'success' : 'tertiary'
             ">
-            {{ getCellValue(row, getEstadoColumn()) ? "Activo" : "Inactivo" }}
+            {{ getCellValue(row, getEstadoColumn())=='true' ? "Activo" : "Inactivo" }}
           </ion-badge>
           <ion-buttons>
             <ion-button

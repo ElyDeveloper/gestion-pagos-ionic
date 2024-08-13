@@ -146,7 +146,10 @@ export class UsuariosPage implements OnInit {
   }
 
   getCellValue(row: any, key: string): any {
-    return key.split(".").reduce((o, k) => (o || {})[k], row);
+    const result = key.split(".").reduce((o, k) => (o || {})[k], row);
+
+    console.log("Resultado de la celda:", result);
+    return result;
   }
 
   getObjectValue(row: any, key: string): string {
@@ -189,7 +192,7 @@ export class UsuariosPage implements OnInit {
 
   //TODO ESPECIFICO
   onResetPasswordButtonClicked(data: any) {
-    console.log('Data: ', data)
+    console.log("Data: ", data);
     this.setModalState(false, true, this.modalResetPswd, data);
   }
 

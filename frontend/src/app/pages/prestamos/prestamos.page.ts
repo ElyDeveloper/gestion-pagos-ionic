@@ -9,6 +9,7 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Observable } from "rxjs";
 import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
 import { Clientes } from "src/app/shared/interfaces/cliente";
+import { Cuotas } from "src/app/shared/interfaces/cuotas";
 import { Prestamos } from "src/app/shared/interfaces/prestamo";
 import { Column } from "src/app/shared/interfaces/table";
 import { GlobalService } from "src/app/shared/services/global.service";
@@ -60,6 +61,7 @@ export class PrestamosPage implements OnInit {
 
   // TODO - Extras
   clientes: Clientes[] = [];
+  cuotas: Cuotas[] = [];
   tiposPrestamo: any[] = [];
 
   private _globalService = inject(GlobalService);
@@ -132,7 +134,7 @@ export class PrestamosPage implements OnInit {
       },
 
       {
-        key: "tipoPrestamo",
+        key: "tipoPrestamo.nombre",
         alias: "Tipo de Préstamo",
       },
       {
@@ -201,6 +203,8 @@ export class PrestamosPage implements OnInit {
 
     if (isEdit && formData) {
       this.formAdd.patchValue(formData);
+      // TODO: ESPECIFICO
+      this.formAdd.get("idCliente")?.setValue(formData.cliente.nombres + " " + formData.cliente.apellidos);
     } else if (!isEdit) {
       this.cleanForm();
     }
