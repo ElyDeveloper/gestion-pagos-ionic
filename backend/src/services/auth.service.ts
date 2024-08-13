@@ -40,7 +40,7 @@ export class AuthService {
     let credentials = await this.credencialesRepository.findOne({
       where: {correo: loginInterface.identificator},
     });
-    console.log('credentials', credentials);
+    console.log('credentialsss: ', credentials);
 
     if (!credentials)
       credentials = await this.credencialesRepository.findOne({
@@ -52,7 +52,7 @@ export class AuthService {
     let user = await this.usuarioRepository.findOne({
       where: {correo: credentials.correo},
     });
-    console.log('user', user);
+    console.log('userrr: ', user);
 
     if (!user) return error.CREDENTIALS_NOT_REGISTER;
 
@@ -67,7 +67,7 @@ export class AuthService {
       usuario: user,
     };
 
-    console.log('auth', auth);
+    console.log('auth login: ', auth);
     return auth;
   }
 

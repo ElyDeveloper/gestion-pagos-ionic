@@ -1,4 +1,4 @@
-import {BindingScope, injectable, service} from '@loopback/core/dist';
+import {BindingScope, inject, injectable, service} from '@loopback/core/dist';
 import {repository} from '@loopback/repository';
 import {HttpErrors, operation} from '@loopback/rest';
 import {LoginInterface} from '../core/interfaces/models/Login.interface';
@@ -10,6 +10,9 @@ import {UsuarioRepository} from '../repositories/usuario.repository';
 import {EncriptDecryptService} from './encript-decrypt.service';
 import {UserService} from './user.service';
 import {VerifyCodeInfo} from '../core/interfaces/models/gCode.interface';
+import { TokenServiceBindings } from '@loopback/authentication-jwt';
+import { TokenService } from '@loopback/authentication';
+import { securityId, UserProfile } from '@loopback/security';
 const jsonwebtoken = require('jsonwebtoken');
 var shortid = require('shortid-36');
 
@@ -31,33 +34,34 @@ export class JWTService {
     private codigoVerificacionRepository: CodigoVerificacionRepository,
     @repository(UsuarioRepository)
     private usuarioRepository: UsuarioRepository,
+    @inject(TokenServiceBindings.TOKEN_SERVICE)
+    private jwtService: TokenService
   ) {}
 
-  createToken(credentials: any, user: any) {
-    try {
-      let token = jsonwebtoken.sign(
-        {
-          // exp: keys.TOKEN_EXPIRATION_TIME,
-          data: {
-            UserID: credentials.id,
-            UserNAME: credentials.username,
-            Role: user.rolid,
-          },
-        },
-        keys.JWT_SECRET_KEY,
-        {expiresIn: 300},
-      );
-      return token;
-    } catch (error) {
-      console.log('Error al generar el token: ', error);
-    }
+  createToken(credentials: any, user: any):Promise<string> {
+    const userProfile: UserProfile ={
+      [securityId]: credentials.id!.toString(),
+      id: (credentials.id)?.toString(),
+      name: credentials.username,
+      role: credentials.role,
+    };
+
+    console.log('Codigo generado: ', this.jwtService.generateToken(userProfile));
+    return this.jwtService.generateToken(userProfile);
   }
 
-  VerifyToken(token: string) {
-    if (!token) throw new HttpErrors[401]('Token vacio');
-    let decoded = jsonwebtoken.verify(token, keys.JWT_SECRET_KEY);
-    if (decoded) return decoded;
-    else throw new HttpErrors[401]('Token invalido');
+  async VerifyToken(token: string):Promise<UserProfile> {
+    if (!token) {
+      throw new HttpErrors[401]('Token vacio');
+    }
+
+    try{
+      const userProfile:UserProfile = await this.jwtService.verifyToken(token);
+      return userProfile;
+    }
+    catch(error){
+      throw new HttpErrors.Unauthorized(`Error verificando el token: ${error.message}`);
+    }
   }
 
   async IdentifyToken(

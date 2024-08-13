@@ -7,29 +7,17 @@ import {token} from '../core/interfaces/models/token.interface';
 export class EstrategyService {
   constructor(/* Add @inject to inject parameters */) { }
 
-  autheticate = async (decodedToken: token, role?: number) => {
-
-    const {UserID, UserNAME, Role} = decodedToken.data;
-    if (decodedToken.exp < Date.now()) {
-      throw new HttpErrors[401]("Sesion expirada.")
+  autheticate = async (decodedToken: UserProfile, role?: number) => {
+    if(decodedToken){
+      const profile: UserProfile = Object.assign({
+        id: decodedToken.id,
+        username: decodedToken.name,
+        email: decodedToken.email,
+      })
+      return profile;
+    }else{
+      throw new HttpErrors[401]('El toje enviado no es valido');
     }
-    if (decodedToken) {
-      if (Role == role) {
-        const profile: UserProfile = Object.assign({
-          userid: UserID,
-          username: UserNAME,
-          role: Role,
-        });
-
-        return profile;
-      } else {
-
-        throw new HttpErrors[401](
-          'El token es válido, pero no tiene los permisos suficientes para ejecutar esta acción.',
-        );
-      }
-    } else {
-      throw new HttpErrors[401]('El token enviado no es válido.');
-    }
+  
   }
 }
