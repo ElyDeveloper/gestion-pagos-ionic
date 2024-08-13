@@ -80,10 +80,10 @@ export class PrestamosPage implements OnInit {
   }
 
   //TODO: ESPECIFICO
-  openTipoPrestamoModal() { }
-  
+  openTipoPrestamoModal() {}
+
   //TODO: ESPECIFICO
-  openClienteModal() { }
+  openClienteModal() {}
 
   setOpenedToast(value: boolean) {
     this.isToastOpen = value;
@@ -131,6 +131,7 @@ export class PrestamosPage implements OnInit {
       {
         key: "estado",
         alias: "Estado",
+        type: "boolean",
       },
 
       {
@@ -200,11 +201,16 @@ export class PrestamosPage implements OnInit {
       }
     }
     console.log("Form Data:", formData);
-
+    this.element = formData;
     if (isEdit && formData) {
       this.formAdd.patchValue(formData);
       // TODO: ESPECIFICO
-      this.formAdd.get("idCliente")?.setValue(formData.cliente.nombres + " " + formData.cliente.apellidos);
+      this.formAdd
+        .get("idCliente")
+        ?.setValue(formData.cliente.nombres + " " + formData.cliente.apellidos);
+      this.formAdd
+        .get("idTipoPrestamo")
+        ?.setValue(formData.tipoPrestamo.nombre);
     } else if (!isEdit) {
       this.cleanForm();
     }
@@ -255,9 +261,6 @@ export class PrestamosPage implements OnInit {
   }
 
   handleUserOperation(operation: "edit" | "create", data: any) {
-    data.fechaIngreso = new Date(data.fechaIngreso);
-    console.log("Datos del cliente:", data);
-
     // return;
     let operationText: string;
     let apiCall: Observable<any>;
@@ -265,17 +268,25 @@ export class PrestamosPage implements OnInit {
     switch (operation) {
       case "edit":
         operationText = "Editando";
-        apiCall = this._globalService.PutId("clientes", data.id, data);
+        apiCall = this._globalService.PutId("prestamos", data.id, data);
         break;
       case "create":
         delete data.Id;
         operationText = "Guardando";
-        apiCall = this._globalService.Post("clientes", data);
+        apiCall = this._globalService.Post("prestamos", data);
         break;
     }
 
     this.textLoader = `${operationText} cliente`;
     this.loaderComponent.show();
+
+    data.idCliente = this.element.idCliente;
+    data.idTipoPrestamo = this.element.idTipoPrestamo;
+    data.idCuotas = this.element.idCuotas;
+    data.fechaInicial = new Date(data.fechaInicial);
+    data.fechaFinal = new Date(data.fechaFinal);
+
+    console.log("Datos del cliente:", data);
 
     apiCall.subscribe({
       next: (response: any) => {

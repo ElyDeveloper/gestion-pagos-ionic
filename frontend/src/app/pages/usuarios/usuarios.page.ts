@@ -148,7 +148,7 @@ export class UsuariosPage implements OnInit {
   getCellValue(row: any, key: string): any {
     const result = key.split(".").reduce((o, k) => (o || {})[k], row);
 
-    console.log("Resultado de la celda:", result);
+    // console.log("Resultado de la celda:", result);
     return result;
   }
 

@@ -147,12 +147,9 @@ export class LoginPage implements OnInit {
 
     // Validación de email
     if (!this.user.identificator) {
-      this.formErrors.email = "El email es requerido.";
+      this.formErrors.email = "El email/usuario es requerido.";
       isValid = false;
-    } else if (!this.isValidEmail(this.user.identificator)) {
-      this.formErrors.email = "Por favor, ingrese un email válido.";
-      isValid = false;
-    }
+    } 
 
     // Validación de contraseña
     if (!this.user.password) {
@@ -168,8 +165,8 @@ export class LoginPage implements OnInit {
     return isValid;
   }
 
-  isValidEmail(email: string): boolean {
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return emailRegex.test(email);
-  }
+  // isValidEmail(email: string): boolean {
+  //   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  //   return emailRegex.test(email);
+  // }
 }
