@@ -14,9 +14,10 @@ import {
 import {viewOf} from '../core/library/views.library';
 import {Cuotas} from '../models';
 import {CuotasRepository} from '../repositories/cuotas.repository';
+import { authenticate } from '@loopback/authentication';
 
-// @authenticate('admin', 'owner')
 
+@authenticate('jwt')
 export class CuotasController {
   constructor(
     @repository(CuotasRepository)

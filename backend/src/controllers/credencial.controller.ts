@@ -20,7 +20,10 @@ import {
 } from '@loopback/rest';
 import {Credenciales} from '../models';
 import {CredencialesRepository} from '../repositories';
+import { authenticate } from '@loopback/authentication';
 
+
+@authenticate('jwt')
 export class CredencialController {
   constructor(
     @repository(CredencialesRepository)

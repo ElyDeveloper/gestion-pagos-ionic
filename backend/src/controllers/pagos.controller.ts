@@ -20,9 +20,10 @@ import {
 import {viewOf} from '../core/library/views.library';
 import {Pagos} from '../models/pagos.model';
 import {PagosRepository} from '../repositories/pagos.repository';
+import { authenticate } from '@loopback/authentication';
 
-// @authenticate('admin', 'owner')
 
+@authenticate('jwt')
 export class PagosController {
   constructor(
     @repository(PagosRepository)

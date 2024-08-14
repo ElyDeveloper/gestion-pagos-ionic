@@ -19,7 +19,10 @@ import {
 } from '@loopback/rest';
 import {UsuarioCliente} from '../models';
 import {UsuarioClienteRepository} from '../repositories';
+import { authenticate } from '@loopback/authentication';
 
+
+@authenticate('jwt')
 export class UsuarioClienteController {
   constructor(
     @repository(UsuarioClienteRepository)
