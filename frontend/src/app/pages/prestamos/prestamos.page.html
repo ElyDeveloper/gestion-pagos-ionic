@@ -47,71 +47,55 @@
             <ion-row>
               <ion-col size-xs="12" size-sm="6">
                 <ion-item>
-                  <ion-item>
-                    <ion-label position="stacked">Cliente</ion-label>
-                    <ion-input formControlName="idCliente" readonly></ion-input>
-                    <!-- <ion-button slot="end" (click)="openClienteModal()"
-                      >Buscar</ion-button
-                    > -->
-                  </ion-item>
+                  <ion-label position="stacked" class="bold-label">Cliente:</ion-label>
+                  <ion-input formControlName="idCliente" readonly></ion-input>
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-sm="6">
                 <ion-item>
-                  <ion-item>
-                    <ion-label position="stacked">Tipo de Préstamo</ion-label>
-                    <ion-input
-                      formControlName="idTipoPrestamo"
-                      readonly></ion-input>
-                    <!-- <ion-button slot="end" (click)="openTipoPrestamoModal()"
-                      >Buscar</ion-button
-                    > -->
-                  </ion-item>
+                  <ion-label position="stacked" class="bold-label">Producto:</ion-label>
+                  <ion-select formControlName="idTipoPrestamo">
+                    @for (item of tiposPrestamos; track item.id) {
+                    <ion-select-option [value]="item.id">{{ item.nombre }}</ion-select-option>
+                    } @empty {
+                    <ion-select-option [value]="0">No hay tipos de préstamos</ion-select-option>
+                    }
+                  </ion-select>
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-sm="6">
                 <ion-item>
-                  <ion-input
-                    label="Monto"
-                    type="number"
-                    formControlName="monto"></ion-input>
+                  <ion-label position="stacked" class="bold-label">Monto:</ion-label>
+                  <ion-input type="number" formControlName="monto"></ion-input>
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-sm="6">
                 <ion-item>
-                  <ion-input
-                    label="Tasa de Interés (%)"
-                    type="number"
-                    formControlName="tasaInteres"></ion-input>
+                  <ion-label position="stacked" class="bold-label">Tasa de Interés (%):</ion-label>
+                  <ion-input type="number" formControlName="tasaInteres"></ion-input>
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-sm="6">
                 <ion-item>
-                  <ion-input
-                    label="Total Monto"
-                    type="number"
-                    formControlName="totalMonto"></ion-input>
+                  <ion-label position="stacked" class="bold-label">Total Monto:</ion-label>
+                  <ion-input type="number" formControlName="totalMonto"></ion-input>
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-sm="6">
                 <ion-item>
-                  <ion-input
-                    label="Fecha Inicial"
-                    type="date"
-                    formControlName="fechaInicial"></ion-input>
+                  <ion-label position="stacked" class="bold-label">Fecha Inicial:</ion-label>
+                  <ion-input type="date" formControlName="fechaInicial"></ion-input>
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-sm="6">
                 <ion-item>
-                  <ion-input
-                    label="Fecha Final"
-                    type="date"
-                    formControlName="fechaFinal"></ion-input>
+                  <ion-label position="stacked" class="bold-label">Fecha Final:</ion-label>
+                  <ion-input type="date" formControlName="fechaFinal"></ion-input>
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-sm="6">
                 <ion-item lines="none">
-                  <ion-label>Estado</ion-label>
+                  <ion-label position="stacked" class="bold-label">Estado:</ion-label>
                   <ion-toggle formControlName="estado"></ion-toggle>
                 </ion-item>
               </ion-col>
@@ -133,6 +117,13 @@
         </form>
       </ion-content>
     </ng-template>
+    
+    <style>
+      .bold-label {
+        font-weight: bold;
+        font-size: 20px !important;
+      }
+    </style>
 
     <ng-template #modalViewInfo let-close="close" let-save="save">
       <ion-header>

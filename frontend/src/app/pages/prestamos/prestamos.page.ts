@@ -62,7 +62,7 @@ export class PrestamosPage implements OnInit {
   // TODO - Extras
   clientes: Clientes[] = [];
   cuotas: Cuotas[] = [];
-  tiposPrestamo: any[] = [];
+  tiposPrestamos: any[] = [];
 
   private _globalService = inject(GlobalService);
 
@@ -133,7 +133,6 @@ export class PrestamosPage implements OnInit {
         alias: "Estado",
         type: "boolean",
       },
-
       {
         key: "tipoPrestamo.nombre",
         alias: "Tipo de Préstamo",
@@ -145,6 +144,26 @@ export class PrestamosPage implements OnInit {
       {
         key: "actions",
         alias: "Acciones",
+        lstActions: [
+          {
+            alias: "Editar",
+            action: "edit",
+            icon: "create",
+            color: "primary",
+          },
+          {
+            alias: "Información",
+            action: "info",
+            icon: "information",
+            color: "tertiary",
+          },
+          {
+            alias: "Eliminar",
+            action: "delete",
+            icon: "close",
+            color: "danger",
+          },
+        ],
       },
     ];
   }
@@ -205,12 +224,13 @@ export class PrestamosPage implements OnInit {
     if (isEdit && formData) {
       this.formAdd.patchValue(formData);
       // TODO: ESPECIFICO
+      const fullName = `${formData.cliente.nombres.split(" ")[0]} ${formData.cliente.apellidos.split(" ")[0]}`;
       this.formAdd
         .get("idCliente")
-        ?.setValue(formData.cliente.nombres + " " + formData.cliente.apellidos);
+        ?.setValue(fullName);
       this.formAdd
         .get("idTipoPrestamo")
-        ?.setValue(formData.tipoPrestamo.nombre);
+        ?.setValue(formData.tipoPrestamo.id);
     } else if (!isEdit) {
       this.cleanForm();
     }
@@ -329,7 +349,7 @@ export class PrestamosPage implements OnInit {
     if (event === "") {
       this.getCountElements();
     } else {
-      this._globalService.Get(`clientes/search?query=${event}`).subscribe({
+      this._globalService.Get(`prestamos/search?query=${event}`).subscribe({
         next: (response: any) => {
           this.elements = response;
           console.log("Elementos obtenidos:", response);
@@ -363,7 +383,7 @@ export class PrestamosPage implements OnInit {
   getTipoPrestamo() {
     this._globalService.Get("tipo-prestamos").subscribe({
       next: (response: any) => {
-        this.tiposPrestamo = response;
+        this.tiposPrestamos = response;
         console.log("Tipos de préstamo:", response);
       },
       error: (error) => {

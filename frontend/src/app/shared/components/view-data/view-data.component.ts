@@ -90,6 +90,10 @@ export class ViewDataComponent implements OnInit {
     this.searchTerm$.next(event);
   }
 
+  getActionsColumn() {
+    return this.columnsData.find(column => column.key === 'actions');
+  }
+
   getEstadoColumn(): Column {
     return this.columnsData.find(column => column.key === 'estado') || {
       key: 'estado',
@@ -166,6 +170,25 @@ export class ViewDataComponent implements OnInit {
 
   hasResetPswdColumn(): boolean {
     return this.columnsData.some((col) => col.type === "pswd");
+  }
+
+  onActionClick(row: any, action: string) {
+    switch(action) {
+      case 'edit':
+        this.onEditButtonClick(row);
+        break;
+      case 'info':
+        this.onInfoButtonClick(row);
+        break;
+      case 'delete':
+        this.onDeleteButtonClick(row);
+        break;
+      case 'resetPswd':
+        this.onResetPassword(row);
+        break;
+      // Añade más casos según sea necesario
+
+    }
   }
 
   onAddButtonClick() {

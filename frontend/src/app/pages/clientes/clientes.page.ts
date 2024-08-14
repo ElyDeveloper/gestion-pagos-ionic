@@ -108,6 +108,11 @@ export class ClientesPage implements OnInit {
         alias: "Correo",
       },
       {
+        key: "estado",
+        alias: "Estado",
+        type: "boolean",
+      },
+      {
         key: "fechaIngreso",
         alias: "Fecha de Ingreso",
         type: "date",
@@ -117,14 +122,30 @@ export class ClientesPage implements OnInit {
         alias: "Fecha de Baja",
         type: "date",
       },
-      {
-        key: "estado",
-        alias: "Estado",
-        type: "boolean",
-      },
+
       {
         key: "actions",
         alias: "Acciones",
+        lstActions: [
+          {
+            alias: "Editar",
+            action: "edit",
+            icon: "create",
+            color: "primary",
+          },
+          {
+            alias: "Información",
+            action: "info",
+            icon: "information",
+            color: "tertiary",
+          },
+          {
+            alias: "Eliminar",
+            action: "delete",
+            icon: "close",
+            color: "danger",
+          },
+        ],
       },
     ];
   }

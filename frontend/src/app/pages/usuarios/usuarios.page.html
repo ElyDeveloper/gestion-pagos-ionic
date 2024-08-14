@@ -47,13 +47,14 @@
             <ion-row>
               <ion-col size-xs="12" size-sm="6" size-md="6">
                 <ion-item>
-                  <ion-select formControlName="rolid" label="Rol">
-                    <!-- Opciones de roles aquí -->
+                  <ion-label position="stacked" class="bold-label"
+                    >Rol</ion-label
+                  >
+                  <ion-select formControlName="rolid">
                     @for (item of roles; track item.id) {
                     <ion-select-option [value]="item.id"
-                      >{{item.nombre}}
-                    </ion-select-option>
-
+                      >{{item.nombre}}</ion-select-option
+                    >
                     } @empty {
                     <ion-select-option [value]="0"
                       >No hay roles</ion-select-option
@@ -65,58 +66,67 @@
 
               <ion-col size-xs="12" size-sm="6" size-md="6">
                 <ion-item>
-                  <ion-input
-                    label="Nombre:"
-                    formControlName="nombre"></ion-input>
+                  <ion-label position="stacked" class="bold-label"
+                    >Nombre:</ion-label
+                  >
+                  <ion-input formControlName="nombre"></ion-input>
                 </ion-item>
               </ion-col>
 
               <ion-col size-xs="12" size-sm="6" size-md="6">
                 <ion-item>
-                  <ion-input
-                    label="Apellido:"
-                    formControlName="apellido"></ion-input>
+                  <ion-label position="stacked" class="bold-label"
+                    >Apellido:</ion-label
+                  >
+                  <ion-input formControlName="apellido"></ion-input>
                 </ion-item>
               </ion-col>
 
               <ion-col size-xs="12" size-sm="6" size-md="6">
                 <ion-item>
-                  <ion-input
-                    label="Télefono:"
-                    type="tel"
-                    formControlName="telefono"></ion-input>
+                  <ion-label position="stacked" class="bold-label"
+                    >Télefono:</ion-label
+                  >
+                  <ion-input type="tel" formControlName="telefono"></ion-input>
                 </ion-item>
               </ion-col>
 
               <ion-col size-xs="12" size-sm="6" size-md="6">
                 <ion-item>
-                  <ion-input
-                    label="Correo:"
-                    type="email"
-                    formControlName="correo"></ion-input>
+                  <ion-label position="stacked" class="bold-label"
+                    >Correo:</ion-label
+                  >
+                  <ion-input type="email" formControlName="correo"></ion-input>
+                </ion-item>
+              </ion-col>
+              <ion-col size-xs="6" size-md="3">
+                <ion-item lines="none">
+                  <ion-label position="stacked" class="bold-label"
+                    >AD</ion-label
+                  >
+                  <ion-toggle formControlName="ad" class="my-2"></ion-toggle>
+                </ion-item>
+              </ion-col>
+
+              <ion-col size-xs="6" size-md="3">
+                <ion-item lines="none">
+                  <ion-label position="stacked" class="bold-label"
+                    >Estado</ion-label
+                  >
+                  <ion-toggle
+                    formControlName="estado"
+                    class="my-2"></ion-toggle>
                 </ion-item>
               </ion-col>
 
               <ion-col size-xs="12" size-md="6">
                 <ion-item>
+                  <ion-label position="stacked" class="bold-label"
+                    >Observación:</ion-label
+                  >
                   <ion-textarea
-                    label="Observación:"
                     formControlName="observacion"
                     rows="3"></ion-textarea>
-                </ion-item>
-              </ion-col>
-
-              <ion-col size-xs="6" size-md="3">
-                <ion-item lines="none">
-                  <ion-label>AD</ion-label>
-                  <ion-toggle formControlName="ad"></ion-toggle>
-                </ion-item>
-              </ion-col>
-
-              <ion-col size-xs="6" size-md="3">
-                <ion-item lines="none">
-                  <ion-label>Estado</ion-label>
-                  <ion-toggle formControlName="estado"></ion-toggle>
                 </ion-item>
               </ion-col>
             </ion-row>
@@ -135,6 +145,13 @@
       </ion-content>
     </ng-template>
 
+    <style>
+      .bold-label {
+        font-weight: bold;
+        font-size: 20px !important;
+      }
+    </style>
+
     <ng-template #modalResetPswd let-close="close" let-save="save">
       <ion-header>
         <ion-toolbar>
@@ -152,10 +169,11 @@
             <ion-row>
               <ion-col size-xs="12" size-sm="12" size-md="12">
                 <ion-item>
+                  <ion-label position="stacked" class="bold-label"
+                    >Identificador</ion-label
+                  >
                   <ion-input
                     [readonly]="true"
-                    label="Identificador"
-                    labelPlacement="floating"
                     formControlName="identificator"
                     placeholder="Correo electrónico o nombre de usuario">
                   </ion-input>
@@ -164,7 +182,9 @@
 
               <ion-col size-xs="12" size-sm="12" size-md="12">
                 <ion-item>
-                  <ion-label position="floating">Nueva Contraseña</ion-label>
+                  <ion-label position="stacked" class="bold-label"
+                    >Nueva Contraseña</ion-label
+                  >
                   <ion-input type="password" formControlName="newPassword">
                     <ion-input-password-toggle
                       slot="end"></ion-input-password-toggle>

@@ -119,15 +119,6 @@ export class UsuariosPage implements OnInit {
         alias: "Rol",
       },
       {
-        key: "telefono",
-        alias: "Teléfono",
-      },
-
-      {
-        key: "observacion",
-        alias: "Observación",
-      },
-      {
         key: "ad",
         alias: "AD",
         type: "boolean",
@@ -138,9 +129,37 @@ export class UsuariosPage implements OnInit {
         type: "boolean",
       },
       {
+        key: "telefono",
+        alias: "Teléfono",
+      },
+      {
+        key: "observacion",
+        alias: "Observación",
+      },
+
+      {
         key: "actions",
         alias: "Acciones",
-        type: "pswd",
+        lstActions: [
+          {
+            alias: "Editar",
+            action: "edit",
+            icon: "create",
+            color: "primary",
+          },
+          {
+            alias: "Contraseña",
+            action: "resetPswd",
+            icon: "key",
+            color: "tertiary",
+          },
+          {
+            alias: "Eliminar",
+            action: "delete",
+            icon: "close",
+            color: "danger",
+          },
+        ],
       },
     ];
   }

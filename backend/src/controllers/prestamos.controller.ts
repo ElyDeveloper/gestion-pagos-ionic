@@ -26,7 +26,7 @@ import {PrestamosRepository} from '../repositories/prestamos.repository';
 export class PrestamosController {
   constructor(
     @repository(PrestamosRepository)
-    public PrestamosRepository: PrestamosRepository
+    public PrestamosRepository: PrestamosRepository,
   ) {}
 
   @post('/prestamos')
@@ -106,7 +106,7 @@ export class PrestamosController {
         {relation: 'cuotas'},
       ],
       skip,
-      limit
+      limit,
     });
   }
 
@@ -138,9 +138,7 @@ export class PrestamosController {
       },
     },
   })
-  async findById(
-    @param.path.number('id') id: number,
-  ): Promise<Prestamos> {
+  async findById(@param.path.number('id') id: number): Promise<Prestamos> {
     return this.PrestamosRepository.findById(id, {
       include: [
         {relation: 'cliente'},
@@ -200,9 +198,21 @@ export class PrestamosController {
 
   @get('/prestamos/search')
   async dataPrestamosSearch(
-    @param.query.string('search') search: string,
+    @param.query.string('query') search: string,
   ): Promise<any> {
-    let PrestamosSearch = await this.getPrestamosSearch(search);
+    let PrestamosSearch = await this.PrestamosRepository.find({
+      include: [
+        {relation: 'cliente'},
+        {relation: 'tipoPrestamo'},
+        {relation: 'cuotas'},
+      ],
+      where: {
+        or: [
+          {nombres: {like: `%${search}%`}},
+          {apellidos: {like: `%${search}%`}},
+        ],
+      },
+    });
     return PrestamosSearch;
   }
 

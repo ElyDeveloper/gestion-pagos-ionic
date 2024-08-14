@@ -46,68 +46,76 @@
             <ion-row>
               <ion-col size-xs="12" size-sm="6" size-md="6">
                 <ion-item>
-                  <ion-input label="DNI:" formControlName="dni"></ion-input>
+                  <ion-label position="stacked" class="bold-label"
+                    >DNI:</ion-label
+                  >
+                  <ion-input formControlName="dni"></ion-input>
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-sm="6" size-md="6">
                 <ion-item>
-                  <ion-input
-                    label="Nombres:"
-                    formControlName="nombres"></ion-input>
+                  <ion-label position="stacked" class="bold-label"
+                    >Nombres:</ion-label
+                  >
+                  <ion-input formControlName="nombres"></ion-input>
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-sm="6" size-md="6">
                 <ion-item>
-                  <ion-input
-                    label="Apellidos:"
-                    formControlName="apellidos"></ion-input>
+                  <ion-label position="stacked" class="bold-label"
+                    >Apellidos:</ion-label
+                  >
+                  <ion-input formControlName="apellidos"></ion-input>
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-sm="6" size-md="6">
                 <ion-item>
-                  <ion-input
-                    label="Celular:"
-                    type="tel"
-                    formControlName="cel"></ion-input>
+                  <ion-label position="stacked" class="bold-label"
+                    >Celular:</ion-label
+                  >
+                  <ion-input type="tel" formControlName="cel"></ion-input>
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-sm="6" size-md="6">
                 <ion-item>
-                  <ion-input
-                    label="Dirección:"
-                    formControlName="direccion"></ion-input>
+                  <ion-label position="stacked" class="bold-label"
+                    >Dirección:</ion-label
+                  >
+                  <ion-input formControlName="direccion"></ion-input>
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-sm="6" size-md="6">
                 <ion-item>
-                  <ion-input
-                    label="Email:"
-                    type="email"
-                    formControlName="email"></ion-input>
+                  <ion-label position="stacked" class="bold-label"
+                    >Email:</ion-label
+                  >
+                  <ion-input type="email" formControlName="email"></ion-input>
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-sm="6" size-md="6">
                 <ion-item>
+                  <ion-label position="stacked" class="bold-label"
+                    >Fecha de Ingreso:</ion-label
+                  >
                   <ion-input
-                    labelPlacement="floating"
-                    label="Fecha de Ingreso:"
                     type="date"
                     formControlName="fechaIngreso"></ion-input>
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-sm="6" size-md="6">
                 <ion-item>
+                  <ion-label position="stacked" class="bold-label"
+                    >Fecha de Baja:</ion-label
+                  >
                   <ion-input
-                    labelPlacement="floating"
-                    label="Fecha de Baja:"
                     type="date"
                     formControlName="fechaBaja"></ion-input>
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-md="6">
                 <ion-item lines="none">
-                  <ion-label>Estado</ion-label>
-                  <ion-toggle formControlName="estado"></ion-toggle>
+                  <ion-label position="stacked" class="bold-label">Estado</ion-label>
+                  <ion-toggle formControlName="estado" class="my-2"></ion-toggle>
                 </ion-item>
               </ion-col>
             </ion-row>
@@ -124,6 +132,13 @@
         </form>
       </ion-content>
     </ng-template>
+
+    <style>
+      .bold-label {
+        font-weight: bold;
+        font-size: 20px !important;
+      }
+    </style>
 
     <ng-template #modalViewInfo let-close="close" let-save="save">
       <ion-header>

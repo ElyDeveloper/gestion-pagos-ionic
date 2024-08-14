@@ -61,10 +61,15 @@
                     <span
                       class="badge"
                       [ngClass]="{
-                        'text-bg-success': getCellValue(row, column) ==='true',
-                        'text-bg-secondary': getCellValue(row, column) === 'false'
+                        'text-bg-success': getCellValue(row, column) === 'true',
+                        'text-bg-secondary':
+                          getCellValue(row, column) === 'false'
                       }">
-                      {{ getCellValue(row, column) ==='true' ? "Activo" : "Inactivo" }}
+                      {{
+                        getCellValue(row, column) === "true"
+                          ? "Activo"
+                          : "Inactivo"
+                      }}
                       <!-- {{ getCellValue(row, column) }} -->
                     </span>
                   </ng-container>
@@ -88,25 +93,16 @@
                 </ng-container>
               </ng-container>
               <ng-template #actionsTemplate>
-                <!-- Tu código existente para las acciones -->
                 <div class="d-flex justify-content-around">
-                  <ion-button
-                    color="primary"
-                    (click)="onEditButtonClick(row)"
-                    class="me-2">
-                    Editar
-                  </ion-button>
-                  <ion-button color="danger" (click)="onDeleteButtonClick(row)">
-                    Eliminar
-                  </ion-button>
-                  <ion-button
-                    expand="block"
-                    (click)="onResetPassword(row)"
-                    *ngIf="hasResetPswdColumn()"
-                    color="tertiary">
-                    <ion-icon class="pe-1" name="key"></ion-icon>
-                    <ion-label>Restablecer</ion-label>
-                  </ion-button>
+                  <ng-container *ngFor="let action of column.lstActions">
+                    <ion-button
+                      [color]="action.color"
+                      (click)="onActionClick(row, action.action)"
+                      class="me-2">
+                      <ion-icon [name]="action.icon" class="pe-1"></ion-icon>
+                      <ion-label>{{ action.alias }}</ion-label>
+                    </ion-button>
+                  </ng-container>
                 </div>
               </ng-template>
             </td>
@@ -128,19 +124,15 @@
           src="https://ionicframework.com/docs/demos/api/avatar/avatar.svg" />
       </ion-thumbnail>
       <ion-label>
-        <ng-container [ngSwitch]="columnsData[0].type">
-          <ng-container *ngSwitchCase="'concat'">
-            <h2>
-              {{ getCellValue(row, columnsData[0]) }}
-            </h2>
-          </ng-container>
-          <ng-container *ngSwitchDefault>
-            <h2>
-              {{ getCellValue(row, columnsData[0]) }}
-              {{ getCellValue(row, columnsData[1]) }}
-            </h2>
-          </ng-container>
-        </ng-container>
+        <!-- Título dinámico -->
+        <h2>
+          {{ getCellValue(row, columnsData[0]) }}
+          {{
+            columnsData[0].type == "concat"
+              ? ""
+              : getCellValue(row, columnsData[1])
+          }}
+        </h2>
 
         <ng-container [ngSwitch]="columnsData[2].type">
           <ng-container *ngSwitchCase="'dni'">
@@ -157,40 +149,33 @@
             <p>{{ getCellValue(row, columnsData[2]) }}</p>
           </ng-container>
         </ng-container>
-        <div
-          class="d-flex justify-content-between align-content-center align-items-center">
+
+        <!-- Acciones -->
+        <div class="d-flex justify-content-between align-items-center">
+          @if (getEstadoColumn()) {
           <ion-badge
             [color]="
-              getCellValue(row, getEstadoColumn()) =='true' ? 'success' : 'tertiary'
+              getCellValue(row, getEstadoColumn()) === 'true'
+                ? 'success'
+                : 'tertiary'
             ">
-            {{ getCellValue(row, getEstadoColumn())=='true' ? "Activo" : "Inactivo" }}
+            {{
+              getCellValue(row, getEstadoColumn()) === "true"
+                ? "Activo"
+                : "Inactivo"
+            }}
           </ion-badge>
+          }
           <ion-buttons>
+            @for (action of getActionsColumn()?.lstActions || []; track
+            action.action) {
             <ion-button
               shape="round"
-              color="primary"
-              (click)="onInfoButtonClick(row)">
-              <ion-icon name="open-outline" size="medium"></ion-icon>
+              [color]="action.color"
+              (click)="onActionClick(row, action.action)">
+              <ion-icon [name]="action.icon" size="medium"></ion-icon>
             </ion-button>
-            <ion-button
-              shape="round"
-              color="primary"
-              *ngIf="hasResetPswdColumn()"
-              (click)="onResetPassword(row)">
-              <ion-icon name="key-outline" size="medium"></ion-icon>
-            </ion-button>
-            <ion-button
-              shape="round"
-              color="primary"
-              (click)="onEditButtonClick(row)">
-              <ion-icon name="create-outline" size="medium"></ion-icon>
-            </ion-button>
-            <ion-button
-              shape="round"
-              color="danger"
-              (click)="onDeleteButtonClick(row)">
-              <ion-icon name="trash-outline" size="medium"></ion-icon>
-            </ion-button>
+            }
           </ion-buttons>
         </div>
       </ion-label>
