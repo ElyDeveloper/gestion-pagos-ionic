@@ -15,6 +15,7 @@ import {UsuarioRepository} from '../repositories/usuario.repository';
 import {MailService} from '../services/mail.service';
 import {EncriptDecryptService} from './encript-decrypt.service';
 import {JWTService} from './jwt.service';
+import { create } from 'domain';
 var shortid = require('shortid-36');
 
 @injectable({scope: BindingScope.TRANSIENT})
@@ -39,8 +40,10 @@ export class AuthService {
 
     let credentials = await this.credencialesRepository.findOne({
       where: {correo: loginInterface.identificator},
+      order: ['id DESC'],
+      limit: 1,
     });
-    console.log('credentials', credentials);
+    console.log('credentialsss: ', credentials);
 
     if (!credentials)
       credentials = await this.credencialesRepository.findOne({

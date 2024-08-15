@@ -20,9 +20,10 @@ import {
 import {viewOf} from '../core/library/views.library';
 import {Prestamos} from '../models';
 import {PrestamosRepository} from '../repositories/prestamos.repository';
+import { authenticate } from '@loopback/authentication';
 
-// @authenticate('admin', 'owner')
 
+@authenticate('jwt')
 export class PrestamosController {
   constructor(
     @repository(PrestamosRepository)

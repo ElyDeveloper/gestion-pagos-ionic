@@ -20,9 +20,11 @@ import {
 import {viewOf} from '../core/library/views.library';
 
 import {ClientesRepository} from '../repositories/clientes.repository';
-import {Clientes} from '../models';
+import { Clientes } from '../models';
+import { authenticate } from '@loopback/authentication';
 
-// @authenticate('admin', 'owner')
+
+@authenticate('jwt')
 export class ClientesController {
   constructor(
     @repository(ClientesRepository)

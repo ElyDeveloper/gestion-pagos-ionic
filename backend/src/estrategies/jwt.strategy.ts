@@ -24,7 +24,7 @@ export class MyAuthStrategyProvider implements AuthenticationStrategy {
 
     const decodedToken = await this.jwtService.VerifyToken(token);
     console.log("Token decodificado", decodedToken);
-    const userProfile = await this.strategyService.autheticate (decodedToken);
+    const userProfile = await this.strategyService.autheticate(decodedToken);
 
     if (!userProfile) {
       throw new HttpErrors.Unauthorized("Usuario no autenticado");

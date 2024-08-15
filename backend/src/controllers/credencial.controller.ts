@@ -21,9 +21,12 @@ import {
 } from '@loopback/rest';
 import {Credenciales} from '../models';
 import {CredencialesRepository} from '../repositories';
+import { authenticate } from '@loopback/authentication';
 import {JWTService} from '../services';
 import { AuthorizationError } from '../core/library/authorization-error';
 
+
+@authenticate('jwt')
 export class CredencialController {
   constructor(
     @repository(CredencialesRepository)
@@ -116,7 +119,8 @@ export class CredencialController {
     filter?: FilterExcludingWhere<Credenciales>,
   ): Promise<Credenciales> {
     try {
-      const idUser = this.jwtService.decryptUserId(id);
+      // const idUser = this.jwtService.decryptUserId(id);
+      const idUser = 1;
       console.log('id User: ', idUser);
       const credenciales = await this.credencialesRepository.findById(
         idUser,

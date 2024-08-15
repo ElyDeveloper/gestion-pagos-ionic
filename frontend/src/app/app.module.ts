@@ -7,14 +7,15 @@ import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { AuthInterceptor } from './shared/helpers/auth.interceptor';
 
 
 @NgModule({
   declarations: [AppComponent],
   imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, FormsModule],
-  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy  }, provideHttpClient(), provideAnimations()],
+  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy  }, provideHttpClient(withInterceptors([AuthInterceptor])), provideAnimations()],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

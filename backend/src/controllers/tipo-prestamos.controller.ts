@@ -20,9 +20,10 @@ import {
 import {viewOf} from '../core/library/views.library';
 import {TipoPrestamos} from '../models';
 import {TipoPrestamosRepository} from '../repositories/tipo-prestamos.repository';
+import { authenticate } from '@loopback/authentication';
 
-// @authenticate('admin', 'owner')
 
+@authenticate('jwt')
 export class TipoPrestamoController {
   constructor(
     @repository(TipoPrestamosRepository)
@@ -171,7 +172,7 @@ export class TipoPrestamoController {
     await this.TipoPrestamoRepository.deleteById(id);
   }
 
-  @get('/get-TipoPrestamos/{id}')
+  @get('/get-tipo-prestamos/{id}')
   async dataTipoPrestamoId(@param.path.number('id') id: number): Promise<any> {
     let datos = await this.getTipoPrestamoId(id);
     return datos;
@@ -196,7 +197,7 @@ export class TipoPrestamoController {
     );
   }
 
-  @get('/get-TipoPrestamos')
+  @get('/get-tipo-prestamos')
   async dataTipoPrestamo(): Promise<any> {
     let datos = await this.getTipoPrestamo();
     return datos;

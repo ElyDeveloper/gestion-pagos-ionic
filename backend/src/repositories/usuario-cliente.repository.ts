@@ -24,4 +24,13 @@ export class UsuarioClienteRepository extends DefaultCrudRepository<
     this.usuario = this.createBelongsToAccessorFor('Usuario', usuarioRepositoryGetter);
     this.registerInclusionResolver('Usuario', this.usuario.inclusionResolver);
   }
+
+
+  // Metodo para transferir cartera
+  //Este metodo tiene que actualizar el id1 en la tabla UsuarioCliente todas las veces que encuentre el id2
+  
+  transferirCartera(id:number, id2:number):void{
+    this.updateAll({usuarioId:id2},{usuarioId:id});
+  }
+
 }

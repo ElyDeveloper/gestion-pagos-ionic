@@ -21,15 +21,15 @@ export class ViewerStrategy implements AuthenticationStrategy {
   ) {
 
   }
-  authenticate(request: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): Promise<UserProfile | RedirectRoute | undefined> {
+  async authenticate(request: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): Promise<UserProfile | RedirectRoute | undefined> {
     const token = parseBearerToken(request);
     console.log(" token desde vv ", token)
 
     if (!token) {
       throw new HttpErrors[401]("No existe un token en la solicitud.")
     }
-    const decodedToken: token = this.jwtService.VerifyToken(token);
-    const profileData = this.strategyService.autheticate(decodedToken, Rol.Viewer);
+    const decodeToke = await this.jwtService.VerifyToken(token);
+    const profileData = await this.strategyService.autheticate(decodeToke, Rol.Viewer);
 
     return profileData;
   }
