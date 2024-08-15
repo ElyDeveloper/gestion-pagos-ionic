@@ -184,4 +184,15 @@ export class UsuarioClienteController {
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.usuarioClienteRepository.deleteById(id);
   }
+
+  @put('/usuario-clientes/transferir-cartera/{id}&{id2}')
+  @response(204, {
+    description: 'UsuarioCliente PUT success',
+  })
+  async transferirCartera(
+    @param.path.number('id') id: number,
+    @param.path.number('id2') id2: number
+  ): Promise<void> {
+    await this.usuarioClienteRepository.transferirCartera(id, id2);
+  }
 }

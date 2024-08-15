@@ -24,7 +24,7 @@ export class CuotasController {
     public CuotasRepository: CuotasRepository,
   ) {}
 
-  @post('/Cuotas')
+  @post('/cuotas')
   @response(200, {
     description: 'Cuotas model instance',
     content: {'application/json': {schema: getModelSchemaRef(Cuotas)}},
@@ -45,7 +45,7 @@ export class CuotasController {
     return this.CuotasRepository.create(Cuotas);
   }
 
-  @get('/Cuotas/count')
+  @get('/cuotas/count')
   @response(200, {
     description: 'Cuotas model count',
     content: {'application/json': {schema: CountSchema}},
@@ -54,7 +54,7 @@ export class CuotasController {
     return this.CuotasRepository.count(where);
   }
 
-  @get('/Cuotas')
+  @get('/cuotas')
   @response(200, {
     description: 'Array of Cuotas model instances',
     content: {
@@ -70,7 +70,7 @@ export class CuotasController {
     return this.CuotasRepository.find(filter);
   }
 
-  @get('/Cuotas/paginated')
+  @get('/cuotas/paginated')
   @response(200, {
     description: 'List of Cuotas model',
     content: {
@@ -89,7 +89,7 @@ export class CuotasController {
     return this.CuotasRepository.find({skip, limit});
   }
 
-  @patch('/Cuotas')
+  @patch('/cuotas')
   @response(200, {
     description: 'Cuotas PATCH success count',
     content: {'application/json': {schema: CountSchema}},
@@ -108,7 +108,7 @@ export class CuotasController {
     return this.CuotasRepository.updateAll(Cuotas, where);
   }
 
-  @get('/Cuotas/{id}')
+  @get('/cuotas/{id}')
   @response(200, {
     description: 'Cuotas model instance',
     content: {
@@ -125,7 +125,7 @@ export class CuotasController {
     return this.CuotasRepository.findById(id, filter);
   }
 
-  @patch('/Cuotas/{id}')
+  @patch('/cuotas/{id}')
   @response(204, {
     description: 'Cuotas PATCH success',
   })
@@ -143,7 +143,7 @@ export class CuotasController {
     await this.CuotasRepository.updateById(id, Cuotas);
   }
 
-  @put('/Cuotas/{id}')
+  @put('/cuotas/{id}')
   @response(204, {
     description: 'Cuotas PUT success',
   })
@@ -154,7 +154,7 @@ export class CuotasController {
     await this.CuotasRepository.replaceById(id, Cuotas);
   }
 
-  @del('/Cuotas/{id}')
+  @del('/cuotas/{id}')
   @response(204, {
     description: 'Cuotas DELETE success',
   })
@@ -162,7 +162,7 @@ export class CuotasController {
     await this.CuotasRepository.deleteById(id);
   }
 
-  @get('/get-Cuotas/{id}')
+  @get('/get-cuotas/{id}')
   async dataCuotasId(@param.path.number('id') id: number): Promise<any> {
     let datos = await this.getCuotasId(id);
     return datos;
@@ -173,7 +173,7 @@ export class CuotasController {
     );
   }
 
-  @get('/Cuotas/search')
+  @get('/cuotas/search')
   async dataCuotasSearch(
     @param.query.string('search') search: string,
   ): Promise<any> {
@@ -187,7 +187,7 @@ export class CuotasController {
     );
   }
 
-  @get('/get-Cuotas')
+  @get('/get-cuotas')
   async dataCuotas(): Promise<any> {
     let datos = await this.getCuotas();
     return datos;

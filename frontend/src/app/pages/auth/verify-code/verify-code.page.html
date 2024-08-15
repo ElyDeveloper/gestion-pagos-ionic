@@ -1,7 +1,7 @@
 <ion-content [fullscreen]="true" class="ion-padding">
   <div
     class="h-100 d-flex justify-content-center align-content-center align-items-center">
-    <ion-card style="max-width: 350px; width: 100%">
+    <ion-card style="max-width: 350px; width: 100%; min-height: 500px;">
       <ion-card-header>
         <ion-card-title>Verificar código</ion-card-title>
       </ion-card-header>
@@ -30,22 +30,22 @@
         </div>
 
         <ion-text color="danger" class="ion-text-center ion-padding-top">
-          <p>
+          <p class="pt-1">
             <strong
               >*Código enviado a su correo, favor revise su bandeja de
               entrada.</strong
             >
           </p>
         </ion-text>
-        <div class="ion-text-center ion-padding-top">
-          <ion-text>Código expira en: {{ remainingTime }}</ion-text>
-        </div>
         <ion-button expand="block" fill="clear" routerLink="/login">
           Iniciar sesión
         </ion-button>
         <ion-button expand="block" fill="clear" routerLink="/forgot-password">
           Atrás
         </ion-button>
+        <div class="ion-text-center ion-padding-top">
+          <ion-text>Código expira en: {{ remainingTime }}</ion-text>
+        </div>
       </ion-card-content>
     </ion-card>
     <ion-toast

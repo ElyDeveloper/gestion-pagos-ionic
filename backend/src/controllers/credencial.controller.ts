@@ -11,6 +11,7 @@ import {
   del,
   get,
   getModelSchemaRef,
+  HttpErrors,
   param,
   patch,
   post,
@@ -21,6 +22,8 @@ import {
 import {Credenciales} from '../models';
 import {CredencialesRepository} from '../repositories';
 import { authenticate } from '@loopback/authentication';
+import {JWTService} from '../services';
+import { AuthorizationError } from '../core/library/authorization-error';
 
 
 @authenticate('jwt')
@@ -28,6 +31,8 @@ export class CredencialController {
   constructor(
     @repository(CredencialesRepository)
     public credencialesRepository: CredencialesRepository,
+    @service(JWTService)
+    private jwtService: JWTService,
   ) {}
 
   @post('/credenciales')
@@ -109,11 +114,36 @@ export class CredencialController {
     },
   })
   async findById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @param.filter(Credenciales, {exclude: 'where'})
     filter?: FilterExcludingWhere<Credenciales>,
   ): Promise<Credenciales> {
-    return this.credencialesRepository.findById(id, filter);
+    try {
+      // const idUser = this.jwtService.decryptUserId(id);
+      const idUser = 1;
+      console.log('id User: ', idUser);
+      const credenciales = await this.credencialesRepository.findById(
+        idUser,
+        filter,
+      );
+      if (!credenciales) {
+        throw new HttpErrors.NotFound('Credenciales no encontradas');
+      }
+      return credenciales;
+    } catch (error) {
+      if (error instanceof AuthorizationError) {
+        throw new HttpErrors.Unauthorized('Usuario inválido');
+      }
+      if (error instanceof HttpErrors.NotFound) {
+        throw error; // Re-lanza el error NotFound
+      }
+      // Log del error para debugging interno
+      console.error('Error en findById:', error);
+      // Lanza un error genérico para el cliente
+      throw new HttpErrors.InternalServerError(
+        'Error al procesar la solicitud',
+      );
+    }
   }
 
   @patch('/credenciales/{id}')

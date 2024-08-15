@@ -30,7 +30,7 @@ export class VerifyCodePage implements OnInit {
     inputMode: "numeric",
   };
 
-  remainingTime: string = "";
+  remainingTime: string = "0:00";
 
   isToastOpen: boolean = false;
   toastMessage: string = "";
@@ -65,9 +65,10 @@ export class VerifyCodePage implements OnInit {
     }
   }
 
-  ngOnDestroy() {
+  ionViewDidLeave() {
     if (this.countdownSubscription) {
       this.countdownSubscription.unsubscribe();
+      console.log("Unsubscribed from countdown");
     }
   }
 
@@ -78,16 +79,23 @@ export class VerifyCodePage implements OnInit {
   submitForm(event: any): void {
     console.log("Form submitted", event);
     // Implement your code verification logic here
-    this._globalService
-      .Post("verify-code", { code: event })
-      .subscribe((result: any) => {
+    this._globalService.Post("verify-code", { code: event }).subscribe({
+      next: (result: any) => {
+        console.log("Result: ", result);
         if (result.error) {
           this.toastMessage = result.error;
           this.isToastOpen = true;
         } else {
-          this.router.navigate(["reset-password", result]);
+          this.router.navigate(["reset-password", result.userId]);
         }
-      });
+      },
+      error: (error) => {
+        console.error("Error verifying code: ", error);
+        //Mostrar toast
+        this.toastMessage = "Error verificando el código";
+        this.isToastOpen = true;
+      },
+    });
   }
 
   private startCountdown(durationInSeconds: number) {

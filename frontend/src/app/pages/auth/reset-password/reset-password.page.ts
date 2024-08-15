@@ -2,6 +2,7 @@ import { Component, inject, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
 import { AlertController } from "@ionic/angular";
+import { CookieService } from "ngx-cookie-service";
 import { AuthService } from "src/app/shared/services/auth.service";
 import { GlobalService } from "src/app/shared/services/global.service";
 
@@ -20,6 +21,7 @@ export class ResetPasswordPage implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private _globalService = inject(GlobalService);
+  private _cookieService = inject(CookieService);
   private _alertController = inject(AlertController);
 
   constructor(private fb: FormBuilder) {
@@ -49,20 +51,27 @@ export class ResetPasswordPage implements OnInit {
   }
 
   consultarCredenciales(id: string): void {
-    this._globalService.Get("credenciales/" + id).subscribe((result: any) => {
-      if (result.error) {
-        //Mostrar toast
-        this.toastMessage = result.error;
+    this._globalService.Get("credenciales/" + id).subscribe({
+      next: (response: any) => {
+        console.log("Response", response);
+        if (response.error) {
+          this.toastMessage = response.error;
+          this.isToastOpen = true;
+        } else {
+          this.validateForm.get("identificator")?.setValue(response.correo);
+        }
+      },
+      error: (error) => {
+        console.error("There was an error!", error.error.error.message);
+        this.toastMessage =
+          "Ha ocurrido un error, " + error.error.error.message;
         this.isToastOpen = true;
-      } else {
-        this.validateForm.patchValue({
-          identificator: result.correo,
-        });
 
-        //Mostrar toast
-        this.toastMessage = "Se ha encontrado su correo electrónico";
-        this.isToastOpen = true;
-      }
+        //esperar 2 segundos y redirigir
+        setTimeout(() => {
+          this.router.navigate(["/forgot-password"]);
+        }, 2000);
+      },
     });
   }
 
@@ -79,9 +88,10 @@ export class ResetPasswordPage implements OnInit {
               this.toastMessage = response.error;
               this.isToastOpen = true;
             } else {
-              this.validateForm.reset();
+              // this.validateForm.reset();
               this.toastMessage = response.message;
               this.isToastOpen = true;
+              this._cookieService.delete("expiration-code");
               //Preguntar al usuario si quiere ser redirigido al login
               this.questRedirect();
             }
@@ -97,7 +107,7 @@ export class ResetPasswordPage implements OnInit {
 
   async questRedirect() {
     const alert = await this._alertController.create({
-      header: "Redirección",
+      header: "Se cambio la contraseña",
       message: "¿Desea ir a inicio de sesión?",
       buttons: [
         {

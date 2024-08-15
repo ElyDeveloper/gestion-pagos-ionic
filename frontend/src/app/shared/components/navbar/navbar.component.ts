@@ -11,7 +11,21 @@ import { Usuario } from "../../interfaces/usuario";
 })
 export class NavbarComponent implements OnInit {
   selectionProfile: any;
-  user: Usuario = {};
+  user: Usuario = {
+    nombre: "",
+    apellido: "",
+    correo: "",
+    telefono: "",
+    observacion: "",
+    ad: false,
+    estado: false,
+    changedPassword: false,
+    rolid: 0,
+    rol: {
+      id: 0,
+      nombre: "",
+    },
+  };
 
   isActionSheetOpen = false;
 

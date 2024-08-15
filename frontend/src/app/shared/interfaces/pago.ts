@@ -1,7 +1,11 @@
-export interface Pago {
+import { Prestamos } from "./prestamo";
+
+export interface Pagos {
   id?: number;
-  idPrestamo?: number;
-  fechaPago?: string;
-  monto?: number;
-  estado?: boolean;
+  fechaPago: string;
+  monto: number;
+  estado: boolean;
+  idPrestamo: number;
+  prestamos?: Prestamos;
+  [prop: string]: any;
 }

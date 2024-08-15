@@ -98,7 +98,7 @@ export class ClientesController {
     return this.ClientesRepository.find({
       include: [{relation: 'prestamos'}],
       skip,
-      limit
+      limit,
     });
   }
 
@@ -188,9 +188,25 @@ export class ClientesController {
 
   @get('/clientes/search')
   async dataClientesSearch(
-    @param.query.string('search') search: string,
+    @param.query.string('query') search: string,
   ): Promise<any> {
-    let clientesSearch = await this.getClientesSearch(search);
+    // let clientesSearch = await this.getClientesSearch(search);
+    // console.log('clientesSearch', clientesSearch);
+    // return clientesSearch;
+
+    console.log('search', search);
+
+    const clientesSearch = await this.ClientesRepository.find({
+      where: {
+        or: [
+          {dni: {like: `%${search}%`}},
+          {nombres: {like: `%${search}%`}},
+          {apellidos: {like: `%${search}%`}},
+        ],
+      },
+      include: [{relation: 'prestamos'}],
+    });
+    console.log('clientesSearch', clientesSearch);
     return clientesSearch;
   }
 
@@ -212,4 +228,3 @@ export class ClientesController {
     );
   }
 }
-

@@ -93,7 +93,7 @@ export class FormModels {
       telefono: ["", Validators.required],
       observacion: [""],
       ad: [false],
-      correo: ["", [Validators.required, Validators.email]],
+      correo: ["", [Validators.required]],
       estado: [true],
       changedPassword: [false],
     });

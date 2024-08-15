@@ -1,50 +1,16 @@
-import {
-  Component,
-  inject,
-  OnInit,
-  TemplateRef,
-  ViewChild,
-} from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { Observable } from "rxjs";
-import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
-import { Cliente } from "src/app/shared/interfaces/cliente";
-import { Column } from "src/app/shared/interfaces/table";
-import { GlobalService } from "src/app/shared/services/global.service";
-import { FormModels } from "src/app/shared/utils/forms-models";
-
-@Component({
-  selector: "app-clientes",
-  templateUrl: "./clientes.page.html",
-  styleUrls: ["./clientes.page.scss"],
-})
-export class ClientesPage implements OnInit {
-  @ViewChild(LoaderComponent) loaderComponent!: LoaderComponent;
-
-  // export interface Cliente {
-  //   Id?: number;
-  //   DNI?: string;
-  //   Nombres?: string;
-  //   Apellidos?: string;
-  //   Cel?: string;
-  //   Direccion?: string;
-  //   Email?: string;
-  //   FechaIngreso?: string;
-  //   FechaBaja?: string;
-  //   Estado?: boolean;
-  // }
+ @ViewChild(LoaderComponent) loaderComponent!: LoaderComponent;
 
   elements: Cliente[] = [];
   element: Cliente = {
-    DNI: "",
-    Nombres: "",
-    Apellidos: "",
-    Cel: "",
-    Direccion: "",
-    Email: "",
-    FechaIngreso: "",
-    FechaBaja: "",
-    Estado: false,
+    dni: "",
+    nombres: "",
+    apellidos: "",
+    cel: "",
+    direccion: "",
+    email: "",
+    fechaIngreso: "",
+    fechaBaja: "",
+    estado: false,
   };
 
   currentPage = 1;
@@ -95,44 +61,43 @@ export class ClientesPage implements OnInit {
 
   buildColumns() {
     this.columnsData = [
-      
       {
-        key: "Nombres",
+        key: "nombres",
         alias: "Nombres",
       },
       {
-        key: "Apellidos",
+        key: "apellidos",
         alias: "Apellidos",
       },
       {
-        key: "DNI",
+        key: "dni",
         alias: "DNI",
         type: "dni",
       },
       {
-        key: "Cel",
+        key: "cel",
         alias: "Celular",
       },
       {
-        key: "Direccion",
+        key: "direccion",
         alias: "Dirección",
       },
       {
-        key: "Email",
+        key: "email",
         alias: "Correo",
       },
       {
-        key: "FechaIngreso",
+        key: "fechaIngreso",
         alias: "Fecha de Ingreso",
         type: "date",
       },
       {
-        key: "FechaBaja",
+        key: "fechaBaja",
         alias: "Fecha de Baja",
         type: "date",
       },
       {
-        key: "Estado",
+        key: "estado",
         alias: "Estado",
         type: "boolean",
       },
@@ -156,7 +121,7 @@ export class ClientesPage implements OnInit {
     return "";
   }
 
-  getObjectValue(row: any, key: string): string {
+  getObjectValue(row: any, key: string): any {
     const obj = row[key];
     if (obj && typeof obj === "object") {
       return obj.nombre || JSON.stringify(obj);
@@ -166,6 +131,14 @@ export class ClientesPage implements OnInit {
 
   private setModalState(isEdit: boolean, modalTemplate: any, formData?: any) {
     this.isEdit = isEdit;
+
+    if (formData) {
+      formData.fechaIngreso = this.formatDateForInput(formData.fechaIngreso);
+      if (formData.fechaBaja) {
+        formData.fechaBaja = this.formatDateForInput(formData.fechaBaja);
+      }
+    }
+    console.log("Form Data:", formData);
 
     if (isEdit && formData) {
       this.formAdd.patchValue(formData);
@@ -179,8 +152,7 @@ export class ClientesPage implements OnInit {
   }
 
   formatDateForInput(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toISOString().split('T')[0];
+    return dateString.split("T")[0];
   }
 
   onAddButtonClicked() {
@@ -220,17 +192,22 @@ export class ClientesPage implements OnInit {
   }
 
   handleUserOperation(operation: "edit" | "create", data: any) {
+    data.fechaIngreso = new Date(data.fechaIngreso);
+    console.log("Datos del cliente:", data);
+
+    // return;
     let operationText: string;
     let apiCall: Observable<any>;
 
     switch (operation) {
       case "edit":
         operationText = "Editando";
-        apiCall = this._globalService.PutId("Clientes", data.id, data);
+        apiCall = this._globalService.PutId("clientes", data.id, data);
         break;
       case "create":
+        delete data.Id;
         operationText = "Guardando";
-        apiCall = this._globalService.Post("Clientes", data);
+        apiCall = this._globalService.Post("clientes", data);
         break;
     }
 
@@ -322,4 +299,3 @@ export class ClientesPage implements OnInit {
       },
     });
   }
-}

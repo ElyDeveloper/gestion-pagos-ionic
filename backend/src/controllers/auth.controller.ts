@@ -68,7 +68,7 @@ export class AuthController {
           schema: {
             type: 'object',
             properties: {
-              identificator: {type: 'number'},
+              identificator: {type: 'string'},
               newPassword: {type: 'string'},
             },
             required: ['identificator', 'newPassword'],
@@ -86,8 +86,6 @@ export class AuthController {
     });
     console.log('Usuarios', user);
 
-    
-
     if (!user) {
       return {error: 'Usuario no encontrado'};
     }
@@ -96,6 +94,17 @@ export class AuthController {
       user.correo ?? '',
       reset.newPassword,
     );
+
+    let userUpdate = await this.usuarioRepository.findOne({
+      where: {correo: user.correo},
+    });
+
+    if (!userUpdate) {
+      return {error: 'Usuario no encontrado'};
+    }
+
+    userUpdate.changedPassword = true;
+    await this.usuarioRepository.updateById(userUpdate.id, userUpdate);
 
     if (!result) {
       return {error: 'Error al cambiar la contraseña'};

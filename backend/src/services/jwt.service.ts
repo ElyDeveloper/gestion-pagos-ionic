@@ -13,8 +13,12 @@ import {VerifyCodeInfo} from '../core/interfaces/models/gCode.interface';
 import { TokenServiceBindings } from '@loopback/authentication-jwt';
 import { TokenService } from '@loopback/authentication';
 import { securityId, UserProfile } from '@loopback/security';
+import { AuthorizationError } from '../core/library/authorization-error';
 const jsonwebtoken = require('jsonwebtoken');
 var shortid = require('shortid-36');
+
+//importar dotenv
+require('dotenv').config();
 
 interface token {
   exp: number;
@@ -142,6 +146,14 @@ export class JWTService {
       return code.padEnd(6, 'A');
     }
     return code;
+  }
+
+  async encryptUserId(credentials:any) {
+    return '';
+  }
+
+  async decryptUserId(credentials:any) {
+    return 1;
   }
 
   async generateCode(userExist: Credenciales) {

@@ -34,7 +34,7 @@ export class TipoPrestamos extends Entity {
   estado: boolean;
 
   // Define well-known properties here
-  @hasMany(() => Prestamos, {keyTo: 'IdTipoPrestamo'})
+  @hasMany(() => Prestamos, {keyTo: 'idTipoPrestamo'})
   prestamos: Prestamos[];
 
   // Indexer property to allow additional data
