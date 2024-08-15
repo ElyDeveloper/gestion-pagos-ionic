@@ -1,7 +1,7 @@
 import {Entity, hasMany, model, property} from '@loopback/repository';
 import { Prestamos } from './prestamos.model';
 
-@model({settings: {idInjection: false, mssql: {schema: 'dbo', table: 'TipoPrestamos'}}})
+@model({settings: {idInjection: false, mssql: {schema: 'dbo', table: 'TiposPrestamo'}}})
 export class TipoPrestamos extends Entity {
   @property({
     type: 'number',

@@ -2,7 +2,7 @@ import {Entity, model, property, belongsTo, hasMany} from '@loopback/repository'
 import {Roles} from './roles.model';
 import { UsuarioCliente } from './usuario-cliente.model';
 
-@model({settings: {idInjection: false, mssql: {schema: 'dbo', table: 'usuario'}}})
+@model({settings: {idInjection: false, mssql: {schema: 'dbo', table: 'Usuarios'}}})
 export class Usuario extends Entity {
   @property({
     type: 'number',

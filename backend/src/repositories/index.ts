@@ -7,3 +7,4 @@ export * from './prestamos.repository';
 export * from './roles.repository';
 export * from './usuario.repository';
 export * from './tipo-prestamos.repository';export * from './usuario-cliente.repository';
+export * from './programacion-tareas.repository';

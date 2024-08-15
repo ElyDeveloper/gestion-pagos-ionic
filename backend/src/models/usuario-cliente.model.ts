@@ -1,7 +1,7 @@
 import { Entity, model, property, belongsTo } from '@loopback/repository';
 import { Clientes } from './clientes.model';
 import { number } from 'mathjs';
-import { Usuario } from './usuario.model';
+import { Usuario } from './usuarios.model';
 
 @model({
   settings: {idInjection: false, mssql: {schema: 'dbo', table: 'UsuarioCliente'}}

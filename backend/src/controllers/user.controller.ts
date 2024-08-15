@@ -21,7 +21,7 @@ import {
 } from '@loopback/rest';
 import {randomBytes} from 'crypto';
 import {viewOf} from '../core/library/views.library';
-import {Usuario} from '../models/usuario.model';
+import {Usuario} from '../models/usuarios.model';
 import {CredencialesRepository} from '../repositories/credenciales.repository';
 import {UsuarioRepository} from '../repositories/usuario.repository';
 import {EncriptDecryptService} from '../services/encript-decrypt.service';

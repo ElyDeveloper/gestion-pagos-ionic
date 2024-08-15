@@ -8,7 +8,7 @@ import {
 } from '../core/interfaces/models/RegisterUser.interface';
 import {error} from '../core/library/errors.library';
 import {Credenciales} from '../models/credenciales.model';
-import {Usuario} from '../models/usuario.model';
+import {Usuario} from '../models/usuarios.model';
 import {CodigoVerificacionRepository} from '../repositories/codigo-verificacion.repository';
 import {CredencialesRepository} from '../repositories/credenciales.repository';
 import {UsuarioRepository} from '../repositories/usuario.repository';
