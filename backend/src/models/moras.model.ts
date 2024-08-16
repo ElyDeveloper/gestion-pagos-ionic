@@ -1,4 +1,8 @@
-import {Entity, model, property} from '@loopback/repository';
+import {belongsTo, Entity, model, property} from '@loopback/repository';
+import { Clientes } from './clientes.model';
+import { Prestamos } from './prestamos.model';
+import { PlanesPago } from './planes-pago.model';
+import { FechasPagos } from './fechas-pagos.model';
 
 @model({settings: {idInjection: false, mssql: {schema: 'dbo', table: 'Moras'}}})
 export class Moras extends Entity {
@@ -12,50 +16,6 @@ export class Moras extends Entity {
     mssql: {columnName: 'Id', dataType: 'int', dataLength: null, dataPrecision: 10, dataScale: 0, nullable: 'NO', generated: 1},
   })
   id?: number;
-
-  @property({
-    type: 'number',
-    required: true,
-    jsonSchema: {nullable: false},
-    precision: 10,
-    scale: 0,
-    generated: false,
-    mssql: {columnName: 'IdCliente', dataType: 'int', dataLength: null, dataPrecision: 10, dataScale: 0, nullable: 'NO', generated: false},
-  })
-  idCliente: number;
-
-  @property({
-    type: 'number',
-    required: true,
-    jsonSchema: {nullable: false},
-    precision: 10,
-    scale: 0,
-    generated: false,
-    mssql: {columnName: 'IdPrestamo', dataType: 'int', dataLength: null, dataPrecision: 10, dataScale: 0, nullable: 'NO', generated: false},
-  })
-  idPrestamo: number;
-
-  @property({
-    type: 'number',
-    required: true,
-    jsonSchema: {nullable: false},
-    precision: 10,
-    scale: 0,
-    generated: false,
-    mssql: {columnName: 'IdPlan', dataType: 'int', dataLength: null, dataPrecision: 10, dataScale: 0, nullable: 'NO', generated: false},
-  })
-  idPlan: number;
-
-  @property({
-    type: 'number',
-    required: true,
-    jsonSchema: {nullable: false},
-    precision: 10,
-    scale: 0,
-    generated: false,
-    mssql: {columnName: 'IdFechaPago', dataType: 'int', dataLength: null, dataPrecision: 10, dataScale: 0, nullable: 'NO', generated: false},
-  })
-  idFechaPago: number;
 
   @property({
     type: 'number',
@@ -80,6 +40,17 @@ export class Moras extends Entity {
   mora: number;
 
   // Define well-known properties here
+  @belongsTo(() => Clientes, {name: 'cliente'})
+  idCliente: number;
+
+  @belongsTo(() => Prestamos, {name: 'prestamo'})
+  idPrestamo: number;
+
+  @belongsTo(() => PlanesPago, {name: 'planPago'})
+  idPlan: number;
+
+  @belongsTo(() => FechasPagos, {name: 'fechaPago'})
+  idFechaPago: number;
 
   // Indexer property to allow additional data
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

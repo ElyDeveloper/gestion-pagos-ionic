@@ -58,6 +58,21 @@ export class LimiteCuotasController {
     return this.limiteCuotasRepository.count(where);
   }
 
+  @get('/limite-cuotas/paginated')
+  @response(200, {
+    description: 'LimiteCuotas model count',
+    content: {'application/json': {schema: CountSchema}},
+  })
+  async dataPaginated(
+    @param.query.number('skip') skip: number,
+    @param.query.number('limit') limit: number,
+  ):Promise<LimiteCuotas[]>{
+    return this.limiteCuotasRepository.find({
+      skip: skip,
+      limit: limit
+    });
+  }
+
   @get('/limite-cuotas')
   @response(200, {
     description: 'Array of LimiteCuotas model instances',
@@ -70,10 +85,8 @@ export class LimiteCuotasController {
       },
     },
   })
-  async find(
-    @param.filter(LimiteCuotas) filter?: Filter<LimiteCuotas>,
-  ): Promise<LimiteCuotas[]> {
-    return this.limiteCuotasRepository.find(filter);
+  async find(): Promise<LimiteCuotas[]> {
+    return this.limiteCuotasRepository.find();
   }
 
   @patch('/limite-cuotas')

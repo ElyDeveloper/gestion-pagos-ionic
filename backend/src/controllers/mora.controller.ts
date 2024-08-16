@@ -3,6 +3,7 @@ import {
   CountSchema,
   Filter,
   FilterExcludingWhere,
+  relation,
   repository,
   Where,
 } from '@loopback/repository';
@@ -47,6 +48,24 @@ export class MoraController {
     return this.morasRepository.create(moras);
   }
 
+  @get('/moras/paginated')
+  @response(200, {
+    description: 'Moras model instance',
+    content: {'application/json': {schema: getModelSchemaRef(Moras)}},
+  })
+  async dataPaginated(
+    @param.query.number('skip') skip: number,
+    @param.query.number('limit') limit: number,
+  ){
+    return this.morasRepository.find({
+      include:[
+        {relation: 'cliente'},
+      ],
+      skip, 
+      limit
+    });
+  }
+
   @get('/moras/count')
   @response(200, {
     description: 'Moras model count',
@@ -70,10 +89,8 @@ export class MoraController {
       },
     },
   })
-  async find(
-    @param.filter(Moras) filter?: Filter<Moras>,
-  ): Promise<Moras[]> {
-    return this.morasRepository.find(filter);
+  async find(): Promise<Moras[]> {
+    return this.morasRepository.find();
   }
 
   @patch('/moras')
@@ -105,10 +122,9 @@ export class MoraController {
     },
   })
   async findById(
-    @param.path.number('id') id: number,
-    @param.filter(Moras, {exclude: 'where'}) filter?: FilterExcludingWhere<Moras>
+    @param.path.number('id') id: number
   ): Promise<Moras> {
-    return this.morasRepository.findById(id, filter);
+    return this.morasRepository.findById(id);
   }
 
   @patch('/moras/{id}')

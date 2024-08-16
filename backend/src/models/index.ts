@@ -24,3 +24,5 @@ export * from './moras.model';
 export * from './productos.model';
 export * from './record-crediticio.model';
 export * from './prestamos.model';
+export * from './pagos.model';
+export * from './vouchers.model';
