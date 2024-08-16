@@ -1,8 +1,10 @@
-import {belongsTo, Entity, hasMany, model, property} from '@loopback/repository';
+import {belongsTo, Entity, model, property} from '@loopback/repository';
 import { Clientes } from './clientes.model';
-import { TipoPrestamos } from './tipos-prestamo.model';
-import { Cuotas } from './cuotas.model';
-import { Pagos } from './pagos.model';
+import { Productos } from './productos.model';
+import { PeriodosCobro } from './periodos-cobro.model';
+import { EstadosAprobacion } from './estados-aprobacion.model';
+import { PlanesPago } from './planes-pago.model';
+import { Monedas } from './monedas.model';
 
 @model({settings: {idInjection: false, mssql: {schema: 'dbo', table: 'Prestamos'}}})
 export class Prestamos extends Entity {
@@ -55,18 +57,17 @@ export class Prestamos extends Entity {
     required: true,
     jsonSchema: {nullable: false},
     generated: false,
-    mssql: {columnName: 'FechaInicial', dataType: 'date', dataLength: null, dataPrecision: null, dataScale: null, nullable: 'NO', generated: false},
+    mssql: {columnName: 'FechaSolicitud', dataType: 'date', dataLength: null, dataPrecision: null, dataScale: null, nullable: 'NO', generated: false},
   })
-  fechaInicial: string;
+  fechaSolicitud: string;
 
   @property({
     type: 'date',
-    required: true,
-    jsonSchema: {nullable: false},
+    jsonSchema: {nullable: true},
     generated: false,
-    mssql: {columnName: 'FechaFinal', dataType: 'date', dataLength: null, dataPrecision: null, dataScale: null, nullable: 'NO', generated: false},
+    mssql: {columnName: 'FechaAprobacion', dataType: 'date', dataLength: null, dataPrecision: null, dataScale: null, nullable: 'YES', generated: false},
   })
-  fechaFinal: string;
+  fechaAprobacion?: string;
 
   @property({
     type: 'boolean',
@@ -81,14 +82,20 @@ export class Prestamos extends Entity {
   @belongsTo(() => Clientes, {name: 'cliente'})
   idCliente: number;
 
-  @belongsTo(() => TipoPrestamos, {name: 'tipoPrestamo'})
-  idTipoPrestamo: number;
+  @belongsTo(() => Productos, {name: 'producto'})
+  idProducto: number;
 
-  @belongsTo(() => Cuotas, {name: 'cuotas'})
-  idCuotas: number;
+  @belongsTo(() => PeriodosCobro, {name: 'periodo'})
+  idPeriodoCobro: number;
 
-  @hasMany(() => Pagos, {keyTo: 'idPrestamo'})
-  pagos: Pagos[];
+  @belongsTo(() => EstadosAprobacion, {name: 'estadoAprobacion'})
+  idEstadoAprobacion: number;
+
+  @belongsTo(() => PlanesPago, {name: 'planPago'})
+  idPlan: number;
+
+  @belongsTo(() => Monedas, {name: 'moneda'})
+  idMoneda: number;
 
   // Indexer property to allow additional data
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

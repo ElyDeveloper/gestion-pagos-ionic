@@ -1,8 +1,7 @@
-import {Entity, hasMany, model, property} from '@loopback/repository';
-import { Prestamos } from './prestamos.model';
+import {Entity, model, property} from '@loopback/repository';
 
-@model({settings: {idInjection: false, mssql: {schema: 'dbo', table: 'TiposPrestamo'}}})
-export class TipoPrestamos extends Entity {
+@model({settings: {idInjection: false, mssql: {schema: 'dbo', table: 'FechasPagos'}}})
+export class FechasPagos extends Entity {
   @property({
     type: 'number',
     jsonSchema: {nullable: false},
@@ -15,14 +14,24 @@ export class TipoPrestamos extends Entity {
   id?: number;
 
   @property({
-    type: 'string',
+    type: 'date',
     required: true,
     jsonSchema: {nullable: false},
-    length: 100,
     generated: false,
-    mssql: {columnName: 'Nombre', dataType: 'varchar', dataLength: 100, dataPrecision: null, dataScale: null, nullable: 'NO', generated: false},
+    mssql: {columnName: 'FechaPago', dataType: 'date', dataLength: null, dataPrecision: null, dataScale: null, nullable: 'NO', generated: false},
   })
-  nombre: string;
+  fechaPago: string;
+
+  @property({
+    type: 'number',
+    required: true,
+    jsonSchema: {nullable: false},
+    precision: 10,
+    scale: 0,
+    generated: false,
+    mssql: {columnName: 'PlanId', dataType: 'int', dataLength: null, dataPrecision: 10, dataScale: 0, nullable: 'NO', generated: false},
+  })
+  planId: number;
 
   @property({
     type: 'boolean',
@@ -34,20 +43,18 @@ export class TipoPrestamos extends Entity {
   estado: boolean;
 
   // Define well-known properties here
-  @hasMany(() => Prestamos, {keyTo: 'idTipoPrestamo'})
-  prestamos: Prestamos[];
 
   // Indexer property to allow additional data
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [prop: string]: any;
 
-  constructor(data?: Partial<TipoPrestamos>) {
+  constructor(data?: Partial<FechasPagos>) {
     super(data);
   }
 }
 
-export interface TipoPrestamosRelations {
+export interface FechasPagosRelations {
   // describe navigational properties here
 }
 
-export type TipoPrestamosWithRelations = TipoPrestamos & TipoPrestamosRelations;
+export type FechasPagosWithRelations = FechasPagos & FechasPagosRelations;

@@ -78,8 +78,11 @@ export class PrestamosController {
     return this.PrestamosRepository.find({
       include: [
         {relation: 'cliente'},
-        {relation: 'tipoPrestamo'},
-        {relation: 'cuotas'},
+        {relation: 'producto'},
+        {relation: 'periodo'},
+        {relation: 'estadoAprobacion'},
+        {relation: 'planPago'},
+        {relation: 'moneda'},
       ],
     });
   }
@@ -103,8 +106,11 @@ export class PrestamosController {
     return this.PrestamosRepository.find({
       include: [
         {relation: 'cliente'},
-        {relation: 'tipoPrestamo'},
-        {relation: 'cuotas'},
+        {relation: 'producto'},
+        {relation: 'periodo'},
+        {relation: 'estadoAprobacion'},
+        {relation: 'planPago'},
+        {relation: 'moneda'},
       ],
       skip,
       limit,
@@ -143,8 +149,11 @@ export class PrestamosController {
     return this.PrestamosRepository.findById(id, {
       include: [
         {relation: 'cliente'},
-        {relation: 'tipoPrestamo'},
-        {relation: 'cuotas'},
+        {relation: 'producto'},
+        {relation: 'periodo'},
+        {relation: 'estadoAprobacion'},
+        {relation: 'planPago'},
+        {relation: 'moneda'},
       ],
     });
   }
@@ -204,8 +213,11 @@ export class PrestamosController {
     let PrestamosSearch = await this.PrestamosRepository.find({
       include: [
         {relation: 'cliente'},
-        {relation: 'tipoPrestamo'},
-        {relation: 'cuotas'},
+        {relation: 'producto'},
+        {relation: 'periodo'},
+        {relation: 'estadoAprobacion'},
+        {relation: 'planPago'},
+        {relation: 'moneda'},       
       ],
       where: {
         or: [

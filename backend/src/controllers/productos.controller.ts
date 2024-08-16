@@ -18,76 +18,76 @@ import {
   response,
 } from '@loopback/rest';
 import {viewOf} from '../core/library/views.library';
-import {TipoPrestamos} from '../models';
-import {TipoPrestamosRepository} from '../repositories/tipo-prestamos.repository';
+import {Productos} from '../models';
+import {ProductosRepository} from '../repositories/productos.repository';
 import { authenticate } from '@loopback/authentication';
 
 
 @authenticate('jwt')
-export class TipoPrestamoController {
+export class ProductosController {
   constructor(
-    @repository(TipoPrestamosRepository)
-    public TipoPrestamoRepository: TipoPrestamosRepository,
+    @repository(ProductosRepository)
+    public TipoPrestamoRepository: ProductosRepository,
   ) {}
 
-  @post('/tipo-prestamos')
+  @post('/productos')
   @response(200, {
-    description: 'TipoPrestamos model instance',
-    content: {'application/json': {schema: getModelSchemaRef(TipoPrestamos)}},
+    description: 'Productos model instance',
+    content: {'application/json': {schema: getModelSchemaRef(Productos)}},
   })
   async create(
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(TipoPrestamos, {
+          schema: getModelSchemaRef(Productos, {
             title: 'NewTipoPrestamo',
             exclude: ['id'],
           }),
         },
       },
     })
-    TipoPrestamos: Omit<TipoPrestamos, 'id'>,
-  ): Promise<TipoPrestamos> {
-    return this.TipoPrestamoRepository.create(TipoPrestamos);
+    Productos: Omit<Productos, 'id'>,
+  ): Promise<Productos> {
+    return this.TipoPrestamoRepository.create(Productos);
   }
 
-  @get('/tipo-prestamos/count')
+  @get('/productos/count')
   @response(200, {
-    description: 'TipoPrestamos model count',
+    description: 'Productos model count',
     content: {'application/json': {schema: CountSchema}},
   })
   async count(
-    @param.where(TipoPrestamos) where?: Where<TipoPrestamos>,
+    @param.where(Productos) where?: Where<Productos>,
   ): Promise<Count> {
     return this.TipoPrestamoRepository.count(where);
   }
 
-  @get('/tipo-prestamos')
+  @get('/productos')
   @response(200, {
-    description: 'Array of TipoPrestamos model instances',
+    description: 'Array of Productos model instances',
     content: {
       'application/json': {
         schema: {
           type: 'array',
-          items: getModelSchemaRef(TipoPrestamos, {includeRelations: true}),
+          items: getModelSchemaRef(Productos, {includeRelations: true}),
         },
       },
     },
   })
   async find(
-    @param.filter(TipoPrestamos) filter?: Filter<TipoPrestamos>,
-  ): Promise<TipoPrestamos[]> {
+    @param.filter(Productos) filter?: Filter<Productos>,
+  ): Promise<Productos[]> {
     return this.TipoPrestamoRepository.find();
   }
 
-  @get('/tipo-prestamos/paginated')
+  @get('/productos/paginated')
   @response(200, {
-    description: 'List of TipoPrestamos model',
+    description: 'List of Productos model',
     content: {
       'application/json': {
         schema: {
           type: 'array',
-          items: getModelSchemaRef(TipoPrestamos, {includeRelations: true}),
+          items: getModelSchemaRef(Productos, {includeRelations: true}),
         },
       },
     },
@@ -95,84 +95,84 @@ export class TipoPrestamoController {
   async dataPaginate(
     @param.query.number('skip') skip: number,
     @param.query.number('limit') limit: number,
-  ): Promise<TipoPrestamos[]> {
+  ): Promise<Productos[]> {
     return this.TipoPrestamoRepository.find({skip, limit});
   }
 
-  @patch('/tipo-prestamos')
+  @patch('/productos')
   @response(200, {
-    description: 'TipoPrestamos PATCH success count',
+    description: 'Productos PATCH success count',
     content: {'application/json': {schema: CountSchema}},
   })
   async updateAll(
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(TipoPrestamos, {partial: true}),
+          schema: getModelSchemaRef(Productos, {partial: true}),
         },
       },
     })
-    TipoPrestamos: TipoPrestamos,
-    @param.where(TipoPrestamos) where?: Where<TipoPrestamos>,
+    Productos: Productos,
+    @param.where(Productos) where?: Where<Productos>,
   ): Promise<Count> {
-    return this.TipoPrestamoRepository.updateAll(TipoPrestamos, where);
+    return this.TipoPrestamoRepository.updateAll(Productos, where);
   }
 
-  @get('/tipo-prestamos/{id}')
+  @get('/productos/{id}')
   @response(200, {
-    description: 'TipoPrestamos model instance',
+    description: 'Productos model instance',
     content: {
       'application/json': {
-        schema: getModelSchemaRef(TipoPrestamos, {includeRelations: true}),
+        schema: getModelSchemaRef(Productos, {includeRelations: true}),
       },
     },
   })
   async findById(
     @param.path.number('id') id: number,
-    @param.filter(TipoPrestamos, {exclude: 'where'})
-    filter?: FilterExcludingWhere<TipoPrestamos>,
-  ): Promise<TipoPrestamos> {
+    @param.filter(Productos, {exclude: 'where'})
+    filter?: FilterExcludingWhere<Productos>,
+  ): Promise<Productos> {
     return this.TipoPrestamoRepository.findById(id, filter);
   }
 
-  @patch('/tipo-prestamos/{id}')
+  @patch('/productos/{id}')
   @response(204, {
-    description: 'TipoPrestamos PATCH success',
+    description: 'Productos PATCH success',
   })
   async updateById(
     @param.path.number('id') id: number,
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(TipoPrestamos, {partial: true}),
+          schema: getModelSchemaRef(Productos, {partial: true}),
         },
       },
     })
-    TipoPrestamos: TipoPrestamos,
+    Productos: Productos,
   ): Promise<void> {
-    await this.TipoPrestamoRepository.updateById(id, TipoPrestamos);
+    await this.TipoPrestamoRepository.updateById(id, Productos);
   }
 
-  @put('/tipo-prestamos/{id}')
+  @put('/productos/{id}')
   @response(204, {
-    description: 'TipoPrestamos PUT success',
+    description: 'Productos PUT success',
   })
   async replaceById(
     @param.path.number('id') id: number,
-    @requestBody() TipoPrestamos: TipoPrestamos,
+    @requestBody() Productos: Productos,
   ): Promise<void> {
-    await this.TipoPrestamoRepository.replaceById(id, TipoPrestamos);
+    await this.TipoPrestamoRepository.replaceById(id, Productos);
   }
 
-  @del('/tipo-prestamos/{id}')
+  @del('/productos/{id}')
   @response(204, {
-    description: 'TipoPrestamos DELETE success',
+    description: 'Productos DELETE success',
   })
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.TipoPrestamoRepository.deleteById(id);
   }
 
-  @get('/get-tipo-prestamos/{id}')
+  @get('/get-productos/{id}')
   async dataTipoPrestamoId(@param.path.number('id') id: number): Promise<any> {
     let datos = await this.getTipoPrestamoId(id);
     return datos;
@@ -183,21 +183,21 @@ export class TipoPrestamoController {
     );
   }
 
-  @get('/tipo-prestamos/search')
-  async dataTipoPrestamoSearch(
+  @get('/productos/search')
+  async dataProductosearch(
     @param.query.string('search') search: string,
   ): Promise<any> {
-    let TipoPrestamoSearch = await this.getTipoPrestamoSearch(search);
-    return TipoPrestamoSearch;
+    let Productosearch = await this.getProductoSearch(search);
+    return Productosearch;
   }
 
-  async getTipoPrestamoSearch(search: string) {
+  async getProductoSearch(search: string) {
     return await this.TipoPrestamoRepository.dataSource.execute(
       `${viewOf.getViewTipoPrestamos} Where Nombre like '%${search}%'`,
     );
   }
 
-  @get('/get-tipo-prestamos')
+  @get('/get-productos')
   async dataTipoPrestamo(): Promise<any> {
     let datos = await this.getTipoPrestamo();
     return datos;
