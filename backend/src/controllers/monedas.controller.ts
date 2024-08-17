@@ -19,7 +19,10 @@ import {
 } from '@loopback/rest';
 import {Monedas} from '../models';
 import {MonedasRepository} from '../repositories';
+import { authenticate } from '@loopback/authentication';
 
+
+@authenticate('jwt')
 export class MonedasController {
   constructor(
     @repository(MonedasRepository)

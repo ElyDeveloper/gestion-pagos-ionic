@@ -12,3 +12,4 @@ export * from './tipo-documentos.controller';
 export * from './mora.controller';
 export * from './record-crediticio.controller';
 export * from './vouchers.controller';
+export * from './transacciones-externas.controller';

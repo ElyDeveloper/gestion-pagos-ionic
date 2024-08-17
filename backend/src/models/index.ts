@@ -26,3 +26,4 @@ export * from './record-crediticio.model';
 export * from './prestamos.model';
 export * from './pagos.model';
 export * from './vouchers.model';
+export * from './transacciones-externas.model';

@@ -19,7 +19,10 @@ import {
 } from '@loopback/rest';
 import {LimiteCuotas} from '../models';
 import {LimiteCuotasRepository} from '../repositories';
+import { authenticate } from '@loopback/authentication';
 
+
+@authenticate('jwt')
 export class LimiteCuotasController {
   constructor(
     @repository(LimiteCuotasRepository)

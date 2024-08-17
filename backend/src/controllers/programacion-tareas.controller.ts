@@ -19,7 +19,10 @@ import {
 } from '@loopback/rest';
 import {ProgramacionTareas} from '../models';
 import {ProgramacionTareasRepository} from '../repositories';
+import { authenticate } from '@loopback/authentication';
 
+
+@authenticate('jwt')
 export class ProgramacionTareasController {
   constructor(
     @repository(ProgramacionTareasRepository)

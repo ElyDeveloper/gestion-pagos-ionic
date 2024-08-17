@@ -19,7 +19,10 @@ import {
 } from '@loopback/rest';
 import {FechasPagos} from '../models';
 import {FechasPagosRepository} from '../repositories';
+import { authenticate } from '@loopback/authentication';
 
+
+@authenticate('jwt')
 export class FechasPagosController {
   constructor(
     @repository(FechasPagosRepository)
@@ -70,10 +73,12 @@ export class FechasPagosController {
       },
     },
   })
-  async find(
-    @param.filter(FechasPagos) filter?: Filter<FechasPagos>,
-  ): Promise<FechasPagos[]> {
-    return this.FechasPagosRepository.find(filter);
+  async find(): Promise<FechasPagos[]> {
+    return this.FechasPagosRepository.find({
+      include: [
+        {relation: 'planPago'}
+      ]
+    });
   }
 
   @patch('/fechas-pagos')
@@ -95,6 +100,31 @@ export class FechasPagosController {
     return this.FechasPagosRepository.updateAll(fechasPagos, where);
   }
 
+  @get('/fechas-pagos/paginated')
+  @response(200, {
+    description: 'List of FechasPagos model',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(FechasPagos, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async dataPaginate(
+    @param.query.number('skip') skip: number,
+    @param.query.number('limit') limit: number,
+  ): Promise<FechasPagos[]> {
+    return this.FechasPagosRepository.find({
+      include: [
+        {relation: 'planPago'}
+      ],
+      skip,
+      limit,
+    });
+  }
+
   @get('/fechas-pagos/{id}')
   @response(200, {
     description: 'FechasPagos model instance',
@@ -105,10 +135,15 @@ export class FechasPagosController {
     },
   })
   async findById(
-    @param.path.number('id') id: number,
-    @param.filter(FechasPagos, {exclude: 'where'}) filter?: FilterExcludingWhere<FechasPagos>
+    @param.path.number('id') id: number
   ): Promise<FechasPagos> {
-    return this.FechasPagosRepository.findById(id, filter);
+    return this.FechasPagosRepository.findById(id, 
+      {
+        include: [
+          {relation: 'planPago'}
+        ]
+      }
+    );
   }
 
   @patch('/fechas-pagos/{id}')

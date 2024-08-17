@@ -70,10 +70,8 @@ export class PlanesPagoController {
       },
     },
   })
-  async find(
-    @param.filter(PlanesPago) filter?: Filter<PlanesPago>,
-  ): Promise<PlanesPago[]> {
-    return this.planesPagoRepository.find(filter);
+  async find(): Promise<PlanesPago[]> {
+    return this.planesPagoRepository.find();
   }
 
   @patch('/planes-pagos')
@@ -105,10 +103,9 @@ export class PlanesPagoController {
     },
   })
   async findById(
-    @param.path.number('id') id: number,
-    @param.filter(PlanesPago, {exclude: 'where'}) filter?: FilterExcludingWhere<PlanesPago>
+    @param.path.number('id') id: number
   ): Promise<PlanesPago> {
-    return this.planesPagoRepository.findById(id, filter);
+    return this.planesPagoRepository.findById(id);
   }
 
   @patch('/planes-pagos/{id}')
