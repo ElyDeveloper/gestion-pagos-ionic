@@ -1,0 +1,382 @@
+<ion-content [fullscreen]="true">
+  <ion-card class="fixed-top-card">
+    <ion-card-content>
+      <app-breadcrumb></app-breadcrumb>
+      <div class="alert alert-info" role="alert">
+        <ion-icon name="person-outline"></ion-icon> Cliente Seleccionado:
+        <strong>
+          @if (clienteSeleccionado.id) { {{clienteSeleccionado.nombres}}
+          {{clienteSeleccionado.apellidos}} }@else { No Aún }
+        </strong>
+      </div>
+      <div
+        class="alert"
+        [ngClass]="{
+          'alert-warning': isWarningState(),
+          'alert-success': isSuccessState()
+        }"
+        role="alert">
+        <ul class="task-list">
+          <li [class.completed]="clienteSeleccionado.id">
+            <span>* Selecciona un cliente</span>
+            @if (clienteSeleccionado.id) {
+            <ion-icon name="checkmark-done-outline" color="success"></ion-icon>
+            } @else {
+            <ion-icon name="close-outline" color="danger"></ion-icon>
+            }
+          </li>
+          <li [class.completed]="planesPagoForm.valid">
+            <span>* Selecciona un plan de pago</span>
+            @if (planesPagoForm.valid) {
+            <ion-icon name="checkmark-done-outline" color="success"></ion-icon>
+            } @else {
+            <ion-icon name="close-outline" color="danger"></ion-icon>
+            }
+          </li>
+          <li [class.completed]="prestamoForm.valid">
+            <span>* Llena los datos de préstamo</span>
+            @if (prestamoForm.valid) {
+            <ion-icon name="checkmark-done-outline" color="success"></ion-icon>
+            } @else {
+            <ion-icon name="close-outline" color="danger"></ion-icon>
+            }
+          </li>
+        </ul>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <div class="content-below-fixed-card">
+    <div [ngSwitch]="currentStep">
+      <div *ngSwitchCase="0">
+        <ion-card>
+          <ion-card-header>
+            <ion-title>Seleccionar Cliente</ion-title>
+          </ion-card-header>
+          <ion-card-content>
+            <!-- Buscador de cliente -->
+            <ion-searchbar
+              placeholder="Buscar..."
+              [(ngModel)]="searchClient"
+              (ngModelChange)="searchValueChanged($event)"></ion-searchbar>
+
+            <!-- Listado de clientes -->
+            <ion-radio-group (ionChange)="onClienteSeleccionado($event)">
+              <ion-list>
+                <ion-item *ngFor="let cliente of clientes">
+                  <ion-radio [value]="cliente"
+                    >{{ cliente.nombres }} {{ cliente.apellidos }}</ion-radio
+                  >
+                </ion-item>
+              </ion-list>
+            </ion-radio-group>
+          </ion-card-content>
+        </ion-card>
+      </div>
+      <div *ngSwitchCase="1">
+        <ion-card>
+          <ion-card-header>
+            <ion-title> Plan de Pago </ion-title>
+          </ion-card-header>
+
+          <ion-card-content>
+            <form [formGroup]="planesPagoForm" (ngSubmit)="onSubmit()">
+              <ion-grid>
+                <ion-row>
+                  <ion-col size-xs="12" size-sm="6" size-md="6">
+                    <ion-item>
+                      <ion-label position="stacked" class="bold-label"
+                        >Cuotas a Pagar:</ion-label
+                      >
+                      <ion-input
+                        type="number"
+                        formControlName="cuotasPagar"></ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size-xs="12" size-sm="6" size-md="6">
+                    <ion-item>
+                      <ion-label position="stacked" class="bold-label"
+                        >Fecha de Inicio:</ion-label
+                      >
+                      <ion-input
+                        type="date"
+                        formControlName="fechaInicio"></ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <!-- <ion-col size-xs="12" size-sm="6" size-md="6">
+                    <ion-item [disabled]="true">
+                      <ion-label position="stacked" class="bold-label"
+                        >Fecha de Fin:</ion-label
+                      >
+                      <ion-input
+                        type="date"
+                        formControlName="fechaFin"
+                        readonly></ion-input>
+                    </ion-item>
+                  </ion-col> -->
+                  <ion-col size-xs="12" size-sm="6" size-md="6">
+                    <ion-item>
+                      <ion-label position="stacked" class="bold-label"
+                        >Día de Cobro:</ion-label
+                      >
+                      <ion-input
+                        type="number"
+                        formControlName="diaCobro"></ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size-xs="12" size-sm="6" size-md="6">
+                    <ion-item>
+                      <ion-label position="stacked" class="bold-label"
+                        >Cuotas Pagadas:</ion-label
+                      >
+                      <ion-input
+                        type="number"
+                        formControlName="cuotaPagadas"></ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size-xs="12" size-md="6">
+                    <ion-item lines="none">
+                      <ion-label position="stacked" class="bold-label"
+                        >Estado</ion-label
+                      >
+                      <ion-toggle
+                        color="success"
+                        formControlName="estado"
+                        class="my-2"></ion-toggle>
+                    </ion-item>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </form>
+          </ion-card-content>
+        </ion-card>
+      </div>
+      <div *ngSwitchCase="2">
+        <ion-card>
+          <ion-card-header>
+            <ion-title>Formulario de Préstamo</ion-title>
+          </ion-card-header>
+          <ion-card-content class="ion-padding">
+            <form [formGroup]="prestamoForm" (ngSubmit)="onSubmit()">
+              <ion-grid>
+                <ion-row>
+                  <ion-col size-xs="12" size-sm="6" size-md="6">
+                    <ion-item>
+                      <ion-label position="stacked" class="bold-label"
+                        >Monto:</ion-label
+                      >
+                      <ion-input
+                        (ngModelChange)="calculateTotalMonto()"
+                        type="number"
+                        formControlName="monto"></ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size-xs="12" size-sm="6" size-md="6">
+                    <ion-item>
+                      <ion-label position="stacked" class="bold-label"
+                        >Tasa de Interés:</ion-label
+                      >
+                      <ion-input
+                        (ngModelChange)="calculateTotalMonto()"
+                        type="number"
+                        formControlName="tasaInteres"></ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size-xs="12" size-sm="6" size-md="6">
+                    <ion-item>
+                      <ion-label position="stacked" class="bold-label"
+                        >Total Monto:</ion-label
+                      >
+                      <ion-input
+                        [readonly]="true"
+                        type="number"
+                        formControlName="totalMonto"></ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size-xs="12" size-sm="6" size-md="6">
+                    <ion-item>
+                      <ion-label position="stacked" class="bold-label"
+                        >Fecha de Solicitud:</ion-label
+                      >
+                      <ion-input
+                        type="date"
+                        formControlName="fechaSolicitud"></ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <!-- <ion-col size-xs="12" size-sm="6" size-md="6">
+                    <ion-item [disabled]="true">
+                      <ion-label position="stacked" class="bold-label"
+                        >Fecha de Aprobación:</ion-label
+                      >
+                      <ion-input
+                        [readonly]="true"
+                        type="date"
+                        formControlName="fechaAprobacion"></ion-input>
+                    </ion-item>
+                  </ion-col> -->
+                  <!-- <ion-col size-xs="12" size-sm="6" size-md="6">
+                    <ion-item>
+                      <ion-label position="stacked" class="bold-label"
+                        >Cliente:</ion-label
+                      >
+                      <ion-input
+                        formControlName="idCliente"
+                        readonly></ion-input>
+                      <ion-button
+                        slot="end"
+                        color="primary"
+                        (click)="buscarCliente()">
+                        Buscar
+                      </ion-button>
+                    </ion-item>
+                  </ion-col> -->
+                  <ion-col size-xs="12" size-sm="6" size-md="6">
+                    <ion-item>
+                      <ion-label position="stacked" class="bold-label"
+                        >Producto:</ion-label
+                      >
+                      <ion-select
+                        formControlName="idProducto"
+                        placeholder="Seleccionar Producto">
+                        <ion-select-option
+                          *ngFor="let producto of productos"
+                          [value]="producto.id">
+                          {{ producto.nombre }}
+                        </ion-select-option>
+                      </ion-select>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size-xs="12" size-sm="6" size-md="6">
+                    <ion-item>
+                      <ion-label position="stacked" class="bold-label"
+                        >Periodo de Cobro:</ion-label
+                      >
+                      <ion-select
+                        formControlName="idPeriodoCobro"
+                        placeholder="Seleccionar Periodo">
+                        <ion-select-option
+                          *ngFor="let periodo of periodosCobro"
+                          [value]="periodo.id">
+                          {{ periodo.descripcion }}
+                        </ion-select-option>
+                      </ion-select>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size-xs="12" size-sm="6" size-md="6">
+                    <ion-item>
+                      <ion-label position="stacked" class="bold-label"
+                        >Estado de Aprobación:</ion-label
+                      >
+                      <ion-select
+                        formControlName="idEstadoAprobacion"
+                        placeholder="Seleccionar Estado">
+                        <ion-select-option
+                          [disabled]="true"
+                          *ngFor="let estado of estadosAprobacion"
+                          [value]="estado.id">
+                          {{ estado.nombre }}
+                        </ion-select-option>
+                      </ion-select>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size-xs="12" size-sm="6" size-md="6">
+                    <ion-item>
+                      <ion-label position="stacked" class="bold-label"
+                        >Moneda:</ion-label
+                      >
+                      <ion-select
+                        formControlName="idMoneda"
+                        placeholder="Seleccionar Moneda">
+                        <ion-select-option
+                          *ngFor="let moneda of monedas"
+                          [value]="moneda.id">
+                          {{ moneda.nombreMoneda }}
+                        </ion-select-option>
+                      </ion-select>
+                    </ion-item>
+                  </ion-col>
+                  <!-- <ion-col size-xs="12" size-sm="6" size-md="6">
+                    <ion-item>
+                      <ion-label position="stacked" class="bold-label"
+                        >Plan de Pago:</ion-label
+                      >
+                      <ion-input
+                        placeholder="Seleccionar plan de Pago"
+                        formControlName="idPlan"
+                        [readonly]="true"></ion-input>
+                      <ion-button
+                        slot="end"
+                        color="primary"
+                        (click)="buscarPlanPago()">
+                        Crear
+                      </ion-button>
+                    </ion-item>
+                  </ion-col> -->
+                  <ion-col size-xs="12" size-md="6">
+                    <ion-item lines="none">
+                      <ion-label position="stacked" class="bold-label"
+                        >Estado</ion-label
+                      >
+                      <ion-toggle
+                        color="success"
+                        formControlName="estado"
+                        class="my-2"></ion-toggle>
+                    </ion-item>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+              <ion-grid>
+                <ion-row class="ion-justify-content-center">
+                  <ion-col size-xs="12" size-sm="8" size-md="6" size-lg="4">
+                    <ion-button
+                      expand="block"
+                      type="submit"
+                      class="ion-margin-top">
+                      Guardar Préstamo
+                    </ion-button>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </form>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+
+    <div class="navigation-buttons">
+      <ion-button [disabled]="currentStep === 0" (click)="previousStep()">
+        Anterior
+      </ion-button>
+      <ion-button
+        [disabled]="currentStep === steps.length - 1"
+        (click)="nextStep()">
+        Siguiente
+      </ion-button>
+    </div>
+  </div>
+
+  <app-reusable-modal
+    [(isOpen)]="isModalOpen"
+    [content]="modalSelected"
+    [formSave]="formSelected"
+    (saveData)="handleSave($event)">
+  </app-reusable-modal>
+  <style>
+    .bold-label {
+      font-weight: bold;
+      font-size: 20px !important;
+    }
+
+    .fixed-top-card {
+      position: fixed;
+      top: 20;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+
+    .content-below-fixed-card {
+      margin-top: 375px; /* Adjust this value based on the height of your fixed card */
+    }
+  </style>
+</ion-content>

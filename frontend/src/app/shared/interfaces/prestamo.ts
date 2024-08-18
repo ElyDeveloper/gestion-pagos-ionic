@@ -1,21 +1,33 @@
 import { Clientes } from "./cliente";
-import { Cuotas } from "./cuotas";
-import { Pagos } from "./pago";
+import { EstadosAprobacion } from "./estado-aprobacion";
+import { Monedas } from "./moneda";
+import { PeriodosCobro } from "./periodo-cobro";
+import { PlanesPago } from "./plan-pago";
+import { Productos } from "./producto";
 
 export interface Prestamos {
   id?: number;
   monto: number;
   tasaInteres: number;
   totalMonto: number;
-  fechaInicial: string;
-  fechaFinal: string;
+  fechaSolicitud: string;
+  fechaAprobacion?: string;
   estado: boolean;
   idCliente: number;
-  idTipoPrestamo: number;
-  idCuotas: number;
-  pagos?: Pagos[];
+  idProducto: number;
+  idPeriodoCobro: number;
+  idEstadoAprobacion: number;
+  idPlan: number;
+  idMoneda: number;
+
+  // Optional: include related objects if needed
   cliente?: Clientes;
-  tipoPrestamo?: Prestamos;
-  cuotas?: Cuotas;
+  producto?: Productos;
+  periodo?: PeriodosCobro;
+  estadoAprobacion?: EstadosAprobacion;
+  planPago?: PlanesPago;
+  moneda?: Monedas;
+
+  // Indexer signature for additional properties
   [prop: string]: any;
 }

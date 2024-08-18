@@ -53,45 +53,53 @@ export class LoginPage implements OnInit {
       this.textLoader = "Iniciando Sesión";
       this.loaderComponent.show();
 
-      this._globalService.Post("login", this.user).subscribe((result: any) => {
-        console.log(result);
+      this._globalService.Post("login", this.user).subscribe({
+        next: (result: any) => {
+          console.log(result);
 
-        const { token, usuario } = result;
+          const { token, usuario } = result;
 
-        if (usuario && usuario.changedPassword === false) {
-          this.loaderComponent.hide();
-          this.toastMessage = "Por favor, cambie su contraseña.";
-          this.setOpenedToast(true);
-
-          //Preguntar si se redirige a la página de cambio de contraseña
-          this.questRedirect(usuario.id);
-          return;
-        }
-
-        if (token) {
-          //Eliminar todas las cookies
-          this._cookieService.deleteAll();
-          this._cookieService.set(
-            "tokensession",
-            result.token,
-            key.TOKEN_EXPIRATION_TIME,
-            ""
-          );
-
-          // Usar el AuthService para almacenar la información del usuario
-          this._authService.setUserInfo(result.usuario);
-
-          setTimeout(() => {
+          if (usuario && usuario.changedPassword === false) {
             this.loaderComponent.hide();
-            this.toastMessage = "Bienvenido " + this.user.identificator;
+            this.toastMessage = "Por favor, cambie su contraseña.";
             this.setOpenedToast(true);
-            this._router.navigate(["/layout"]);
-          }, 2000);
-        } else {
+
+            //Preguntar si se redirige a la página de cambio de contraseña
+            this.questRedirect(usuario.id);
+            return;
+          }
+
+          if (token) {
+            //Eliminar todas las cookies
+            this._cookieService.deleteAll();
+            this._cookieService.set(
+              "tokensession",
+              result.token,
+              key.TOKEN_EXPIRATION_TIME,
+              ""
+            );
+
+            // Usar el AuthService para almacenar la información del usuario
+            this._authService.setUserInfo(result.usuario);
+
+            setTimeout(() => {
+              this.loaderComponent.hide();
+              this.toastMessage = "Bienvenido " + this.user.identificator;
+              this.setOpenedToast(true);
+              this._router.navigate(["/layout"]);
+            }, 2000);
+          } else {
+            this.loaderComponent.hide();
+            this.toastMessage = "Usuario o contraseña incorrectos.";
+            this.setOpenedToast(true);
+          }
+        },
+        error: (error: any) => {
+          console.error(error);
           this.loaderComponent.hide();
-          this.toastMessage = "Usuario o contraseña incorrectos.";
+          this.toastMessage = "Error al iniciar sesión";
           this.setOpenedToast(true);
-        }
+        },
       });
     } else {
       this.toastMessage = "Por favor, corrija los errores en el formulario.";
@@ -149,7 +157,7 @@ export class LoginPage implements OnInit {
     if (!this.user.identificator) {
       this.formErrors.email = "El email/usuario es requerido.";
       isValid = false;
-    } 
+    }
 
     // Validación de contraseña
     if (!this.user.password) {

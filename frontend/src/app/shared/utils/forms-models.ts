@@ -52,17 +52,36 @@ export class FormModels {
 
   prestamoForm(): FormGroup {
     return this.fb.group({
-      id: [null],
-      idCliente: [null, Validators.required],
-      idTipoPrestamo: [null, Validators.required],
+      // id: [null],
       monto: [null, [Validators.required, Validators.min(0)]],
       tasaInteres: [
         null,
         [Validators.required, Validators.min(0), Validators.max(100)],
       ],
       totalMonto: [null, [Validators.required, Validators.min(0)]],
-      fechaInicial: ["", Validators.required],
-      fechaFinal: ["", Validators.required],
+      fechaSolicitud: [null, Validators.required],
+      fechaAprobacion: [null],
+      estado: [true],
+      idCliente: [null],
+      idProducto: [null, Validators.required],
+      idPeriodoCobro: [null, Validators.required],
+      idEstadoAprobacion: [null, Validators.required],
+      idPlan: [null],
+      idMoneda: [null, Validators.required],
+    });
+  }
+
+  planesPagoForm(): FormGroup {
+    return this.fb.group({
+      // id: [null],
+      cuotasPagar: [null, [Validators.required, Validators.min(1)]],
+      fechaInicio: [null, Validators.required],
+      fechaFin: [null, { disabled: true }],
+      diaCobro: [
+        null,
+        [Validators.required, Validators.min(1), Validators.max(31)],
+      ],
+      cuotaPagadas: [0, [Validators.required, Validators.min(0)]],
       estado: [true],
     });
   }

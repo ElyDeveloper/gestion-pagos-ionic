@@ -6,6 +6,7 @@ import {
   ViewChild,
 } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { Router } from "@angular/router";
 import { Observable } from "rxjs";
 import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
 import { Clientes } from "src/app/shared/interfaces/cliente";
@@ -13,6 +14,7 @@ import { Cuotas } from "src/app/shared/interfaces/cuotas";
 import { Prestamos } from "src/app/shared/interfaces/prestamo";
 import { Column } from "src/app/shared/interfaces/table";
 import { GlobalService } from "src/app/shared/services/global.service";
+import { ActionButtonAdd } from "src/app/shared/utils/enums";
 import { FormModels } from "src/app/shared/utils/forms-models";
 
 @Component({
@@ -28,12 +30,15 @@ export class PrestamosPage implements OnInit {
     monto: 0,
     tasaInteres: 0,
     totalMonto: 0,
-    fechaInicial: "",
-    fechaFinal: "",
+    fechaSolicitud: "",
+    fechaAprobacion: "",
     estado: true,
     idCliente: 0,
-    idTipoPrestamo: 0,
-    idCuotas: 0,
+    idProducto: 0,
+    idPeriodoCobro: 0,
+    idEstadoAprobacion: 0,
+    idPlan: 0,
+    idMoneda: 0,
   };
 
   currentPage = 1;
@@ -59,12 +64,8 @@ export class PrestamosPage implements OnInit {
   modalSelected: TemplateRef<any> = this.modalAdd;
   formSelected: FormGroup;
 
-  // TODO - Extras
-  clientes: Clientes[] = [];
-  cuotas: Cuotas[] = [];
-  tiposPrestamos: any[] = [];
-
   private _globalService = inject(GlobalService);
+  private _router = inject(Router);
 
   constructor(private fb: FormBuilder) {
     this.formModels = new FormModels(this.fb);
@@ -75,7 +76,6 @@ export class PrestamosPage implements OnInit {
 
   ngOnInit() {
     this.getCountElements();
-    this.getTipoPrestamo();
     this.buildColumns();
   }
 
@@ -104,14 +104,14 @@ export class PrestamosPage implements OnInit {
         combineFormat: (nombre, apellido) => `${nombre} ${apellido}`,
       },
       {
-        key: "tasaInteres",
-        alias: "Tasa de Interés",
-        type: "percentage",
-      },
-      {
         key: "monto",
         alias: "Monto",
         type: "currency",
+      },
+      {
+        key: "tasaInteres",
+        alias: "Tasa de Interés",
+        type: "percentage",
       },
       {
         key: "totalMonto",
@@ -119,13 +119,13 @@ export class PrestamosPage implements OnInit {
         type: "currency",
       },
       {
-        key: "fechaInicial",
-        alias: "Fecha Inicial",
+        key: "fechaSolicitud",
+        alias: "Fecha de Solicitud",
         type: "date",
       },
       {
-        key: "fechaFinal",
-        alias: "Fecha Final",
+        key: "fechaAprobacion",
+        alias: "Fecha de Aprobación",
         type: "date",
       },
       {
@@ -134,12 +134,24 @@ export class PrestamosPage implements OnInit {
         type: "boolean",
       },
       {
-        key: "tipoPrestamo.nombre",
-        alias: "Tipo de Préstamo",
+        key: "producto.nombre",
+        alias: "Producto",
       },
       {
-        key: "cuotas.cuotas",
-        alias: "Cuotas",
+        key: "periodo.nombre",
+        alias: "Período de Cobro",
+      },
+      {
+        key: "estadoAprobacion.nombre",
+        alias: "Estado de Aprobación",
+      },
+      {
+        key: "planPago.nombre",
+        alias: "Plan de Pago",
+      },
+      {
+        key: "moneda.nombre",
+        alias: "Moneda",
       },
       {
         key: "actions",
@@ -224,13 +236,11 @@ export class PrestamosPage implements OnInit {
     if (isEdit && formData) {
       this.formAdd.patchValue(formData);
       // TODO: ESPECIFICO
-      const fullName = `${formData.cliente.nombres.split(" ")[0]} ${formData.cliente.apellidos.split(" ")[0]}`;
-      this.formAdd
-        .get("idCliente")
-        ?.setValue(fullName);
-      this.formAdd
-        .get("idTipoPrestamo")
-        ?.setValue(formData.tipoPrestamo.id);
+      const fullName = `${formData.cliente.nombres.split(" ")[0]} ${
+        formData.cliente.apellidos.split(" ")[0]
+      }`;
+      this.formAdd.get("idCliente")?.setValue(fullName);
+      this.formAdd.get("idTipoPrestamo")?.setValue(formData.tipoPrestamo.id);
     } else if (!isEdit) {
       this.cleanForm();
     }
@@ -245,7 +255,11 @@ export class PrestamosPage implements OnInit {
   }
 
   onAddButtonClicked() {
-    this.setModalState(false, this.modalAdd);
+    this._router.navigate(["/layout/gestion-prestamo"], {
+      
+    });
+    // this._router.navigate(["/layout"]);
+
   }
 
   onEditButtonClicked(data: any) {
@@ -280,53 +294,71 @@ export class PrestamosPage implements OnInit {
     });
   }
 
-  handleUserOperation(operation: "edit" | "create", data: any) {
-    // return;
-    let operationText: string;
-    let apiCall: Observable<any>;
-
-    switch (operation) {
-      case "edit":
-        operationText = "Editando";
-        apiCall = this._globalService.PutId("prestamos", data.id, data);
-        break;
-      case "create":
-        delete data.Id;
-        operationText = "Guardando";
-        apiCall = this._globalService.Post("prestamos", data);
-        break;
-    }
+  handleUserOperation(operation: "edit" | "create", data: any): void {
+    const { operationText, apiCall } = this.getOperationConfig(operation, data);
 
     this.textLoader = `${operationText} cliente`;
     this.loaderComponent.show();
 
-    data.idCliente = this.element.idCliente;
-    data.idTipoPrestamo = this.element.idTipoPrestamo;
-    data.idCuotas = this.element.idCuotas;
-    data.fechaInicial = new Date(data.fechaInicial);
-    data.fechaFinal = new Date(data.fechaFinal);
+    this.updateDataFromElement(data);
 
     console.log("Datos del cliente:", data);
 
     apiCall.subscribe({
-      next: (response: any) => {
-        console.log(`cliente ${operationText.toLowerCase()}:`, response);
-        this.isModalOpen = false;
-        this.loaderComponent.hide();
-        this.toastMessage = `cliente ${operationText.toLowerCase()} correctamente`;
-        this.setOpenedToast(true);
-        this.cleanForm();
-        this.getCountElements();
-      },
-      error: (error: any) => {
-        console.error(
-          `Error al ${operationText.toLowerCase()} el cliente:`,
-          error
-        );
-        this.loaderComponent.hide();
-        this.toastMessage = `Error al ${operationText.toLowerCase()} el cliente`;
-      },
+      next: (response: any) =>
+        this.handleOperationSuccess(response, operationText),
+      error: (error: any) => this.handleOperationError(error, operationText),
     });
+  }
+
+  private getOperationConfig(
+    operation: "edit" | "create",
+    data: any
+  ): { operationText: string; apiCall: Observable<any> } {
+    switch (operation) {
+      case "edit":
+        return {
+          operationText: "Editando",
+          apiCall: this._globalService.PutId("prestamos", data.id, data),
+        };
+      case "create":
+        const { id, ...dataWithoutId } = data;
+        return {
+          operationText: "Guardando",
+          apiCall: this._globalService.Post("prestamos", dataWithoutId),
+        };
+      default:
+        throw new Error(`Operación no soportada: ${operation}`);
+    }
+  }
+
+  //INFO METODO ESPECIFICO
+  private updateDataFromElement(data: any): void {
+    Object.assign(data, {
+      idCliente: this.element.idCliente,
+      idProducto: this.element.idProducto,
+      idPeriodoCobro: this.element.idPeriodoCobro,
+      idEstadoAprobacion: this.element.idEstadoAprobacion,
+      idPlan: this.element.idPlan,
+      idMoneda: this.element.idMoneda,
+    });
+  }
+
+  private handleOperationSuccess(response: any, operationText: string): void {
+    console.log(`cliente ${operationText.toLowerCase()}:`, response);
+    this.isModalOpen = false;
+    this.loaderComponent.hide();
+    this.toastMessage = `cliente ${operationText.toLowerCase()} correctamente`;
+    this.setOpenedToast(true);
+    this.cleanForm();
+    this.getCountElements();
+  }
+
+  private handleOperationError(error: any, operationText: string): void {
+    console.error(`Error al ${operationText.toLowerCase()} el cliente:`, error);
+    this.loaderComponent.hide();
+    this.toastMessage = `Error al ${operationText.toLowerCase()} el cliente`;
+    this.setOpenedToast(true);
   }
 
   async handleSave(data: any) {
@@ -377,19 +409,6 @@ export class PrestamosPage implements OnInit {
           console.error("Error al obtener los elementos:", error);
         },
       });
-  }
-
-  // TODO: Metodo especifico
-  getTipoPrestamo() {
-    this._globalService.Get("tipo-prestamos").subscribe({
-      next: (response: any) => {
-        this.tiposPrestamos = response;
-        console.log("Tipos de préstamo:", response);
-      },
-      error: (error) => {
-        console.error("Error al obtener los tipos de préstamo:", error);
-      },
-    });
   }
 
   getCountElements() {

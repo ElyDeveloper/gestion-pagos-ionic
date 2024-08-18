@@ -89,14 +89,15 @@ ion-item {
     background-color: #253465;
     color: #fff;
     font-weight: bold;
-    padding: 5px;
-    // border: 1px solid;
+    padding: 10px !important;
+    border: 1px solid;
   }
 
   td {
     // Estilos para las celdas
     border: 1px solid;
     padding: 5px;
+    text-align: center;
   }
 }
 
