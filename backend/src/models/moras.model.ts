@@ -75,7 +75,7 @@ export class Moras extends Entity {
     precision: 10,
     scale: 0,
     generated: false,
-    mssql: {columnName: 'Mora', dataType: 'int', dataLength: null, dataPrecision: 10, dataScale: 0, nullable: 'NO', generated: false},
+    mssql: {columnName: 'Mora', dataType: 'decimal', dataLength: null, dataPrecision: 10, dataScale: 2, nullable: 'NO', generated: false},
   })
   mora: number;
 

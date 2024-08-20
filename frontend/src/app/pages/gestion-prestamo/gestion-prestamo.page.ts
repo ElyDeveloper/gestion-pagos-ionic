@@ -244,7 +244,6 @@ export class GestionPrestamoPage implements OnInit {
           this.planesPagoForm.get("fechaInicio")?.value || new Date()
         ),
         fechaFin: this.planesPagoForm.get("fechaFin")?.value,
-        diaCobro: this.planesPagoForm.get("diaCobro")?.value,
         cuotaPagadas: 0,
         estado: this.planesPagoForm.get("estado")?.value,
       };
