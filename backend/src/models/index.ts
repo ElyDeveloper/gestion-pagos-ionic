@@ -27,3 +27,4 @@ export * from './prestamos.model';
 export * from './pagos.model';
 export * from './vouchers.model';
 export * from './transacciones-externas.model';
+export * from './planes-pago.model';

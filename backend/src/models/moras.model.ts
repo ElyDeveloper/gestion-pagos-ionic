@@ -1,7 +1,7 @@
 import {belongsTo, Entity, model, property} from '@loopback/repository';
 import { Clientes } from './clientes.model';
-import { Prestamos } from './prestamos.model';
 import { PlanesPago } from './planes-pago.model';
+import { Prestamos } from './prestamos.model';
 import { FechasPagos } from './fechas-pagos.model';
 
 @model({settings: {idInjection: false, mssql: {schema: 'dbo', table: 'Moras'}}})
@@ -33,11 +33,19 @@ export class Moras extends Entity {
     required: true,
     jsonSchema: {nullable: false},
     precision: 10,
-    scale: 0,
+    scale: 2,
     generated: false,
-    mssql: {columnName: 'Mora', dataType: 'int', dataLength: null, dataPrecision: 10, dataScale: 0, nullable: 'NO', generated: false},
+    mssql: {columnName: 'Mora', dataType: 'decimal', dataLength: null, dataPrecision: 10, dataScale: 2, nullable: 'NO', generated: false},
   })
   mora: number;
+
+  @property({
+    type: 'boolean',
+    jsonSchema: {nullable: true},
+    generated: false,
+    mssql: {columnName: 'Estado', dataType: 'bit', dataLength: null, dataPrecision: null, dataScale: null, nullable: 'YES', generated: false},
+  })
+  estado?: boolean;
 
   // Define well-known properties here
   @belongsTo(() => Clientes, {name: 'cliente'})
