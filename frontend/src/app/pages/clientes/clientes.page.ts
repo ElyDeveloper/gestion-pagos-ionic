@@ -150,8 +150,37 @@ export class ClientesPage implements OnInit {
     ];
   }
 
-  getCellValue(row: any, key: string): any {
-    return key.split(".").reduce((o, k) => (o || {})[k], row);
+  getCellValue(row: any, column: Column): any {
+    const primaryValue = this.getNestedValue(row, column.key);
+
+    if (column.combineWith) {
+      const secondaryValue = this.getNestedValue(row, column.combineWith);
+      if (column.combineFormat) {
+        return column.combineFormat(primaryValue, secondaryValue);
+      }
+      return `${this.formatValue(primaryValue)} ${this.formatValue(
+        secondaryValue
+      )}`;
+    }
+
+    return this.formatValue(primaryValue);
+  }
+
+  private getNestedValue(obj: any, key: string): any {
+    return key.split(".").reduce((o, k) => (o || {})[k], obj);
+  }
+
+  private formatValue(value: any): string {
+    if (value && typeof value === "object") {
+      return value.nombre || JSON.stringify(value);
+    }
+    return value !== undefined && value !== null ? value.toString() : "";
+  }
+
+  // Este método ya no es necesario, pero lo mantenemos por compatibilidad
+  getObjectValue(row: any, key: string): any {
+    const value = this.getNestedValue(row, key);
+    return this.formatValue(value);
   }
 
   getDateValue(row: any, key: string): any {
@@ -163,22 +192,11 @@ export class ClientesPage implements OnInit {
     return "";
   }
 
-  getObjectValue(row: any, key: string): any {
-    const obj = row[key];
-    if (obj && typeof obj === "object") {
-      return obj.nombre || JSON.stringify(obj);
-    }
-    return "";
-  }
-
   private setModalState(isEdit: boolean, modalTemplate: any, formData?: any) {
     this.isEdit = isEdit;
 
     if (formData) {
-      formData.fechaIngreso = this.formatDateForInput(formData.fechaIngreso);
-      if (formData.fechaBaja) {
-        formData.fechaBaja = this.formatDateForInput(formData.fechaBaja);
-      }
+      formData = this._globalService.parseObjectDates(formData);
     }
     console.log("Form Data:", formData);
 
@@ -191,10 +209,6 @@ export class ClientesPage implements OnInit {
     this.modalSelected = modalTemplate;
     this.formSelected = this.formAdd;
     this.isModalOpen = true;
-  }
-
-  formatDateForInput(dateString: string): string {
-    return dateString.split("T")[0];
   }
 
   onAddButtonClicked() {

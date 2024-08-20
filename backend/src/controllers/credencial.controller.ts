@@ -119,7 +119,7 @@ export class CredencialController {
     filter?: FilterExcludingWhere<Credenciales>,
   ): Promise<Credenciales> {
     try {
-      const idUser = this.jwtService.decryptUserId(id);
+      const idUser = this.jwtService.decryptId(id);
       console.log('id User: ', idUser);
       const credenciales = await this.credencialesRepository.findById(
         idUser,

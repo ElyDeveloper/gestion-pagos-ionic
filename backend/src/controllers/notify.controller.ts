@@ -133,7 +133,7 @@ export class NotifyController {
     }
 
     return {
-      userId: this.jwt.encryptUserId(CodeExist.userId ?? 0),
+      userId: this.jwt.encryptId(CodeExist.userId ?? 0),
     };
   }
 }

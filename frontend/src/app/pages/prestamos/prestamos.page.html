@@ -12,6 +12,7 @@
       [currentPage]="1"
       [totalPages]="10"
       [title]="'Prestamos'"
+      [context]="'prestamo'"
       [data]="elements"
       [columnsData]="columnsData"
       [currentPage]="currentPage"
@@ -30,7 +31,7 @@
       [formSave]="formSelected"
       (saveData)="handleSave($event)">
     </app-reusable-modal>
-    
+
     <style>
       .bold-label {
         font-weight: bold;
@@ -41,7 +42,7 @@
     <ng-template #modalViewInfo let-close="close" let-save="save">
       <ion-header>
         <ion-toolbar>
-          <ion-title>Vista de Cliente</ion-title>
+          <ion-title>Vista de Prestamo</ion-title>
           <ion-buttons slot="end">
             <ion-button (click)="close()">Cerrar</ion-button>
           </ion-buttons>
@@ -64,11 +65,20 @@
               <ion-note slot="end"
                 >{{ getCellValue(element, column) }}</ion-note
               >
-              } @default {
+              } @case ('date') {
+              <ion-note slot="end"
+                >{{ getCellValue(element, column) | customDate : 6 :
+                "dd/MM/yyyy" }}</ion-note
+              >
+              } @case ('dni') {
+              <ion-note slot="end"
+                >{{ getCellValue(element, column) | formatDni}}</ion-note
+              >
+              }@default {
               <ion-note slot="end"
                 >{{ getCellValue(element, column) }}</ion-note
               >
-              } }
+              }}
             </ion-item>
             } }
           </ion-card-content>

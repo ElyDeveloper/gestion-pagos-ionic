@@ -20,14 +20,17 @@ import {
 import {viewOf} from '../core/library/views.library';
 import {Prestamos} from '../models';
 import {PrestamosRepository} from '../repositories/prestamos.repository';
-import { authenticate } from '@loopback/authentication';
-
+import {authenticate} from '@loopback/authentication';
+import {service} from '@loopback/core';
+import {JWTService} from '../services';
 
 // @authenticate('jwt')
 export class PrestamosController {
   constructor(
     @repository(PrestamosRepository)
     public PrestamosRepository: PrestamosRepository,
+    @service(JWTService)
+    private jwtService: JWTService,
   ) {}
 
   @post('/prestamos')
@@ -103,7 +106,7 @@ export class PrestamosController {
     @param.query.number('skip') skip: number,
     @param.query.number('limit') limit: number,
   ): Promise<Prestamos[]> {
-    return this.PrestamosRepository.find({
+    const prestamos = await this.PrestamosRepository.find({
       include: [
         {relation: 'cliente'},
         {relation: 'producto'},
@@ -115,6 +118,16 @@ export class PrestamosController {
       skip,
       limit,
     });
+
+    // clonar array
+    const copia: any = Array.from(prestamos);
+
+    //encriptar id de prestamos con jwtService
+    copia.forEach((prestamo: any) => {
+      prestamo.id = this.jwtService.encryptId(prestamo.id || 0);
+    });
+
+    return copia;
   }
 
   @patch('/prestamos')
@@ -145,8 +158,11 @@ export class PrestamosController {
       },
     },
   })
-  async findById(@param.path.number('id') id: number): Promise<Prestamos> {
-    return this.PrestamosRepository.findById(id, {
+  async findById(@param.path.string('id') id: string): Promise<Prestamos> {
+    console.log('Id Encrypted: ', id);
+    const idDecrypted = this.jwtService.decryptId(id);
+    console.log('Id Decrypted: ', idDecrypted)
+    return this.PrestamosRepository.findById(idDecrypted, {
       include: [
         {relation: 'cliente'},
         {relation: 'producto'},
@@ -217,7 +233,7 @@ export class PrestamosController {
         {relation: 'periodo'},
         {relation: 'estadoAprobacion'},
         {relation: 'planPago'},
-        {relation: 'moneda'},       
+        {relation: 'moneda'},
       ],
       where: {
         or: [

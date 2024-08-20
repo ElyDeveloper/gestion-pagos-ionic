@@ -94,17 +94,22 @@
               </ng-container>
               <ng-template #actionsTemplate>
                 <div class="d-flex justify-content-around">
-                  <ng-container *ngFor="let action of column.lstActions">
-                    @if (!action.rolesAuthorized || (userLogged.rolid &&
-                    action.rolesAuthorized.includes(userLogged.rolid))) {
-                    <ion-button
-                      [color]="action.color"
-                      (click)="onActionClick(row, action.action)"
-                      [attr.aria-label]="action.alias"
-                      class="me-2">
-                      <ion-icon [name]="action.icon" class="pe-1"></ion-icon>
-                      <ion-label>{{ action.alias }}</ion-label>
-                    </ion-button>
+                  <ng-container *ngFor="let action of column.lstActions; let i = index">
+                    @if (!action.rolesAuthorized || (userLogged.rolid && action.rolesAuthorized.includes(userLogged.rolid))) {
+                    <div>
+                      <ion-button
+                        [id]="'action-button-' + i"
+                        [color]="action.color"
+                        (click)="onActionClick(row, action.action)"
+                        [attr.aria-label]="action.alias"
+                        shape="round"
+                        class="me-2"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        [title]="action.alias + ' ' + context || 'Descripción no disponible'">
+                        <ion-icon slot="icon-only" [name]="action.icon"></ion-icon>
+                      </ion-button>
+                    </div>
                     }
                   </ng-container>
                 </div>

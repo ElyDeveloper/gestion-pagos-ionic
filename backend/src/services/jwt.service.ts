@@ -1,8 +1,7 @@
 import {BindingScope, inject, injectable, service} from '@loopback/core/dist';
 import {repository} from '@loopback/repository';
-import {HttpErrors, operation} from '@loopback/rest';
+import {HttpErrors} from '@loopback/rest';
 import {LoginInterface} from '../core/interfaces/models/Login.interface';
-import {keys} from '../env/interfaces/Servicekeys.interface';
 import {Credenciales} from '../models/credenciales.model';
 import {CodigoVerificacionRepository} from '../repositories/codigo-verificacion.repository';
 import {CredencialesRepository} from '../repositories/credenciales.repository';
@@ -13,18 +12,14 @@ import {VerifyCodeInfo} from '../core/interfaces/models/gCode.interface';
 import {TokenServiceBindings} from '@loopback/authentication-jwt';
 import {TokenService} from '@loopback/authentication';
 import {securityId, UserProfile} from '@loopback/security';
-import {AuthorizationError} from '../core/library/authorization-error';
-const jsonwebtoken = require('jsonwebtoken');
+import * as crypto from 'crypto';
 var shortid = require('shortid-36');
 
 //importar dotenv
 require('dotenv').config();
 
-interface token {
-  exp: number;
-  data: {UserID: number; UserNAME: string; Role: number};
-  iat: number;
-}
+const ENCRYPTION_KEY = crypto.randomBytes(32); // 256 bit key
+const IV_LENGTH = 16;
 
 @injectable({scope: BindingScope.TRANSIENT})
 export class JWTService {
@@ -36,8 +31,6 @@ export class JWTService {
     private encriptDecryptService: EncriptDecryptService,
     @repository(CodigoVerificacionRepository)
     private codigoVerificacionRepository: CodigoVerificacionRepository,
-    @repository(UsuarioRepository)
-    private usuarioRepository: UsuarioRepository,
     @inject(TokenServiceBindings.TOKEN_SERVICE)
     private jwtService: TokenService,
   ) {}
@@ -152,30 +145,31 @@ export class JWTService {
     return code;
   }
 
-  encryptUserId(userId: number): string {
-    return jsonwebtoken.sign(
-      {userId: userId},
-      process.env.JWT_SECRET_KEY || 'indeterminated',
-      {algorithm: 'HS256'},
+  encryptId(id: number): string {
+    const iv = crypto.randomBytes(IV_LENGTH);
+    const cipher = crypto.createCipheriv(
+      'aes-256-cbc',
+      Buffer.from(ENCRYPTION_KEY),
+      iv,
     );
+    const idString = id.toString();
+    let encrypted = cipher.update(idString);
+    encrypted = Buffer.concat([encrypted, cipher.final()]);
+    return iv.toString('hex') + ':' + encrypted.toString('hex');
   }
 
-  decryptUserId(token: string): number {
-    try {
-      const decoded = jsonwebtoken.verify(
-        token,
-        process.env.JWT_SECRET_KEY || 'indeterminated',
-      ) as {userId: number};
-
-      if (typeof decoded.userId !== 'number') {
-        throw new AuthorizationError('Token de id de usuario inválido');
-      }
-
-      return decoded.userId;
-    } catch (error) {
-      console.error('Error al desencriptar token:', error);
-      throw new AuthorizationError('Token de id de usuario inválido');
-    }
+  decryptId(encryptedId: string): number {
+    const textParts = encryptedId.split(':');
+    const iv = Buffer.from(textParts.shift()!, 'hex');
+    const encryptedText = Buffer.from(textParts.join(':'), 'hex');
+    const decipher = crypto.createDecipheriv(
+      'aes-256-cbc',
+      Buffer.from(ENCRYPTION_KEY),
+      iv,
+    );
+    let decrypted = decipher.update(encryptedText);
+    decrypted = Buffer.concat([decrypted, decipher.final()]);
+    return parseInt(decrypted.toString());
   }
 
   async generateCode(userExist: Credenciales) {

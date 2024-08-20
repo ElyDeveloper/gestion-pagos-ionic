@@ -61,6 +61,13 @@ const routes: Routes = [
           ),
       },
       {
+        path: "gestion-prestamo/:id",
+        loadChildren: () =>
+          import("./gestion-prestamo/gestion-prestamo.module").then(
+            (m) => m.GestionPrestamoPageModule
+          ),
+      },
+      {
         path: "view-prestamo/:id",
         loadChildren: () =>
           import("./view-prestamo/view-prestamo.module").then(

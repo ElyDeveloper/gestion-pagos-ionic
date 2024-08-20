@@ -2,20 +2,29 @@
   <ion-card class="fixed-top-card">
     <ion-card-content>
       <app-breadcrumb></app-breadcrumb>
-      <div class="alert alert-info d-flex justify-content-between" role="alert">
-        <div>
-          <ion-icon name="person-outline"></ion-icon> Cliente Seleccionado:
-          <strong>
-            @if (clienteSeleccionado.id) { {{clienteSeleccionado.nombres}}
-            {{clienteSeleccionado.apellidos}} }@else { No Aún }
-          </strong>
+      <div
+        class="alert alert-info d-flex justify-content-between py-1"
+        role="alert">
+        <div
+          class="row d-flex align-content-center align-items-center justify-content-center">
+          <p>
+            <ion-icon name="person-outline"></ion-icon> Cliente Seleccionado:
+            <strong>
+              @if (clienteSeleccionado.id) { {{clienteSeleccionado.nombres}}
+              {{clienteSeleccionado.apellidos}} - {{clienteSeleccionado.dni}} }@else { No Aún }
+            </strong>
+          </p>
         </div>
-        <!-- <div>
-          <ion-button routerLink="/layout/prestamos">
+        <div>
+          <button class="btn btn-success" routerLink="/layout/prestamos">
             Ver Prestamos
             <ion-icon class="ms-2" name="open-outline"></ion-icon>
-          </ion-button>
-        </div> -->
+          </button>
+          <!-- <ion-button routerLink="/layout/prestamos">
+            Ver Prestamos
+            <ion-icon class="ms-2" name="open-outline"></ion-icon>
+          </ion-button> -->
+        </div>
       </div>
       <div
         class="alert"
@@ -73,7 +82,7 @@
               <ion-list>
                 <ion-item *ngFor="let cliente of clientes">
                   <ion-radio [value]="cliente"
-                    >{{ cliente.nombres }} {{ cliente.apellidos }}</ion-radio
+                    >{{ cliente.nombres }} {{ cliente.apellidos }} - {{clienteSeleccionado.dni}} </ion-radio
                   >
                 </ion-item>
               </ion-list>
@@ -293,7 +302,8 @@
       <ion-button
         [disabled]="currentStep === steps.length - 1"
         (click)="nextStep()">
-        Siguiente <ion-icon class="ms-2" name="arrow-forward-outline"></ion-icon>
+        Siguiente
+        <ion-icon class="ms-2" name="arrow-forward-outline"></ion-icon>
       </ion-button>
     </div>
   </div>

@@ -9,12 +9,16 @@ const API_URL = environment.apiURL;
 })
 export class GlobalService {
   private _http = inject(HttpClient);
-  constructor() {}
+  constructor() { }
 
   Get(endPoint: string) {
     return this._http.get(`${API_URL}${endPoint}`);
   }
   GetId(endPoint: string, Id: number) {
+    return this._http.get(`${API_URL}${endPoint}/${Id}`);
+  }
+
+  GetByIdEncrypted(endPoint: string, Id: string) {
     return this._http.get(`${API_URL}${endPoint}/${Id}`);
   }
   GetManyById(endPoint: string, Id: number) {
@@ -52,4 +56,31 @@ export class GlobalService {
     return this._http.get(`${API_URL}${endPoint}`);
   }
 
+  parseObjectDates(obj: any): any {
+    if (obj === null || typeof obj !== 'object') {
+      return obj;
+    }
+
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        const value = obj[key];
+        if (typeof value === 'string' && this.isISODate(value)) {
+          obj[key] = this.formatDateForInput(value);
+        } else if (typeof value === 'object') {
+          // Aquí es donde maneja la anidación
+          this.parseObjectDates(value);
+        }
+      }
+    }
+
+    return obj;
+  }
+
+  private formatDateForInput(dateString: string): string {
+    return dateString.split('T')[0];
+  }
+
+  private isISODate(str: string): boolean {
+    return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(str);
+  }
 }

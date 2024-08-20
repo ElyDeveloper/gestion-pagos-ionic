@@ -1,5 +1,6 @@
 import { Component, inject } from "@angular/core";
 import { Platform } from "@ionic/angular";
+import { BackdropFixService } from "./shared/services/backdrop-fix.service";
 @Component({
   selector: "app-root",
   templateUrl: "app.component.html",
@@ -12,12 +13,17 @@ export class AppComponent {
     { title: "Inicio", url: "/layout/home", icon: "home" },
     { title: "Usuarios", url: "/layout/usuarios", icon: "people" },
     { title: "Clientes", url: "/layout/clientes", icon: "person" },
-    { title: "Contratos Pagos", url: "/layout/contratos-pago", icon: "document-text" },
+    {
+      title: "Contratos Pagos",
+      url: "/layout/contratos-pago",
+      icon: "document-text",
+    },
     { title: "Préstamos", url: "/layout/prestamos", icon: "cash" },
     { title: "Pagos", url: "/layout/pagos", icon: "card" },
     { title: "Reportes", url: "/layout/reportes-pagos", icon: "stats-chart" },
   ];
-  
+
+  private backdropFixService = inject(BackdropFixService);
 
   constructor(private platform: Platform) {
     this.initializeApp();
@@ -27,6 +33,8 @@ export class AppComponent {
     this.platform.ready().then(() => {
       this.checkDarkMode();
     });
+
+    this.backdropFixService.startObserving();
   }
 
   checkDarkMode() {
@@ -50,6 +58,5 @@ export class AppComponent {
     document.body.classList.toggle("dark");
     //Guardar en localstorage
     localStorage.setItem("themeApp", this.darkMode ? "dark" : "light");
-
   }
 }

@@ -7,9 +7,21 @@ import {
 } from "@angular/core";
 import { FormBuilder, FormGroup } from "@angular/forms";
 import { ActivatedRoute } from "@angular/router";
-import { debounceTime, distinctUntilChanged, Subject } from "rxjs";
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  forkJoin,
+  map,
+  Subject,
+} from "rxjs";
+import { Clientes } from "src/app/shared/interfaces/cliente";
+import { EstadosAprobacion } from "src/app/shared/interfaces/estado-aprobacion";
+import { Monedas } from "src/app/shared/interfaces/moneda";
+import { PeriodosCobro } from "src/app/shared/interfaces/periodo-cobro";
 import { PlanesPago } from "src/app/shared/interfaces/plan-pago";
 import { Prestamos } from "src/app/shared/interfaces/prestamo";
+import { Productos } from "src/app/shared/interfaces/producto";
 import { GlobalService } from "src/app/shared/services/global.service";
 import { FormModels } from "src/app/shared/utils/forms-models";
 
@@ -29,13 +41,14 @@ export class GestionPrestamoPage implements OnInit {
 
   prestamoForm: FormGroup;
   planesPagoForm: FormGroup;
-  productos: any[] = [];
-  periodosCobro: any[] = [];
-  estadosAprobacion: any[] = [];
-  monedas: any[] = [];
-  clientes: any[] = [];
+  productos: Productos[] = [];
+  periodosCobro: PeriodosCobro[] = [];
+  estadosAprobacion: EstadosAprobacion[] = [];
+  monedas: Monedas[] = [];
+  clientes: Clientes[] = [];
 
   clienteSeleccionado: any = {};
+  prestamoSeleccionado: any = {};
 
   isModalOpen = false;
   isToastOpen = false;
@@ -48,6 +61,7 @@ export class GestionPrestamoPage implements OnInit {
   formSelected: FormGroup;
 
   private _globalService = inject(GlobalService);
+  private _route = inject(ActivatedRoute);
 
   constructor(private fb: FormBuilder) {
     this.formModels = new FormModels(this.fb);
@@ -59,7 +73,34 @@ export class GestionPrestamoPage implements OnInit {
   ngOnInit() {
     this.initSearcher();
     this.getInfoSelects();
-    this.initValuesForm();
+    this.getPrestamo();
+  }
+
+  getPrestamo() {
+    //Obtener id de la url
+    this._route.paramMap.subscribe((params) => {
+      const id = params.get("id");
+      if (id) {
+        this._globalService.GetByIdEncrypted("prestamos", id).subscribe({
+          next: (prestamo: any) => {
+            if (prestamo) {
+              prestamo = this._globalService.parseObjectDates(prestamo);
+              this.prestamoSeleccionado = prestamo;
+              this.clienteSeleccionado = prestamo.cliente;
+              console.log("Plan de Pago: ", prestamo.planPago);
+              this.prestamoForm.patchValue(prestamo);
+              this.planesPagoForm.patchValue(prestamo.planPago);
+              this.isEdit = true;
+            }
+          },
+          error: (error) => console.error(error),
+        });
+      } else {
+        this.prestamoSeleccionado = null;
+        this.isEdit = false;
+        this.initValuesForm();
+      }
+    });
   }
 
   calculateTotalMonto() {
@@ -123,43 +164,32 @@ export class GestionPrestamoPage implements OnInit {
   }
 
   getInfoSelects() {
-    this._globalService.Get("productos").subscribe({
-      next: (response: any) => {
-        this.productos = response;
-        console.log("Productos obtenidos:", response);
+    const endpoints = [
+      { key: "productos", setter: (data: any) => (this.productos = data) },
+      {
+        key: "periodos-cobros",
+        setter: (data: any) => (this.periodosCobro = data),
       },
-      error: (error) => {
-        console.error("Error al obtener productos:", error);
+      {
+        key: "estados-aprobacions",
+        setter: (data: any) => (this.estadosAprobacion = data),
       },
-    });
+      { key: "monedas", setter: (data: any) => (this.monedas = data) },
+    ];
 
-    this._globalService.Get("periodos-cobros").subscribe({
-      next: (response: any) => {
-        this.periodosCobro = response;
-        console.log("Periodos de cobro obtenidos:", response);
-      },
-      error: (error) => {
-        console.error("Error al obtener periodos de cobro:", error);
-      },
+    endpoints.forEach((endpoint) => {
+      this.fetchData(endpoint.key, endpoint.setter);
     });
+  }
 
-    this._globalService.Get("estados-aprobacions").subscribe({
+  private fetchData(endpoint: string, setter: (data: any) => void) {
+    this._globalService.Get(endpoint).subscribe({
       next: (response: any) => {
-        this.estadosAprobacion = response;
-        console.log("Estados de aprobación obtenidos:", response);
+        setter(response);
+        console.log(`${endpoint} obtenidos:`, response);
       },
       error: (error) => {
-        console.error("Error al obtener estados de aprobación:", error);
-      },
-    });
-
-    this._globalService.Get("monedas").subscribe({
-      next: (response: any) => {
-        this.monedas = response;
-        console.log("Monedas obtenidas:", response);
-      },
-      error: (error) => {
-        console.error("Error al obtener monedas:", error);
+        console.error(`Error al obtener ${endpoint}:`, error);
       },
     });
   }
@@ -234,75 +264,92 @@ export class GestionPrestamoPage implements OnInit {
 
   onSubmit() {
     if (this.prestamoForm.valid && this.planesPagoForm.valid) {
-      // Implementar lógica para guardar el préstamo
-      console.log(this.prestamoForm.value);
-      console.log(this.planesPagoForm.value);
+      const planPago = this.createPlanPago();
 
-      const planPago: PlanesPago = {
-        cuotasPagar: this.planesPagoForm.get("cuotasPagar")?.value,
-        fechaInicio: new Date(
-          this.planesPagoForm.get("fechaInicio")?.value || new Date()
-        ),
-        fechaFin: this.planesPagoForm.get("fechaFin")?.value,
-        cuotaPagadas: 0,
-        estado: this.planesPagoForm.get("estado")?.value,
-      };
-
-      //Primero guardamos el plan de pago
-      this._globalService.Post("planes-pagos", planPago).subscribe({
-        next: (response: any) => {
-          console.log("Plan de pago guardado con éxito:", response);
-
-          this.prestamoForm
-            .get("idCliente")
-            ?.setValue(this.clienteSeleccionado.id);
-          this.prestamoForm.get("idPlan")?.setValue(response.id);
-
-          const prestamo: Prestamos = {
-            monto: this.prestamoForm.get("monto")?.value,
-            tasaInteres: this.prestamoForm.get("tasaInteres")?.value,
-            totalMonto: this.prestamoForm.get("totalMonto")?.value,
-            fechaSolicitud: new Date(
-              this.prestamoForm.get("fechaSolicitud")?.value || new Date()
-            ),
-            fechaAprobacion:
-              this.prestamoForm.get("fechaAprobacion")?.value || new Date(),
-            estado: this.prestamoForm.get("estado")?.value,
-            idCliente: this.clienteSeleccionado.id,
-            idProducto: this.prestamoForm.get("idProducto")?.value,
-            idPeriodoCobro: this.prestamoForm.get("idPeriodoCobro")?.value,
-            idEstadoAprobacion:
-              this.prestamoForm.get("idEstadoAprobacion")?.value,
-            idPlan: response.id,
-            idMoneda: this.prestamoForm.get("idMoneda")?.value,
-          };
-
-          // Luego guardamos el préstamo
-          this._globalService.Post("prestamos", prestamo).subscribe({
-            next: (response: any) => {
-              console.log("Préstamo guardado con éxito:", response);
-              this.isModalOpen = false;
-              this.isEdit = false;
-              this.cleanForms();
-              this.initValuesForm();
-              this.currentStep = 0;
-            },
-            error: (error) => {
-              console.error("Error al guardar préstamo:", error);
-            },
-          });
-        },
-        error: (error) => {
-          console.error("Error al guardar préstamo");
-          console.error("Error al guardar plan de pago:", error);
-          this.isModalOpen = false;
-          this.isEdit = false;
-          this.initValuesForm();
-          this.currentStep = 0;
-          // TODO: Mostrar mensaje de error al guardar el plan de pago
-          // this.errorMessage = error.error.message;
-        },
-      });
+      if (this.isEdit) {
+        this.updatePrestamo(planPago);
+      } else {
+        this.savePrestamo(planPago);
+      }
     }
+  }
+
+  private createPlanPago(): PlanesPago {
+    return {
+      cuotasPagar: this.planesPagoForm.get("cuotasPagar")?.value,
+      fechaInicio: new Date(
+        this.planesPagoForm.get("fechaInicio")?.value || new Date()
+      ),
+      fechaFin: this.planesPagoForm.get("fechaFin")?.value,
+      cuotaPagadas: 0,
+      estado: this.planesPagoForm.get("estado")?.value,
+    };
+  }
+
+  private createPrestamo(idPlan: number): Prestamos {
+    return {
+      monto: this.prestamoForm.get("monto")?.value,
+      tasaInteres: this.prestamoForm.get("tasaInteres")?.value,
+      totalMonto: this.prestamoForm.get("totalMonto")?.value,
+      fechaSolicitud: new Date(
+        this.prestamoForm.get("fechaSolicitud")?.value || new Date()
+      ),
+      fechaAprobacion: this.prestamoForm.get("fechaAprobacion")?.value || null,
+      estado: this.prestamoForm.get("estado")?.value,
+      idCliente: this.clienteSeleccionado.id,
+      idProducto: this.prestamoForm.get("idProducto")?.value,
+      idPeriodoCobro: this.prestamoForm.get("idPeriodoCobro")?.value,
+      idEstadoAprobacion: this.prestamoForm.get("idEstadoAprobacion")?.value,
+      idPlan: idPlan,
+      idMoneda: this.prestamoForm.get("idMoneda")?.value,
+    };
+  }
+
+  private updatePrestamo(planPago: PlanesPago) {
+    const idPlan = this.prestamoSeleccionado.planPago.id;
+    const idPrestamo = this.prestamoSeleccionado.id;
+
+    this._globalService.PutId("planes-pagos", idPlan, planPago).subscribe({
+      next: () => {
+        const prestamo = this.createPrestamo(idPlan);
+        console.log("Prestamo a guardar: ", prestamo);
+        this._globalService.PutId("prestamos", idPrestamo, prestamo).subscribe({
+          next: this.handlePrestamoSuccess.bind(this),
+          error: this.handlePrestamoError.bind(this),
+        });
+      },
+      error: this.handlePrestamoError.bind(this),
+    });
+  }
+
+  private savePrestamo(planPago: PlanesPago) {
+    this._globalService.Post("planes-pagos", planPago).subscribe({
+      next: (response: any) => {
+        const prestamo = this.createPrestamo(response.id);
+        this._globalService.Post("prestamos", prestamo).subscribe({
+          next: this.handlePrestamoSuccess.bind(this),
+          error: this.handlePrestamoError.bind(this),
+        });
+      },
+      error: this.handlePrestamoError.bind(this),
+    });
+  }
+
+  private handlePrestamoSuccess(response: any) {
+    console.log("Operación de préstamo exitosa:", response);
+    this.isModalOpen = false;
+    this.isEdit = false;
+    this.cleanForms();
+    this.initValuesForm();
+    this.currentStep = 0;
+  }
+
+  private handlePrestamoError(error: any) {
+    console.error("Error en la operación de préstamo:", error);
+    // TODO: Mostrar mensaje de error al usuario
+    this.isModalOpen = false;
+    this.isEdit = false;
+    this.initValuesForm();
+    this.currentStep = 0;
   }
 }

@@ -12,6 +12,7 @@
       [currentPage]="1"
       [totalPages]="10"
       [title]="'Clientes'"
+      [context]="'cliente'"
       [data]="elements"
       [columnsData]="columnsData"
       [currentPage]="currentPage"
@@ -114,8 +115,12 @@
               </ion-col>
               <ion-col size-xs="12" size-md="6">
                 <ion-item lines="none">
-                  <ion-label position="stacked" class="bold-label">Estado</ion-label>
-                  <ion-toggle formControlName="estado" class="my-2"></ion-toggle>
+                  <ion-label position="stacked" class="bold-label"
+                    >Estado</ion-label
+                  >
+                  <ion-toggle
+                    formControlName="estado"
+                    class="my-2"></ion-toggle>
                 </ion-item>
               </ion-col>
             </ion-row>
@@ -159,23 +164,27 @@
               @switch (column.type) { @case ('boolean') {
               <ion-badge
                 slot="end"
-                [color]="getCellValue(element, column.key) ? 'success' : 'medium'">
-                {{ getCellValue(element, column.key) ? "Activo" : "Inactivo" }}
+                [color]="getCellValue(element, column) ? 'success' : 'medium'">
+                {{ getCellValue(element, column) ? "Activo" : "Inactivo" }}
               </ion-badge>
               } @case ('object') {
               <ion-note slot="end"
-                >{{ getObjectValue(element, column.key) }}</ion-note
+                >{{ getCellValue(element, column) }}</ion-note
               >
               } @case ('date') {
               <ion-note slot="end"
-                >{{ getDateValue(element, column.key) |customDate : 6 :
+                >{{ getCellValue(element, column) | customDate : 6 :
                 "dd/MM/yyyy" }}</ion-note
               >
-              } @default {
+              } @case ('dni') {
               <ion-note slot="end"
-                >{{ getCellValue(element, column.key) }}</ion-note
+                >{{ getCellValue(element, column) | formatDni}}</ion-note
               >
-              } }
+              }@default {
+              <ion-note slot="end"
+                >{{ getCellValue(element, column) }}</ion-note
+              >
+              }}
             </ion-item>
             } }
           </ion-card-content>

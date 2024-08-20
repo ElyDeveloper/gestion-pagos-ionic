@@ -165,7 +165,7 @@ export class PrestamosPage implements OnInit {
             action: "edit",
             icon: "create",
             color: "primary",
-            rolesAuthorized: [1,2]
+            rolesAuthorized: [1, 2],
           },
           {
             alias: "Información",
@@ -178,7 +178,7 @@ export class PrestamosPage implements OnInit {
             action: "delete",
             icon: "close",
             color: "danger",
-            rolesAuthorized: [1]
+            rolesAuthorized: [1],
           },
         ],
       },
@@ -260,15 +260,12 @@ export class PrestamosPage implements OnInit {
   }
 
   onAddButtonClicked() {
-    this._router.navigate(["/layout/gestion-prestamo"], {
-      
-    });
+    this._router.navigate(["/layout/gestion-prestamo"]);
     // this._router.navigate(["/layout"]);
-
   }
 
   onEditButtonClicked(data: any) {
-    this.setModalState(true, this.modalAdd, data);
+    this._router.navigate(["/layout/gestion-prestamo/" + data.id]);
   }
 
   onInfoButtonClicked(data: any) {

@@ -19,6 +19,7 @@ import { debounceTime, distinctUntilChanged, Subject } from "rxjs";
 })
 export class ViewDataComponent implements OnInit {
   @Input() showAdd: boolean = true;
+  @Input() context: string = 'elemento';
   @Input() showCalendar: boolean = false;
   @Input() currentPage: number = 1;
   @Input() totalPages: number = 10; // Esto debería ser dinámico basado en tus datos

@@ -72,7 +72,7 @@ export class AuthService {
 
     let userReturn: any = user;
     console.log('userReturn', userReturn);
-    const idEncrypted = await this.jwtService.encryptUserId(
+    const idEncrypted = await this.jwtService.encryptId(
       credentials.id || 0,
     );
     userReturn.id = idEncrypted;
