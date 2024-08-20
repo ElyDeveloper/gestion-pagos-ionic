@@ -113,6 +113,11 @@ export class ViewDataComponent implements OnInit {
       return `${this.formatValue(primaryValue)} ${this.formatValue(secondaryValue)}`;
     }
 
+    if (column.addText) {
+      const secondaryValue = column.texto;
+      return column.addText(primaryValue, secondaryValue);
+    }
+
     // console.log('primaryValue', primaryValue);
     return this.formatValue(primaryValue);
   }

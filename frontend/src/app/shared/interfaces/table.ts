@@ -18,6 +18,8 @@ export interface Column {
   lstActions?: Action[];
   combineWith?: string; // Nueva propiedad para indicar combinación
   combineFormat?: (value1: any, value2: any) => string; // Función opcional para formatear la combinación
+  texto?: string; // Nueva propiedad para adicionar texto
+  addText?: (value1:any, value2: any) => string; //
 }
 
 export interface Row {

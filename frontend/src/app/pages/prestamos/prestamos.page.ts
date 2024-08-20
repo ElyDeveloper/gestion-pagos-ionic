@@ -148,6 +148,9 @@ export class PrestamosPage implements OnInit {
       {
         key: "planPago.cuotasPagar",
         alias: "Plan de Pago",
+        type: "add",
+        texto: "Cuotas",
+        addText: (cuotasPagar, texto) => `${cuotasPagar} ${texto}`,
       },
       {
         key: "moneda.nombreMoneda",
