@@ -15,7 +15,7 @@ import {UsuarioRepository} from '../repositories/usuario.repository';
 import {MailService} from '../services/mail.service';
 import {EncriptDecryptService} from './encript-decrypt.service';
 import {JWTService} from './jwt.service';
-import { create } from 'domain';
+import {create} from 'domain';
 var shortid = require('shortid-36');
 
 @injectable({scope: BindingScope.TRANSIENT})
@@ -43,12 +43,16 @@ export class AuthService {
       order: ['id DESC'],
       limit: 1,
     });
-    console.log('credentialsss: ', credentials);
 
-    if (!credentials)
+    if (!credentials) {
       credentials = await this.credencialesRepository.findOne({
         where: {username: loginInterface.identificator},
+        limit: 1,
       });
+
+      console.log('Comprobo por username');
+    }
+    console.log('credentialsss: ', credentials);
 
     if (!credentials) return error.CREDENTIALS_NOT_REGISTER;
 
@@ -57,20 +61,25 @@ export class AuthService {
     });
 
     // console.log('user', user);
-    
+
     if (!user) return error.CREDENTIALS_NOT_REGISTER;
-    
+
     if (!user.estado) return error.DISABLE_USER;
-    
+
     let matchCredencials = await this.jwtService.IdentifyToken(loginInterface);
-    
+
     if (!matchCredencials) return error.INVALID_PASSWORD;
-    
-    const userReturn: any = user;
+
+    let userReturn: any = user;
     console.log('userReturn', userReturn);
-    userReturn.id = this.jwtService.encryptUserId(credentials.id || 0);
+    const idEncrypted = await this.jwtService.encryptUserId(
+      credentials.id || 0,
+    );
+    userReturn.id = idEncrypted;
+
+    const token = await this.jwtService.createToken(matchCredencials, user);
     const auth = {
-      token: await this.jwtService.createToken(matchCredencials, user),
+      token,
       usuario: userReturn,
     };
 

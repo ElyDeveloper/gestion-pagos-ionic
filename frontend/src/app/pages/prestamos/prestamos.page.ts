@@ -165,6 +165,7 @@ export class PrestamosPage implements OnInit {
             action: "edit",
             icon: "create",
             color: "primary",
+            rolesAuthorized: [1,2]
           },
           {
             alias: "Información",
@@ -177,6 +178,7 @@ export class PrestamosPage implements OnInit {
             action: "delete",
             icon: "close",
             color: "danger",
+            rolesAuthorized: [1]
           },
         ],
       },

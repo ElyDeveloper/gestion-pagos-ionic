@@ -37,6 +37,8 @@ export class ViewDataComponent implements OnInit {
   search: string = "";
   searchTerm$ = new Subject<string>();
 
+  userLogged: any = {};
+
   selectedMonth: number | null = null;
   selectedYear: number | null = null;
   months = [
@@ -61,7 +63,17 @@ export class ViewDataComponent implements OnInit {
   ngOnInit() {
     this.initSearcher();
     this.initCalendar();
+    this.getUserLoggedIn();
     this.updateVisiblePages();
+  }
+
+  getUserLoggedIn() {
+    //Obtener de localStorage
+    const userLoggedData = localStorage.getItem("userInfo");
+    if (userLoggedData) {
+      this.userLogged = JSON.parse(userLoggedData);
+      console.log("User logged: ", this.userLogged);
+    }
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -91,26 +103,30 @@ export class ViewDataComponent implements OnInit {
   }
 
   getActionsColumn() {
-    return this.columnsData.find(column => column.key === 'actions');
+    return this.columnsData.find((column) => column.key === "actions");
   }
 
   getEstadoColumn(): Column {
-    return this.columnsData.find(column => column.key === 'estado') || {
-      key: 'estado',
-      alias: 'Estado',
-      type: 'boolean'
-    };
+    return (
+      this.columnsData.find((column) => column.key === "estado") || {
+        key: "estado",
+        alias: "Estado",
+        type: "boolean",
+      }
+    );
   }
 
   getCellValue(row: any, column: Column): any {
     const primaryValue = this.getNestedValue(row, column.key);
-    
+
     if (column.combineWith) {
       const secondaryValue = this.getNestedValue(row, column.combineWith);
       if (column.combineFormat) {
         return column.combineFormat(primaryValue, secondaryValue);
       }
-      return `${this.formatValue(primaryValue)} ${this.formatValue(secondaryValue)}`;
+      return `${this.formatValue(primaryValue)} ${this.formatValue(
+        secondaryValue
+      )}`;
     }
 
     if (column.addText) {
@@ -178,21 +194,20 @@ export class ViewDataComponent implements OnInit {
   }
 
   onActionClick(row: any, action: string) {
-    switch(action) {
-      case 'edit':
+    switch (action) {
+      case "edit":
         this.onEditButtonClick(row);
         break;
-      case 'info':
+      case "info":
         this.onInfoButtonClick(row);
         break;
-      case 'delete':
+      case "delete":
         this.onDeleteButtonClick(row);
         break;
-      case 'resetPswd':
+      case "resetPswd":
         this.onResetPassword(row);
         break;
       // Añade más casos según sea necesario
-
     }
   }
 

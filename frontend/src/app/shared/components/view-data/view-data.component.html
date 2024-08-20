@@ -95,13 +95,17 @@
               <ng-template #actionsTemplate>
                 <div class="d-flex justify-content-around">
                   <ng-container *ngFor="let action of column.lstActions">
+                    @if (!action.rolesAuthorized || (userLogged.rolid &&
+                    action.rolesAuthorized.includes(userLogged.rolid))) {
                     <ion-button
                       [color]="action.color"
                       (click)="onActionClick(row, action.action)"
+                      [attr.aria-label]="action.alias"
                       class="me-2">
                       <ion-icon [name]="action.icon" class="pe-1"></ion-icon>
                       <ion-label>{{ action.alias }}</ion-label>
                     </ion-button>
+                    }
                   </ng-container>
                 </div>
               </ng-template>

@@ -55,7 +55,7 @@ export class LoginPage implements OnInit {
 
       this._globalService.Post("login", this.user).subscribe({
         next: (result: any) => {
-          console.log(result);
+          console.log('Login Result',result);
 
           const { token, usuario } = result;
 

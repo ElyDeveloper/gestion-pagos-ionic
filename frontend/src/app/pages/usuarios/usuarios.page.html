@@ -53,7 +53,7 @@
                   <ion-select formControlName="rolid">
                     @for (item of roles; track item.id) {
                     <ion-select-option [value]="item.id"
-                      >{{item.nombre}}</ion-select-option
+                      >{{item.descripcion}}</ion-select-option
                     >
                     } @empty {
                     <ion-select-option [value]="0"

@@ -10,10 +10,10 @@ import {UsuarioRepository} from '../repositories/usuario.repository';
 import {EncriptDecryptService} from './encript-decrypt.service';
 import {UserService} from './user.service';
 import {VerifyCodeInfo} from '../core/interfaces/models/gCode.interface';
-import { TokenServiceBindings } from '@loopback/authentication-jwt';
-import { TokenService } from '@loopback/authentication';
-import { securityId, UserProfile } from '@loopback/security';
-import { AuthorizationError } from '../core/library/authorization-error';
+import {TokenServiceBindings} from '@loopback/authentication-jwt';
+import {TokenService} from '@loopback/authentication';
+import {securityId, UserProfile} from '@loopback/security';
+import {AuthorizationError} from '../core/library/authorization-error';
 const jsonwebtoken = require('jsonwebtoken');
 var shortid = require('shortid-36');
 
@@ -39,32 +39,36 @@ export class JWTService {
     @repository(UsuarioRepository)
     private usuarioRepository: UsuarioRepository,
     @inject(TokenServiceBindings.TOKEN_SERVICE)
-    private jwtService: TokenService
+    private jwtService: TokenService,
   ) {}
 
-  createToken(credentials: any, user: any):Promise<string> {
-    const userProfile: UserProfile ={
+  async createToken(credentials: any, user: any): Promise<string> {
+    const userProfile: UserProfile = {
       [securityId]: credentials.id!.toString(),
-      id: (credentials.id)?.toString(),
+      id: credentials.id?.toString(),
       name: credentials.username,
       role: credentials.role,
     };
 
-    console.log('Codigo generado: ', this.jwtService.generateToken(userProfile));
-    return this.jwtService.generateToken(userProfile);
+    console.log(
+      'Codigo generado: ',
+      await this.jwtService.generateToken(userProfile),
+    );
+    return await this.jwtService.generateToken(userProfile);
   }
 
-  async VerifyToken(token: string):Promise<UserProfile> {
+  async VerifyToken(token: string): Promise<UserProfile> {
     if (!token) {
       throw new HttpErrors[401]('Token vacio');
     }
 
-    try{
-      const userProfile:UserProfile = await this.jwtService.verifyToken(token);
+    try {
+      const userProfile: UserProfile = await this.jwtService.verifyToken(token);
       return userProfile;
-    }
-    catch(error){
-      throw new HttpErrors.Unauthorized(`Error verificando el token: ${error.message}`);
+    } catch (error) {
+      throw new HttpErrors.Unauthorized(
+        `Error verificando el token: ${error.message}`,
+      );
     }
   }
 
@@ -148,12 +152,30 @@ export class JWTService {
     return code;
   }
 
-  async encryptUserId(credentials:any) {
-    return '';
+  encryptUserId(userId: number): string {
+    return jsonwebtoken.sign(
+      {userId: userId},
+      process.env.JWT_SECRET_KEY || 'indeterminated',
+      {algorithm: 'HS256'},
+    );
   }
 
-  async decryptUserId(credentials:any) {
-    return 1;
+  decryptUserId(token: string): number {
+    try {
+      const decoded = jsonwebtoken.verify(
+        token,
+        process.env.JWT_SECRET_KEY || 'indeterminated',
+      ) as {userId: number};
+
+      if (typeof decoded.userId !== 'number') {
+        throw new AuthorizationError('Token de id de usuario inválido');
+      }
+
+      return decoded.userId;
+    } catch (error) {
+      console.error('Error al desencriptar token:', error);
+      throw new AuthorizationError('Token de id de usuario inválido');
+    }
   }
 
   async generateCode(userExist: Credenciales) {
