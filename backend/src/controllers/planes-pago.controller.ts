@@ -23,7 +23,7 @@ import {PlanesPagoRepository} from '../repositories';
 export class PlanesPagoController {
   constructor(
     @repository(PlanesPagoRepository)
-    public planesPagoRepository : PlanesPagoRepository,
+    public planesPagoRepository: PlanesPagoRepository,
   ) {}
 
   @post('/planes-pagos')
@@ -37,12 +37,11 @@ export class PlanesPagoController {
         'application/json': {
           schema: getModelSchemaRef(PlanesPago, {
             title: 'NewPlanesPago',
-            
           }),
         },
       },
     })
-    planesPago: PlanesPago,
+    planesPago: Omit<PlanesPago, 'id'>,
   ): Promise<PlanesPago> {
     return this.planesPagoRepository.create(planesPago);
   }
@@ -106,7 +105,8 @@ export class PlanesPagoController {
   })
   async findById(
     @param.path.number('id') id: number,
-    @param.filter(PlanesPago, {exclude: 'where'}) filter?: FilterExcludingWhere<PlanesPago>
+    @param.filter(PlanesPago, {exclude: 'where'})
+    filter?: FilterExcludingWhere<PlanesPago>,
   ): Promise<PlanesPago> {
     return this.planesPagoRepository.findById(id, filter);
   }

@@ -51,6 +51,24 @@ export class HomePage {
         console.error("Error al obtener la cantidad de clientes", error);
       },
     });
+
+    this._globalService.Get("contratos-pago/count").subscribe({
+      next: (data: any) => {
+        this.folders[2].count = data.count;
+      },
+      error: (error) => {
+        console.error("Error al obtener la cantidad de contratos de pago", error);
+      },
+    });
+
+    this._globalService.Get("prestamos/count").subscribe({
+      next: (data: any) => {
+        this.folders[3].count = data.count;
+      },
+      error: (error) => {
+        console.error("Error al obtener la cantidad de prestamos", error);
+      },
+    });
     
   }
 

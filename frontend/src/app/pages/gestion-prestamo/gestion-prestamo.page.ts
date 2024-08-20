@@ -8,6 +8,8 @@ import {
 import { FormBuilder, FormGroup } from "@angular/forms";
 import { ActivatedRoute } from "@angular/router";
 import { debounceTime, distinctUntilChanged, Subject } from "rxjs";
+import { PlanesPago } from "src/app/shared/interfaces/plan-pago";
+import { Prestamos } from "src/app/shared/interfaces/prestamo";
 import { GlobalService } from "src/app/shared/services/global.service";
 import { FormModels } from "src/app/shared/utils/forms-models";
 
@@ -68,7 +70,6 @@ export class GestionPrestamoPage implements OnInit {
       const totalMonto = monto * (1 + tasa / 100);
       this.prestamoForm.get("totalMonto")?.setValue(totalMonto);
     }
-    
   }
 
   nextStep() {
@@ -237,43 +238,72 @@ export class GestionPrestamoPage implements OnInit {
       console.log(this.prestamoForm.value);
       console.log(this.planesPagoForm.value);
 
-      //Primero guardamos el plan de pago
-      this._globalService
-        .Post("planes-pagos", this.planesPagoForm.value)
-        .subscribe({
-          next: (response: any) => {
-            console.log("Plan de pago guardado con éxito:", response);
+      const planPago: PlanesPago = {
+        cuotasPagar: this.planesPagoForm.get("cuotasPagar")?.value,
+        fechaInicio: new Date(
+          this.planesPagoForm.get("fechaInicio")?.value || new Date()
+        ),
+        fechaFin: this.planesPagoForm.get("fechaFin")?.value,
+        diaCobro: this.planesPagoForm.get("diaCobro")?.value,
+        cuotaPagadas: 0,
+        estado: this.planesPagoForm.get("estado")?.value,
+      };
 
-            this.prestamoForm.get('idCliente')?.setValue(this.clienteSeleccionado.id)
-            this.prestamoForm.get('idPlan')?.setValue(response.id);
-            // Luego guardamos el préstamo
-            this._globalService
-              .Post("prestamos", this.prestamoForm.value)
-              .subscribe({
-                next: (response: any) => {
-                  console.log("Préstamo guardado con éxito:", response);
-                  this.isModalOpen = false;
-                  this.isEdit = false;
-                  this.cleanForms();
-                  this.initValuesForm();
-                  this.currentStep = 0;
-                },
-                error: (error) => {
-                  console.error("Error al guardar préstamo:", error);
-                },
-              });
-          },
-          error: (error) => {
-            console.error("Error al guardar préstamo");
-            console.error("Error al guardar plan de pago:", error);
-            this.isModalOpen = false;
-            this.isEdit = false;
-            this.initValuesForm();
-            this.currentStep = 0;
-            // TODO: Mostrar mensaje de error al guardar el plan de pago
-            // this.errorMessage = error.error.message;
-          },
-        });
+      //Primero guardamos el plan de pago
+      this._globalService.Post("planes-pagos", planPago).subscribe({
+        next: (response: any) => {
+          console.log("Plan de pago guardado con éxito:", response);
+
+          this.prestamoForm
+            .get("idCliente")
+            ?.setValue(this.clienteSeleccionado.id);
+          this.prestamoForm.get("idPlan")?.setValue(response.id);
+
+          const prestamo: Prestamos = {
+            monto: this.prestamoForm.get("monto")?.value,
+            tasaInteres: this.prestamoForm.get("tasaInteres")?.value,
+            totalMonto: this.prestamoForm.get("totalMonto")?.value,
+            fechaSolicitud: new Date(
+              this.prestamoForm.get("fechaSolicitud")?.value || new Date()
+            ),
+            fechaAprobacion:
+              this.prestamoForm.get("fechaAprobacion")?.value || new Date(),
+            estado: this.prestamoForm.get("estado")?.value,
+            idCliente: this.clienteSeleccionado.id,
+            idProducto: this.prestamoForm.get("idProducto")?.value,
+            idPeriodoCobro: this.prestamoForm.get("idPeriodoCobro")?.value,
+            idEstadoAprobacion:
+              this.prestamoForm.get("idEstadoAprobacion")?.value,
+            idPlan: response.id,
+            idMoneda: this.prestamoForm.get("idMoneda")?.value,
+          };
+
+          // Luego guardamos el préstamo
+          this._globalService.Post("prestamos", prestamo).subscribe({
+            next: (response: any) => {
+              console.log("Préstamo guardado con éxito:", response);
+              this.isModalOpen = false;
+              this.isEdit = false;
+              this.cleanForms();
+              this.initValuesForm();
+              this.currentStep = 0;
+            },
+            error: (error) => {
+              console.error("Error al guardar préstamo:", error);
+            },
+          });
+        },
+        error: (error) => {
+          console.error("Error al guardar préstamo");
+          console.error("Error al guardar plan de pago:", error);
+          this.isModalOpen = false;
+          this.isEdit = false;
+          this.initValuesForm();
+          this.currentStep = 0;
+          // TODO: Mostrar mensaje de error al guardar el plan de pago
+          // this.errorMessage = error.error.message;
+        },
+      });
     }
   }
 }

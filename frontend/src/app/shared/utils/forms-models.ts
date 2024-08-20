@@ -77,10 +77,6 @@ export class FormModels {
       cuotasPagar: [null, [Validators.required, Validators.min(1)]],
       fechaInicio: [null, Validators.required],
       fechaFin: [null, { disabled: true }],
-      diaCobro: [
-        null,
-        [Validators.required, Validators.min(1), Validators.max(31)],
-      ],
       cuotaPagadas: [0, [Validators.required, Validators.min(0)]],
       estado: [true],
     });

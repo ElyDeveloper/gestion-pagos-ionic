@@ -23,7 +23,7 @@ import {PrestamosRepository} from '../repositories/prestamos.repository';
 import { authenticate } from '@loopback/authentication';
 
 
-@authenticate('jwt')
+// @authenticate('jwt')
 export class PrestamosController {
   constructor(
     @repository(PrestamosRepository)

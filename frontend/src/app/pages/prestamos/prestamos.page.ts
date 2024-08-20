@@ -146,11 +146,11 @@ export class PrestamosPage implements OnInit {
         alias: "Estado de Aprobación",
       },
       {
-        key: "planPago.nombre",
+        key: "planPago.cuotasPagar",
         alias: "Plan de Pago",
       },
       {
-        key: "moneda.nombre",
+        key: "moneda.nombreMoneda",
         alias: "Moneda",
       },
       {

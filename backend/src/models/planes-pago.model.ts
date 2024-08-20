@@ -49,17 +49,6 @@ export class PlanesPago extends Entity {
     precision: 10,
     scale: 0,
     generated: false,
-    mssql: {columnName: 'DiaCobro', dataType: 'int', dataLength: null, dataPrecision: 10, dataScale: 0, nullable: 'NO', generated: false},
-  })
-  diaCobro: number;
-
-  @property({
-    type: 'number',
-    required: true,
-    jsonSchema: {nullable: false},
-    precision: 10,
-    scale: 0,
-    generated: false,
     mssql: {columnName: 'CuotaPagadas', dataType: 'int', dataLength: null, dataPrecision: 10, dataScale: 0, nullable: 'NO', generated: false},
   })
   cuotaPagadas: number;

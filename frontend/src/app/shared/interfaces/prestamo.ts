@@ -10,8 +10,8 @@ export interface Prestamos {
   monto: number;
   tasaInteres: number;
   totalMonto: number;
-  fechaSolicitud: string;
-  fechaAprobacion?: string;
+  fechaSolicitud: string | Date;
+  fechaAprobacion?: string | Date;
   estado: boolean;
   idCliente: number;
   idProducto: number;

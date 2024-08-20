@@ -3,9 +3,8 @@ import { Prestamos } from "./prestamo";
 export interface PlanesPago {
   id?: number;
   cuotasPagar: number;
-  fechaInicio: string;
-  fechaFin?: string;
-  diaCobro: number;
+  fechaInicio: string | Date;
+  fechaFin?: string | Date;
   cuotaPagadas: number;
   estado: boolean;
   prestamos?: Prestamos[];
