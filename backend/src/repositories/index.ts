@@ -23,3 +23,5 @@ export * from './moras.repository';
 export * from './productos.repository';
 export * from './record-crediticio.repository';
 export * from './estados-aprobacion.repository';
+export * from './vouchers.repository';
+export * from './transacciones-externas.repository';

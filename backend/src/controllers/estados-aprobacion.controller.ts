@@ -19,7 +19,10 @@ import {
 } from '@loopback/rest';
 import {EstadosAprobacion} from '../models';
 import {EstadosAprobacionRepository} from '../repositories';
+import { authenticate } from '@loopback/authentication';
 
+
+@authenticate('jwt')
 export class EstadosAprobacionController {
   constructor(
     @repository(EstadosAprobacionRepository)

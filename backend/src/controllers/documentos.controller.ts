@@ -19,7 +19,10 @@ import {
 } from '@loopback/rest';
 import {Documentos} from '../models';
 import {DocumentosRepository} from '../repositories';
+import { authenticate } from '@loopback/authentication';
 
+
+@authenticate('jwt')
 export class DocumentosController {
   constructor(
     @repository(DocumentosRepository)

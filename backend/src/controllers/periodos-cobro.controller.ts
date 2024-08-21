@@ -19,7 +19,10 @@ import {
 } from '@loopback/rest';
 import {PeriodosCobro} from '../models';
 import {PeriodosCobroRepository} from '../repositories';
+import { authenticate } from '@loopback/authentication';
 
+
+@authenticate('jwt')
 export class PeriodosCobroController {
   constructor(
     @repository(PeriodosCobroRepository)

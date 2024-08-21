@@ -72,8 +72,14 @@ export class PagosController {
       },
     },
   })
-  async find(@param.filter(Pagos) filter?: Filter<Pagos>): Promise<Pagos[]> {
-    return this.PagosRepository.find();
+  async find(): Promise<Pagos[]> {
+    return this.PagosRepository.find(
+      {
+        include:[
+          {relation: 'prestamos'},
+        ],
+      }
+    );
   }
 
   @get('/pagos/paginated')
@@ -131,10 +137,8 @@ export class PagosController {
   })
   async findById(
     @param.path.number('id') id: number,
-    @param.filter(Pagos, {exclude: 'where'})
-    filter?: FilterExcludingWhere<Pagos>,
   ): Promise<Pagos> {
-    return this.PagosRepository.findById(id, filter);
+    return this.PagosRepository.findById(id);
   }
 
   @patch('/pagos/{id}')
@@ -199,7 +203,7 @@ export class PagosController {
     );
   }
 
-  @get('/get-pagos')
+  @get('/get-pagos/vista')
   async dataPagos(): Promise<any> {
     let datos = await this.getPagos();
     return datos;
