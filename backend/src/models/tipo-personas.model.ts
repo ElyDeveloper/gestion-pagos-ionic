@@ -1,9 +1,7 @@
 import {Entity, model, property} from '@loopback/repository';
 
-@model({
-  settings: {idInjection: false, mssql: {schema: 'dbo', table: 'TipoDocumentos'}}
-})
-export class TipoDocumentos extends Entity {
+@model({settings: {idInjection: false, mssql: {schema: 'dbo', table: 'TipoPersonas'}}})
+export class TipoPersonas extends Entity {
   @property({
     type: 'number',
     jsonSchema: {nullable: false},
@@ -19,9 +17,9 @@ export class TipoDocumentos extends Entity {
     type: 'string',
     required: true,
     jsonSchema: {nullable: false},
-    length: 150,
+    length: 50,
     generated: false,
-    mssql: {columnName: 'Descripcion', dataType: 'varchar', dataLength: 150, dataPrecision: null, dataScale: null, nullable: 'NO', generated: false},
+    mssql: {columnName: 'Descripcion', dataType: 'varchar', dataLength: 50, dataPrecision: null, dataScale: null, nullable: 'NO', generated: false},
   })
   descripcion: string;
 
@@ -31,13 +29,13 @@ export class TipoDocumentos extends Entity {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [prop: string]: any;
 
-  constructor(data?: Partial<TipoDocumentos>) {
+  constructor(data?: Partial<TipoPersonas>) {
     super(data);
   }
 }
 
-export interface TipoDocumentosRelations {
+export interface TipoPersonasRelations {
   // describe navigational properties here
 }
 
-export type TipoDocumentosWithRelations = TipoDocumentos & TipoDocumentosRelations;
+export type TipoPersonasWithRelations = TipoPersonas & TipoPersonasRelations;

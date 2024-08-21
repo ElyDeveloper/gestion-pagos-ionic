@@ -1,11 +1,11 @@
-import {belongsTo, Entity, hasMany, model, property} from '@loopback/repository';
-import { Clientes } from './clientes.model';
-import { Productos } from './productos.model';
-import { PeriodosCobro } from './periodos-cobro.model';
-import { EstadosAprobacion } from './estados-aprobacion.model';
-import { PlanesPago } from './planes-pago.model';
-import { Monedas } from './monedas.model';
-import { Pagos } from './pagos.model';
+import {Entity, model, property, belongsTo, hasMany} from '@loopback/repository';
+import {Personas} from './personas.model';
+import {Productos} from './productos.model';
+import {PlanesPago} from './planes-pago.model';
+import {Monedas} from './monedas.model';
+import {PeriodosCobro} from './periodos-cobro.model';
+import {EstadosAprobacion} from './estados-aprobacion.model';
+import {Pagos} from './pagos.model';
 
 @model({settings: {idInjection: false, mssql: {schema: 'dbo', table: 'Prestamos'}}})
 export class Prestamos extends Entity {
@@ -19,7 +19,6 @@ export class Prestamos extends Entity {
     mssql: {columnName: 'Id', dataType: 'int', dataLength: null, dataPrecision: 10, dataScale: 0, nullable: 'NO', generated: 1},
   })
   id?: number;
-
   @property({
     type: 'number',
     required: true,
@@ -78,19 +77,11 @@ export class Prestamos extends Entity {
     mssql: {columnName: 'Estado', dataType: 'bit', dataLength: null, dataPrecision: null, dataScale: null, nullable: 'NO', generated: false},
   })
   estado: boolean;
-
-  // Define well-known properties here
-  @belongsTo(() => Clientes, {name: 'cliente'})
+  @belongsTo(() => Personas, {name: 'cliente'})
   idCliente: number;
 
   @belongsTo(() => Productos, {name: 'producto'})
   idProducto: number;
-
-  @belongsTo(() => PeriodosCobro, {name: 'periodo'})
-  idPeriodoCobro: number;
-
-  @belongsTo(() => EstadosAprobacion, {name: 'estadoAprobacion'})
-  idEstadoAprobacion: number;
 
   @belongsTo(() => PlanesPago, {name: 'planPago'})
   idPlan: number;
@@ -98,9 +89,19 @@ export class Prestamos extends Entity {
   @belongsTo(() => Monedas, {name: 'moneda'})
   idMoneda: number;
 
+  @belongsTo(() => PeriodosCobro, {name: 'periodoCobro'})
+  idPeriodoCobro: number;
+
+  @belongsTo(() => EstadosAprobacion, {name: 'estadoAprobacion'})
+  idEstadoAprobacion: number;
+
+  @belongsTo(() => Personas, {name: 'aval'})
+  idAval: number;
 
   @hasMany(() => Pagos, {keyTo: 'idPrestamo'})
   pagos: Pagos[];
+  // Define well-known properties here
+
   // Indexer property to allow additional data
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [prop: string]: any;

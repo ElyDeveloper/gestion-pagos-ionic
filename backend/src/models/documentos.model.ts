@@ -14,28 +14,6 @@ export class Documentos extends Entity {
   id?: number;
 
   @property({
-    type: 'number',
-    required: true,
-    jsonSchema: {nullable: false},
-    precision: 10,
-    scale: 0,
-    generated: false,
-    mssql: {columnName: 'PrestamoId', dataType: 'int', dataLength: null, dataPrecision: 10, dataScale: 0, nullable: 'NO', generated: false},
-  })
-  prestamoId: number;
-
-  @property({
-    type: 'number',
-    required: true,
-    jsonSchema: {nullable: false},
-    precision: 10,
-    scale: 0,
-    generated: false,
-    mssql: {columnName: 'TipoDocumentoId', dataType: 'int', dataLength: null, dataPrecision: 10, dataScale: 0, nullable: 'NO', generated: false},
-  })
-  tipoDocumentoId: number;
-
-  @property({
     type: 'string',
     jsonSchema: {nullable: true},
     length: 1000,
@@ -52,6 +30,17 @@ export class Documentos extends Entity {
     mssql: {columnName: 'FechaSubida', dataType: 'datetime2', dataLength: null, dataPrecision: null, dataScale: null, nullable: 'NO', generated: false},
   })
   fechaSubida: string;
+
+  @property({
+    type: 'number',
+    required: true,
+    jsonSchema: {nullable: false},
+    precision: 10,
+    scale: 0,
+    generated: false,
+    mssql: {columnName: 'IdDocTipDoc', dataType: 'int', dataLength: null, dataPrecision: 10, dataScale: 0, nullable: 'NO', generated: false},
+  })
+  idDocTipDoc: number;
 
   // Define well-known properties here
 

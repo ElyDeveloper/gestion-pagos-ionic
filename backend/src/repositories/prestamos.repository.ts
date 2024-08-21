@@ -1,51 +1,56 @@
-import {Getter, inject} from '@loopback/core';
-import {BelongsToAccessor, DefaultCrudRepository, HasManyRepositoryFactory, repository} from '@loopback/repository';
+import {inject, Getter} from '@loopback/core';
+import {DefaultCrudRepository, repository, BelongsToAccessor, HasManyRepositoryFactory} from '@loopback/repository';
 import {GestionEdboDataSource} from '../datasources';
-import {Clientes, Cuotas, EstadosAprobacion, Monedas, Pagos, PeriodosCobro, PlanesPago, Prestamos, PrestamosRelations, Productos} from '../models';
-import { ClientesRepository } from './clientes.repository';
-import { ProductosRepository } from './productos.repository';
-import { PeriodosCobroRepository } from './periodos-cobro.repository';
-import { EstadosAprobacionRepository } from './estados-aprobacion.repository';
-import { PlanesPagoRepository } from './planes-pago.repository';
-import { MonedasRepository } from './monedas.repository';
+import {Prestamos, PrestamosRelations, Personas, Productos, PlanesPago, Monedas, PeriodosCobro, EstadosAprobacion, Pagos} from '../models';
+import {PersonasRepository} from './personas.repository';
+import {ProductosRepository} from './productos.repository';
+import {PlanesPagoRepository} from './planes-pago.repository';
+import {MonedasRepository} from './monedas.repository';
+import {PeriodosCobroRepository} from './periodos-cobro.repository';
+import {EstadosAprobacionRepository} from './estados-aprobacion.repository';
+import {PagosRepository} from './pagos.repository';
 
 export class PrestamosRepository extends DefaultCrudRepository<
   Prestamos,
   typeof Prestamos.prototype.id,
   PrestamosRelations
 > {
-  public readonly cliente: BelongsToAccessor<Clientes, typeof Prestamos.prototype.Id>;
-  public readonly productos: BelongsToAccessor<Productos, typeof Productos.prototype.Id>;
-  public readonly periodos: BelongsToAccessor<PeriodosCobro, typeof PeriodosCobro.prototype.Id>;
-  public readonly estado: BelongsToAccessor<EstadosAprobacion, typeof EstadosAprobacion.prototype.Id>;
-  public readonly planPago: BelongsToAccessor<PlanesPago, typeof PlanesPago.prototype.Id>;
-  public readonly moneda: BelongsToAccessor<Monedas, typeof Monedas.prototype.Id>;
+
+  public readonly cliente: BelongsToAccessor<Personas, typeof Prestamos.prototype.id>;
+
+  public readonly producto: BelongsToAccessor<Productos, typeof Prestamos.prototype.id>;
+
+  public readonly planPago: BelongsToAccessor<PlanesPago, typeof Prestamos.prototype.id>;
+
+  public readonly moneda: BelongsToAccessor<Monedas, typeof Prestamos.prototype.id>;
+
+  public readonly periodoCobro: BelongsToAccessor<PeriodosCobro, typeof Prestamos.prototype.id>;
+
+  public readonly estadoAprobacion: BelongsToAccessor<EstadosAprobacion, typeof Prestamos.prototype.id>;
+
+  public readonly aval: BelongsToAccessor<Personas, typeof Prestamos.prototype.id>;
+
+  public readonly pagos: HasManyRepositoryFactory<Pagos, typeof Prestamos.prototype.id>;
+
   constructor(
-    @inject('datasources.GestionEDBO') dataSource: GestionEdboDataSource,
-    @repository.getter('ClientesRepository') protected clientesRepositoryGetter: Getter<ClientesRepository>,
-    @repository.getter('ProductosRepository') protected productosRepositoryGetter: Getter<ProductosRepository>,
-    @repository.getter('PeriodosCobroRepository') protected periodosRepositoryGetter: Getter<PeriodosCobroRepository>,
-    @repository.getter('EstadosAprobacionRepository') protected estadosRepositoryGetter: Getter<EstadosAprobacionRepository>,
-    @repository.getter('PlanesPagoRepository') protected planesPagoRepositoryGetter: Getter<PlanesPagoRepository>,
-    @repository.getter('MonedasRepository') protected monedasRepositoryGetter: Getter<MonedasRepository>,
+    @inject('datasources.GestionEDBO') dataSource: GestionEdboDataSource, @repository.getter('PersonasRepository') protected personasRepositoryGetter: Getter<PersonasRepository>, @repository.getter('ProductosRepository') protected productosRepositoryGetter: Getter<ProductosRepository>, @repository.getter('PlanesPagoRepository') protected planesPagoRepositoryGetter: Getter<PlanesPagoRepository>, @repository.getter('MonedasRepository') protected monedasRepositoryGetter: Getter<MonedasRepository>, @repository.getter('PeriodosCobroRepository') protected periodosCobroRepositoryGetter: Getter<PeriodosCobroRepository>, @repository.getter('EstadosAprobacionRepository') protected estadosAprobacionRepositoryGetter: Getter<EstadosAprobacionRepository>, @repository.getter('PagosRepository') protected pagosRepositoryGetter: Getter<PagosRepository>,
   ) {
     super(Prestamos, dataSource);
-    this.cliente = this.createBelongsToAccessorFor('cliente', clientesRepositoryGetter);
-    this.registerInclusionResolver('cliente', this.cliente.inclusionResolver);
-
-    this.productos = this.createBelongsToAccessorFor('producto', productosRepositoryGetter);
-    this.registerInclusionResolver('producto', this.productos.inclusionResolver);
-
-    this.periodos = this.createBelongsToAccessorFor('periodo', periodosRepositoryGetter);
-    this.registerInclusionResolver('periodo', this.periodos.inclusionResolver);
-
-    this.estado = this.createBelongsToAccessorFor('estadoAprobacion', estadosRepositoryGetter);
-    this.registerInclusionResolver('estadoAprobacion', this.estado.inclusionResolver);
-
-    this.planPago = this.createBelongsToAccessorFor('planPago', planesPagoRepositoryGetter);
-    this.registerInclusionResolver('planPago', this.planPago.inclusionResolver);
-
-    this.moneda = this.createBelongsToAccessorFor('moneda', monedasRepositoryGetter);
+    this.pagos = this.createHasManyRepositoryFactoryFor('pagos', pagosRepositoryGetter,);
+    this.registerInclusionResolver('pagos', this.pagos.inclusionResolver);
+    this.aval = this.createBelongsToAccessorFor('aval', personasRepositoryGetter,);
+    this.registerInclusionResolver('aval', this.aval.inclusionResolver);
+    this.estadoAprobacion = this.createBelongsToAccessorFor('estadoAprobacion', estadosAprobacionRepositoryGetter,);
+    this.registerInclusionResolver('estadoAprobacion', this.estadoAprobacion.inclusionResolver);
+    this.periodoCobro = this.createBelongsToAccessorFor('periodoCobro', periodosCobroRepositoryGetter,);
+    this.registerInclusionResolver('periodoCobro', this.periodoCobro.inclusionResolver);
+    this.moneda = this.createBelongsToAccessorFor('moneda', monedasRepositoryGetter,);
     this.registerInclusionResolver('moneda', this.moneda.inclusionResolver);
+    this.planPago = this.createBelongsToAccessorFor('planPago', planesPagoRepositoryGetter,);
+    this.registerInclusionResolver('planPago', this.planPago.inclusionResolver);
+    this.producto = this.createBelongsToAccessorFor('producto', productosRepositoryGetter,);
+    this.registerInclusionResolver('producto', this.producto.inclusionResolver);
+    this.cliente = this.createBelongsToAccessorFor('cliente', personasRepositoryGetter,);
+    this.registerInclusionResolver('cliente', this.cliente.inclusionResolver);
   }
 }

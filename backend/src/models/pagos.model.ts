@@ -48,6 +48,10 @@ export class Pagos extends Entity {
   @belongsTo(() => Prestamos, {name: 'prestamos'})
   planId: number;
 
+  @property({
+    type: 'number',
+  })
+  idPrestamo?: number;
   @hasMany(() => Vouchers, {keyTo: 'idPago'})
   vouchers: Vouchers[];
 
