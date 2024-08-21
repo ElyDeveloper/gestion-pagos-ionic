@@ -182,4 +182,65 @@ export class FechasPagosController {
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.FechasPagosRepository.deleteById(id);
   }
+
+  @post('/fechas-pagos/crear-fechas-pagos')
+  async createFechasPagos(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            properties: {
+              planId: {type: 'number'},
+              estado: {type: 'boolean'},
+              cuota: {type: 'number'},
+              fechaInicio: {type: 'string', format: 'date'},
+              frecuencia: {type: 'string', enum: ['semanal', 'quincenal', 'mensual']},
+              numeroCuotas: {type: 'number'},
+            },
+          },
+        },
+      },
+    })
+    datos: {
+      planId: number,
+      estado: boolean,
+      cuota: number,
+      fechaInicio: string,
+      frecuencia: string,
+      numeroCuotas: number,
+    },
+  ): Promise<void> {
+    const {planId, estado, cuota, fechaInicio, frecuencia, numeroCuotas} = datos;
+
+    let fechaActual = new Date(fechaInicio);
+    const fechasPagos = [];
+
+    for (let i = 0; i < numeroCuotas; i++) {
+      fechasPagos.push({
+        planId: planId,
+        estado: estado,
+        cuota: cuota,
+        FechaPago: fechaActual,
+      });
+
+      // Incrementar la fecha según la frecuencia
+      switch (frecuencia) {
+        case 'semanal':
+          fechaActual.setDate(fechaActual.getDate() + 7);
+          break;
+        case 'quincenal':
+          fechaActual.setDate(fechaActual.getDate() + 15);
+          break;
+        case 'mensual':
+          fechaActual.setMonth(fechaActual.getMonth() + 1);
+          break;
+        default:
+          throw new Error('Frecuencia no válida');
+      }
+    }
+
+    console.log('fechas pagos: ', fechasPagos)
+    await this.FechasPagosRepository.createAll(fechasPagos);
+  }
 }

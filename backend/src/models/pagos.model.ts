@@ -1,6 +1,7 @@
 import {belongsTo, Entity, hasMany, model, property} from '@loopback/repository';
 import { Prestamos } from './prestamos.model';
 import { Vouchers } from './vouchers.model';
+import { DocumentosTipoDoc } from './documentos-tipo-doc.model';
 
 @model({settings: {idInjection: false, mssql: {schema: 'dbo', table: 'Pagos'}}})
 export class Pagos extends Entity {
@@ -54,6 +55,9 @@ export class Pagos extends Entity {
   idPrestamo?: number;
   @hasMany(() => Vouchers, {keyTo: 'idPago'})
   vouchers: Vouchers[];
+
+  @hasMany(() => DocumentosTipoDoc, {keyTo: 'idDocumento'})
+  documentosTipoDocs: DocumentosTipoDoc[];
 
   // Indexer property to allow additional data
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

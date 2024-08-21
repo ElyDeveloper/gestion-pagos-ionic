@@ -1,4 +1,5 @@
-import {Entity, model, property} from '@loopback/repository';
+import { Entity, hasMany, model, property, belongsTo } from '@loopback/repository';
+import { DocumentosTipoDoc } from './documentos-tipo-doc.model';
 
 @model({settings: {idInjection: false, mssql: {schema: 'dbo', table: 'Documentos'}}})
 export class Documentos extends Entity {
@@ -31,18 +32,9 @@ export class Documentos extends Entity {
   })
   fechaSubida: string;
 
-  @property({
-    type: 'number',
-    required: true,
-    jsonSchema: {nullable: false},
-    precision: 10,
-    scale: 0,
-    generated: false,
-    mssql: {columnName: 'IdDocTipDoc', dataType: 'int', dataLength: null, dataPrecision: 10, dataScale: 0, nullable: 'NO', generated: false},
-  })
-  idDocTipDoc: number;
-
   // Define well-known properties here
+  @belongsTo(() => DocumentosTipoDoc, {name: 'documentosTipoDoc'})
+  idDocTipDoc: number;
 
   // Indexer property to allow additional data
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

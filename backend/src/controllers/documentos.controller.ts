@@ -22,7 +22,7 @@ import {DocumentosRepository} from '../repositories';
 import { authenticate } from '@loopback/authentication';
 
 
-@authenticate('jwt')
+// @authenticate('jwt')
 export class DocumentosController {
   constructor(
     @repository(DocumentosRepository)
@@ -73,10 +73,34 @@ export class DocumentosController {
       },
     },
   })
-  async find(
-    @param.filter(Documentos) filter?: Filter<Documentos>,
+  async find(): Promise<Documentos[]> {
+    return this.documentosRepository.find({
+      include: [{relation: 'documentosTipoDoc'}]
+    });
+  }
+
+
+  @get('/documentos/paginated')
+  @response(200, {
+    description: 'Documentos model instance',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Documentos, {includeRelations: true}),
+        }
+      },
+    }
+  })
+  async findPaginated(
+    @param.query.number('skip') skip: number,
+    @param.query.number('limit') limit: number,
   ): Promise<Documentos[]> {
-    return this.documentosRepository.find(filter);
+    return this.documentosRepository.find({
+      include: [{relation: 'documentosTipoDoc'}],
+      skip,
+      limit
+    });
   }
 
   @patch('/documentos')
@@ -108,10 +132,11 @@ export class DocumentosController {
     },
   })
   async findById(
-    @param.path.number('id') id: number,
-    @param.filter(Documentos, {exclude: 'where'}) filter?: FilterExcludingWhere<Documentos>
+    @param.path.number('id') id: number
   ): Promise<Documentos> {
-    return this.documentosRepository.findById(id, filter);
+    return this.documentosRepository.findById(id, 
+      {include: [{relation: 'documentosTipoDoc'}]}
+    );
   }
 
   @patch('/documentos/{id}')

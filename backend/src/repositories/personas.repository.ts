@@ -13,4 +13,5 @@ export class PersonasRepository extends DefaultCrudRepository<
   ) {
     super(Personas, dataSource);
   }
+
 }

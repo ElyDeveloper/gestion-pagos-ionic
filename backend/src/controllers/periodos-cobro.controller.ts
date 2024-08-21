@@ -73,10 +73,8 @@ export class PeriodosCobroController {
       },
     },
   })
-  async find(
-    @param.filter(PeriodosCobro) filter?: Filter<PeriodosCobro>,
-  ): Promise<PeriodosCobro[]> {
-    return this.periodosCobroRepository.find(filter);
+  async find(): Promise<PeriodosCobro[]> {
+    return this.periodosCobroRepository.find();
   }
 
   @patch('/periodos-cobros')
@@ -108,10 +106,9 @@ export class PeriodosCobroController {
     },
   })
   async findById(
-    @param.path.number('id') id: number,
-    @param.filter(PeriodosCobro, {exclude: 'where'}) filter?: FilterExcludingWhere<PeriodosCobro>
+    @param.path.number('id') id: number
   ): Promise<PeriodosCobro> {
-    return this.periodosCobroRepository.findById(id, filter);
+    return this.periodosCobroRepository.findById(id);
   }
 
   @patch('/periodos-cobros/{id}')

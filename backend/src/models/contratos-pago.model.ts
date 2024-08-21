@@ -22,7 +22,7 @@ export class ContratosPago extends Entity {
     generated: false,
     mssql: {columnName: 'IdPrestamo', dataType: 'int', dataLength: null, dataPrecision: 10, dataScale: 0, nullable: 'NO', generated: false},
   })
-  idPrestamo: number;
+  idPrestamo?: number;
 
   @property({
     type: 'string',
@@ -32,7 +32,7 @@ export class ContratosPago extends Entity {
     generated: false,
     mssql: {columnName: 'Correlativo', dataType: 'varchar', dataLength: 10, dataPrecision: null, dataScale: null, nullable: 'NO', generated: false},
   })
-  correlativo: string;
+  correlativo?: string;
 
   // Define well-known properties here
 

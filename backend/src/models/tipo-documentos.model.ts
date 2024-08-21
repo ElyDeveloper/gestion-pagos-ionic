@@ -1,4 +1,5 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, hasMany, model, property} from '@loopback/repository';
+import { DocumentosTipoDoc } from './documentos-tipo-doc.model';
 
 @model({
   settings: {idInjection: false, mssql: {schema: 'dbo', table: 'TipoDocumentos'}}
@@ -26,6 +27,8 @@ export class TipoDocumentos extends Entity {
   descripcion: string;
 
   // Define well-known properties here
+  @hasMany(() => DocumentosTipoDoc, {keyTo: 'idTipoDocumento'})
+  documentosTipoDocs: DocumentosTipoDoc[];
 
   // Indexer property to allow additional data
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

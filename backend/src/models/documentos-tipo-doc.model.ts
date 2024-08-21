@@ -1,4 +1,7 @@
-import {Entity, model, property} from '@loopback/repository';
+import {belongsTo, Entity, hasMany, model, property} from '@loopback/repository';
+import { TipoDocumentos } from './tipo-documentos.model';
+import { Documentos } from './documentos.model';
+import { Pagos } from './pagos.model';
 
 @model({
   settings: {idInjection: false, mssql: {schema: 'dbo', table: 'DocumentosTipoDoc'}}
@@ -15,29 +18,15 @@ export class DocumentosTipoDoc extends Entity {
   })
   id?: number;
 
-  @property({
-    type: 'number',
-    required: true,
-    jsonSchema: {nullable: false},
-    precision: 10,
-    scale: 0,
-    generated: false,
-    mssql: {columnName: 'IdTipoDocumento', dataType: 'int', dataLength: null, dataPrecision: 10, dataScale: 0, nullable: 'NO', generated: false},
-  })
+  // Define well-known properties here
+  @belongsTo(() => TipoDocumentos, {name: 'tipoDocumentos'})
   idTipoDocumento: number;
 
-  @property({
-    type: 'number',
-    required: true,
-    jsonSchema: {nullable: false},
-    precision: 10,
-    scale: 0,
-    generated: false,
-    mssql: {columnName: 'IdDocumento', dataType: 'int', dataLength: null, dataPrecision: 10, dataScale: 0, nullable: 'NO', generated: false},
-  })
+  @belongsTo(() => Pagos, {name: 'pagos'})
   idDocumento: number;
 
-  // Define well-known properties here
+  @hasMany(() => Documentos, {keyTo: 'idDocTipDoc'})
+  documentos: Documentos[];
 
   // Indexer property to allow additional data
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
