@@ -119,12 +119,14 @@ export class ViewDataComponent implements OnInit {
   }
 
   getCellValue(row: any, column: Column): any {
-    const primaryValue = this.getNestedValue(row, column.key);
+    let primaryValue = this.getNestedValue(row, column.key);
 
     if (column.combineWith) {
       const secondaryValue = this.getNestedValue(row, column.combineWith);
       if (column.combineFormat) {
-        return column.combineFormat(primaryValue, secondaryValue);
+        if (primaryValue && secondaryValue) {
+          return column.combineFormat(primaryValue, secondaryValue);
+        }
       }
       return `${this.formatValue(primaryValue)} ${this.formatValue(
         secondaryValue
@@ -230,7 +232,6 @@ export class ViewDataComponent implements OnInit {
 
   onCheckButtonClick(data: any) {
     this.checkButtonClicked.emit(data);
-
   }
 
   async onDeleteButtonClick(data: any) {

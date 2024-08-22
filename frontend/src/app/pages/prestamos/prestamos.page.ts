@@ -100,7 +100,7 @@ export class PrestamosPage implements OnInit {
     this.columnsData = [
       {
         key: "cliente.nombres",
-        alias: "Nombre Completo",
+        alias: "Cliente",
         type: "concat",
         combineWith: "cliente.apellidos",
         combineFormat: (nombre, apellido) => `${nombre} ${apellido}`,
@@ -134,6 +134,13 @@ export class PrestamosPage implements OnInit {
         key: "estado",
         alias: "Estado",
         type: "boolean",
+      },
+      {
+        key: "aval.nombres",
+        alias: "Aval",
+        type: "concat",
+        combineWith: "aval.apellidos",
+        combineFormat: (nombre, apellido) => `${nombre} ${apellido}`,
       },
       {
         key: "producto.nombre",

@@ -92,9 +92,13 @@ export class GestionPrestamoPage implements OnInit {
           next: (prestamo: any) => {
             if (prestamo) {
               prestamo = this._globalService.parseObjectDates(prestamo);
+              console.log('Prestamo: ',prestamo);
               this.prestamoSeleccionado = prestamo;
               this.clienteSeleccionado = prestamo.cliente;
               this.avalSeleccionado = prestamo.aval;
+              if (prestamo.idAval) {
+                this.hasAval = true;
+              }
               console.log("Plan de Pago: ", prestamo.planPago);
               this.prestamoForm.patchValue(prestamo);
               this.planesPagoForm.patchValue(prestamo.planPago);
