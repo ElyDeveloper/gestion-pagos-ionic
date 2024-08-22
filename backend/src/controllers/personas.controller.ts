@@ -16,6 +16,7 @@ import {
   del,
   requestBody,
   response,
+  HttpErrors,
 } from '@loopback/rest';
 import {Personas} from '../models';
 import {PersonasRepository} from '../repositories';
@@ -226,7 +227,13 @@ export class PersonasController {
     @requestBody() personas: Personas,
   ): Promise<void> {
     console.log('personas', id, personas);
-    await this.personasRepository.replaceById(id, personas);
+
+    try {
+      await this.personasRepository.replaceById(id, personas);
+    } catch (error) {
+      console.error('Error updating persona:', error);
+      throw new HttpErrors.InternalServerError('Error updating persona');
+    }
   }
 
   @del('/personas/{id}')

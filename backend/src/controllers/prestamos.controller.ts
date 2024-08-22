@@ -211,17 +211,6 @@ export class PrestamosController {
     await this.PrestamosRepository.deleteById(id);
   }
 
-  @get('/get-prestamos-vista/{id}')
-  async dataPrestamosId(@param.path.number('id') id: number): Promise<any> {
-    let datos = await this.getPrestamosId(id);
-    return datos;
-  }
-  async getPrestamosId(id: number) {
-    return await this.PrestamosRepository.dataSource.execute(
-      `${viewOf.getPrestamos} Where Prestamos.Estado = ${id}`,
-    );
-  }
-
   @get('/prestamos/search')
   async dataPrestamosSearch(
     @param.query.string('query') search: string,
@@ -245,21 +234,5 @@ export class PrestamosController {
     return PrestamosSearch;
   }
 
-  async getPrestamosSearch(search: string) {
-    return await this.PrestamosRepository.dataSource.execute(
-      `${viewOf.getViewPrestamos} Where Nombres like '%${search}%' or Apellidos like '%${search}%' or Nombre like '%${search}%'  or Monto like '%${search}%'  or TotalMonto like '%${search}%' or FechaInicial like '%${search}%' or FechaFinal like '%${search}%'`,
-    );
-  }
 
-  @get('/get-prestamos-vista')
-  async dataPrestamos(): Promise<any> {
-    let datos = await this.getPrestamos();
-    return datos;
-  }
-
-  async getPrestamos() {
-    return await this.PrestamosRepository.dataSource.execute(
-      `${viewOf.getPrestamos}`,
-    );
-  }
 }
