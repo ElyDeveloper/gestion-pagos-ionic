@@ -79,7 +79,9 @@ export class ClientesPage implements OnInit {
     console.log("Formulario de cliente:", this.formAdd);
   }
 
-  ngOnInit() {
+  ngOnInit() {}
+
+  ionViewWillEnter() {
     this.getCountElements();
     this.buildColumns();
     this.cargarOpciones();

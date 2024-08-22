@@ -42,16 +42,14 @@ export class PrestamosController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Prestamos, {
-            title: 'NewPrestamos',
-            exclude: ['id'],
-          }),
+          schema: {}
         },
       },
     })
-    Prestamos: Omit<Prestamos, 'id'>,
+    prestamos: any,
   ): Promise<Prestamos> {
-    return this.PrestamosRepository.create(Prestamos);
+    // console.log('Prestamos: ', prestamos);
+    return this.PrestamosRepository.create(prestamos);
   }
 
   @get('/prestamos/count')
@@ -106,14 +104,16 @@ export class PrestamosController {
     @param.query.number('skip') skip: number,
     @param.query.number('limit') limit: number,
   ): Promise<Prestamos[]> {
+    console.log('Llamada de paginacion');
     const prestamos = await this.PrestamosRepository.find({
       include: [
         {relation: 'cliente'},
         {relation: 'producto'},
-        {relation: 'periodo'},
-        {relation: 'estadoAprobacion'},
         {relation: 'planPago'},
         {relation: 'moneda'},
+        {relation: 'periodoCobro'},
+        {relation: 'estadoAprobacion'},
+        {relation: 'aval'},
       ],
       skip,
       limit,
@@ -161,15 +161,16 @@ export class PrestamosController {
   async findById(@param.path.string('id') id: string): Promise<Prestamos> {
     console.log('Id Encrypted: ', id);
     const idDecrypted = this.jwtService.decryptId(id);
-    console.log('Id Decrypted: ', idDecrypted)
+    console.log('Id Decrypted: ', idDecrypted);
     return this.PrestamosRepository.findById(idDecrypted, {
       include: [
         {relation: 'cliente'},
         {relation: 'producto'},
-        {relation: 'periodo'},
-        {relation: 'estadoAprobacion'},
         {relation: 'planPago'},
         {relation: 'moneda'},
+        {relation: 'periodoCobro'},
+        {relation: 'estadoAprobacion'},
+        {relation: 'aval'},
       ],
     });
   }
@@ -198,9 +199,9 @@ export class PrestamosController {
   })
   async replaceById(
     @param.path.number('id') id: number,
-    @requestBody() Prestamos: Prestamos,
+    @requestBody() prestamos: any,
   ): Promise<void> {
-    await this.PrestamosRepository.replaceById(id, Prestamos);
+    await this.PrestamosRepository.replaceById(id, prestamos);
   }
 
   @del('/prestamos/{id}')
@@ -233,6 +234,4 @@ export class PrestamosController {
     });
     return PrestamosSearch;
   }
-
-
 }

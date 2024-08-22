@@ -318,11 +318,15 @@ export class PersonasController {
 
     const PersonasSearch = await this.personasRepository.find({
       where: {
-        idTipoPersona: 1,
-        or: [
-          {dni: {like: `%${search}%`}},
-          {nombres: {like: `%${search}%`}},
-          {apellidos: {like: `%${search}%`}},
+        and: [
+          {idTipoPersona: 1},
+          {
+            or: [
+              {dni: {like: `%${search}%`}},
+              {nombres: {like: `%${search}%`}},
+              {apellidos: {like: `%${search}%`}},
+            ],
+          },
         ],
       },
       include: [
@@ -330,7 +334,8 @@ export class PersonasController {
         {relation: 'recordCrediticio'},
         {relation: 'estadoCivil'},
         {relation: 'tipoPersona'},
-      ],    });
+      ],
+    });
     console.log('PersonasSearch', PersonasSearch);
     return PersonasSearch;
   }
@@ -347,11 +352,15 @@ export class PersonasController {
 
     const PersonasSearch = await this.personasRepository.find({
       where: {
-        idTipoPersona: 2,
-        or: [
-          {dni: {like: `%${search}%`}},
-          {nombres: {like: `%${search}%`}},
-          {apellidos: {like: `%${search}%`}},
+        and: [
+          {idTipoPersona: 2},
+          {
+            or: [
+              {dni: {like: `%${search}%`}},
+              {nombres: {like: `%${search}%`}},
+              {apellidos: {like: `%${search}%`}},
+            ],
+          },
         ],
       },
       include: [
@@ -359,7 +368,8 @@ export class PersonasController {
         {relation: 'recordCrediticio'},
         {relation: 'estadoCivil'},
         {relation: 'tipoPersona'},
-      ],    });
+      ],
+    });
     console.log('PersonasSearch', PersonasSearch);
     return PersonasSearch;
   }

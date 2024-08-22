@@ -59,6 +59,7 @@ export class PrestamosPage implements OnInit {
   @ViewChild("modalAdd", { static: true }) modalAdd!: TemplateRef<any>;
   @ViewChild("modalViewInfo", { static: true })
   modalViewInfo!: TemplateRef<any>;
+  modalAprobar!: TemplateRef<any>;
 
   modalSelected: TemplateRef<any> = this.modalAdd;
   formSelected: FormGroup;
@@ -73,7 +74,9 @@ export class PrestamosPage implements OnInit {
     console.log("Formulario de cliente:", this.formAdd);
   }
 
-  ngOnInit() {
+  ngOnInit() {}
+
+  ionViewWillEnter() {
     this.getCountElements();
     this.buildColumns();
   }
@@ -137,7 +140,7 @@ export class PrestamosPage implements OnInit {
         alias: "Producto",
       },
       {
-        key: "periodo.nombre",
+        key: "periodoCobro.nombre",
         alias: "Período de Cobro",
       },
       {
@@ -171,6 +174,13 @@ export class PrestamosPage implements OnInit {
             action: "info",
             icon: "information",
             color: "tertiary",
+          },
+          {
+            alias: "Aprobar",
+            action: "check",
+            icon: "checkmark",
+            color: "success",
+            rolesAuthorized: [1],
           },
           {
             alias: "Eliminar",
@@ -272,6 +282,13 @@ export class PrestamosPage implements OnInit {
     this.element = data;
     this.modalSelected = this.modalViewInfo;
     this.isModalOpen = true;
+  }
+
+  onCheckButtonClicked(data: any) {
+    this.element = data;
+    this.modalSelected = this.modalAprobar;
+    this.isModalOpen = true;
+    
   }
 
   onDeleteButtonClicked(data: any) {

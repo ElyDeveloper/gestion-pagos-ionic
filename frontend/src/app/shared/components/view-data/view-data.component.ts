@@ -19,7 +19,7 @@ import { debounceTime, distinctUntilChanged, Subject } from "rxjs";
 })
 export class ViewDataComponent implements OnInit {
   @Input() showAdd: boolean = true;
-  @Input() context: string = 'elemento';
+  @Input() context: string = "elemento";
   @Input() showCalendar: boolean = false;
   @Input() currentPage: number = 1;
   @Input() totalPages: number = 10; // Esto debería ser dinámico basado en tus datos
@@ -31,6 +31,7 @@ export class ViewDataComponent implements OnInit {
   @Output() editButtonClicked = new EventEmitter<any>();
   @Output() deleteButtonClicked = new EventEmitter<any>();
   @Output() infoButtonClicked = new EventEmitter<any>();
+  @Output() checkButtonClicked = new EventEmitter<any>();
   @Output() resetPasswordButtonClicked = new EventEmitter<any>();
   @Output() currentPageOut = new EventEmitter<number>();
   @Output() searchOut = new EventEmitter<string>();
@@ -205,6 +206,9 @@ export class ViewDataComponent implements OnInit {
       case "delete":
         this.onDeleteButtonClick(row);
         break;
+      case "check":
+        this.onCheckButtonClick(row);
+        break;
       case "resetPswd":
         this.onResetPassword(row);
         break;
@@ -222,6 +226,11 @@ export class ViewDataComponent implements OnInit {
 
   onInfoButtonClick(data: any) {
     this.infoButtonClicked.emit(data);
+  }
+
+  onCheckButtonClick(data: any) {
+    this.checkButtonClicked.emit(data);
+
   }
 
   async onDeleteButtonClick(data: any) {

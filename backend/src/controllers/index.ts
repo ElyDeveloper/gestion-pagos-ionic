@@ -17,4 +17,3 @@ export * from './personas.controller';
 export * from './nacionalidades.controller';
 export * from './estados-civiles.controller';
 export * from './tipo-personas.controller';
-

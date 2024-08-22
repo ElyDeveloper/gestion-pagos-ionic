@@ -28,18 +28,19 @@ export class PrestamosRepository extends DefaultCrudRepository<
 
   public readonly estadoAprobacion: BelongsToAccessor<EstadosAprobacion, typeof Prestamos.prototype.id>;
 
-  public readonly aval: BelongsToAccessor<Personas, typeof Prestamos.prototype.id>;
 
   public readonly pagos: HasManyRepositoryFactory<Pagos, typeof Prestamos.prototype.id>;
+
+  public readonly aval: BelongsToAccessor<Personas, typeof Prestamos.prototype.id>;
 
   constructor(
     @inject('datasources.GestionEDBO') dataSource: GestionEdboDataSource, @repository.getter('PersonasRepository') protected personasRepositoryGetter: Getter<PersonasRepository>, @repository.getter('ProductosRepository') protected productosRepositoryGetter: Getter<ProductosRepository>, @repository.getter('PlanesPagoRepository') protected planesPagoRepositoryGetter: Getter<PlanesPagoRepository>, @repository.getter('MonedasRepository') protected monedasRepositoryGetter: Getter<MonedasRepository>, @repository.getter('PeriodosCobroRepository') protected periodosCobroRepositoryGetter: Getter<PeriodosCobroRepository>, @repository.getter('EstadosAprobacionRepository') protected estadosAprobacionRepositoryGetter: Getter<EstadosAprobacionRepository>, @repository.getter('PagosRepository') protected pagosRepositoryGetter: Getter<PagosRepository>,
   ) {
     super(Prestamos, dataSource);
-    this.pagos = this.createHasManyRepositoryFactoryFor('pagos', pagosRepositoryGetter,);
-    this.registerInclusionResolver('pagos', this.pagos.inclusionResolver);
     this.aval = this.createBelongsToAccessorFor('aval', personasRepositoryGetter,);
     this.registerInclusionResolver('aval', this.aval.inclusionResolver);
+    this.pagos = this.createHasManyRepositoryFactoryFor('pagos', pagosRepositoryGetter,);
+    this.registerInclusionResolver('pagos', this.pagos.inclusionResolver);
     this.estadoAprobacion = this.createBelongsToAccessorFor('estadoAprobacion', estadosAprobacionRepositoryGetter,);
     this.registerInclusionResolver('estadoAprobacion', this.estadoAprobacion.inclusionResolver);
     this.periodoCobro = this.createBelongsToAccessorFor('periodoCobro', periodosCobroRepositoryGetter,);

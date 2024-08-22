@@ -38,3 +38,4 @@ export * from './estado-civil.model';
 export * from './prestamos.model';
 export * from './fechas-pagos.model';
 export * from './personas.model';
+export * from './prestamos.model';

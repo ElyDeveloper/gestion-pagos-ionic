@@ -6,7 +6,7 @@ import {
   ViewChild,
 } from "@angular/core";
 import { FormBuilder, FormGroup } from "@angular/forms";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import {
   catchError,
   debounceTime,
@@ -46,9 +46,10 @@ export class GestionPrestamoPage implements OnInit {
   estadosAprobacion: EstadosAprobacion[] = [];
   monedas: Monedas[] = [];
   clientes: Personas[] = [];
+  avales: Personas[] = [];
 
-  clienteSeleccionado: any = {};
-  avalSeleccionado: any = {};
+  clienteSeleccionado: any = null;
+  avalSeleccionado: any = null;
   prestamoSeleccionado: any = {};
 
   isModalOpen = false;
@@ -66,6 +67,7 @@ export class GestionPrestamoPage implements OnInit {
 
   private _globalService = inject(GlobalService);
   private _route = inject(ActivatedRoute);
+  private _router = inject(Router);
 
   constructor(private fb: FormBuilder) {
     this.formModels = new FormModels(this.fb);
@@ -92,6 +94,7 @@ export class GestionPrestamoPage implements OnInit {
               prestamo = this._globalService.parseObjectDates(prestamo);
               this.prestamoSeleccionado = prestamo;
               this.clienteSeleccionado = prestamo.cliente;
+              this.avalSeleccionado = prestamo.aval;
               console.log("Plan de Pago: ", prestamo.planPago);
               this.prestamoForm.patchValue(prestamo);
               this.planesPagoForm.patchValue(prestamo.planPago);
@@ -138,7 +141,7 @@ export class GestionPrestamoPage implements OnInit {
 
   isSuccessState(): boolean {
     return (
-      this.clienteSeleccionado.id &&
+      this.clienteSeleccionado?.id &&
       this.planesPagoForm.valid &&
       this.prestamoForm.valid
     );
@@ -146,7 +149,7 @@ export class GestionPrestamoPage implements OnInit {
 
   isWarningState(): boolean {
     return (
-      !this.clienteSeleccionado.id ||
+      !this.clienteSeleccionado?.id ||
       !this.planesPagoForm.valid ||
       !this.prestamoForm.valid
     );
@@ -178,7 +181,7 @@ export class GestionPrestamoPage implements OnInit {
         if (this.searchAval !== "") {
           this.searchDataAval();
         } else {
-          this.clientes = [];
+          this.avales = [];
         }
         // this.searchEmpleado(); // Llama a la función de búsqueda cuando se cumplan las condiciones
       });
@@ -235,20 +238,33 @@ export class GestionPrestamoPage implements OnInit {
 
   searchDataAval() {
     this._globalService
-      .Get(`personas/avales/search?query=${this.searchClient}`)
+      .Get(`personas/avales/search?query=${this.searchAval}`)
       .subscribe({
         next: (response: any) => {
-          this.clientes = response;
-          console.log("Clientes obtenidos:", response);
+          this.avales = response;
+          console.log("Avales obtenidos:", response);
         },
         error: (error) => {
-          console.error("Error al obtener clientes:", error);
+          console.error("Error al obtener avales:", error);
         },
       });
   }
 
   onClienteSeleccionado(event: any) {
     this.clienteSeleccionado = event.detail.value;
+  }
+  onAvalSeleccionado(event: any) {
+    this.avalSeleccionado = event.detail.value;
+  }
+
+  changeAval(event: any) {
+    console.log("Change: " + event.detail.checked);
+    const val = event.detail.checked;
+
+    if (!val) {
+      this.avalSeleccionado = null;
+      this.searchAval = "";
+    }
   }
 
   async handleSave(data: any) {
@@ -341,7 +357,7 @@ export class GestionPrestamoPage implements OnInit {
       idEstadoAprobacion: this.prestamoForm.get("idEstadoAprobacion")?.value,
       idPlan: idPlan,
       idMoneda: this.prestamoForm.get("idMoneda")?.value,
-      idAval: this.prestamoForm.get("idAval")?.value,
+      idAval: this.avalSeleccionado?.id || null,
     };
   }
 
@@ -354,7 +370,10 @@ export class GestionPrestamoPage implements OnInit {
         const prestamo = this.createPrestamo(idPlan);
         console.log("Prestamo a guardar: ", prestamo);
         this._globalService.PutId("prestamos", idPrestamo, prestamo).subscribe({
-          next: this.handlePrestamoSuccess.bind(this),
+          next: () => {
+            this.handlePrestamoSuccess.bind(this);
+            this._router.navigate(["layout/prestamos"]);
+          },
           error: this.handlePrestamoError.bind(this),
         });
       },
@@ -366,6 +385,7 @@ export class GestionPrestamoPage implements OnInit {
     this._globalService.Post("planes-pagos", planPago).subscribe({
       next: (response: any) => {
         const prestamo = this.createPrestamo(response.id);
+        console.log("Prestamo a guardar: ", prestamo);
         this._globalService.Post("prestamos", prestamo).subscribe({
           next: this.handlePrestamoSuccess.bind(this),
           error: this.handlePrestamoError.bind(this),
@@ -380,6 +400,10 @@ export class GestionPrestamoPage implements OnInit {
     this.isModalOpen = false;
     this.isEdit = false;
     this.cleanForms();
+    this.clienteSeleccionado = null;
+    this.searchClient = "";
+    this.avalSeleccionado = null;
+    this.searchAval = "";
     this.initValuesForm();
     this.currentStep = 0;
   }

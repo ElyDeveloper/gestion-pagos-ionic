@@ -77,6 +77,7 @@ export class Prestamos extends Entity {
     mssql: {columnName: 'Estado', dataType: 'bit', dataLength: null, dataPrecision: null, dataScale: null, nullable: 'NO', generated: false},
   })
   estado: boolean;
+  
   @belongsTo(() => Personas, {name: 'cliente'})
   idCliente: number;
 
