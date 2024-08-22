@@ -7,11 +7,28 @@
     (didDismiss)="setOpenedToast(false)"></ion-toast>
 
   <app-breadcrumb></app-breadcrumb>
+  <ion-grid>
+    <ion-row class="d-flex justify-content-center">
+      <ion-col sizeSm="12" sizeMd="6">
+        <ion-segment  value="all">
+          <ion-segment-button color="primary" (click)="goAction('Clientes')" value="clients">
+            Clientes
+          </ion-segment-button>
+          <ion-segment-button color="primary" (click)="goAction('Todos')" value="all">
+            Todos
+          </ion-segment-button>
+          <ion-segment-button color="primary" (click)="goAction('Avales')" value="avals">
+            Avales
+          </ion-segment-button>
+        </ion-segment>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
   <section>
     <app-view-data
       [currentPage]="1"
       [totalPages]="10"
-      [title]="'Clientes'"
+      [title]="title"
       [context]="'cliente'"
       [data]="elements"
       [columnsData]="columnsData"
@@ -36,7 +53,7 @@
     <ng-template #modalAdd let-close="close" let-save="save" let-form="form">
       <ion-header>
         <ion-toolbar>
-          <ion-title>Formulario de Clientes</ion-title>
+          <ion-title>Formulario de Clientes/Avales</ion-title>
           <ion-buttons slot="end">
             <ion-button (click)="close()">Cerrar</ion-button>
           </ion-buttons>

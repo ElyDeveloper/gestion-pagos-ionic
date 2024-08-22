@@ -48,14 +48,18 @@ export class GestionPrestamoPage implements OnInit {
   clientes: Personas[] = [];
 
   clienteSeleccionado: any = {};
+  avalSeleccionado: any = {};
   prestamoSeleccionado: any = {};
 
   isModalOpen = false;
   isToastOpen = false;
   isEdit = false;
+  hasAval = false;
 
   searchClient: string = "";
-  searchTerm$ = new Subject<string>();
+  searchAval: string = "";
+  searchTermClient$ = new Subject<string>();
+  searchTermAval$ = new Subject<string>();
 
   modalSelected: TemplateRef<any> = this.modalPlanPago;
   formSelected: FormGroup;
@@ -71,7 +75,8 @@ export class GestionPrestamoPage implements OnInit {
   }
 
   ngOnInit() {
-    this.initSearcher();
+    this.initSearcherClient();
+    this.initSearcherAval();
     this.getInfoSelects();
     this.getPrestamo();
   }
@@ -147,15 +152,31 @@ export class GestionPrestamoPage implements OnInit {
     );
   }
 
-  initSearcher() {
-    this.searchTerm$
+  initSearcherClient() {
+    this.searchTermClient$
       .pipe(
         debounceTime(800), // Espera 300 ms después de que el usuario deja de escribir
         distinctUntilChanged() // Asegura que solo se realice una búsqueda si el valor ha cambiado
       )
       .subscribe(() => {
         if (this.searchClient !== "") {
-          this.searchData();
+          this.searchDataClient();
+        } else {
+          this.clientes = [];
+        }
+        // this.searchEmpleado(); // Llama a la función de búsqueda cuando se cumplan las condiciones
+      });
+  }
+
+  initSearcherAval() {
+    this.searchTermAval$
+      .pipe(
+        debounceTime(800), // Espera 300 ms después de que el usuario deja de escribir
+        distinctUntilChanged() // Asegura que solo se realice una búsqueda si el valor ha cambiado
+      )
+      .subscribe(() => {
+        if (this.searchAval !== "") {
+          this.searchDataAval();
         } else {
           this.clientes = [];
         }
@@ -198,9 +219,23 @@ export class GestionPrestamoPage implements OnInit {
     this.prestamoForm.get("idEstadoAprobacion")?.setValue(1);
   }
 
-  searchData() {
+  searchDataClient() {
     this._globalService
-      .Get(`clientes/search?query=${this.searchClient}`)
+      .Get(`personas/clientes/search?query=${this.searchClient}`)
+      .subscribe({
+        next: (response: any) => {
+          this.clientes = response;
+          console.log("Clientes obtenidos:", response);
+        },
+        error: (error) => {
+          console.error("Error al obtener clientes:", error);
+        },
+      });
+  }
+
+  searchDataAval() {
+    this._globalService
+      .Get(`personas/avales/search?query=${this.searchClient}`)
       .subscribe({
         next: (response: any) => {
           this.clientes = response;
@@ -225,8 +260,12 @@ export class GestionPrestamoPage implements OnInit {
     }
   }
 
-  searchValueChanged(event: any) {
-    this.searchTerm$.next(event);
+  searchValueClientChanged(event: any) {
+    this.searchTermClient$.next(event);
+  }
+
+  searchValueAvalChanged(event: any) {
+    this.searchTermAval$.next(event);
   }
 
   cleanForms() {

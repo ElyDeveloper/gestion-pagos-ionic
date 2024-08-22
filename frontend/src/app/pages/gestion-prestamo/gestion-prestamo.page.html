@@ -15,6 +15,14 @@
               }@else { No Aún }
             </strong>
           </p>
+          <p *ngIf="hasAval">
+            <ion-icon name="person-outline"></ion-icon> Aval Seleccionado:
+            <strong>
+              @if (avalSeleccionado.id) { {{avalSeleccionado.nombres}}
+              {{avalSeleccionado.apellidos}} - {{clienteSeleccionado.dni}}
+              }@else { No Aún }
+            </strong>
+          </p>
         </div>
         <div>
           <button class="btn btn-success" routerLink="/layout/prestamos">
@@ -68,26 +76,53 @@
     <div *ngSwitchCase="0">
       <ion-card>
         <ion-card-header>
-          <ion-title>Seleccionar Cliente</ion-title>
+          <ion-title>Seleccionar Cliente/Aval</ion-title>
         </ion-card-header>
         <ion-card-content>
-          <!-- Buscador de cliente -->
-          <ion-searchbar
-            placeholder="Buscar..."
-            [(ngModel)]="searchClient"
-            (ngModelChange)="searchValueChanged($event)"></ion-searchbar>
+          <ion-grid>
+            <ion-row>
+              <ion-col size-sm="12" size-md="6">
+                <!-- Buscador de cliente -->
+                <ion-searchbar
+                  placeholder="Buscar Cliente..."
+                  [(ngModel)]="searchClient"
+                  (ngModelChange)="searchValueClientChanged($event)"></ion-searchbar>
 
-          <!-- Listado de clientes -->
-          <ion-radio-group (ionChange)="onClienteSeleccionado($event)">
-            <ion-list>
-              <ion-item *ngFor="let cliente of clientes">
-                <ion-radio [value]="cliente"
-                  >{{ cliente.nombres }} {{ cliente.apellidos }} -
-                  {{clienteSeleccionado.dni}}
-                </ion-radio>
-              </ion-item>
-            </ion-list>
-          </ion-radio-group>
+                <!-- Listado de clientes -->
+                <ion-radio-group (ionChange)="onClienteSeleccionado($event)">
+                  <ion-list>
+                    <ion-item *ngFor="let cliente of clientes">
+                      <ion-radio [value]="cliente"
+                        >{{ cliente.nombres }} {{ cliente.apellidos }} -
+                        {{clienteSeleccionado.dni}}
+                      </ion-radio>
+                    </ion-item>
+                  </ion-list>
+                </ion-radio-group>
+                <ion-toggle [(ngModel)]="hasAval">Tiene Aval?</ion-toggle>
+              </ion-col>
+              <ion-col size-sm="12" size-md="6">
+                <!-- Buscador de Aval -->
+                <ion-searchbar
+                  [disabled]="!hasAval"
+                  placeholder="Buscar Aval..."
+                  [(ngModel)]="searchAval"
+                  (ngModelChange)="searchValueAvalChanged($event)"></ion-searchbar>
+
+                <!-- Listado de avales -->
+                <ion-radio-group (ionChange)="onClienteSeleccionado($event)">
+                  <ion-list>
+                    <ion-item *ngFor="let cliente of clientes">
+                      <ion-radio [value]="cliente"
+                        >{{ cliente.nombres }} {{ cliente.apellidos }} -
+                        {{clienteSeleccionado.dni}}
+                      </ion-radio>
+                    </ion-item>
+                  </ion-list>
+                </ion-radio-group>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
         </ion-card-content>
       </ion-card>
     </div>

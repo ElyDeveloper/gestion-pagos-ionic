@@ -53,6 +53,8 @@ export class ClientesPage implements OnInit {
 
   textLoader: string = "Cargando...";
   toastMessage: string = "cliente guardado correctamente";
+  title: string = "Todos";
+  action: string = "todos";
 
   @ViewChild("modalAdd", { static: true }) modalAdd!: TemplateRef<any>;
   @ViewChild("modalViewInfo", { static: true })
@@ -81,6 +83,14 @@ export class ClientesPage implements OnInit {
     this.getCountElements();
     this.buildColumns();
     this.cargarOpciones();
+  }
+
+  //TODO: ESPECIFICO
+  goAction(action: string) {
+    console.log("Accion capturada: ", action);
+    this.title = action;
+    this.action = action.toLowerCase();
+    this.getCountElements();
   }
 
   //TODO: ESPECIFICO
@@ -370,15 +380,17 @@ export class ClientesPage implements OnInit {
     if (event === "") {
       this.getCountElements();
     } else {
-      this._globalService.Get(`personas/search?query=${event}`).subscribe({
-        next: (response: any) => {
-          this.elements = response;
-          console.log("Elementos obtenidos:", response);
-        },
-        error: (error) => {
-          console.error("Error al obtener los elementos:", error);
-        },
-      });
+      this._globalService
+        .Get(`personas/${this.action}/search?query=${event}`)
+        .subscribe({
+          next: (response: any) => {
+            this.elements = response;
+            console.log("Elementos obtenidos:", response);
+          },
+          error: (error) => {
+            console.error("Error al obtener los elementos:", error);
+          },
+        });
     }
   }
 
@@ -388,7 +400,7 @@ export class ClientesPage implements OnInit {
     const limit = this.currentPageSize;
 
     this._globalService
-      .Get(`personas/clientes/paginated?skip=${skip}&limit=${limit}`)
+      .Get(`personas/${this.action}/paginated?skip=${skip}&limit=${limit}`)
       .subscribe({
         next: (response: any) => {
           this.elements = response;
@@ -401,7 +413,7 @@ export class ClientesPage implements OnInit {
   }
 
   getCountElements() {
-    this._globalService.Get("personas/clientes/count").subscribe({
+    this._globalService.Get("personas/count").subscribe({
       next: (response: any) => {
         console.log("Cantidad de elementos:", response.count);
         const totalElements = response.count;

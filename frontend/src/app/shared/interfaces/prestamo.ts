@@ -36,9 +36,3 @@ export interface Prestamos {
   // Indexer signature for additional properties
   [prop: string]: any;
 }
-
-export interface PrestamosRelations {
-  // You can define any additional relational properties here if needed
-}
-
-export type PrestamosWithRelations = Prestamos & PrestamosRelations;

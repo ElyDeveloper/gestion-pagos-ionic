@@ -102,6 +102,34 @@ export class PersonasController {
     return this.personasRepository.find();
   }
 
+  @get('/personas/todos/paginated')
+  @response(200, {
+    description: 'List of Personas model',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Personas, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async dataPaginate(
+    @param.query.number('skip') skip: number,
+    @param.query.number('limit') limit: number,
+  ): Promise<Personas[]> {
+    return this.personasRepository.find({
+      include: [
+        {relation: 'nacionalidad'},
+        {relation: 'recordCrediticio'},
+        {relation: 'estadoCivil'},
+        {relation: 'tipoPersona'},
+      ],
+      skip,
+      limit,
+    });
+  }
+
   @get('/personas/clientes/paginated')
   @response(200, {
     description: 'List of Personas model',
@@ -120,9 +148,9 @@ export class PersonasController {
   ): Promise<Personas[]> {
     console.log('Consulta paginada: ', skip);
     const clientes = await this.personasRepository.find({
-      // where: {
-      //   idTipoPersona: 1,
-      // },
+      where: {
+        idTipoPersona: 1,
+      },
       include: [
         {relation: 'nacionalidad'},
         {relation: 'recordCrediticio'},
@@ -158,7 +186,12 @@ export class PersonasController {
       where: {
         idTipoPersona: 2,
       },
-      include: [{relation: 'prestamos'}],
+      include: [
+        {relation: 'nacionalidad'},
+        {relation: 'recordCrediticio'},
+        {relation: 'estadoCivil'},
+        {relation: 'tipoPersona'},
+      ],
       skip,
       limit,
     });
@@ -244,7 +277,7 @@ export class PersonasController {
     await this.personasRepository.deleteById(id);
   }
 
-  @get('/personas/search')
+  @get('/personas/todos/search')
   async dataPersonasSearch(
     @param.query.string('query') search: string,
   ): Promise<any> {
@@ -262,7 +295,12 @@ export class PersonasController {
           {apellidos: {like: `%${search}%`}},
         ],
       },
-      include: [{relation: 'prestamos'}],
+      include: [
+        {relation: 'nacionalidad'},
+        {relation: 'recordCrediticio'},
+        {relation: 'estadoCivil'},
+        {relation: 'tipoPersona'},
+      ],
     });
     console.log('PersonasSearch', PersonasSearch);
     return PersonasSearch;
@@ -287,8 +325,12 @@ export class PersonasController {
           {apellidos: {like: `%${search}%`}},
         ],
       },
-      include: [{relation: 'prestamos'}],
-    });
+      include: [
+        {relation: 'nacionalidad'},
+        {relation: 'recordCrediticio'},
+        {relation: 'estadoCivil'},
+        {relation: 'tipoPersona'},
+      ],    });
     console.log('PersonasSearch', PersonasSearch);
     return PersonasSearch;
   }
@@ -312,8 +354,12 @@ export class PersonasController {
           {apellidos: {like: `%${search}%`}},
         ],
       },
-      include: [{relation: 'prestamos'}],
-    });
+      include: [
+        {relation: 'nacionalidad'},
+        {relation: 'recordCrediticio'},
+        {relation: 'estadoCivil'},
+        {relation: 'tipoPersona'},
+      ],    });
     console.log('PersonasSearch', PersonasSearch);
     return PersonasSearch;
   }
