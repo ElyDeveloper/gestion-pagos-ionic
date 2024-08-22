@@ -1,7 +1,7 @@
 import { Entity, model, property, belongsTo } from '@loopback/repository';
-import { Clientes } from './clientes.model';
 import { number } from 'mathjs';
 import { Usuario } from './usuarios.model';
+import { Personas } from './personas.model';
 
 @model({
   settings: {idInjection: false, mssql: {schema: 'dbo', table: 'UsuarioCliente'}}
@@ -22,7 +22,7 @@ export class UsuarioCliente extends Entity {
   @belongsTo(() => Usuario, {name: 'Usuario'})
   usuarioId:number;
   
-  @belongsTo(() => Clientes, {name: 'Cliente'})
+  @belongsTo(() => Personas, {name: 'Cliente'})
   clienteId:number;
   
   // Indexer property to allow additional data

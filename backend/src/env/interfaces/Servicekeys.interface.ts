@@ -1,5 +1,6 @@
 export namespace keys {
   export const JWT_SECRET_KEY = 'jwtSecret@Key*2021';
+  export const SECRET_KEY = 'keyAcces2024';
   export const ONE_HOUR_SECONDS = 3600000 * 99;
   export const MILLISECONDS = 1000;
   export const ONE_MINUTE_MILLISECONDS = 60000;

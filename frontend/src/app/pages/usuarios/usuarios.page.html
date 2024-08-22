@@ -7,7 +7,7 @@
     (didDismiss)="setOpenedToast(false)"></ion-toast>
 
   <app-breadcrumb></app-breadcrumb>
-  <section class="container">
+  <section>
     <app-view-data
       [currentPage]="1"
       [totalPages]="10"
@@ -51,7 +51,9 @@
                   <ion-label position="stacked" class="bold-label"
                     >Rol</ion-label
                   >
-                  <ion-select formControlName="rolid">
+                  <ion-select
+                    formControlName="rolid"
+                    placeholder="Seleccione un rol">
                     @for (item of roles; track item.id) {
                     <ion-select-option [value]="item.id"
                       >{{item.descripcion}}</ion-select-option
@@ -70,7 +72,9 @@
                   <ion-label position="stacked" class="bold-label"
                     >Nombre:</ion-label
                   >
-                  <ion-input formControlName="nombre"></ion-input>
+                  <ion-input
+                    formControlName="nombre"
+                    placeholder="Ingrese nombre"></ion-input>
                 </ion-item>
               </ion-col>
 
@@ -79,16 +83,21 @@
                   <ion-label position="stacked" class="bold-label"
                     >Apellido:</ion-label
                   >
-                  <ion-input formControlName="apellido"></ion-input>
+                  <ion-input
+                    formControlName="apellido"
+                    placeholder="Ingrese apellido"></ion-input>
                 </ion-item>
               </ion-col>
 
               <ion-col size-xs="12" size-sm="6" size-md="6">
                 <ion-item>
                   <ion-label position="stacked" class="bold-label"
-                    >Télefono:</ion-label
+                    >Teléfono:</ion-label
                   >
-                  <ion-input type="tel" formControlName="telefono"></ion-input>
+                  <ion-input
+                    type="tel"
+                    formControlName="telefono"
+                    placeholder="Ej: 0000-0000"></ion-input>
                 </ion-item>
               </ion-col>
 
@@ -97,9 +106,13 @@
                   <ion-label position="stacked" class="bold-label"
                     >Correo:</ion-label
                   >
-                  <ion-input type="email" formControlName="correo"></ion-input>
+                  <ion-input
+                    type="email"
+                    formControlName="correo"
+                    placeholder="usuario@ejemplo.com"></ion-input>
                 </ion-item>
               </ion-col>
+
               <ion-col size-xs="6" size-md="3">
                 <ion-item lines="none">
                   <ion-label position="stacked" class="bold-label"
@@ -127,7 +140,8 @@
                   >
                   <ion-textarea
                     formControlName="observacion"
-                    rows="3"></ion-textarea>
+                    rows="3"
+                    placeholder="Ingrese observaciones aquí"></ion-textarea>
                 </ion-item>
               </ion-col>
             </ion-row>
@@ -186,7 +200,10 @@
                   <ion-label position="stacked" class="bold-label"
                     >Nueva Contraseña</ion-label
                   >
-                  <ion-input type="password" formControlName="newPassword">
+                  <ion-input
+                    type="password"
+                    formControlName="newPassword"
+                    placeholder="Ingrese su nueva contraseña">
                     <ion-input-password-toggle
                       slot="end"></ion-input-password-toggle>
                   </ion-input>

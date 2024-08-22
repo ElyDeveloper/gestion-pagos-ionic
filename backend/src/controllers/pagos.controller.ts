@@ -178,17 +178,6 @@ export class PagosController {
     await this.PagosRepository.deleteById(id);
   }
 
-  @get('/get-pagos/{id}')
-  async dataPagosId(@param.path.number('id') id: number): Promise<any> {
-    let datos = await this.getPagosId(id);
-    return datos;
-  }
-  async getPagosId(id: number) {
-    return await this.PagosRepository.dataSource.execute(
-      `${viewOf.getPagos} Where p.[Estado] = ${id}`,
-    );
-  }
-
   @get('/pagos/search')
   async dataPagosSearch(
     @param.query.string('search') search: string,
@@ -203,13 +192,5 @@ export class PagosController {
     );
   }
 
-  @get('/get-pagos/vista')
-  async dataPagos(): Promise<any> {
-    let datos = await this.getPagos();
-    return datos;
-  }
-
-  async getPagos() {
-    return await this.PagosRepository.dataSource.execute(`${viewOf.getPagos}`);
-  }
+  
 }

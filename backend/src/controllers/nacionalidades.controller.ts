@@ -23,7 +23,7 @@ import {NacionalidadesRepository} from '../repositories';
 export class NacionalidadesController {
   constructor(
     @repository(NacionalidadesRepository)
-    public nacionalidadesRepository : NacionalidadesRepository,
+    public nacionalidadesRepository: NacionalidadesRepository,
   ) {}
 
   @post('/nacionalidades')
@@ -104,28 +104,10 @@ export class NacionalidadesController {
   })
   async findById(
     @param.path.number('id') id: number,
-    @param.filter(Nacionalidades, {exclude: 'where'}) filter?: FilterExcludingWhere<Nacionalidades>
+    @param.filter(Nacionalidades, {exclude: 'where'})
+    filter?: FilterExcludingWhere<Nacionalidades>,
   ): Promise<Nacionalidades> {
     return this.nacionalidadesRepository.findById(id, filter);
-  }
-
-  @get('nacionalidades/paginate')
-  @response(200, {
-    description: 'Nacionalidades model paginate',
-    content: {
-      'application/json': {
-        schema: getModelSchemaRef(Nacionalidades, {includeRelations: true}),
-      },
-    },
-  })
-  async dataPaginate(
-    @param.query.number('skip') skip: number,
-    @param.query.number('limit') limit: number,
-  ):Promise<Nacionalidades[]> {
-    return this.nacionalidadesRepository.find({
-      skip,
-      limit
-    });
   }
 
   @patch('/nacionalidades/{id}')

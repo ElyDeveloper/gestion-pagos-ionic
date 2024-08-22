@@ -8,9 +8,10 @@ import {
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Observable } from "rxjs";
 import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
-import { Clientes } from "src/app/shared/interfaces/cliente";
+import { Personas } from "src/app/shared/interfaces/persona";
 import { Column } from "src/app/shared/interfaces/table";
 import { GlobalService } from "src/app/shared/services/global.service";
+import { FieldAliases, ModalConfig } from "src/app/shared/utils/extra";
 import { FormModels } from "src/app/shared/utils/forms-models";
 
 @Component({
@@ -20,9 +21,8 @@ import { FormModels } from "src/app/shared/utils/forms-models";
 })
 export class ClientesPage implements OnInit {
   @ViewChild(LoaderComponent) loaderComponent!: LoaderComponent;
-
-  elements: Clientes[] = [];
-  element: Clientes = {
+  elements: Personas[] = [];
+  element: Personas = {
     dni: "",
     nombres: "",
     apellidos: "",
@@ -32,6 +32,10 @@ export class ClientesPage implements OnInit {
     fechaIngreso: "",
     fechaBaja: "",
     estado: false,
+    idNacionalidad: 1,
+    idRecordCrediticio: 1,
+    idEstadoCivil: 1,
+    idTipoPersona: 1,
   };
 
   currentPage = 1;
@@ -49,26 +53,62 @@ export class ClientesPage implements OnInit {
 
   textLoader: string = "Cargando...";
   toastMessage: string = "cliente guardado correctamente";
+  title: string = "Todos";
+  action: string = "todos";
 
   @ViewChild("modalAdd", { static: true }) modalAdd!: TemplateRef<any>;
   @ViewChild("modalViewInfo", { static: true })
   modalViewInfo!: TemplateRef<any>;
 
   modalSelected: TemplateRef<any> = this.modalAdd;
+  modalConfig: ModalConfig = { fieldAliases: {} };
   formSelected: FormGroup;
 
   private _globalService = inject(GlobalService);
 
+  //TODO: Elementos propios del componente
+  nacionalidades: any[] = [];
+  recordsCrediticios: any[] = [];
+  estadosCiviles: any[] = [];
+  tiposPersona: any[] = [];
+
   constructor(private fb: FormBuilder) {
     this.formModels = new FormModels(this.fb);
-    this.formAdd = this.formModels.clienteForm();
+    this.formAdd = this.formModels.personasForm();
     this.formSelected = this.formAdd;
     console.log("Formulario de cliente:", this.formAdd);
   }
 
-  ngOnInit() {
+  ngOnInit() {}
+
+  ionViewWillEnter() {
     this.getCountElements();
     this.buildColumns();
+    this.cargarOpciones();
+  }
+
+  //TODO: ESPECIFICO
+  goAction(action: string) {
+    console.log("Accion capturada: ", action);
+    this.title = action;
+    this.action = action.toLowerCase();
+    this.getCountElements();
+  }
+
+  //TODO: ESPECIFICO
+  cargarOpciones() {
+    this._globalService.Get("nacionalidades").subscribe((data: any) => {
+      this.nacionalidades = data;
+    });
+    this._globalService.Get("record-crediticios").subscribe((data: any) => {
+      this.recordsCrediticios = data;
+    });
+    this._globalService.Get("estado-civils").subscribe((data: any) => {
+      this.estadosCiviles = data;
+    });
+    this._globalService.Get("tipo-personas").subscribe((data: any) => {
+      this.tiposPersona = data;
+    });
   }
 
   setOpenedToast(value: boolean) {
@@ -77,7 +117,7 @@ export class ClientesPage implements OnInit {
 
   cleanForm() {
     this.formAdd.reset();
-    this.formAdd = this.formModels.clienteForm();
+    this.formAdd = this.formModels.personasForm();
   }
 
   buildColumns() {
@@ -122,7 +162,22 @@ export class ClientesPage implements OnInit {
         alias: "Fecha de Baja",
         type: "date",
       },
-
+      {
+        key: "estadoCivil.descripcion",
+        alias: "Estado Civil",
+      },
+      {
+        key: "nacionalidad.descripcion",
+        alias: "Nacionalidad",
+      },
+      {
+        key: "recordCrediticio.descripcion",
+        alias: "Récord Crediticio",
+      },
+      {
+        key: "tipoPersona.descripcion",
+        alias: "Tipo de Persona",
+      },
       {
         key: "actions",
         alias: "Acciones",
@@ -209,6 +264,19 @@ export class ClientesPage implements OnInit {
       this.cleanForm();
     }
 
+    const fieldAliases = this.columnsData.reduce<FieldAliases>((acc, col) => {
+      if (col.key !== "actions") {
+        acc[col.key] = col.alias;
+      }
+      return acc;
+    }, {});
+
+    // Asignar este objeto al modalConfig
+    this.modalConfig = {
+      fieldAliases: fieldAliases,
+      // ... otras configuraciones del modal si las tienes
+    };
+
     this.modalSelected = modalTemplate;
     this.formSelected = this.formAdd;
     this.isModalOpen = true;
@@ -233,7 +301,7 @@ export class ClientesPage implements OnInit {
     console.log("Eliminar cliente Obtenido:", data);
     this.textLoader = "Eliminando cliente";
     this.loaderComponent.show();
-    this._globalService.Delete("clientes", data.id).subscribe({
+    this._globalService.Delete("personas", data.id).subscribe({
       next: (response: any) => {
         console.log("cliente eliminado:", response);
         this.getCountElements();
@@ -261,12 +329,12 @@ export class ClientesPage implements OnInit {
     switch (operation) {
       case "edit":
         operationText = "Editado";
-        apiCall = this._globalService.PutId("clientes", data.id, data);
+        apiCall = this._globalService.PutId("personas", data.id, data);
         break;
       case "create":
         delete data.Id;
         operationText = "Guardado";
-        apiCall = this._globalService.Post("clientes", data);
+        apiCall = this._globalService.Post("personas", data);
         break;
     }
 
@@ -314,15 +382,17 @@ export class ClientesPage implements OnInit {
     if (event === "") {
       this.getCountElements();
     } else {
-      this._globalService.Get(`clientes/search?query=${event}`).subscribe({
-        next: (response: any) => {
-          this.elements = response;
-          console.log("Elementos obtenidos:", response);
-        },
-        error: (error) => {
-          console.error("Error al obtener los elementos:", error);
-        },
-      });
+      this._globalService
+        .Get(`personas/${this.action}/search?query=${event}`)
+        .subscribe({
+          next: (response: any) => {
+            this.elements = response;
+            console.log("Elementos obtenidos:", response);
+          },
+          error: (error) => {
+            console.error("Error al obtener los elementos:", error);
+          },
+        });
     }
   }
 
@@ -332,7 +402,7 @@ export class ClientesPage implements OnInit {
     const limit = this.currentPageSize;
 
     this._globalService
-      .Get(`clientes/paginated?skip=${skip}&limit=${limit}`)
+      .Get(`personas/${this.action}/paginated?skip=${skip}&limit=${limit}`)
       .subscribe({
         next: (response: any) => {
           this.elements = response;
@@ -345,7 +415,7 @@ export class ClientesPage implements OnInit {
   }
 
   getCountElements() {
-    this._globalService.Get("clientes/count").subscribe({
+    this._globalService.Get("personas/count").subscribe({
       next: (response: any) => {
         console.log("Cantidad de elementos:", response.count);
         const totalElements = response.count;

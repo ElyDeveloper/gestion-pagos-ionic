@@ -7,7 +7,7 @@
     (didDismiss)="setOpenedToast(false)"></ion-toast>
 
   <app-breadcrumb></app-breadcrumb>
-  <section class="container">
+  <section>
     <app-view-data
       [currentPage]="1"
       [totalPages]="10"
@@ -21,6 +21,7 @@
       (editButtonClicked)="onEditButtonClicked($event)"
       (deleteButtonClicked)="onDeleteButtonClicked($event)"
       (infoButtonClicked)="onInfoButtonClicked($event)"
+      (checkButtonClicked)="onCheckButtonClicked($event)"
       (currentPageOut)="onPageChange($event)"
       (searchOut)="onSearchData($event)">
     </app-view-data>

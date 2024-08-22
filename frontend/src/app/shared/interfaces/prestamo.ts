@@ -1,9 +1,11 @@
-import { Clientes } from "./cliente";
 import { EstadosAprobacion } from "./estado-aprobacion";
 import { Monedas } from "./moneda";
+import { Pagos } from "./pago";
 import { PeriodosCobro } from "./periodo-cobro";
+import { Personas } from "./persona";
 import { PlanesPago } from "./plan-pago";
 import { Productos } from "./producto";
+
 
 export interface Prestamos {
   id?: number;
@@ -15,18 +17,21 @@ export interface Prestamos {
   estado: boolean;
   idCliente: number;
   idProducto: number;
-  idPeriodoCobro: number;
-  idEstadoAprobacion: number;
   idPlan: number;
   idMoneda: number;
+  idPeriodoCobro: number;
+  idEstadoAprobacion: number;
+  idAval: number;
 
-  // Optional: include related objects if needed
-  cliente?: Clientes;
+  // Optional properties for related entities
+  cliente?: Personas;
   producto?: Productos;
-  periodo?: PeriodosCobro;
-  estadoAprobacion?: EstadosAprobacion;
   planPago?: PlanesPago;
   moneda?: Monedas;
+  periodoCobro?: PeriodosCobro;
+  estadoAprobacion?: EstadosAprobacion;
+  aval?: Personas;
+  pagos?: Pagos[];
 
   // Indexer signature for additional properties
   [prop: string]: any;

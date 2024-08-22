@@ -1,6 +1,6 @@
 import {Entity, model, property, belongsTo} from '@loopback/repository';
-import {Nacionalidades} from './nacionalidades.model';
 import {RecordCrediticio} from './record-crediticio.model';
+import {Nacionalidades} from './nacionalidades.model';
 import {EstadoCivil} from './estado-civil.model';
 import {TipoPersonas} from './tipo-personas.model';
 
@@ -101,11 +101,11 @@ export class Personas extends Entity {
   })
   estado: boolean;
 
-  @belongsTo(() => Nacionalidades, {name: 'nacionalidad'})
-  idNacionalidad: number;
-
   @belongsTo(() => RecordCrediticio, {name: 'recordCrediticio'})
   idRecordCrediticio: number;
+
+  @belongsTo(() => Nacionalidades, {name: 'nacionalidad'})
+  idNacionalidad: number;
 
   @belongsTo(() => EstadoCivil, {name: 'estadoCivil'})
   idEstadoCivil: number;
