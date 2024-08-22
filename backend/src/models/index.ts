@@ -1,4 +1,3 @@
-export * from './clientes.model';
 export * from './productos.model';
 export * from './prestamos.model';
 export * from './pagos.model';
@@ -37,3 +36,5 @@ export * from './tipo-documentos.model';
 export * from './tipo-personas.model';
 export * from './estado-civil.model';
 export * from './prestamos.model';
+export * from './fechas-pagos.model';
+export * from './personas.model';

@@ -43,7 +43,7 @@ export class HomePage {
       },
     });
 
-    this._globalService.Get("clientes/count").subscribe({
+    this._globalService.Get("personas/clientes/count").subscribe({
       next: (data: any) => {
         this.folders[1].count = data.count;
       },

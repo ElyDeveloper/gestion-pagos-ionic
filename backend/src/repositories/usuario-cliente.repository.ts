@@ -1,20 +1,20 @@
 import {Getter, inject} from '@loopback/core';
 import {BelongsToAccessor, DefaultCrudRepository, repository} from '@loopback/repository';
 import {GestionEdboDataSource} from '../datasources';
-import {Clientes, Usuario, UsuarioCliente, UsuarioClienteRelations} from '../models';
-import { ClientesRepository } from './clientes.repository';
+import { Personas, Usuario, UsuarioCliente, UsuarioClienteRelations} from '../models';
 import { UsuarioRepository } from './usuario.repository';
+import { PersonasRepository } from './personas.repository';
 
 export class UsuarioClienteRepository extends DefaultCrudRepository<
   UsuarioCliente,
   typeof UsuarioCliente.prototype.id,
   UsuarioClienteRelations
 > {
-  public readonly cliente: BelongsToAccessor<Clientes, typeof UsuarioCliente.prototype.id>;
+  public readonly cliente: BelongsToAccessor<Personas, typeof UsuarioCliente.prototype.id>;
   public readonly usuario: BelongsToAccessor<Usuario, typeof UsuarioCliente.prototype.id>;
   constructor(
     @inject('datasources.GestionEDBO') dataSource: GestionEdboDataSource,
-    @repository.getter('ClientesRepository') protected clientesRepositoryGetter: Getter<ClientesRepository>,
+    @repository.getter('ClientesRepository') protected clientesRepositoryGetter: Getter<PersonasRepository>,
     @repository.getter('UsuarioRepository') protected usuarioRepositoryGetter: Getter<UsuarioRepository>,
   ) {
     super(UsuarioCliente, dataSource);

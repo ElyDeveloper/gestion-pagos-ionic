@@ -1,6 +1,5 @@
-import {belongsTo, Entity, hasMany, model, property} from '@loopback/repository';
-import { PlanesPago } from './planes-pago.model';
-import { TransaccionesExternas } from './transacciones-externas.model';
+import {Entity, model, property, belongsTo} from '@loopback/repository';
+import {PlanesPago} from './planes-pago.model';
 
 @model({settings: {idInjection: false, mssql: {schema: 'dbo', table: 'FechasPagos'}}})
 export class FechasPagos extends Entity {
@@ -23,7 +22,6 @@ export class FechasPagos extends Entity {
     mssql: {columnName: 'FechaPago', dataType: 'date', dataLength: null, dataPrecision: null, dataScale: null, nullable: 'NO', generated: false},
   })
   fechaPago: string;
-
   @property({
     type: 'boolean',
     required: true,
@@ -33,12 +31,19 @@ export class FechasPagos extends Entity {
   })
   estado: boolean;
 
-  // Define well-known properties here
-  @belongsTo(() => PlanesPago, {name: 'planPago'})
-  planId: number;
+  @property({
+    type: 'number',
+    jsonSchema: {nullable: true},
+    precision: 10,
+    scale: 2,
+    generated: false,
+    mssql: {columnName: 'Cuota', dataType: 'decimal', dataLength: null, dataPrecision: 10, dataScale: 2, nullable: 'YES', generated: false},
+  })
+  cuota?: number;
 
-  @hasMany(() => TransaccionesExternas, {keyTo: 'idPago'})
-  transaccionesExternas: TransaccionesExternas[];
+  @belongsTo(() => PlanesPago)
+  planId: number;
+  // Define well-known properties here
 
   // Indexer property to allow additional data
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -23,7 +23,7 @@ import {PersonasRepository} from '../repositories';
 export class PersonasController {
   constructor(
     @repository(PersonasRepository)
-    public personasRepository : PersonasRepository,
+    public personasRepository: PersonasRepository,
   ) {}
 
   @post('/personas')
@@ -44,6 +44,7 @@ export class PersonasController {
     })
     personas: Omit<Personas, 'id'>,
   ): Promise<Personas> {
+    console.log('create persona: ', personas);
     return this.personasRepository.create(personas);
   }
 
@@ -52,10 +53,34 @@ export class PersonasController {
     description: 'Personas model count',
     content: {'application/json': {schema: CountSchema}},
   })
-  async count(
+  async count(@param.where(Personas) where?: Where<Personas>): Promise<Count> {
+    return this.personasRepository.count(where);
+  }
+
+  @get('/personas/clientes/count')
+  @response(200, {
+    description: 'Personas model count',
+    content: {'application/json': {schema: CountSchema}},
+  })
+  async countClientes(
     @param.where(Personas) where?: Where<Personas>,
   ): Promise<Count> {
-    return this.personasRepository.count(where);
+    return this.personasRepository.count({
+      idTipoPersona: 1,
+    });
+  }
+
+  @get('/personas/avales/count')
+  @response(200, {
+    description: 'Personas model count',
+    content: {'application/json': {schema: CountSchema}},
+  })
+  async countAvales(
+    @param.where(Personas) where?: Where<Personas>,
+  ): Promise<Count> {
+    return this.personasRepository.count({
+      idTipoPersona: 2,
+    });
   }
 
   @get('/personas')
@@ -73,7 +98,69 @@ export class PersonasController {
   async find(
     @param.filter(Personas) filter?: Filter<Personas>,
   ): Promise<Personas[]> {
-    return this.personasRepository.find(filter);
+    return this.personasRepository.find();
+  }
+
+  @get('/personas/clientes/paginated')
+  @response(200, {
+    description: 'List of Personas model',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Personas, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async dataPaginateClientes(
+    @param.query.number('skip') skip: number,
+    @param.query.number('limit') limit: number,
+  ): Promise<Personas[]> {
+    console.log('Consulta paginada: ', skip);
+    const clientes = await this.personasRepository.find({
+      // where: {
+      //   idTipoPersona: 1,
+      // },
+      include: [
+        {relation: 'nacionalidad'},
+        {relation: 'recordCrediticio'},
+        {relation: 'estadoCivil'},
+        {relation: 'tipoPersona'},
+      ],
+      skip,
+      limit,
+    });
+
+    console.log('Clientes: ', clientes);
+
+    return clientes;
+  }
+
+  @get('/personas/avales/paginated')
+  @response(200, {
+    description: 'List of Personas model',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Personas, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async dataPaginateAvales(
+    @param.query.number('skip') skip: number,
+    @param.query.number('limit') limit: number,
+  ): Promise<Personas[]> {
+    return this.personasRepository.find({
+      where: {
+        idTipoPersona: 2,
+      },
+      include: [{relation: 'prestamos'}],
+      skip,
+      limit,
+    });
   }
 
   @patch('/personas')
@@ -106,7 +193,8 @@ export class PersonasController {
   })
   async findById(
     @param.path.number('id') id: number,
-    @param.filter(Personas, {exclude: 'where'}) filter?: FilterExcludingWhere<Personas>
+    @param.filter(Personas, {exclude: 'where'})
+    filter?: FilterExcludingWhere<Personas>,
   ): Promise<Personas> {
     return this.personasRepository.findById(id, filter);
   }
@@ -137,6 +225,7 @@ export class PersonasController {
     @param.path.number('id') id: number,
     @requestBody() personas: Personas,
   ): Promise<void> {
+    console.log('personas', id, personas);
     await this.personasRepository.replaceById(id, personas);
   }
 
@@ -146,5 +235,79 @@ export class PersonasController {
   })
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.personasRepository.deleteById(id);
+  }
+
+  @get('/personas/search')
+  async dataPersonasSearch(
+    @param.query.string('query') search: string,
+  ): Promise<any> {
+    // let PersonasSearch = await this.getPersonasSearch(search);
+    // console.log('PersonasSearch', PersonasSearch);
+    // return PersonasSearch;
+
+    console.log('search', search);
+
+    const PersonasSearch = await this.personasRepository.find({
+      where: {
+        or: [
+          {dni: {like: `%${search}%`}},
+          {nombres: {like: `%${search}%`}},
+          {apellidos: {like: `%${search}%`}},
+        ],
+      },
+      include: [{relation: 'prestamos'}],
+    });
+    console.log('PersonasSearch', PersonasSearch);
+    return PersonasSearch;
+  }
+
+  @get('/personas/clientes/search')
+  async dataClientesSearch(
+    @param.query.string('query') search: string,
+  ): Promise<any> {
+    // let PersonasSearch = await this.getPersonasSearch(search);
+    // console.log('PersonasSearch', PersonasSearch);
+    // return PersonasSearch;
+
+    console.log('search', search);
+
+    const PersonasSearch = await this.personasRepository.find({
+      where: {
+        idTipoPersona: 1,
+        or: [
+          {dni: {like: `%${search}%`}},
+          {nombres: {like: `%${search}%`}},
+          {apellidos: {like: `%${search}%`}},
+        ],
+      },
+      include: [{relation: 'prestamos'}],
+    });
+    console.log('PersonasSearch', PersonasSearch);
+    return PersonasSearch;
+  }
+
+  @get('/personas/avales/search')
+  async dataAvalesSearch(
+    @param.query.string('query') search: string,
+  ): Promise<any> {
+    // let PersonasSearch = await this.getPersonasSearch(search);
+    // console.log('PersonasSearch', PersonasSearch);
+    // return PersonasSearch;
+
+    console.log('search', search);
+
+    const PersonasSearch = await this.personasRepository.find({
+      where: {
+        idTipoPersona: 2,
+        or: [
+          {dni: {like: `%${search}%`}},
+          {nombres: {like: `%${search}%`}},
+          {apellidos: {like: `%${search}%`}},
+        ],
+      },
+      include: [{relation: 'prestamos'}],
+    });
+    console.log('PersonasSearch', PersonasSearch);
+    return PersonasSearch;
   }
 }

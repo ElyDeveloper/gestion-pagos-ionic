@@ -1,4 +1,3 @@
-export * from './clientes.repository';
 export * from './codigo-verificacion.repository';
 export * from './credenciales.repository';
 export * from './cuotas.repository';
@@ -34,3 +33,4 @@ export * from './tipo-documentos.repository';
 export * from './tipo-personas.repository';
 export * from './estado-civil.repository';
 export * from './prestamos.repository';
+export * from './fechas-pagos.repository';

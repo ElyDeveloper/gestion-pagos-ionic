@@ -9,12 +9,9 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { Observable } from "rxjs";
 import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
-import { Clientes } from "src/app/shared/interfaces/cliente";
-import { Cuotas } from "src/app/shared/interfaces/cuotas";
 import { Prestamos } from "src/app/shared/interfaces/prestamo";
 import { Column } from "src/app/shared/interfaces/table";
 import { GlobalService } from "src/app/shared/services/global.service";
-import { ActionButtonAdd } from "src/app/shared/utils/enums";
 import { FormModels } from "src/app/shared/utils/forms-models";
 
 @Component({
@@ -26,6 +23,7 @@ export class PrestamosPage implements OnInit {
   @ViewChild(LoaderComponent) loaderComponent!: LoaderComponent;
 
   elements: Prestamos[] = [];
+
   element: Prestamos = {
     monto: 0,
     tasaInteres: 0,
@@ -39,6 +37,7 @@ export class PrestamosPage implements OnInit {
     idEstadoAprobacion: 0,
     idPlan: 0,
     idMoneda: 0,
+    idAval: 0,
   };
 
   currentPage = 1;

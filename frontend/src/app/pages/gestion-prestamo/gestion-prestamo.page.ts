@@ -15,10 +15,10 @@ import {
   map,
   Subject,
 } from "rxjs";
-import { Clientes } from "src/app/shared/interfaces/cliente";
 import { EstadosAprobacion } from "src/app/shared/interfaces/estado-aprobacion";
 import { Monedas } from "src/app/shared/interfaces/moneda";
 import { PeriodosCobro } from "src/app/shared/interfaces/periodo-cobro";
+import { Personas } from "src/app/shared/interfaces/persona";
 import { PlanesPago } from "src/app/shared/interfaces/plan-pago";
 import { Prestamos } from "src/app/shared/interfaces/prestamo";
 import { Productos } from "src/app/shared/interfaces/producto";
@@ -45,7 +45,7 @@ export class GestionPrestamoPage implements OnInit {
   periodosCobro: PeriodosCobro[] = [];
   estadosAprobacion: EstadosAprobacion[] = [];
   monedas: Monedas[] = [];
-  clientes: Clientes[] = [];
+  clientes: Personas[] = [];
 
   clienteSeleccionado: any = {};
   prestamoSeleccionado: any = {};
@@ -302,6 +302,7 @@ export class GestionPrestamoPage implements OnInit {
       idEstadoAprobacion: this.prestamoForm.get("idEstadoAprobacion")?.value,
       idPlan: idPlan,
       idMoneda: this.prestamoForm.get("idMoneda")?.value,
+      idAval: this.prestamoForm.get("idAval")?.value,
     };
   }
 
