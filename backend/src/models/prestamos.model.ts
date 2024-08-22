@@ -67,7 +67,7 @@ export class Prestamos extends Entity {
     generated: false,
     mssql: {columnName: 'FechaAprobacion', dataType: 'date', dataLength: null, dataPrecision: null, dataScale: null, nullable: 'YES', generated: false},
   })
-  fechaAprobacion?: string;
+  fechaAprobacion?: string | null;
 
   @property({
     type: 'boolean',

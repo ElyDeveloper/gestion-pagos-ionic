@@ -33,6 +33,16 @@ export class FechasPagos extends Entity {
   })
   estado: boolean;
 
+  @property({
+    type: 'number',
+    jsonSchema: {nullable: true},
+    precision: 10,
+    scale: 2,
+    generated: false,
+    mssql: {columnName: 'Cuota', dataType: 'decimal', dataLength: null, dataPrecision: 10, dataScale: 2, nullable: 'YES', generated: false},
+  })
+  cuota?: number;
+
   // Define well-known properties here
   @belongsTo(() => PlanesPago, {name: 'planPago'})
   planId: number;
