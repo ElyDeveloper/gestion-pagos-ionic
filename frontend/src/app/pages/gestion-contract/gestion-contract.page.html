@@ -12,6 +12,10 @@
     <ion-card-header>
       <ion-card-title>Datos Empresa/Bancarios</ion-card-title>
       <div class="d-flex justify-content-end">
+        <button class="btn btn-danger me-2" (click)="generatePDF()">
+          Generar PDF
+          <i class="fa-regular fa-file-pdf"></i>
+        </button>
         <button class="btn btn-success" routerLink="/layout/prestamos">
           Ver Prestamos
           <ion-icon class="ms-2" name="open-outline"></ion-icon>
@@ -166,7 +170,7 @@
                   {{clienteSeleccionado?.apellidos}} </strong
                 >, mayor de edad,
                 {{toLowerCase(clienteSeleccionado?.estadoCivil?.descripcion)}},
-                {{toLowerCase(clienteSeleccionado?.estadoCivil?.nacionalidad)}},
+                {{toLowerCase(clienteSeleccionado?.nacionalidad?.descripcion)}},
                 con documento nacional de identificación
                 {{clienteSeleccionado?.dni}}, con domicilio en
                 {{clienteSeleccionado?.direccion}} y Yo
@@ -175,9 +179,9 @@
                 >, con documento nacional de identificación
                 {{avalSeleccionado?.dni|formatDni}}, en condición de aval
                 solidario, mayor de edad,
-                {{toLowerCase(clienteSeleccionado?.estadoCivil?.descripcion)}},
-                {{toLowerCase(clienteSeleccionado?.estadoCivil?.nacionalidad)}},
-                con domicilio en {{clienteSeleccionado?.direccion}}; por medio
+                {{toLowerCase(avalSeleccionado?.estadoCivil?.descripcion)}},
+                {{toLowerCase(avalSeleccionado?.nacionalidad?.descripcion)}},
+                con domicilio en {{avalSeleccionado?.direccion}}; por medio
                 del presente documento:
               </p>
               }@else {
@@ -189,7 +193,7 @@
                   {{clienteSeleccionado?.apellidos}}</strong
                 >, mayor de edad,
                 {{toLowerCase(clienteSeleccionado?.estadoCivil?.descripcion)}},
-                {{toLowerCase(clienteSeleccionado?.estadoCivil?.nacionalidad)}},
+                {{toLowerCase(clienteSeleccionado?.nacionalidad?.descripcion)}},
                 con documento nacional de identificación
                 {{clienteSeleccionado?.dni |formatDni}}, con domicilio en
                 {{clienteSeleccionado?.direccion}}; por medio del presente

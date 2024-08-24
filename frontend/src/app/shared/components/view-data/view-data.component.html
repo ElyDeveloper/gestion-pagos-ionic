@@ -1,6 +1,8 @@
 <ion-card>
   <ion-card-header>
-    <ion-card-title class="d-none d-md-block" *ngIf="showTitle">{{ title }}</ion-card-title>
+    <ion-card-title class="d-none d-md-block" *ngIf="showTitle">{{
+      title
+    }}</ion-card-title>
     <div class="row d-flex justify-content-end" *ngIf="showAdd">
       <div style="width: 150px">
         <ion-button color="primary" (click)="onAddButtonClick()">
@@ -86,6 +88,13 @@
                   </ng-container>
                   <ng-container *ngSwitchCase="'dni'">
                     {{ getCellValue(row, column) | formatDni }}
+                  </ng-container>
+                  <ng-container *ngSwitchCase="'image'">
+                    <!-- {{ getCellValue(row, column) }} <br /> -->
+                    <img
+                      [src]="'assets/flags/' + getImageUrl(row, column)"
+                      [alt]="getCellValue(row, column)"
+                      class="flag-image" />
                   </ng-container>
                   <ng-container *ngSwitchDefault>
                     {{ getCellValue(row, column) }}

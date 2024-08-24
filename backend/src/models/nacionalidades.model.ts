@@ -44,6 +44,15 @@ export class Nacionalidades extends Entity {
   })
   abreviatura: string;
 
+  @property({
+    type: 'string',
+    jsonSchema: {nullable: true},
+    length: 50,
+    generated: false,
+    mssql: {columnName: 'Gentilicio', dataType: 'varchar', dataLength: 50, dataPrecision: null, dataScale: null, nullable: 'YES', generated: false},
+  })
+  gentilicio?: string;
+
   // Define well-known properties here
 
   // Indexer property to allow additional data

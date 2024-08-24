@@ -101,6 +101,7 @@ export class ClientesPage implements OnInit {
   cargarOpciones() {
     this._globalService.Get("nacionalidades").subscribe((data: any) => {
       this.nacionalidades = data;
+      console.log(this.nacionalidades);
     });
     this._globalService.Get("record-crediticios").subscribe((data: any) => {
       this.recordsCrediticios = data;
@@ -172,6 +173,8 @@ export class ClientesPage implements OnInit {
       {
         key: "nacionalidad.descripcion",
         alias: "Nacionalidad",
+        imageUrl: "nacionalidad.urlBandera",
+        type: "image"
       },
       {
         key: "recordCrediticio.descripcion",

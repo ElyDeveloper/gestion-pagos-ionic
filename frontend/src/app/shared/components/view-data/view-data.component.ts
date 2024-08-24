@@ -146,6 +146,18 @@ export class ViewDataComponent implements OnInit {
     return this.formatValue(primaryValue);
   }
 
+  getImageUrl(row: any, column: any): string {
+    const urlKey = column.imageUrl;
+    const urlValue = this.getCellValue(row, { key: urlKey, alias: "Imagen" });
+    const onlyIdentifier = urlValue.split("/").pop();
+    // console.log(onlyIdentifier);
+
+    if (onlyIdentifier) {
+      return onlyIdentifier;
+    }
+    return "";
+  }
+
   getCellOptions(column: Column): string[] {
     return column.options || [];
   }

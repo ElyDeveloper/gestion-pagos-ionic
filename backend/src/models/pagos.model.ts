@@ -1,5 +1,5 @@
-import {belongsTo, Entity, hasMany, model, property} from '@loopback/repository';
-import { Prestamos } from './prestamos.model';
+import {Entity, model, property, belongsTo, hasMany} from '@loopback/repository';
+import {FechasPagos} from './fechas-pagos.model';
 import { Vouchers } from './vouchers.model';
 import { DocumentosTipoDoc } from './documentos-tipo-doc.model';
 
@@ -15,7 +15,6 @@ export class Pagos extends Entity {
     mssql: {columnName: 'Id', dataType: 'int', dataLength: null, dataPrecision: 10, dataScale: 0, nullable: 'NO', generated: 1},
   })
   id?: number;
-
   @property({
     type: 'date',
     required: true,
@@ -45,9 +44,9 @@ export class Pagos extends Entity {
   })
   estado: boolean;
 
+  @belongsTo(() => FechasPagos, {name: 'cuota'})
+  idFechaPago: number;
   // Define well-known properties here
-  @belongsTo(() => Prestamos, {name: 'prestamos'})
-  planId: number;
 
   @property({
     type: 'number',
@@ -58,7 +57,6 @@ export class Pagos extends Entity {
 
   @hasMany(() => DocumentosTipoDoc, {keyTo: 'idDocumento'})
   documentosTipoDocs: DocumentosTipoDoc[];
-
   // Indexer property to allow additional data
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [prop: string]: any;

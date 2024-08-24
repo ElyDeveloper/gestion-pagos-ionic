@@ -2,6 +2,8 @@ import { Component, inject, OnInit, ViewChild } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
 import { GlobalService } from "src/app/shared/services/global.service";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import { environment } from "src/environments/environment";
 const COMPANY = environment.company || "No Aún";
 @Component({
@@ -39,7 +41,6 @@ export class GestionContractPage implements OnInit {
   avalSeleccionado: any = null;
   prestamoSeleccionado: any = {};
 
-  private _router = inject(Router);
   private _globalService = inject(GlobalService);
   private _route = inject(ActivatedRoute);
 
@@ -47,6 +48,79 @@ export class GestionContractPage implements OnInit {
 
   ngOnInit() {
     this.getPrestamo();
+  }
+
+  generatePDF() {
+    this.exportToPDF(
+      `${this.clienteSeleccionado.nombres} ${this.clienteSeleccionado.apellidos}`,
+      "print-element"
+    );
+  }
+
+  exportToPDF(name: string, idElement: string) {
+    // Extraemos el
+    const DATA = document.getElementById(idElement) as HTMLElement;
+    const doc = new jsPDF("p", "pt", "letter");
+    const options = {
+      background: "white",
+      scale: 3,
+    };
+
+    // Crear un elemento de estilo
+    const style = document.createElement("style");
+    style.textContent = `
+      p{
+        font-size: 22px!important;
+      }
+      
+      h3{
+        font-size: 24px!important;
+      }
+    `;
+
+    // Añadir los estilos al head
+    document.head.appendChild(style);
+
+    this.textLoader = "Generando Pdf";
+    this.loaderComponent.show();
+    html2canvas(DATA, options)
+      .then((canvas) => {
+        const img = canvas.toDataURL("image/PNG");
+
+        // Add image Canvas to PDF
+        const bufferX = 15;
+        const bufferY = 15;
+        const imgProps = (doc as any).getImageProperties(img);
+        const pdfWidth = doc.internal.pageSize.getWidth() - 2 * bufferX;
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        doc.addImage(
+          img,
+          "PNG",
+          bufferX,
+          bufferY,
+          pdfWidth,
+          pdfHeight,
+          undefined,
+          "FAST"
+        );
+        return doc;
+      })
+      .then((docResult) => {
+        const fecha = new Date();
+        const time = fecha.getTime();
+
+        docResult.save(`Pagaré(${name} - ${time}).pdf`);
+        document.head.removeChild(style);
+
+        //console.log('Error: ', err);
+        this.loaderComponent.hide();
+      })
+      .catch((err) => {
+        document.head.removeChild(style);
+
+        //console.log('Error: ', err);
+        this.loaderComponent.hide();
+      });
   }
   getPrestamo() {
     //Obtener id de la url

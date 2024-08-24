@@ -171,13 +171,28 @@
                   <ion-label position="stacked" class="bold-label"
                     >Nacionalidad:</ion-label
                   >
+
                   <ion-select
                     formControlName="idNacionalidad"
                     placeholder="Seleccione nacionalidad">
                     <ion-select-option
                       *ngFor="let nacionalidad of nacionalidades"
                       [value]="nacionalidad.id">
-                      {{ nacionalidad.descripcion }}
+                      <ion-row class="ion-align-items-center">
+                        <ion-col>
+                          <ion-img
+                            [src]="nacionalidad.urlBandera"
+                            [alt]="'Bandera de ' + nacionalidad.descripcion"
+                            style="
+                              width: 30px;
+                              height: 20px;
+                              object-fit: cover;
+                            ">
+                          </ion-img>
+                          {{ nacionalidad.abreviatura }}
+                        </ion-col>
+                        <ion-col> - {{ nacionalidad.descripcion }} </ion-col>
+                      </ion-row>
                     </ion-select-option>
                   </ion-select>
                 </ion-item>
@@ -251,7 +266,5 @@
           [columnsData]="columnsData"></card-view-info>
       </ion-content>
     </ng-template>
-
-    
   </section>
 </ion-content>
