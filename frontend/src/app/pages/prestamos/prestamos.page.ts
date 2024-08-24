@@ -124,9 +124,15 @@ export class PrestamosPage implements OnInit {
 
   buildColumnsPlan() {
     this.columnsDataPlan = [
+      { key: "numero", alias: "#" },
       { key: "fechaPago", alias: "Fecha de Pago", type: "date" },
       { key: "cuota", alias: "Monto Cuota", type: "currency" },
-      { key: "estado", alias: "Estado", type: "boolean", options:['Pagado', 'Pendiente'] },
+      {
+        key: "estado",
+        alias: "Estado",
+        type: "boolean",
+        options: ["Pagado", "Pendiente"],
+      },
     ];
   }
 
@@ -225,6 +231,13 @@ export class PrestamosPage implements OnInit {
             color: "primary",
           },
           {
+            alias: "Contrato",
+            action: "contract",
+            icon: "document",
+            color: "primary",
+            rolesAuthorized: [1, 2],
+          },
+          {
             alias: "Información",
             action: "info",
             icon: "information",
@@ -293,6 +306,11 @@ export class PrestamosPage implements OnInit {
     this._router.navigate(["/layout/gestion-prestamo/" + data.id]);
   }
 
+  onContractButtonClicked(data: any) {
+    console.log("Contrato del cliente:", data);
+    this._router.navigate(["/layout/gestion-contrato/" + data.id]);
+  }
+
   onInfoButtonClicked(data: any) {
     // console.log("Información del cliente:", data);
     this.element = data;
@@ -306,6 +324,10 @@ export class PrestamosPage implements OnInit {
       next: (response: any) => {
         console.log("Plan de pago:", response);
         this.proyeccionesPlan = response;
+        //Agregar columna numero correlativo
+        this.proyeccionesPlan.forEach((plan: any) => {
+          plan.numero = this.proyeccionesPlan.indexOf(plan) + 1;
+        });
         this.modalSelected = this.modalViewPlan;
         this.isModalOpen = true;
       },

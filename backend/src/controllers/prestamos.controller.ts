@@ -42,7 +42,7 @@ export class PrestamosController {
     @requestBody({
       content: {
         'application/json': {
-          schema: {}
+          schema: {},
         },
       },
     })
@@ -164,7 +164,12 @@ export class PrestamosController {
     console.log('Id Decrypted: ', idDecrypted);
     return this.PrestamosRepository.findById(idDecrypted, {
       include: [
-        {relation: 'cliente'},
+        {
+          relation: 'cliente',
+          scope: {
+            include: [{relation: 'estadoCivil'}, {relation: 'nacionalidad'}],
+          },
+        },
         {relation: 'producto'},
         {relation: 'planPago'},
         {relation: 'moneda'},

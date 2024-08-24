@@ -6,6 +6,7 @@ export const environment = {
   production: false,
   // apiURL: 'http://localhost:3005/',
   apiURL: 'http://localhost:3001/',
+  company: 'Sociedad Financiamiento de Crédito Efectivo (FICRE) S. de R. L.',
 };
 
 /*

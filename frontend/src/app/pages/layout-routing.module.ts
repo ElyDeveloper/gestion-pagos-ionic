@@ -54,6 +54,13 @@ const routes: Routes = [
           ),
       },
       {
+        path: "gestion-contrato/:id",
+        loadChildren: () =>
+          import("./gestion-contract/gestion-contract.module").then(
+            (m) => m.GestionContractPageModule
+          ),
+      },
+      {
         path: "gestion-prestamo",
         loadChildren: () =>
           import("./gestion-prestamo/gestion-prestamo.module").then(

@@ -6,6 +6,7 @@ import {
   ViewChild,
 } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { Router } from "@angular/router";
 import { Observable } from "rxjs";
 import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
 import { Personas } from "src/app/shared/interfaces/persona";
@@ -64,9 +65,10 @@ export class ClientesPage implements OnInit {
   modalConfig: ModalConfig = { fieldAliases: {} };
   formSelected: FormGroup;
 
+  private _router = inject(Router);
   private _globalService = inject(GlobalService);
 
-  //TODO: Elementos propios del componente
+  //TODO: ESPECIFICOS
   nacionalidades: any[] = [];
   recordsCrediticios: any[] = [];
   estadosCiviles: any[] = [];
@@ -190,6 +192,7 @@ export class ClientesPage implements OnInit {
             color: "primary",
             rolesAuthorized: [1, 2],
           },
+
           {
             alias: "Información",
             action: "info",
@@ -197,6 +200,7 @@ export class ClientesPage implements OnInit {
             color: "tertiary",
             rolesAuthorized: [1, 2, 3],
           },
+
           {
             alias: "Eliminar",
             action: "delete",
@@ -207,48 +211,6 @@ export class ClientesPage implements OnInit {
         ],
       },
     ];
-  }
-
-  getCellValue(row: any, column: Column): any {
-    const primaryValue = this.getNestedValue(row, column.key);
-
-    if (column.combineWith) {
-      const secondaryValue = this.getNestedValue(row, column.combineWith);
-      if (column.combineFormat) {
-        return column.combineFormat(primaryValue, secondaryValue);
-      }
-      return `${this.formatValue(primaryValue)} ${this.formatValue(
-        secondaryValue
-      )}`;
-    }
-
-    return this.formatValue(primaryValue);
-  }
-
-  private getNestedValue(obj: any, key: string): any {
-    return key.split(".").reduce((o, k) => (o || {})[k], obj);
-  }
-
-  private formatValue(value: any): string {
-    if (value && typeof value === "object") {
-      return value.nombre || JSON.stringify(value);
-    }
-    return value !== undefined && value !== null ? value.toString() : "";
-  }
-
-  // Este método ya no es necesario, pero lo mantenemos por compatibilidad
-  getObjectValue(row: any, key: string): any {
-    const value = this.getNestedValue(row, key);
-    return this.formatValue(value);
-  }
-
-  getDateValue(row: any, key: string): any {
-    const element = key.split(".").reduce((o, k) => (o || {})[k], row);
-
-    if (element) {
-      return new Date(element);
-    }
-    return "";
   }
 
   private setModalState(isEdit: boolean, modalTemplate: any, formData?: any) {
@@ -280,6 +242,7 @@ export class ClientesPage implements OnInit {
 
     this.modalSelected = modalTemplate;
     this.formSelected = this.formAdd;
+
     this.isModalOpen = true;
   }
 

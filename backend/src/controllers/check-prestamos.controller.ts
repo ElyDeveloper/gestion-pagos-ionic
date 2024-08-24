@@ -80,7 +80,7 @@ export class CheckPrestamosController {
         planId: planId,
         estado: false,
         cuota: cuota,
-        fechaPago: fechaPago,
+        fechaPago,
       });
 
       // Incrementar la fecha según el periodo de cobro
@@ -99,6 +99,12 @@ export class CheckPrestamosController {
       }
     }
 
+    const latestDate =
+      fechasPagos.length > 0
+        ? fechasPagos[fechasPagos.length - 1].fechaPago.toISOString()
+        : undefined;
+    console.log('Ultima fecha: ', latestDate);
+
     const fechasPagosData: DataObject<FechasPagos>[] = fechasPagos.map(fp => ({
       ...fp,
       fechaPago: fp.fechaPago.toISOString(), // Convert Date to string
@@ -106,6 +112,7 @@ export class CheckPrestamosController {
 
     await this.planesPagoRepository.updateById(planId, {
       fechaInicio,
+      fechaFin: latestDate,
     });
 
     // Actualizar el estado del préstamo según el estado de aprobación
