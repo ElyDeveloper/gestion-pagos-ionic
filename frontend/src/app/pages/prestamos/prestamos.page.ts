@@ -124,7 +124,7 @@ export class PrestamosPage implements OnInit {
 
   buildColumnsPlan() {
     this.columnsDataPlan = [
-      { key: "numero", alias: "#" },
+      { key: "numero", alias: "No. Cuota" },
       { key: "fechaPago", alias: "Fecha de Pago", type: "date" },
       { key: "cuota", alias: "Monto Cuota", type: "currency" },
       {
