@@ -55,21 +55,35 @@ export class PrestamosPage implements OnInit {
 
   textLoader: string = "Cargando...";
   toastMessage: string = "cliente guardado correctamente";
+  typeFormSelected: string = "formAdd";
+  elementType: string = "prestamo";
 
   @ViewChild("modalAdd", { static: true }) modalAdd!: TemplateRef<any>;
+
   @ViewChild("modalViewInfo", { static: true })
   modalViewInfo!: TemplateRef<any>;
-  modalAprobar!: TemplateRef<any>;
 
   modalSelected: TemplateRef<any> = this.modalAdd;
   formSelected: FormGroup;
 
   private _globalService = inject(GlobalService);
   private _router = inject(Router);
+  //TODO ESPECIFICO
+  @ViewChild("modalAprobar", { static: true })
+  modalAprobar!: TemplateRef<any>;
 
+  @ViewChild("modalViewPlan", { static: true })
+  modalViewPlan!: TemplateRef<any>;
+
+  proyeccionesPlan: any[] = [];
+  estadosAprobacion: any[] = [];
+  columnsDataPlan: Column[] = []; // Aquí deberías recibir los datos a mostrar en la tabla (cabeceras)
+
+  formAprobar: FormGroup;
   constructor(private fb: FormBuilder) {
     this.formModels = new FormModels(this.fb);
     this.formAdd = this.formModels.prestamoForm();
+    this.formAprobar = this.formModels.checkForm();
     this.formSelected = this.formAdd;
     console.log("Formulario de cliente:", this.formAdd);
   }
@@ -77,8 +91,20 @@ export class PrestamosPage implements OnInit {
   ngOnInit() {}
 
   ionViewWillEnter() {
+    this.getEstadosAprobacion();
     this.getCountElements();
     this.buildColumns();
+    this.buildColumnsPlan();
+  }
+
+  //TODO: ESPECIFICO
+  getEstadosAprobacion() {
+    // TODO: Implementar la llamada a la API para obtener los estados de aprobación
+    Ejemplo: this._globalService
+      .Get("estados-aprobacions")
+      .subscribe((data: any) => {
+        this.estadosAprobacion = data;
+      });
   }
 
   //TODO: ESPECIFICO
@@ -94,6 +120,14 @@ export class PrestamosPage implements OnInit {
   cleanForm() {
     this.formAdd.reset();
     this.formAdd = this.formModels.prestamoForm();
+  }
+
+  buildColumnsPlan() {
+    this.columnsDataPlan = [
+      { key: "fechaPago", alias: "Fecha de Pago", type: "date" },
+      { key: "cuota", alias: "Monto Cuota", type: "currency" },
+      { key: "estado", alias: "Estado", type: "boolean", options:['Pagado', 'Pendiente'] },
+    ];
   }
 
   buildColumns() {
@@ -134,6 +168,7 @@ export class PrestamosPage implements OnInit {
         key: "estado",
         alias: "Estado",
         type: "boolean",
+        options: ["Activo", "Inactivo"],
       },
       {
         key: "aval.nombres",
@@ -170,11 +205,24 @@ export class PrestamosPage implements OnInit {
         alias: "Acciones",
         lstActions: [
           {
+            alias: "Cliente",
+            action: "client",
+            icon: "person",
+            color: "primary",
+            rolesAuthorized: [1, 2],
+          },
+          {
             alias: "Editar",
             action: "edit",
             icon: "create",
             color: "primary",
             rolesAuthorized: [1, 2],
+          },
+          {
+            alias: "Plan de pago - ",
+            action: "plan",
+            icon: "list",
+            color: "primary",
           },
           {
             alias: "Información",
@@ -201,73 +249,34 @@ export class PrestamosPage implements OnInit {
     ];
   }
 
-  getCellValue(row: any, column: Column): any {
-    const primaryValue = this.getNestedValue(row, column.key);
-
-    if (column.combineWith) {
-      const secondaryValue = this.getNestedValue(row, column.combineWith);
-      if (column.combineFormat) {
-        return column.combineFormat(primaryValue, secondaryValue);
-      }
-      return `${this.formatValue(primaryValue)} ${this.formatValue(
-        secondaryValue
-      )}`;
-    }
-
-    return this.formatValue(primaryValue);
-  }
-
-  private getNestedValue(obj: any, key: string): any {
-    return key.split(".").reduce((o, k) => (o || {})[k], obj);
-  }
-
-  private formatValue(value: any): string {
-    if (value && typeof value === "object") {
-      return value.nombre || JSON.stringify(value);
-    }
-    return value !== undefined && value !== null ? value.toString() : "";
-  }
-
-  // Este método ya no es necesario, pero lo mantenemos por compatibilidad
-  getObjectValue(row: any, key: string): any {
-    const value = this.getNestedValue(row, key);
-    return this.formatValue(value);
-  }
-
-  getDateValue(row: any, key: string): any {
-    const element = key.split(".").reduce((o, k) => (o || {})[k], row);
-
-    if (element) {
-      return new Date(element);
-    }
-    return "";
-  }
-
-  private setModalState(isEdit: boolean, modalTemplate: any, formData?: any) {
+  private setModalState(
+    isEdit: boolean,
+    modalTemplate: TemplateRef<any>,
+    form: FormGroup,
+    formData?: any
+  ) {
     this.isEdit = isEdit;
 
     if (formData) {
-      formData.fechaInicial = this.formatDateForInput(formData.fechaInicial);
+      formData.planPago.fechaInicio = this.formatDateForInput(
+        formData.planPago.fechaInicio
+      );
       if (formData.fechaFinal) {
         formData.fechaFinal = this.formatDateForInput(formData.fechaFinal);
       }
     }
     console.log("Form Data:", formData);
     this.element = formData;
-    if (isEdit && formData) {
-      this.formAdd.patchValue(formData);
-      // TODO: ESPECIFICO
-      const fullName = `${formData.cliente.nombres.split(" ")[0]} ${
-        formData.cliente.apellidos.split(" ")[0]
-      }`;
-      this.formAdd.get("idCliente")?.setValue(fullName);
-      this.formAdd.get("idTipoPrestamo")?.setValue(formData.tipoPrestamo.id);
-    } else if (!isEdit) {
-      this.cleanForm();
-    }
+
+    form.get("fechaInicio")?.setValue(formData.planPago.fechaInicio);
+    form.get("idEstadoAprobacion")?.setValue(formData.idEstadoAprobacion);
+
+    // console.log("Modal Template: ", modalTemplate);
+    // console.log("Form Select: ", form);
 
     this.modalSelected = modalTemplate;
-    this.formSelected = this.formAdd;
+    this.formSelected = form;
+    this.typeFormSelected = "formAprobar";
     this.isModalOpen = true;
   }
 
@@ -291,11 +300,26 @@ export class PrestamosPage implements OnInit {
     this.isModalOpen = true;
   }
 
+  onPlanButtonClicked(data: any) {
+    console.log("Información del prestamo:", data);
+    this._globalService.Get("fechas-pagos/plan/" + data.planPago.id).subscribe({
+      next: (response: any) => {
+        console.log("Plan de pago:", response);
+        this.proyeccionesPlan = response;
+        this.modalSelected = this.modalViewPlan;
+        this.isModalOpen = true;
+      },
+      error: (error: any) => {
+        console.error("Error al obtener el plan de pago:", error);
+        this.loaderComponent.hide();
+        this.toastMessage = "Error al obtener el plan de pago";
+        this.setOpenedToast(true);
+      },
+    });
+  }
+
   onCheckButtonClicked(data: any) {
-    this.element = data;
-    this.modalSelected = this.modalAprobar;
-    this.isModalOpen = true;
-    
+    this.setModalState(false, this.modalAprobar, this.formAprobar, data);
   }
 
   onDeleteButtonClicked(data: any) {
@@ -320,14 +344,16 @@ export class PrestamosPage implements OnInit {
   }
 
   handleUserOperation(operation: "edit" | "create", data: any): void {
-    const { operationText, apiCall } = this.getOperationConfig(operation, data);
+    const { operationText, apiCall } = this.getOperationConfigElement(
+      operation,
+      data
+    );
 
-    this.textLoader = `${operationText} cliente`;
+    this.textLoader = `${operationText} ${this.elementType}`;
     this.loaderComponent.show();
 
-    this.updateDataFromElement(data);
-
-    console.log("Datos del cliente:", data);
+    //TODO COMENTAR
+    console.log(`Datos del ${this.elementType}: `, data);
 
     apiCall.subscribe({
       next: (response: any) =>
@@ -336,7 +362,26 @@ export class PrestamosPage implements OnInit {
     });
   }
 
-  private getOperationConfig(
+  handleAprobar(operation: "edit" | "create", data: any): void {
+    const { operationText, apiCall } = this.getOperationConfigCheck(
+      operation,
+      data
+    );
+
+    this.textLoader = `${operationText} ${this.elementType}`;
+    // this.loaderComponent.show();
+
+    //TODO COMENTAR
+    // console.log(`Datos del ${this.elementType}: `, data);
+
+    apiCall.subscribe({
+      next: (response: any) =>
+        this.handleOperationSuccess(response, operationText),
+      error: (error: any) => this.handleOperationError(error, operationText),
+    });
+  }
+
+  private getOperationConfigElement(
     operation: "edit" | "create",
     data: any
   ): { operationText: string; apiCall: Observable<any> } {
@@ -357,41 +402,91 @@ export class PrestamosPage implements OnInit {
     }
   }
 
-  //INFO METODO ESPECIFICO
-  private updateDataFromElement(data: any): void {
-    Object.assign(data, {
-      idCliente: this.element.idCliente,
-      idProducto: this.element.idProducto,
-      idPeriodoCobro: this.element.idPeriodoCobro,
-      idEstadoAprobacion: this.element.idEstadoAprobacion,
-      idPlan: this.element.idPlan,
-      idMoneda: this.element.idMoneda,
-    });
+  private getOperationConfigCheck(
+    operation: "edit" | "create",
+    data: any
+  ): { operationText: string; apiCall: Observable<any> } {
+    const cuota =
+      this.element.totalMonto / (this.element.planPago?.cuotasPagar || 1);
+    const dataSave = {
+      idPrestamo: this.element.id,
+      planId: this.element.idPlan,
+      estado: this.element.planPago?.estado || false,
+      cuota,
+      // fechaInicio: new Date(data.fechaInicio),
+      fechaInicio: data.fechaInicio,
+      periodoCobro: this.element.idPeriodoCobro,
+      numeroCuotas: this.element.planPago?.cuotasPagar || 0,
+      idEstadoAprobacion: data.idEstadoAprobacion || 0,
+    };
+    switch (operation) {
+      case "edit":
+        return {
+          operationText: "Editando",
+          apiCall: this._globalService.PutId(
+            "check-prestamos/crear-fechas-pagos",
+            data.id,
+            dataSave
+          ),
+        };
+      case "create":
+        //TODO ONLY DEBUG
+        console.log("Entro aquí: ", dataSave);
+        return {
+          operationText: "Guardando",
+          apiCall: this._globalService.Post(
+            "check-prestamos/crear-fechas-pagos",
+            dataSave
+          ),
+        };
+      default:
+        throw new Error(`Operación no soportada: ${operation}`);
+    }
   }
 
   private handleOperationSuccess(response: any, operationText: string): void {
+    //TODO: COMENTAR
     console.log(`cliente ${operationText.toLowerCase()}:`, response);
     this.isModalOpen = false;
     this.loaderComponent.hide();
-    this.toastMessage = `cliente ${operationText.toLowerCase()} correctamente`;
+    this.toastMessage = `${
+      this.elementType
+    } ${operationText.toLowerCase()} correctamente`;
     this.setOpenedToast(true);
     this.cleanForm();
     this.getCountElements();
   }
 
   private handleOperationError(error: any, operationText: string): void {
-    console.error(`Error al ${operationText.toLowerCase()} el cliente:`, error);
+    console.error(
+      `Error al ${operationText.toLowerCase()} el ${this.elementType}:`,
+      error
+    );
     this.loaderComponent.hide();
-    this.toastMessage = `Error al ${operationText.toLowerCase()} el cliente`;
+    this.toastMessage = `Error al ${operationText.toLowerCase()} el ${
+      this.elementType
+    }`;
     this.setOpenedToast(true);
   }
 
-  async handleSave(data: any) {
-    if (this.isEdit) {
-      this.handleUserOperation("edit", data);
-    } else if (!this.isEdit) {
-      delete data.id;
-      this.handleUserOperation("create", data);
+  handleSave(data: any) {
+    //TODO ONLY DEBUG
+    // console.log(`Datos del formulario: `, data);
+    switch (this.typeFormSelected) {
+      case "formAdd":
+        if (this.isEdit) {
+          this.handleUserOperation("edit", data);
+        } else if (!this.isEdit) {
+          delete data.id;
+          this.handleUserOperation("create", data);
+        }
+        break;
+      case "formAprobar":
+        this.handleAprobar("create", data);
+        break;
+
+      default:
+        throw new Error(`Formulario no soportado: ${this.typeFormSelected}`);
     }
   }
 

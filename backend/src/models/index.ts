@@ -26,3 +26,4 @@ export * from './personas.model';
 export * from './tipo-personas.model';
 export * from './estado-civil.model';
 export * from './prestamos.model';
+export * from './fechas-pagos.model';

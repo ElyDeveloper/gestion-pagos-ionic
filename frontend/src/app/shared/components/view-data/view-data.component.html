@@ -1,6 +1,6 @@
 <ion-card>
   <ion-card-header>
-    <ion-card-title class="d-none d-md-block">{{ title }}</ion-card-title>
+    <ion-card-title class="d-none d-md-block" *ngIf="showTitle">{{ title }}</ion-card-title>
     <div class="row d-flex justify-content-end" *ngIf="showAdd">
       <div style="width: 150px">
         <ion-button color="primary" (click)="onAddButtonClick()">
@@ -33,7 +33,7 @@
       </div>
     </div>
 
-    <div class="row">
+    <div class="row" *ngIf="showSearch">
       <ion-searchbar
         placeholder="Buscar..."
         [(ngModel)]="search"
@@ -67,8 +67,8 @@
                       }">
                       {{
                         getCellValue(row, column) === "true"
-                          ? "Activo"
-                          : "Inactivo"
+                          ? getCellOptions(column)[0]
+                          : getCellOptions(column)[1]
                       }}
                       <!-- {{ getCellValue(row, column) }} -->
                     </span>
@@ -94,8 +94,10 @@
               </ng-container>
               <ng-template #actionsTemplate>
                 <div class="d-flex justify-content-around">
-                  <ng-container *ngFor="let action of column.lstActions; let i = index">
-                    @if (!action.rolesAuthorized || (userLogged.rolid && action.rolesAuthorized.includes(userLogged.rolid))) {
+                  <ng-container
+                    *ngFor="let action of column.lstActions; let i = index">
+                    @if (!action.rolesAuthorized || (userLogged.rolid &&
+                    action.rolesAuthorized.includes(userLogged.rolid))) {
                     <div>
                       <ion-button
                         [id]="'action-button-' + i"
@@ -106,8 +108,13 @@
                         class="me-2"
                         data-bs-toggle="tooltip"
                         data-bs-placement="top"
-                        [title]="action.alias + ' ' + context || 'Descripción no disponible'">
-                        <ion-icon slot="icon-only" [name]="action.icon"></ion-icon>
+                        [title]="
+                          action.alias + ' ' + context ||
+                          'Descripción no disponible'
+                        ">
+                        <ion-icon
+                          slot="icon-only"
+                          [name]="action.icon"></ion-icon>
                       </ion-button>
                     </div>
                     }
@@ -194,7 +201,9 @@
 </section>
 
 <!-- Seccion de paginacion -->
-<section class="d-flex justify-content-center" *ngIf="search === ''">
+<section
+  class="d-flex justify-content-center"
+  *ngIf="search === '' && showPagination === true">
   <nav aria-label="Page navigation" class="mt-3">
     <ul class="pagination justify-content-end">
       <li class="page-item" [class.disabled]="currentPage === 1">

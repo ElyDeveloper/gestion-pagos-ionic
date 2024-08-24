@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from "@angular/core";
-import { NavigationEnd, Router } from "@angular/router";
+import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { filter, Subscription } from "rxjs";
 
 @Component({
@@ -8,50 +8,37 @@ import { filter, Subscription } from "rxjs";
   styleUrls: ["./breadcrumb.component.scss"],
 })
 export class BreadcrumbComponent implements OnInit {
-  private router = inject(Router);
-
   segments: any[] = [];
 
-  subscriptions: Subscription[] = [];
-
+  private _route = inject(ActivatedRoute);
+  private _router = inject(Router);
   constructor() {}
 
   ngOnInit() {
-    // Suscribirse a los eventos del router para capturar cambios en la URL
-    this.subscriptions = [];
-    this.subscriptions.push(
-      this.router.events
-        .pipe(
-          filter((event: any) => event instanceof NavigationEnd) // Filtrar solo los eventos de finalización de navegación
-        )
-        .subscribe(() => {
-          const url = this.router.url; // Obtener la URL actual
-          this.segments = (url.split("/")); // Dividir la URL en segmentos
-          //Eliminar primeros dos elementos del array
-          this.segments = this.segments.slice(2);
+    //Obtener Url
 
-          //Si hay mas de 1 segmento, eliminar el ultimo
-          if (this.segments.length > 1) {
-            this.segments.pop();
-          }
+    const url = this.getCurrentUrl();
+    this.segments = url.split("/"); // Dividir la URL en segmentos
+    //Eliminar primeros dos elementos del array
+    this.segments = this.segments.slice(2);
 
-          console.log("Segmentos: ", this.segments);
-          //Si el segmento es igual a home eliminarlo
-          if (this.segments[0] === "home") {
-            this.segments = [];
-          }
-        })
-    );
+    //Si hay mas de 1 segmento, eliminar el ultimo
+    if (this.segments.length > 1) {
+      this.segments.pop();
+    }
+
+    console.log("Segmentos: ", this.segments);
+    //Si el segmento es igual a home eliminarlo
+    if (this.segments[0] === "home") {
+      this.segments = [];
+    }
   }
 
   goTo(url: string) {
-    this.router.navigateByUrl("/layout/" + url);
+    this._router.navigateByUrl("/layout/" + url);
   }
 
-  ngOnDestroy() {
-    //Ver cantidad de suscripciones
-    console.log("Suscripciones activas: ", this.subscriptions.length);
-    // Desuscribirse de todos los eventos al destruir el componente
-    this.subscriptions.forEach((s) => s.unsubscribe());
+  getCurrentUrl() {
+    return this._router.url;
   }
 }

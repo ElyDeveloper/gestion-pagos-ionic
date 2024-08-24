@@ -10,14 +10,23 @@
   <ion-grid>
     <ion-row class="d-flex justify-content-center">
       <ion-col sizeSm="12" sizeMd="6">
-        <ion-segment  value="all">
-          <ion-segment-button color="primary" (click)="goAction('Clientes')" value="clients">
+        <ion-segment value="all">
+          <ion-segment-button
+            color="primary"
+            (click)="goAction('Clientes')"
+            value="clients">
             Clientes
           </ion-segment-button>
-          <ion-segment-button color="primary" (click)="goAction('Todos')" value="all">
+          <ion-segment-button
+            color="primary"
+            (click)="goAction('Todos')"
+            value="all">
             Todos
           </ion-segment-button>
-          <ion-segment-button color="primary" (click)="goAction('Avales')" value="avals">
+          <ion-segment-button
+            color="primary"
+            (click)="goAction('Avales')"
+            value="avals">
             Avales
           </ion-segment-button>
         </ion-segment>
@@ -237,40 +246,9 @@
         </ion-toolbar>
       </ion-header>
       <ion-content>
-        <ion-card>
-          <ion-card-content>
-            @for (column of columnsData; track column.key) { @if (column.key !==
-            'actions') {
-            <ion-item lines="none">
-              <ion-label>{{ column.alias }}</ion-label>
-              @switch (column.type) { @case ('boolean') {
-              <ion-badge
-                slot="end"
-                [color]="getCellValue(element, column) ? 'success' : 'medium'">
-                {{ getCellValue(element, column) ? "Activo" : "Inactivo" }}
-              </ion-badge>
-              } @case ('object') {
-              <ion-note slot="end"
-                >{{ getCellValue(element, column) }}</ion-note
-              >
-              } @case ('date') {
-              <ion-note slot="end"
-                >{{ getCellValue(element, column) | customDate : 6 :
-                "dd/MM/yyyy" }}</ion-note
-              >
-              } @case ('dni') {
-              <ion-note slot="end"
-                >{{ getCellValue(element, column) | formatDni}}</ion-note
-              >
-              }@default {
-              <ion-note slot="end"
-                >{{ getCellValue(element, column) }}</ion-note
-              >
-              }}
-            </ion-item>
-            } }
-          </ion-card-content>
-        </ion-card>
+        <card-view-info
+          [element]="element"
+          [columnsData]="columnsData"></card-view-info>
       </ion-content>
     </ng-template>
   </section>

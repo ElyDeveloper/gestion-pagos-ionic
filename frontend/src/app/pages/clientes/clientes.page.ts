@@ -151,6 +151,7 @@ export class ClientesPage implements OnInit {
         key: "estado",
         alias: "Estado",
         type: "boolean",
+        options: ["Activo", "Inactivo"],
       },
       {
         key: "fechaIngreso",

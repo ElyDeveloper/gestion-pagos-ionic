@@ -10,13 +10,13 @@ export class FechasPagosRepository extends DefaultCrudRepository<
   FechasPagosRelations
 > {
 
-  public readonly plan: BelongsToAccessor<PlanesPago, typeof FechasPagos.prototype.id>;
+  public readonly planPago: BelongsToAccessor<PlanesPago, typeof FechasPagos.prototype.id>;
 
   constructor(
     @inject('datasources.GestionEDBO') dataSource: GestionEdboDataSource, @repository.getter('PlanesPagoRepository') protected planesPagoRepositoryGetter: Getter<PlanesPagoRepository>,
   ) {
     super(FechasPagos, dataSource);
-    this.plan = this.createBelongsToAccessorFor('plan', planesPagoRepositoryGetter,);
-    this.registerInclusionResolver('plan', this.plan.inclusionResolver);
+    this.planPago = this.createBelongsToAccessorFor('planPago', planesPagoRepositoryGetter,);
+    this.registerInclusionResolver('planPago', this.planPago.inclusionResolver);
   }
 }

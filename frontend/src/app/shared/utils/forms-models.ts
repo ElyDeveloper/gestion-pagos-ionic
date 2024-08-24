@@ -87,6 +87,13 @@ export class FormModels {
     });
   }
 
+  checkForm(): FormGroup {
+    return this.fb.group({
+      fechaInicio: [null, Validators.required],
+      idEstadoAprobacion: [null, Validators.required],
+    });
+  }
+
   rolForm(): FormGroup {
     return this.fb.group({
       id: [null],

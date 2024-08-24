@@ -41,10 +41,8 @@ export class FechasPagos extends Entity {
   })
   cuota?: number;
 
-  // Define well-known properties here
   @belongsTo(() => PlanesPago, {name: 'planPago'})
   planId: number;
-
   // Define well-known properties here
 
   // Indexer property to allow additional data

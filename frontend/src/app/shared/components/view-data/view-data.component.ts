@@ -18,7 +18,10 @@ import { debounceTime, distinctUntilChanged, Subject } from "rxjs";
   styleUrls: ["./view-data.component.scss"],
 })
 export class ViewDataComponent implements OnInit {
+  @Input() showTitle: boolean = true;
+  @Input() showPagination: boolean = true;
   @Input() showAdd: boolean = true;
+  @Input() showSearch: boolean = true;
   @Input() context: string = "elemento";
   @Input() showCalendar: boolean = false;
   @Input() currentPage: number = 1;
@@ -33,6 +36,7 @@ export class ViewDataComponent implements OnInit {
   @Output() infoButtonClicked = new EventEmitter<any>();
   @Output() checkButtonClicked = new EventEmitter<any>();
   @Output() resetPasswordButtonClicked = new EventEmitter<any>();
+  @Output() planButtonClicked = new EventEmitter<any>();
   @Output() currentPageOut = new EventEmitter<number>();
   @Output() searchOut = new EventEmitter<string>();
 
@@ -142,6 +146,10 @@ export class ViewDataComponent implements OnInit {
     return this.formatValue(primaryValue);
   }
 
+  getCellOptions(column: Column): string[] {
+    return column.options || [];
+  }
+
   private getNestedValue(obj: any, key: string): any {
     return key.split(".").reduce((o, k) => (o || {})[k], obj);
   }
@@ -211,6 +219,9 @@ export class ViewDataComponent implements OnInit {
       case "check":
         this.onCheckButtonClick(row);
         break;
+      case "plan":
+        this.onInfoPlan(row);
+        break;
       case "resetPswd":
         this.onResetPassword(row);
         break;
@@ -261,6 +272,11 @@ export class ViewDataComponent implements OnInit {
 
   onResetPassword(data: any) {
     this.resetPasswordButtonClicked.emit(data);
+  }
+
+  onInfoPlan(data: any) {
+    console.log("Se click en plan");
+    this.planButtonClicked.emit(data);
   }
 
   updateVisiblePages() {

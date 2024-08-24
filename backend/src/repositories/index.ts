@@ -34,3 +34,4 @@ export * from './tipo-personas.repository';
 export * from './estado-civil.repository';
 export * from './prestamos.repository';
 export * from './fechas-pagos.repository';
+export * from './fechas-pagos.repository';
