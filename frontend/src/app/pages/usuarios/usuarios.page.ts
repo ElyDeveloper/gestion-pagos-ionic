@@ -124,6 +124,7 @@ export class UsuariosPage implements OnInit {
         key: "ad",
         alias: "AD",
         type: "boolean",
+        options: ["Activo", "Inactivo"],
       },
       {
         key: "estado",

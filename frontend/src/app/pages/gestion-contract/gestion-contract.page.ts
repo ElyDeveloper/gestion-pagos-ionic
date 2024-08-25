@@ -2,7 +2,7 @@ import { Component, inject, OnInit, ViewChild } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
 import { GlobalService } from "src/app/shared/services/global.service";
-import jsPDF from "jspdf";
+import jsPDF, { Html2CanvasOptions, jsPDFOptions } from "jspdf";
 import html2canvas from "html2canvas";
 import { environment } from "src/environments/environment";
 const COMPANY = environment.company || "No Aún";
@@ -62,19 +62,19 @@ export class GestionContractPage implements OnInit {
     const DATA = document.getElementById(idElement) as HTMLElement;
     const doc = new jsPDF("p", "pt", "letter");
     const options = {
-      background: "white",
-      scale: 3,
+      backgroundColor: "white",
+      scale: 1,
     };
 
     // Crear un elemento de estilo
     const style = document.createElement("style");
     style.textContent = `
       p{
-        font-size: 22px!important;
+        font-size: 30px!important;
       }
       
       h3{
-        font-size: 24px!important;
+        font-size: 32px!important;
       }
     `;
 

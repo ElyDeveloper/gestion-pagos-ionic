@@ -155,10 +155,12 @@
       <div class="carta">
         <div class="container">
           <div class="row">
-            <h3 class="text-center mb-4 fw-bold">
+            <br /><br /><br />
+            <h3 class="text-center my-5 fw-bold">
               PAGARÉ POR {{this.prestamoSeleccionado?.totalMonto| currency : "L"
               : "symbol"}}
             </h3>
+            <br /><br /><br />
 
             <div class="col-12">
               @if(hasAval){
@@ -181,8 +183,8 @@
                 solidario, mayor de edad,
                 {{toLowerCase(avalSeleccionado?.estadoCivil?.descripcion)}},
                 {{toLowerCase(avalSeleccionado?.nacionalidad?.descripcion)}},
-                con domicilio en {{avalSeleccionado?.direccion}}; por medio
-                del presente documento:
+                con domicilio en {{avalSeleccionado?.direccion}}; por medio del
+                presente documento:
               </p>
               }@else {
               <!-- Párrafo sin aval -->
@@ -257,16 +259,19 @@
                 {{formatDate(this.fechaAcuerdo)}} }@else {
                 <strong style="color: red">No Aún</strong>}.
               </p>
-
-              <br /><br /><br />
+              <br /><br /><br /><br /><br />
               <div
                 class="row mt-5 diplay-flex justify-content-center align-content-center">
-                <div class="col-4 text-center">
-                  <div class="border-top pt-2">Firma</div>
+                <div class="col-4 text-center mt-5 me-5">
+                  <div class="border-top pt-2">
+                    <p class="text-center">Firma</p>
+                  </div>
                 </div>
                 @if(hasAval){
-                <div class="col-4 text-center">
-                  <div class="border-top pt-2">Firma (Aval)</div>
+                <div class="col-4 text-center mt-5">
+                  <div class="border-top pt-2">
+                    <p class="text-center">Firma (Aval)</p>
+                  </div>
                 </div>
                 }
               </div>
@@ -291,18 +296,6 @@
       body {
         margin: 0;
       }
-    }
-
-    .carta {
-      width: 8.5in;
-      height: 11in;
-      padding: 1in;
-      margin: 20px auto;
-      background-color: white;
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-      font-size: 12pt;
-      line-height: 1.5;
-      overflow: hidden;
     }
 
     .carta h1 {

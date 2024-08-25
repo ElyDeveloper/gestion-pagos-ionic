@@ -231,6 +231,13 @@ export class PrestamosPage implements OnInit {
             color: "primary",
           },
           {
+            alias: "Registrar pago -",
+            action: "pay",
+            icon: "card",
+            color: "primary",
+            rolesAuthorized: [1, 2],
+          },
+          {
             alias: "Contrato",
             action: "contract",
             icon: "document",
