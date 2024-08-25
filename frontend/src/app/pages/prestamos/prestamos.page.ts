@@ -318,6 +318,11 @@ export class PrestamosPage implements OnInit {
     this._router.navigate(["/gestion-contrato/" + data.id]);
   }
 
+  onPagoButtonClicked(data: any) {
+    console.log("Contrato del cliente:", data);
+    this._router.navigate(["/layout/gestion-pago/" + data.id]);
+  }
+
   onInfoButtonClicked(data: any) {
     // console.log("Información del cliente:", data);
     this.element = data;

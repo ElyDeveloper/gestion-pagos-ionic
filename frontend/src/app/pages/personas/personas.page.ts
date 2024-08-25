@@ -17,10 +17,10 @@ import { FormModels } from "src/app/shared/utils/forms-models";
 
 @Component({
   selector: "app-clientes",
-  templateUrl: "./clientes.page.html",
-  styleUrls: ["./clientes.page.scss"],
+  templateUrl: "./personas.page.html",
+  styleUrls: ["./personas.page.scss"],
 })
-export class ClientesPage implements OnInit {
+export class PersonasPage implements OnInit {
   @ViewChild(LoaderComponent) loaderComponent!: LoaderComponent;
   elements: Personas[] = [];
   element: Personas = {
