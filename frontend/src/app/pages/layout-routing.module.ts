@@ -87,7 +87,11 @@ const routes: Routes = [
         pathMatch: "full",
       },
     ],
+  },  {
+    path: 'getion-pago',
+    loadChildren: () => import('./getion-pago/getion-pago.module').then( m => m.GetionPagoPageModule)
   },
+
 ];
 
 @NgModule({
