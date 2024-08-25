@@ -54,6 +54,10 @@ const routes: Routes = [
           ),
       },
       {
+        path: 'gestion-pago/:id',
+        loadChildren: () => import('./gestion-pago/gestion-pago.module').then( m => m.GestionPagoPageModule)
+      },
+      {
         path: "gestion-contrato/:id",
         loadChildren: () =>
           import("./gestion-contract/gestion-contract.module").then(
@@ -87,10 +91,10 @@ const routes: Routes = [
         pathMatch: "full",
       },
     ],
-  },  {
-    path: 'getion-pago',
-    loadChildren: () => import('./getion-pago/getion-pago.module').then( m => m.GetionPagoPageModule)
   },
+  
+
+  
 
 ];
 

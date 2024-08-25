@@ -4,17 +4,17 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { GetionPagoPageRoutingModule } from './getion-pago-routing.module';
+import { GestionPagoPageRoutingModule } from './gestion-pago-routing.module';
 
-import { GetionPagoPage } from './getion-pago.page';
+import { GestionPagoPage } from './gestion-pago.page';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    GetionPagoPageRoutingModule
+    GestionPagoPageRoutingModule
   ],
-  declarations: [GetionPagoPage]
+  declarations: [GestionPagoPage]
 })
-export class GetionPagoPageModule {}
+export class GestionPagoPageModule {}
