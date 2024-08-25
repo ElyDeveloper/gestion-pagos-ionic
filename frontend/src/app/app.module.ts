@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, Title } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
@@ -15,7 +15,7 @@ import { AuthInterceptor } from './shared/helpers/auth.interceptor';
 @NgModule({
   declarations: [AppComponent],
   imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, FormsModule],
-  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy  }, provideHttpClient(withInterceptors([AuthInterceptor])), provideAnimations()],
+  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy  }, provideHttpClient(withInterceptors([AuthInterceptor])), provideAnimations(), Title],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

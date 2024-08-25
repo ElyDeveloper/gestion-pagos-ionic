@@ -48,6 +48,7 @@ export class PrestamosController {
     })
     prestamos: any,
   ): Promise<Prestamos> {
+    prestamos.idCliente = this.jwtService.decryptId(prestamos.idCliente);
     // console.log('Prestamos: ', prestamos);
     return this.PrestamosRepository.create(prestamos);
   }

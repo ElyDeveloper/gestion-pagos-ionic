@@ -54,14 +54,10 @@ const routes: Routes = [
           ),
       },
       {
-        path: 'gestion-pago/:id',
-        loadChildren: () => import('./gestion-pago/gestion-pago.module').then( m => m.GestionPagoPageModule)
-      },
-      {
-        path: "gestion-contrato/:id",
+        path: "gestion-pago/:id",
         loadChildren: () =>
-          import("./gestion-contract/gestion-contract.module").then(
-            (m) => m.GestionContractPageModule
+          import("./gestion-pago/gestion-pago.module").then(
+            (m) => m.GestionPagoPageModule
           ),
       },
       {
@@ -92,10 +88,6 @@ const routes: Routes = [
       },
     ],
   },
-  
-
-  
-
 ];
 
 @NgModule({

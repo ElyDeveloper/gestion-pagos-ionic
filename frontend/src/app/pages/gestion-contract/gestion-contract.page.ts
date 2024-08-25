@@ -1,10 +1,19 @@
-import { Component, inject, OnInit, ViewChild } from "@angular/core";
-import { ActivatedRoute, Router } from "@angular/router";
+import {
+  Component,
+  EventEmitter,
+  inject,
+  OnInit,
+  Output,
+  ViewChild,
+} from "@angular/core";
+import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
 import { GlobalService } from "src/app/shared/services/global.service";
 import jsPDF, { Html2CanvasOptions, jsPDFOptions } from "jspdf";
 import html2canvas from "html2canvas";
 import { environment } from "src/environments/environment";
+import { filter, map } from "rxjs";
+import { Title } from "@angular/platform-browser";
 const COMPANY = environment.company || "No Aún";
 @Component({
   selector: "app-gestion-contract",
@@ -13,6 +22,21 @@ const COMPANY = environment.company || "No Aún";
 })
 export class GestionContractPage implements OnInit {
   @ViewChild(LoaderComponent) loaderComponent!: LoaderComponent;
+
+  //INFO
+  @Output() changeView: EventEmitter<void> = new EventEmitter();
+
+  // @ViewChild('printElement') printElement: ElementRef;
+
+  showData: boolean = false;
+  showContent: boolean = true;
+  isPrint: boolean = false;
+
+  urls: any = {
+    getMedidores: "/get-dataMedidores",
+  };
+
+  //INFO
 
   isModalOpen = false;
   isToastOpen = false;
@@ -24,6 +48,7 @@ export class GestionContractPage implements OnInit {
   editarCiudadBanco: boolean = false;
   editarDireccionEmpresa: boolean = false;
   editarFechaAcuerdo: boolean = false;
+  editarLugarAcuerdo: boolean = false;
 
   nombreEmpresa: string = COMPANY;
   bancoDepositar: string = "";
@@ -31,6 +56,7 @@ export class GestionContractPage implements OnInit {
   cuentaBancaria: string = "";
   direccionEmpresa: string = "";
   fechaAcuerdo: string = "";
+  lugarAcuerdo: string = "";
 
   textLoader: string = "Cargando...";
   toastMessage: string = "cliente guardado correctamente";
@@ -43,6 +69,8 @@ export class GestionContractPage implements OnInit {
 
   private _globalService = inject(GlobalService);
   private _route = inject(ActivatedRoute);
+  private _router = inject(Router);
+  private _titleService = inject(Title);
 
   constructor() {}
 
@@ -50,11 +78,109 @@ export class GestionContractPage implements OnInit {
     this.getPrestamo();
   }
 
-  generatePDF() {
-    this.exportToPDF(
-      `${this.clienteSeleccionado.nombres} ${this.clienteSeleccionado.apellidos}`,
-      "print-element"
+  setTitle() {
+    this._titleService.setTitle(
+      "Contrato - " +
+        this.clienteSeleccionado.nombres +
+        " " +
+        this.clienteSeleccionado.apellidos +
+        " " +
+        new Date().getTime()
     );
+  }
+
+  ionViewWillLeave() {
+    this._titleService.setTitle("Gestión Pagos");
+  }
+
+  changeViewState() {
+    this.changeView.emit();
+  }
+
+  generatePDF() {
+    // this.exportToPDF(
+    //   `${this.clienteSeleccionado.nombres} ${this.clienteSeleccionado.apellidos}`,
+    //   "print-element"
+    // );
+
+    this.printSection();
+  }
+
+  printSection() {
+    this.isPrint = true;
+    this.changeViewState();
+    //Esperar 1 segundo para que se muestre el loader
+    this.loaderComponent.show();
+    setTimeout(() => {
+      this.loaderComponent.hide();
+
+      var contentToPrint = document.getElementById(
+        "contentToPrint"
+      ) as HTMLElement;
+
+      //Verificar si hay contenido para imprimir
+      if (!contentToPrint) {
+        this.isPrint = false;
+        this.changeViewState();
+        return;
+      }
+
+      // Obtener las tablas
+      // var tables = document.querySelectorAll('#contentToPrint table');
+      // var canvases: any = document.querySelectorAll('#contentToPrint canvas');
+
+      // // Cambiar el tamaño de la fuente de las tablas a 8px
+      // tables.forEach(function (table: any) {
+      //   table.style.fontSize = '18px';
+      // });
+
+      // Convertir cada canvas en una imagen y agregarla al documento temporal
+      // canvases.forEach(function (canvas: any) {
+      //   var canvasImg = canvas.toDataURL('image/png');
+
+      //   //Reemplazar el canvas por una imagen
+      //   var img = document.createElement('img');
+      //   img.src = canvasImg;
+
+      //   img.style.width = '100%';
+      //   img.style.height = '100%';
+
+      //   canvas.parentNode.replaceChild(img, canvas);
+      // });
+
+      // Ocultar la URL del documento durante la impresión
+      const style = document.createElement("style");
+      style.innerHTML = `
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+  
+      @media print {
+        @page { margin-bottom: 0; margin-top: 0; }
+        body::after { content: none !important;
+      }
+    `;
+
+      // contentToPrint.innerHTML = contentToPrint.innerHTML;
+      contentToPrint.appendChild(style);
+
+      // var contentToPrint = document.getElementById('contentToPrint').innerHTML;
+      // document.body.innerHTML = contentToPrint.innerHTML;
+
+      //Esperar a que se cargue la imagen
+      setTimeout(() => {
+        // Imprimir el contenido
+        window.print();
+        //Eliminar los estilos
+        contentToPrint.removeChild(style);
+        this.isPrint = false;
+        console.log("Valor isPrint desde RangePicker: ", this.isPrint);
+        this.changeViewState();
+        console.log("Se ha restablecido el componente...");
+        // window.location.reload();
+      }, 3000);
+    }, 1000);
   }
 
   exportToPDF(name: string, idElement: string) {
@@ -105,7 +231,7 @@ export class GestionContractPage implements OnInit {
         );
         return doc;
       })
-      .then((docResult:any) => {
+      .then((docResult: any) => {
         const fecha = new Date();
         const time = fecha.getTime();
 
@@ -115,7 +241,7 @@ export class GestionContractPage implements OnInit {
         //console.log('Error: ', err);
         this.loaderComponent.hide();
       })
-      .catch((err:any) => {
+      .catch((err: any) => {
         document.head.removeChild(style);
 
         //console.log('Error: ', err);
@@ -139,6 +265,8 @@ export class GestionContractPage implements OnInit {
                 this.hasAval = true;
               }
               console.log("Plan de Pago: ", prestamo.planPago);
+
+              this.setTitle();
 
               this.isEdit = true;
             }

@@ -6,9 +6,7 @@
     [duration]="5000"
     (didDismiss)="setOpenedToast(false)"></ion-toast>
 
-  <app-breadcrumb></app-breadcrumb>
-
-  <ion-card>
+  <ion-card *ngIf="!isPrint">
     <ion-card-header>
       <ion-card-title>Datos Empresa/Bancarios</ion-card-title>
       <div class="d-flex justify-content-end">
@@ -145,22 +143,46 @@
               </div>
             </ion-item>
           </ion-col>
+
+          <ion-col size="12" size-sm="6" size-md="4">
+            <ion-item lines="full">
+              <ion-label position="stacked" class="bold-label"
+                >Lugar de Acuerdo</ion-label
+              >
+              <div style="display: flex; align-items: center; width: 100%">
+                <ion-input
+                  type="date"
+                  placeholder="YYYY-MM-DD"
+                  [(ngModel)]="lugarAcuerdo"
+                  [disabled]="!editarLugarAcuerdo"
+                  style="flex: 1">
+                </ion-input>
+                <ion-button
+                  fill="clear"
+                  (click)="editarLugarAcuerdo = !editarLugarAcuerdo"
+                  style="margin-left: 8px">
+                  <ion-icon
+                    [name]="editarLugarAcuerdo ? 'checkmark-circle' : 'create'"
+                    slot="icon-only"></ion-icon>
+                </ion-button>
+              </div>
+            </ion-item>
+          </ion-col>
         </ion-row>
       </ion-grid>
     </ion-card-content>
   </ion-card>
 
-  <ion-card>
-    <ion-card-content id="print-element">
+  <div>
+    <!-- <ion-card-content id="print-element" > -->
+    <div id="contentToPrint" #contentToPrint>
       <div class="carta">
         <div class="container">
           <div class="row">
-            <br /><br /><br />
-            <h3 class="text-center my-5 fw-bold">
+            <h6 class="text-center mt-5 fw-bold">
               PAGARÉ POR {{this.prestamoSeleccionado?.totalMonto| currency : "L"
               : "symbol"}}
-            </h3>
-            <br /><br /><br />
+            </h6>
 
             <div class="col-12">
               @if(hasAval){
@@ -172,7 +194,7 @@
                   {{clienteSeleccionado?.apellidos}} </strong
                 >, mayor de edad,
                 {{toLowerCase(clienteSeleccionado?.estadoCivil?.descripcion)}},
-                {{toLowerCase(clienteSeleccionado?.nacionalidad?.descripcion)}},
+                {{toLowerCase(clienteSeleccionado?.nacionalidad?.gentilicio)}},
                 con documento nacional de identificación
                 {{clienteSeleccionado?.dni}}, con domicilio en
                 {{clienteSeleccionado?.direccion}} y Yo
@@ -182,7 +204,7 @@
                 {{avalSeleccionado?.dni|formatDni}}, en condición de aval
                 solidario, mayor de edad,
                 {{toLowerCase(avalSeleccionado?.estadoCivil?.descripcion)}},
-                {{toLowerCase(avalSeleccionado?.nacionalidad?.descripcion)}},
+                {{toLowerCase(avalSeleccionado?.nacionalidad?.gentilicio)}},
                 con domicilio en {{avalSeleccionado?.direccion}}; por medio del
                 presente documento:
               </p>
@@ -195,7 +217,7 @@
                   {{clienteSeleccionado?.apellidos}}</strong
                 >, mayor de edad,
                 {{toLowerCase(clienteSeleccionado?.estadoCivil?.descripcion)}},
-                {{toLowerCase(clienteSeleccionado?.nacionalidad?.descripcion)}},
+                {{toLowerCase(clienteSeleccionado?.nacionalidad?.gentilicio)}},
                 con documento nacional de identificación
                 {{clienteSeleccionado?.dni |formatDni}}, con domicilio en
                 {{clienteSeleccionado?.direccion}}; por medio del presente
@@ -203,7 +225,7 @@
               </p>
               }
 
-              <h3 class="mt-4 mb-3 fw-bold">DECLARO Y HAGO CONSTAR</h3>
+              <h6 class="mt-4 mb-3 fw-bold">DECLARO Y HAGO CONSTAR</h6>
 
               <p>
                 <strong>PRIMERO:</strong> Que estoy en adeudarle a
@@ -254,12 +276,12 @@
 
               <p class="mt-4">
                 En fe de lo cual y para los fines legales correspondientes,
-                firmo el presente PAGARE en la ciudad de Gracias, Departamento
-                de Lempira, a los días, @if(this.fechaAcuerdo){
+                firmo el presente PAGARE en @if(this.lugarAcuerdo){
+                  {{formatDate(this.lugarAcuerdo)}} }@else {
+                  <strong style="color: red">Pendiente lugar acuerdo</strong>}, a los días, @if(this.fechaAcuerdo){
                 {{formatDate(this.fechaAcuerdo)}} }@else {
-                <strong style="color: red">No Aún</strong>}.
+                <strong style="color: red">Pendiente fecha acuerdo</strong>}.
               </p>
-              <br /><br /><br /><br /><br />
               <div
                 class="row mt-5 diplay-flex justify-content-center align-content-center">
                 <div class="col-4 text-center mt-5 me-5">
@@ -279,8 +301,8 @@
           </div>
         </div>
       </div>
-    </ion-card-content>
-  </ion-card>
+    </div>
+  </div>
 
   <style>
     .bold-label {

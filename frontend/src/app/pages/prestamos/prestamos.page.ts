@@ -315,7 +315,7 @@ export class PrestamosPage implements OnInit {
 
   onContractButtonClicked(data: any) {
     console.log("Contrato del cliente:", data);
-    this._router.navigate(["/layout/gestion-contrato/" + data.id]);
+    this._router.navigate(["/gestion-contrato/" + data.id]);
   }
 
   onInfoButtonClicked(data: any) {

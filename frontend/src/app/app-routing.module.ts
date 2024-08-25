@@ -13,16 +13,25 @@ const routes: Routes = [
       import("./pages/auth/login/login.module").then((m) => m.LoginPageModule),
   },
   {
-    path: 'forgot-password',
-    loadChildren: () => import('./pages/auth/forgot-password/forgot-password.module').then( m => m.ForgotPasswordPageModule)
+    path: "forgot-password",
+    loadChildren: () =>
+      import("./pages/auth/forgot-password/forgot-password.module").then(
+        (m) => m.ForgotPasswordPageModule
+      ),
   },
   {
-    path: 'reset-password/:id',
-    loadChildren: () => import('./pages/auth/reset-password/reset-password.module').then( m => m.ResetPasswordPageModule)
+    path: "reset-password/:id",
+    loadChildren: () =>
+      import("./pages/auth/reset-password/reset-password.module").then(
+        (m) => m.ResetPasswordPageModule
+      ),
   },
   {
-    path: 'verify-code',
-    loadChildren: () => import('./pages/auth/verify-code/verify-code.module').then( m => m.VerifyCodePageModule)
+    path: "verify-code",
+    loadChildren: () =>
+      import("./pages/auth/verify-code/verify-code.module").then(
+        (m) => m.VerifyCodePageModule
+      ),
   },
   {
     path: "register",
@@ -35,6 +44,13 @@ const routes: Routes = [
     path: "layout",
     loadChildren: () =>
       import("./pages/layout.module").then((m) => m.LayoutPageModule),
+  },
+  {
+    path: "gestion-contrato/:id",
+    loadChildren: () =>
+      import("./pages/gestion-contract/gestion-contract.module").then(
+        (m) => m.GestionContractPageModule
+      ),
   },
 ];
 
