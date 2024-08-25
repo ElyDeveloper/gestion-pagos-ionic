@@ -48,8 +48,12 @@ export class PrestamosController {
     })
     prestamos: any,
   ): Promise<Prestamos> {
-    prestamos.idCliente = this.jwtService.decryptId(prestamos.idCliente);
-    // console.log('Prestamos: ', prestamos);
+    if (typeof prestamos.idCliente === 'string') {
+      prestamos.idCliente = this.jwtService.decryptId(prestamos.idCliente);
+    }
+    if (typeof prestamos.idAval === 'string') {
+      prestamos.idAval = this.jwtService.decryptId(prestamos.idAval);
+    }
     return this.PrestamosRepository.create(prestamos);
   }
 
@@ -176,7 +180,12 @@ export class PrestamosController {
         {relation: 'moneda'},
         {relation: 'periodoCobro'},
         {relation: 'estadoAprobacion'},
-        {relation: 'aval'},
+        {
+          relation: 'aval',
+          scope: {
+            include: [{relation: 'estadoCivil'}, {relation: 'nacionalidad'}],
+          },
+        },
       ],
     });
   }
@@ -207,6 +216,16 @@ export class PrestamosController {
     @param.path.number('id') id: number,
     @requestBody() prestamos: any,
   ): Promise<void> {
+    //verificar si prestamos.idCliente es numero entero
+    if (typeof prestamos.idCliente === 'string') {
+      prestamos.idCliente = this.jwtService.decryptId(prestamos.idCliente);
+    }
+    if (typeof prestamos.idAval === 'string') {
+      prestamos.idAval = this.jwtService.decryptId(prestamos.idAval);
+    }
+
+    console.log('Prestamo: ', prestamos);
+
     await this.PrestamosRepository.replaceById(id, prestamos);
   }
 
@@ -214,8 +233,11 @@ export class PrestamosController {
   @response(204, {
     description: 'Prestamos DELETE success',
   })
-  async deleteById(@param.path.number('id') id: number): Promise<void> {
-    await this.PrestamosRepository.deleteById(id);
+  async deleteById(@param.path.string('id') id: string): Promise<void> {
+    const decryptedId = await this.jwtService.decryptId(id);
+    await this.PrestamosRepository.updateById(decryptedId, {
+      estado: false,
+    });
   }
 
   @get('/prestamos/search')
@@ -230,6 +252,7 @@ export class PrestamosController {
         {relation: 'estadoAprobacion'},
         {relation: 'planPago'},
         {relation: 'moneda'},
+        {relation: 'aval'},
       ],
       where: {
         or: [

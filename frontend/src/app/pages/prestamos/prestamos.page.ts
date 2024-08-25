@@ -355,7 +355,7 @@ export class PrestamosPage implements OnInit {
     console.log("Eliminar cliente Obtenido:", data);
     this.textLoader = "Eliminando cliente";
     this.loaderComponent.show();
-    this._globalService.Delete("clientes", data.id).subscribe({
+    this._globalService.Delete("prestamos", data.id).subscribe({
       next: (response: any) => {
         console.log("cliente eliminado:", response);
         this.getCountElements();

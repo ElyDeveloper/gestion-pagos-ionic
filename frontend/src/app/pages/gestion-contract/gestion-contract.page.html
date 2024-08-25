@@ -151,8 +151,7 @@
               >
               <div style="display: flex; align-items: center; width: 100%">
                 <ion-input
-                  type="date"
-                  placeholder="YYYY-MM-DD"
+                  placeholder="Ej. Lugar de Acuerdo"
                   [(ngModel)]="lugarAcuerdo"
                   [disabled]="!editarLugarAcuerdo"
                   style="flex: 1">
@@ -277,20 +276,20 @@
               <p class="mt-4">
                 En fe de lo cual y para los fines legales correspondientes,
                 firmo el presente PAGARE en @if(this.lugarAcuerdo){
-                  {{formatDate(this.lugarAcuerdo)}} }@else {
+                  {{this.lugarAcuerdo}} }@else {
                   <strong style="color: red">Pendiente lugar acuerdo</strong>}, a los días, @if(this.fechaAcuerdo){
                 {{formatDate(this.fechaAcuerdo)}} }@else {
                 <strong style="color: red">Pendiente fecha acuerdo</strong>}.
               </p>
               <div
                 class="row mt-5 diplay-flex justify-content-center align-content-center">
-                <div class="col-4 text-center mt-5 me-5">
+                <div class="col-4 text-center m-5">
                   <div class="border-top pt-2">
                     <p class="text-center">Firma</p>
                   </div>
                 </div>
                 @if(hasAval){
-                <div class="col-4 text-center mt-5">
+                <div class="col-4 text-center m-5">
                   <div class="border-top pt-2">
                     <p class="text-center">Firma (Aval)</p>
                   </div>

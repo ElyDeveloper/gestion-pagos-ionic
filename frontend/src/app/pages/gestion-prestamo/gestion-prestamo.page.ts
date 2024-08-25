@@ -92,7 +92,7 @@ export class GestionPrestamoPage implements OnInit {
           next: (prestamo: any) => {
             if (prestamo) {
               prestamo = this._globalService.parseObjectDates(prestamo);
-              console.log('Prestamo: ',prestamo);
+              console.log("Prestamo: ", prestamo);
               this.prestamoSeleccionado = prestamo;
               this.clienteSeleccionado = prestamo.cliente;
               this.avalSeleccionado = prestamo.aval;
@@ -256,9 +256,11 @@ export class GestionPrestamoPage implements OnInit {
 
   onClienteSeleccionado(event: any) {
     this.clienteSeleccionado = event.detail.value;
+    console.log("Cliente seleccionado: ", this.clienteSeleccionado);
   }
   onAvalSeleccionado(event: any) {
     this.avalSeleccionado = event.detail.value;
+    console.log("Aval seleccionado: ", this.avalSeleccionado);
   }
 
   changeAval(event: any) {
@@ -339,7 +341,7 @@ export class GestionPrestamoPage implements OnInit {
       fechaInicio: new Date(
         this.planesPagoForm.get("fechaInicio")?.value || new Date()
       ),
-      fechaFin: this.planesPagoForm.get("fechaFin")?.value,
+      fechaFin: new Date(this.planesPagoForm.get("fechaFin")?.value) || null,
       cuotaPagadas: 0,
       estado: this.planesPagoForm.get("estado")?.value,
     };
@@ -368,6 +370,8 @@ export class GestionPrestamoPage implements OnInit {
   private updatePrestamo(planPago: PlanesPago) {
     const idPlan = this.prestamoSeleccionado.planPago.id;
     const idPrestamo = this.prestamoSeleccionado.id;
+
+    console.log("Plan Pago: ", planPago);
 
     this._globalService.PutId("planes-pagos", idPlan, planPago).subscribe({
       next: () => {
