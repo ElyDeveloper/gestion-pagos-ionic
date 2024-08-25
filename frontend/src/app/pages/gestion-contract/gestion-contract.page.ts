@@ -105,7 +105,7 @@ export class GestionContractPage implements OnInit {
         );
         return doc;
       })
-      .then((docResult) => {
+      .then((docResult:any) => {
         const fecha = new Date();
         const time = fecha.getTime();
 
@@ -115,7 +115,7 @@ export class GestionContractPage implements OnInit {
         //console.log('Error: ', err);
         this.loaderComponent.hide();
       })
-      .catch((err) => {
+      .catch((err:any) => {
         document.head.removeChild(style);
 
         //console.log('Error: ', err);
