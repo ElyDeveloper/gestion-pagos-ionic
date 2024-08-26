@@ -54,6 +54,13 @@ const routes: Routes = [
           ),
       },
       {
+        path: "gestion-pago/:id",
+        loadChildren: () =>
+          import("./gestion-pago/gestion-pago.module").then(
+            (m) => m.GestionPagoPageModule
+          ),
+      },
+      {
         path: "gestion-prestamo",
         loadChildren: () =>
           import("./gestion-prestamo/gestion-prestamo.module").then(

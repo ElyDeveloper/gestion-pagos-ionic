@@ -12,7 +12,7 @@ export class AppComponent {
   public appPages = [
     { title: "Inicio", url: "/layout/home", icon: "home" },
     { title: "Usuarios", url: "/layout/usuarios", icon: "people" },
-    { title: "Clientes", url: "/layout/clientes", icon: "person" },
+    { title: "Clientes/Avales", url: "/layout/clientes", icon: "person" },
     {
       title: "Contratos Pagos",
       url: "/layout/contratos-pago",

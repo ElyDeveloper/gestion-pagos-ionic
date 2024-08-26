@@ -82,7 +82,9 @@ export class UsuariosPage implements OnInit {
     this.formResetPswd = this.formModels.resetPswdForm();
   }
 
-  ngOnInit() {
+  ngOnInit() {}
+
+  ionViewWillEnter() {
     this.getRoles();
     this.getCountElements();
     this.buildColumns();
@@ -122,11 +124,13 @@ export class UsuariosPage implements OnInit {
         key: "ad",
         alias: "AD",
         type: "boolean",
+        options: ["Activo", "Inactivo"],
       },
       {
         key: "estado",
         alias: "Estado",
         type: "boolean",
+        options: ["Activo", "Inactivo"],
       },
       {
         key: "telefono",

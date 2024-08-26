@@ -7,18 +7,22 @@ export class FormModels {
     this.fb = formBuilder;
   }
 
-  clienteForm(): FormGroup {
+  personasForm(): FormGroup {
     return this.fb.group({
       id: [null],
-      dni: ["", Validators.required],
-      nombres: ["", Validators.required],
-      apellidos: ["", Validators.required],
-      cel: ["", Validators.required],
-      direccion: ["", Validators.required],
-      email: ["", [Validators.required, Validators.email]],
-      fechaIngreso: ["", Validators.required],
-      fechaBaja: [undefined],
+      dni: [null],
+      nombres: [null, [Validators.required, Validators.minLength(2)]],
+      apellidos: [null, [Validators.required, Validators.minLength(2)]],
+      cel: [null, [Validators.required, Validators.pattern(/^\d{4}-\d{4}$/)]],
+      direccion: [null, Validators.required],
+      email: [null, [Validators.required, Validators.email]],
+      fechaIngreso: [null, Validators.required],
+      fechaBaja: [null],
       estado: [true],
+      idNacionalidad: [null, Validators.required],
+      idRecordCrediticio: [1],
+      idEstadoCivil: [null, Validators.required],
+      idTipoPersona: [null, Validators.required],
     });
   }
 
@@ -68,6 +72,7 @@ export class FormModels {
       idEstadoAprobacion: [null, Validators.required],
       idPlan: [null],
       idMoneda: [null, Validators.required],
+      idAval: [null],
     });
   }
 
@@ -79,6 +84,13 @@ export class FormModels {
       fechaFin: [null, { disabled: true }],
       cuotaPagadas: [0, [Validators.required, Validators.min(0)]],
       estado: [true],
+    });
+  }
+
+  checkForm(): FormGroup {
+    return this.fb.group({
+      fechaInicio: [null, Validators.required],
+      idEstadoAprobacion: [null, Validators.required],
     });
   }
 

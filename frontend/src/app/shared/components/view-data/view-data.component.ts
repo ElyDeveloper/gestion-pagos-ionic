@@ -1,4 +1,3 @@
-import { formatDate } from "@angular/common";
 import {
   Component,
   EventEmitter,
@@ -18,8 +17,11 @@ import { debounceTime, distinctUntilChanged, Subject } from "rxjs";
   styleUrls: ["./view-data.component.scss"],
 })
 export class ViewDataComponent implements OnInit {
+  @Input() showTitle: boolean = true;
+  @Input() showPagination: boolean = true;
   @Input() showAdd: boolean = true;
-  @Input() context: string = 'elemento';
+  @Input() showSearch: boolean = true;
+  @Input() context: string = "elemento";
   @Input() showCalendar: boolean = false;
   @Input() currentPage: number = 1;
   @Input() totalPages: number = 10; // Esto debería ser dinámico basado en tus datos
@@ -31,7 +33,10 @@ export class ViewDataComponent implements OnInit {
   @Output() editButtonClicked = new EventEmitter<any>();
   @Output() deleteButtonClicked = new EventEmitter<any>();
   @Output() infoButtonClicked = new EventEmitter<any>();
+  @Output() checkButtonClicked = new EventEmitter<any>();
+  @Output() contractButtonClicked = new EventEmitter<any>();
   @Output() resetPasswordButtonClicked = new EventEmitter<any>();
+  @Output() planButtonClicked = new EventEmitter<any>();
   @Output() currentPageOut = new EventEmitter<number>();
   @Output() searchOut = new EventEmitter<string>();
 
@@ -118,12 +123,14 @@ export class ViewDataComponent implements OnInit {
   }
 
   getCellValue(row: any, column: Column): any {
-    const primaryValue = this.getNestedValue(row, column.key);
+    let primaryValue = this.getNestedValue(row, column.key);
 
     if (column.combineWith) {
       const secondaryValue = this.getNestedValue(row, column.combineWith);
       if (column.combineFormat) {
-        return column.combineFormat(primaryValue, secondaryValue);
+        if (primaryValue && secondaryValue) {
+          return column.combineFormat(primaryValue, secondaryValue);
+        }
       }
       return `${this.formatValue(primaryValue)} ${this.formatValue(
         secondaryValue
@@ -137,6 +144,22 @@ export class ViewDataComponent implements OnInit {
 
     // console.log('primaryValue', primaryValue);
     return this.formatValue(primaryValue);
+  }
+
+  getImageUrl(row: any, column: any): string {
+    const urlKey = column.imageUrl;
+    const urlValue = this.getCellValue(row, { key: urlKey, alias: "Imagen" });
+    const onlyIdentifier = urlValue.split("/").pop();
+    // console.log(onlyIdentifier);
+
+    if (onlyIdentifier) {
+      return onlyIdentifier;
+    }
+    return "";
+  }
+
+  getCellOptions(column: Column): string[] {
+    return column.options || [];
   }
 
   private getNestedValue(obj: any, key: string): any {
@@ -205,6 +228,15 @@ export class ViewDataComponent implements OnInit {
       case "delete":
         this.onDeleteButtonClick(row);
         break;
+      case "check":
+        this.onCheckButtonClick(row);
+        break;
+      case "contract":
+        this.onContractButtonClick(row);
+        break;
+      case "plan":
+        this.onInfoPlan(row);
+        break;
       case "resetPswd":
         this.onResetPassword(row);
         break;
@@ -222,6 +254,14 @@ export class ViewDataComponent implements OnInit {
 
   onInfoButtonClick(data: any) {
     this.infoButtonClicked.emit(data);
+  }
+
+  onCheckButtonClick(data: any) {
+    this.checkButtonClicked.emit(data);
+  }
+
+  onContractButtonClick(data: any) {
+    this.contractButtonClicked.emit(data);
   }
 
   async onDeleteButtonClick(data: any) {
@@ -251,6 +291,11 @@ export class ViewDataComponent implements OnInit {
 
   onResetPassword(data: any) {
     this.resetPasswordButtonClicked.emit(data);
+  }
+
+  onInfoPlan(data: any) {
+    console.log("Se click en plan");
+    this.planButtonClicked.emit(data);
   }
 
   updateVisiblePages() {

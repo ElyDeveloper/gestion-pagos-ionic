@@ -1,4 +1,4 @@
-import { Clientes } from "./cliente";
+import { Personas } from "./persona";
 import { Usuario } from "./usuario";
 
 export interface UsuarioCliente {
@@ -6,6 +6,6 @@ export interface UsuarioCliente {
   usuarioId: number;
   clienteId: number;
   Usuario?: Usuario;
-  Cliente?: Clientes;
+  Cliente?: Personas
   [prop: string]: any;
 }

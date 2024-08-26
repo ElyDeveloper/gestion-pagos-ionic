@@ -5,7 +5,6 @@ import {LoginInterface} from '../core/interfaces/models/Login.interface';
 import {Credenciales} from '../models/credenciales.model';
 import {CodigoVerificacionRepository} from '../repositories/codigo-verificacion.repository';
 import {CredencialesRepository} from '../repositories/credenciales.repository';
-import {UsuarioRepository} from '../repositories/usuario.repository';
 import {EncriptDecryptService} from './encript-decrypt.service';
 import {UserService} from './user.service';
 import {VerifyCodeInfo} from '../core/interfaces/models/gCode.interface';
@@ -13,12 +12,13 @@ import {TokenServiceBindings} from '@loopback/authentication-jwt';
 import {TokenService} from '@loopback/authentication';
 import {securityId, UserProfile} from '@loopback/security';
 import * as crypto from 'crypto';
+import { keys } from '../env/interfaces/Servicekeys.interface';
 var shortid = require('shortid-36');
 
 //importar dotenv
 require('dotenv').config();
 
-const ENCRYPTION_KEY = crypto.randomBytes(32); // 256 bit key
+const ENCRYPTION_KEY = crypto.createHash('sha256').update(keys.SECRET_KEY).digest();
 const IV_LENGTH = 16;
 
 @injectable({scope: BindingScope.TRANSIENT})

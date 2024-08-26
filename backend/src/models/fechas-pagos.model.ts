@@ -1,6 +1,5 @@
-import {belongsTo, Entity, hasMany, model, property} from '@loopback/repository';
-import { PlanesPago } from './planes-pago.model';
-import { TransaccionesExternas } from './transacciones-externas.model';
+import {Entity, model, property, belongsTo} from '@loopback/repository';
+import {PlanesPago} from './planes-pago.model';
 
 @model({settings: {idInjection: false, mssql: {schema: 'dbo', table: 'FechasPagos'}}})
 export class FechasPagos extends Entity {
@@ -23,7 +22,6 @@ export class FechasPagos extends Entity {
     mssql: {columnName: 'FechaPago', dataType: 'date', dataLength: null, dataPrecision: null, dataScale: null, nullable: 'NO', generated: false},
   })
   fechaPago: string;
-
   @property({
     type: 'boolean',
     required: true,
@@ -43,12 +41,9 @@ export class FechasPagos extends Entity {
   })
   cuota?: number;
 
-  // Define well-known properties here
   @belongsTo(() => PlanesPago, {name: 'planPago'})
   planId: number;
-
-  @hasMany(() => TransaccionesExternas, {keyTo: 'idPago'})
-  transaccionesExternas: TransaccionesExternas[];
+  // Define well-known properties here
 
   // Indexer property to allow additional data
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

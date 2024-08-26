@@ -42,16 +42,19 @@ export class PrestamosController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Prestamos, {
-            title: 'NewPrestamos',
-            exclude: ['id'],
-          }),
+          schema: {},
         },
       },
     })
-    Prestamos: Omit<Prestamos, 'id'>,
+    prestamos: any,
   ): Promise<Prestamos> {
-    return this.PrestamosRepository.create(Prestamos);
+    if (typeof prestamos.idCliente === 'string') {
+      prestamos.idCliente = this.jwtService.decryptId(prestamos.idCliente);
+    }
+    if (typeof prestamos.idAval === 'string') {
+      prestamos.idAval = this.jwtService.decryptId(prestamos.idAval);
+    }
+    return this.PrestamosRepository.create(prestamos);
   }
 
   @get('/prestamos/count')
@@ -106,14 +109,16 @@ export class PrestamosController {
     @param.query.number('skip') skip: number,
     @param.query.number('limit') limit: number,
   ): Promise<Prestamos[]> {
+    console.log('Llamada de paginacion');
     const prestamos = await this.PrestamosRepository.find({
       include: [
         {relation: 'cliente'},
         {relation: 'producto'},
-        {relation: 'periodo'},
-        {relation: 'estadoAprobacion'},
         {relation: 'planPago'},
         {relation: 'moneda'},
+        {relation: 'periodoCobro'},
+        {relation: 'estadoAprobacion'},
+        {relation: 'aval'},
       ],
       skip,
       limit,
@@ -161,15 +166,26 @@ export class PrestamosController {
   async findById(@param.path.string('id') id: string): Promise<Prestamos> {
     console.log('Id Encrypted: ', id);
     const idDecrypted = this.jwtService.decryptId(id);
-    console.log('Id Decrypted: ', idDecrypted)
+    console.log('Id Decrypted: ', idDecrypted);
     return this.PrestamosRepository.findById(idDecrypted, {
       include: [
-        {relation: 'cliente'},
+        {
+          relation: 'cliente',
+          scope: {
+            include: [{relation: 'estadoCivil'}, {relation: 'nacionalidad'}],
+          },
+        },
         {relation: 'producto'},
-        {relation: 'periodo'},
-        {relation: 'estadoAprobacion'},
         {relation: 'planPago'},
         {relation: 'moneda'},
+        {relation: 'periodoCobro'},
+        {relation: 'estadoAprobacion'},
+        {
+          relation: 'aval',
+          scope: {
+            include: [{relation: 'estadoCivil'}, {relation: 'nacionalidad'}],
+          },
+        },
       ],
     });
   }
@@ -198,28 +214,30 @@ export class PrestamosController {
   })
   async replaceById(
     @param.path.number('id') id: number,
-    @requestBody() Prestamos: Prestamos,
+    @requestBody() prestamos: any,
   ): Promise<void> {
-    await this.PrestamosRepository.replaceById(id, Prestamos);
+    //verificar si prestamos.idCliente es numero entero
+    if (typeof prestamos.idCliente === 'string') {
+      prestamos.idCliente = this.jwtService.decryptId(prestamos.idCliente);
+    }
+    if (typeof prestamos.idAval === 'string') {
+      prestamos.idAval = this.jwtService.decryptId(prestamos.idAval);
+    }
+
+    console.log('Prestamo: ', prestamos);
+
+    await this.PrestamosRepository.replaceById(id, prestamos);
   }
 
   @del('/prestamos/{id}')
   @response(204, {
     description: 'Prestamos DELETE success',
   })
-  async deleteById(@param.path.number('id') id: number): Promise<void> {
-    await this.PrestamosRepository.deleteById(id);
-  }
-
-  @get('/get-prestamos-vista/{id}')
-  async dataPrestamosId(@param.path.number('id') id: number): Promise<any> {
-    let datos = await this.getPrestamosId(id);
-    return datos;
-  }
-  async getPrestamosId(id: number) {
-    return await this.PrestamosRepository.dataSource.execute(
-      `${viewOf.getPrestamos} Where Prestamos.Estado = ${id}`,
-    );
+  async deleteById(@param.path.string('id') id: string): Promise<void> {
+    const decryptedId = await this.jwtService.decryptId(id);
+    await this.PrestamosRepository.updateById(decryptedId, {
+      estado: false,
+    });
   }
 
   @get('/prestamos/search')
@@ -234,6 +252,7 @@ export class PrestamosController {
         {relation: 'estadoAprobacion'},
         {relation: 'planPago'},
         {relation: 'moneda'},
+        {relation: 'aval'},
       ],
       where: {
         or: [
@@ -243,23 +262,5 @@ export class PrestamosController {
       },
     });
     return PrestamosSearch;
-  }
-
-  async getPrestamosSearch(search: string) {
-    return await this.PrestamosRepository.dataSource.execute(
-      `${viewOf.getViewPrestamos} Where Nombres like '%${search}%' or Apellidos like '%${search}%' or Nombre like '%${search}%'  or Monto like '%${search}%'  or TotalMonto like '%${search}%' or FechaInicial like '%${search}%' or FechaFinal like '%${search}%'`,
-    );
-  }
-
-  @get('/get-prestamos-vista')
-  async dataPrestamos(): Promise<any> {
-    let datos = await this.getPrestamos();
-    return datos;
-  }
-
-  async getPrestamos() {
-    return await this.PrestamosRepository.dataSource.execute(
-      `${viewOf.getPrestamos}`,
-    );
   }
 }

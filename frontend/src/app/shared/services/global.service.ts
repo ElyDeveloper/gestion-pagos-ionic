@@ -8,6 +8,10 @@ const API_URL = environment.apiURL;
   providedIn: "root",
 })
 export class GlobalService {
+  private unidades: string[] = ['', 'uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve'];
+  private decenas: string[] = ['diez', 'veinte', 'treinta', 'cuarenta', 'cincuenta', 'sesenta', 'setenta', 'ochenta', 'noventa'];
+  private especiales: string[] = ['once', 'doce', 'trece', 'catorce', 'quince', 'dieciséis', 'diecisiete', 'dieciocho', 'diecinueve'];
+
   private _http = inject(HttpClient);
   constructor() { }
 
@@ -42,7 +46,7 @@ export class GlobalService {
     return this._http.put(`${API_URL}${endPoint}/${Id}`, body);
   }
   Delete(endPoint: string, Id: number) {
-    return this._http.delete(`${API_URL}/${endPoint}/${Id}`);
+    return this._http.delete(`${API_URL}${endPoint}/${Id}`);
   }
   Patch(endPoint: string, Id: number, body: any) {
     return this._http.patch(`${API_URL}${endPoint}/${Id}`, body);
@@ -82,5 +86,30 @@ export class GlobalService {
 
   private isISODate(str: string): boolean {
     return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(str);
+  }
+
+  
+
+  numberToText(numero: number): string {
+    if (numero < 0 || numero > 99) {
+      return 'Número fuera de rango';
+    }
+
+    if (numero < 10) {
+      return this.unidades[numero];
+    }
+
+    if (numero < 20) {
+      return this.especiales[numero - 11];
+    }
+
+    const unidad = numero % 10;
+    const decena = Math.floor(numero / 10);
+
+    if (unidad === 0) {
+      return this.decenas[decena - 1];
+    }
+
+    return `${this.decenas[decena - 1]} y ${this.unidades[unidad]}`;
   }
 }

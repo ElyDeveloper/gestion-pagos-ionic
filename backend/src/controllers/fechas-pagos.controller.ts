@@ -20,14 +20,13 @@ import {
 } from '@loopback/rest';
 import {FechasPagos} from '../models';
 import {FechasPagosRepository} from '../repositories';
-import { authenticate } from '@loopback/authentication';
-
+import {authenticate} from '@loopback/authentication';
 
 // @authenticate('jwt')
 export class FechasPagosController {
   constructor(
     @repository(FechasPagosRepository)
-    public FechasPagosRepository : FechasPagosRepository,
+    public FechasPagosRepository: FechasPagosRepository,
   ) {}
 
   @post('/fechas-pagos')
@@ -41,7 +40,6 @@ export class FechasPagosController {
         'application/json': {
           schema: getModelSchemaRef(FechasPagos, {
             title: 'NewHistorialPagos',
-            
           }),
         },
       },
@@ -76,9 +74,7 @@ export class FechasPagosController {
   })
   async find(): Promise<FechasPagos[]> {
     return this.FechasPagosRepository.find({
-      include: [
-        {relation: 'planPago'}
-      ]
+      include: [{relation: 'planPago'}],
     });
   }
 
@@ -118,9 +114,7 @@ export class FechasPagosController {
     @param.query.number('limit') limit: number,
   ): Promise<FechasPagos[]> {
     return this.FechasPagosRepository.find({
-      include: [
-        {relation: 'planPago'}
-      ],
+      include: [{relation: 'planPago'}],
       skip,
       limit,
     });
@@ -135,16 +129,30 @@ export class FechasPagosController {
       },
     },
   })
-  async findById(
-    @param.path.number('id') id: number
-  ): Promise<FechasPagos> {
-    return this.FechasPagosRepository.findById(id, 
-      {
-        include: [
-          {relation: 'planPago'}
-        ]
-      }
-    );
+  async findById(@param.path.number('id') id: number): Promise<FechasPagos> {
+    return this.FechasPagosRepository.findById(id, {
+      include: [{relation: 'planPago'}],
+    });
+  }
+
+  @get('/fechas-pagos/plan/{id}')
+  @response(200, {
+    description: 'FechasPagos model instance',
+    content: {
+      'application/json': {
+        schema: getModelSchemaRef(FechasPagos, {includeRelations: true}),
+      },
+    },
+  })
+  async findByIdPlan(
+    @param.path.number('id') id: number,
+  ): Promise<FechasPagos[]> {
+    return await this.FechasPagosRepository.find({
+      where: {planId: id},
+      include: [{ relation: 'planPago' }],
+      order: ['fechaPago ASC'],
+
+    });
   }
 
   @get('/fechas-pagos/moras')
@@ -196,5 +204,4 @@ export class FechasPagosController {
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.FechasPagosRepository.deleteById(id);
   }
-  
 }

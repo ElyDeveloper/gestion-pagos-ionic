@@ -13,7 +13,10 @@ import { FormGroup } from "@angular/forms";
     <ion-modal [isOpen]="isOpen" (didDismiss)="onDidDismiss()">
       <ng-container *ngIf="content">
         <ng-container
-          *ngTemplateOutlet="content; context: { close: close, save: save, form:formSave }">
+          *ngTemplateOutlet="
+            content;
+            context: { close: close, save: save, form: formSave }
+          ">
         </ng-container>
         <ion-toast
           [isOpen]="isToastOpen"
@@ -28,6 +31,7 @@ export class ReusableModalComponent {
   @Input() isOpen: boolean = false;
   @Input() content!: TemplateRef<any>;
   @Input() formSave!: FormGroup;
+  @Input() modalConfig: any;
   @Output() isOpenChange = new EventEmitter<boolean>();
   @Output() saveData = new EventEmitter<any>();
 
@@ -42,22 +46,20 @@ export class ReusableModalComponent {
   save = (data: any) => {
     console.log("data", data);
     if (this.formSave.invalid) {
-      // Mostrar qué campos son inválidos
-      const invalidFields: any[] = [];
+      const invalidFields: string[] = [];
 
       Object.keys(this.formSave.controls).forEach((key) => {
         const control = this.formSave.get(key);
         if (control && control.invalid) {
-          invalidFields.push(key);
+          // Usar el alias del campo si está disponible, de lo contrario usar la clave
+          const fieldName = this.modalConfig.fieldAliases[key] || key;
+          invalidFields.push(fieldName);
         }
       });
 
       console.log("Campos inválidos:", invalidFields);
 
-      // Puedes personalizar el mensaje para incluir los campos inválidos
-      this.toastMessage = `Por favor, verifica los siguientes campos: ${invalidFields.join(
-        ", "
-      )}`;
+      this.toastMessage = `Por favor, complete correctamente los siguientes campos: ${invalidFields.join(", ")}`;
       this.setOpenedToast(true);
       return;
     }

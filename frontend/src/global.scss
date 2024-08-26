@@ -142,3 +142,9 @@ ion-item {
   background-color: transparent !important;
   color: #9a8c50;
 }
+
+.flag-image {
+  width: 30px;  /* o el tamaño que prefieras */
+  height: auto;
+  object-fit: contain;
+}

@@ -12,6 +12,7 @@ import { BreadcrumbComponent } from "./breadcrumb/breadcrumb.component";
 import { CustomDatePipe } from "../pipes/date.pipe";
 import { FormatDniPipe } from "../pipes/dni.pipe";
 import { DatePipe } from "@angular/common";
+import { CardViewInfoComponent } from "./card-view-info/card-view-info.component";
 
 //INFO MODULES
 
@@ -21,6 +22,7 @@ import { DatePipe } from "@angular/common";
     ReusableModalComponent,
     NavbarComponent,
     BreadcrumbComponent,
+    CardViewInfoComponent,
     CustomDatePipe,
     FormatDniPipe,
   ],
@@ -31,6 +33,7 @@ import { DatePipe } from "@angular/common";
     ReusableModalComponent,
     NavbarComponent,
     BreadcrumbComponent,
+    CardViewInfoComponent,
     CustomDatePipe,
     FormatDniPipe,
   ],
