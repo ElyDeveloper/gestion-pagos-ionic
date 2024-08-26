@@ -36,6 +36,7 @@ export class ViewDataComponent implements OnInit {
   @Output() deleteButtonClicked = new EventEmitter<any>();
   @Output() infoButtonClicked = new EventEmitter<any>();
   @Output() checkButtonClicked = new EventEmitter<any>();
+  @Output() selectButtonClicked = new EventEmitter<any>();
   @Output() contractButtonClicked = new EventEmitter<any>();
   @Output() pagoButtonClicked = new EventEmitter<any>();
   @Output() resetPasswordButtonClicked = new EventEmitter<any>();
@@ -241,6 +242,9 @@ export class ViewDataComponent implements OnInit {
       case "check":
         this.onCheckButtonClick(row);
         break;
+      case "select":
+        this.onSelectButtonClick(row);
+        break;
       case "contract":
         this.onContractButtonClick(row);
         break;
@@ -271,6 +275,9 @@ export class ViewDataComponent implements OnInit {
 
   onCheckButtonClick(data: any) {
     this.checkButtonClicked.emit(data);
+  }
+  onSelectButtonClick(data: any) {
+    this.selectButtonClicked.emit(data);
   }
 
   onContractButtonClick(data: any) {
