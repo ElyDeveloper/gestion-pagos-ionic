@@ -27,7 +27,7 @@ export class BreadcrumbComponent implements OnInit {
       this.segments.pop();
     }
 
-    console.log("Segmentos: ", this.segments);
+    // console.log("Segmentos: ", this.segments);
     //Si el segmento es igual a home eliminarlo
     if (this.segments[0] === "home") {
       this.segments = [];

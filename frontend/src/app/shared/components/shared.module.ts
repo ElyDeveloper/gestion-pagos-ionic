@@ -13,8 +13,11 @@ import { CustomDatePipe } from "../pipes/date.pipe";
 import { FormatDniPipe } from "../pipes/dni.pipe";
 import { DatePipe } from "@angular/common";
 import { CardViewInfoComponent } from "./card-view-info/card-view-info.component";
+import { UploaderComponent } from "./uploader/uploader.component";
 
 //INFO MODULES
+import { FileUploadModule } from "ng2-file-upload";
+
 
 @NgModule({
   declarations: [
@@ -23,10 +26,11 @@ import { CardViewInfoComponent } from "./card-view-info/card-view-info.component
     NavbarComponent,
     BreadcrumbComponent,
     CardViewInfoComponent,
+    UploaderComponent,
     CustomDatePipe,
     FormatDniPipe,
   ],
-  imports: [AuthModule],
+  imports: [AuthModule, FileUploadModule],
   exports: [
     AuthModule,
     ViewDataComponent,
@@ -34,6 +38,7 @@ import { CardViewInfoComponent } from "./card-view-info/card-view-info.component
     NavbarComponent,
     BreadcrumbComponent,
     CardViewInfoComponent,
+    UploaderComponent,
     CustomDatePipe,
     FormatDniPipe,
   ],

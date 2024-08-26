@@ -3,7 +3,10 @@
 
   <ion-grid>
     <ion-row>
-      <ion-col size="6" size-md="2" *ngFor="let folder of folders">
+      @for (folder of folders; track folder.name) { @if (!folder.rolesAuthorized
+      || (userLogged.rolid &&
+      folder.rolesAuthorized.includes(userLogged.rolid))) {
+      <ion-col size="6" size-md="2">
         <ion-card [routerLink]="[folder.url]" class="folder-card">
           <ion-card-header>
             <div class="d-flex justify-content-between">
@@ -18,6 +21,7 @@
           </ion-card-content>
         </ion-card>
       </ion-col>
+      } } @empty { No hay opciones... }
     </ion-row>
   </ion-grid>
 </ion-content>

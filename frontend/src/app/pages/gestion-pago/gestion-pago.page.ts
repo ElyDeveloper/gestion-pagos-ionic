@@ -7,9 +7,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class GestionPagoPage implements OnInit {
 
+
   constructor() { }
 
   ngOnInit() {
+  }
+
+  onUploaderChange(uploader: any) {
+    console.log(uploader);
+
   }
 
 }

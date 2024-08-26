@@ -10,6 +10,8 @@ import {
 import { Column } from "../../interfaces/table";
 import { AlertController } from "@ionic/angular";
 import { debounceTime, distinctUntilChanged, Subject } from "rxjs";
+import { AuthService } from "../../services/auth.service";
+import { Router } from "@angular/router";
 
 @Component({
   selector: "app-view-data",
@@ -65,22 +67,29 @@ export class ViewDataComponent implements OnInit {
   years: number[] = [];
 
   private _alertController = inject(AlertController);
+  private _authService = inject(AuthService);
+  private _router = inject(Router);
+
   constructor() {}
 
   ngOnInit() {
-    this.initSearcher();
-    this.initCalendar();
     this.getUserLoggedIn();
-    this.updateVisiblePages();
   }
 
   getUserLoggedIn() {
-    //Obtener de localStorage
-    const userLoggedData = localStorage.getItem("userInfo");
-    if (userLoggedData) {
-      this.userLogged = JSON.parse(userLoggedData);
-      console.log("User logged: ", this.userLogged);
-    }
+    this._authService.getUserInfo().subscribe({
+      next: (user: any) => {
+        this.userLogged = user;
+        // console.log("User logged: ", this.userLogged);
+        this.initSearcher();
+        this.initCalendar();
+        this.updateVisiblePages();
+      },
+      error: (error) => {
+        console.error("Error al obtener usuario logueado", error);
+        this._router.navigate(["/login"]);
+      },
+    });
   }
 
   ngOnChanges(changes: SimpleChanges) {
