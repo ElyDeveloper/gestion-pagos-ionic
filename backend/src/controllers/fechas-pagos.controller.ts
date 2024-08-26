@@ -147,6 +147,19 @@ export class FechasPagosController {
     );
   }
 
+  @get('/fechas-pagos/moras')
+  @response(200, {
+    description: 'FechasPagos model instance',
+    content: {
+      'application/json': {
+        schema: getModelSchemaRef(FechasPagos, {includeRelations: true}),
+      },
+    },
+  })
+  async findMoras(): Promise<any> {
+    return this.FechasPagosRepository.execute(`sp_ConsultarFechasPagos`);
+  }
+
   @patch('/fechas-pagos/{id}')
   @response(204, {
     description: 'FechasPagos PATCH success',
