@@ -82,10 +82,10 @@ export class LoginPage implements OnInit {
             // Usar el AuthService para almacenar la información del usuario
             this._authService.setUserInfo(result.usuario);
 
+            this.toastMessage = "Bienvenido " + this.user.identificator;
+            this.setOpenedToast(true);
             setTimeout(() => {
               this.loaderComponent.hide();
-              this.toastMessage = "Bienvenido " + this.user.identificator;
-              this.setOpenedToast(true);
               this._router.navigate(["/layout"]);
             }, 2000);
           } else {

@@ -4,7 +4,7 @@ export interface FechasPagos {
   id?: number;
   fechaPago: string;
   estado: boolean;
-  cuota?: number;
+  monto?: number;
   planId: number;
 
   // Optional property for related entity

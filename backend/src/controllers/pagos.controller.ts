@@ -178,13 +178,9 @@ export class PagosController {
     },
   })
   async find(): Promise<Pagos[]> {
-    return this.PagosRepository.find(
-      {
-        include:[
-          {relation: 'prestamos'},
-        ],
-      }
-    );
+    return this.PagosRepository.find({
+      include: [{relation: 'prestamos'}],
+    });
   }
 
   @get('/pagos/paginated')
@@ -204,11 +200,9 @@ export class PagosController {
     @param.query.number('limit') limit: number,
   ): Promise<Pagos[]> {
     return this.PagosRepository.find({
-      include:[
-        {relation: 'prestamos'},
-      ],
+      include: [{relation: 'prestamos'}],
       skip,
-      limit
+      limit,
     });
   }
 
@@ -240,10 +234,25 @@ export class PagosController {
       },
     },
   })
-  async findById(
-    @param.path.number('id') id: number,
-  ): Promise<Pagos> {
+  async findById(@param.path.number('id') id: number): Promise<Pagos> {
     return this.PagosRepository.findById(id);
+  }
+
+  @get('/pagos/fecha-pago/{id}')
+  @response(200, {
+    description: 'Pagos model instance',
+    content: {
+      'application/json': {
+        schema: getModelSchemaRef(Pagos, {includeRelations: true}),
+      },
+    },
+  })
+  async findByIdFechaPago(
+    @param.path.number('id') id: number,
+  ): Promise<Pagos[]> {
+    return this.PagosRepository.find({
+      where: {idFechaPago: id},
+    });
   }
 
   @patch('/pagos/{id}')
@@ -296,6 +305,4 @@ export class PagosController {
       `${viewOf.getViewPagos} Where ClienteNombre like '%${search}%' or ClienteApellidos like '%${search}%' or TipoPrestamoNombre like '%${search}%'  or Monto like '%${search}%'  or FechaPago like '%${search}%' or FechaInicial like '%${search}%' or FechaFinal like '%${search}%'`,
     );
   }
-
-  
 }

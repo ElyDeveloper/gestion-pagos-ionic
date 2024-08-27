@@ -1,20 +1,12 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { NgModule } from "@angular/core";
 
-import { IonicModule } from '@ionic/angular';
+import { GestionPagoPageRoutingModule } from "./gestion-pago-routing.module";
 
-import { GestionPagoPageRoutingModule } from './gestion-pago-routing.module';
-
-import { GestionPagoPage } from './gestion-pago.page';
+import { GestionPagoPage } from "./gestion-pago.page";
+import { SharedModule } from "src/app/shared/components/shared.module";
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    GestionPagoPageRoutingModule
-  ],
-  declarations: [GestionPagoPage]
+  imports: [SharedModule, GestionPagoPageRoutingModule],
+  declarations: [GestionPagoPage],
 })
 export class GestionPagoPageModule {}

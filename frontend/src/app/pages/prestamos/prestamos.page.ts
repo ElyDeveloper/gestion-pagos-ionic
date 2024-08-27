@@ -126,7 +126,7 @@ export class PrestamosPage implements OnInit {
     this.columnsDataPlan = [
       { key: "numero", alias: "No. Cuota" },
       { key: "fechaPago", alias: "Fecha de Pago", type: "date" },
-      { key: "cuota", alias: "Monto Cuota", type: "currency" },
+      { key: "monto", alias: "Monto Cuota", type: "currency" },
       {
         key: "estado",
         alias: "Estado",
@@ -278,11 +278,11 @@ export class PrestamosPage implements OnInit {
     this.isEdit = isEdit;
 
     if (formData) {
-      formData.planPago.fechaInicio = this.formatDateForInput(
+      formData.planPago.fechaInicio = this._globalService.formatDateForInput(
         formData.planPago.fechaInicio
       );
       if (formData.fechaFinal) {
-        formData.fechaFinal = this.formatDateForInput(formData.fechaFinal);
+        formData.fechaFinal = this._globalService.formatDateForInput(formData.fechaFinal);
       }
     }
     console.log("Form Data:", formData);
@@ -300,10 +300,6 @@ export class PrestamosPage implements OnInit {
     this.isModalOpen = true;
   }
 
-  formatDateForInput(dateString: string): string {
-    return dateString.split("T")[0];
-  }
-
   onAddButtonClicked() {
     this._router.navigate(["/layout/gestion-prestamo"]);
     // this._router.navigate(["/layout"]);
@@ -316,6 +312,11 @@ export class PrestamosPage implements OnInit {
   onContractButtonClicked(data: any) {
     console.log("Contrato del cliente:", data);
     this._router.navigate(["/gestion-contrato/" + data.id]);
+  }
+
+  onPagoButtonClicked(data: any) {
+    console.log("Contrato del cliente:", data);
+    this._router.navigate(["/layout/gestion-pago/" + data.id]);
   }
 
   onInfoButtonClicked(data: any) {
@@ -435,13 +436,13 @@ export class PrestamosPage implements OnInit {
     operation: "edit" | "create",
     data: any
   ): { operationText: string; apiCall: Observable<any> } {
-    const cuota =
+    const monto =
       this.element.totalMonto / (this.element.planPago?.cuotasPagar || 1);
     const dataSave = {
       idPrestamo: this.element.id,
       planId: this.element.idPlan,
       estado: this.element.planPago?.estado || false,
-      cuota,
+      monto,
       // fechaInicio: new Date(data.fechaInicio),
       fechaInicio: data.fechaInicio,
       periodoCobro: this.element.idPeriodoCobro,

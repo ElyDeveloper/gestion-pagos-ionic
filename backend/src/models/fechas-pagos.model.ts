@@ -37,9 +37,9 @@ export class FechasPagos extends Entity {
     precision: 10,
     scale: 2,
     generated: false,
-    mssql: {columnName: 'Cuota', dataType: 'decimal', dataLength: null, dataPrecision: 10, dataScale: 2, nullable: 'YES', generated: false},
+    mssql: {columnName: 'Monto', dataType: 'decimal', dataLength: null, dataPrecision: 10, dataScale: 2, nullable: 'YES', generated: false},
   })
-  cuota?: number;
+  monto?: number;
 
   @belongsTo(() => PlanesPago, {name: 'planPago'})
   planId: number;

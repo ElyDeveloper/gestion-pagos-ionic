@@ -10,6 +10,8 @@ import {
 import { Column } from "../../interfaces/table";
 import { AlertController } from "@ionic/angular";
 import { debounceTime, distinctUntilChanged, Subject } from "rxjs";
+import { AuthService } from "../../services/auth.service";
+import { Router } from "@angular/router";
 
 @Component({
   selector: "app-view-data",
@@ -34,7 +36,9 @@ export class ViewDataComponent implements OnInit {
   @Output() deleteButtonClicked = new EventEmitter<any>();
   @Output() infoButtonClicked = new EventEmitter<any>();
   @Output() checkButtonClicked = new EventEmitter<any>();
+  @Output() selectButtonClicked = new EventEmitter<any>();
   @Output() contractButtonClicked = new EventEmitter<any>();
+  @Output() pagoButtonClicked = new EventEmitter<any>();
   @Output() resetPasswordButtonClicked = new EventEmitter<any>();
   @Output() planButtonClicked = new EventEmitter<any>();
   @Output() currentPageOut = new EventEmitter<number>();
@@ -64,22 +68,29 @@ export class ViewDataComponent implements OnInit {
   years: number[] = [];
 
   private _alertController = inject(AlertController);
+  private _authService = inject(AuthService);
+  private _router = inject(Router);
+
   constructor() {}
 
   ngOnInit() {
-    this.initSearcher();
-    this.initCalendar();
     this.getUserLoggedIn();
-    this.updateVisiblePages();
   }
 
   getUserLoggedIn() {
-    //Obtener de localStorage
-    const userLoggedData = localStorage.getItem("userInfo");
-    if (userLoggedData) {
-      this.userLogged = JSON.parse(userLoggedData);
-      console.log("User logged: ", this.userLogged);
-    }
+    this._authService.getUserInfo().subscribe({
+      next: (user: any) => {
+        this.userLogged = user;
+        // console.log("User logged: ", this.userLogged);
+        this.initSearcher();
+        this.initCalendar();
+        this.updateVisiblePages();
+      },
+      error: (error) => {
+        console.error("Error al obtener usuario logueado", error);
+        this._router.navigate(["/login"]);
+      },
+    });
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -122,6 +133,36 @@ export class ViewDataComponent implements OnInit {
     );
   }
 
+  getClassForOption(column: any, row: any): string {
+    if (column.type !== "options") {
+      return "";
+    }
+
+    const color = this.getCellColor(row, column);
+    const defaultColor = "secondary";
+
+    if (color) {
+      // console.log("Color: ", color);
+      return `text-bg-${color}`;
+    }
+
+    return `text-bg-${defaultColor}`;
+  }
+
+  getCellColor(row: any, column: any): string {
+    const value = this.getCellValue(row, column);
+    // console.log("Value: ", value);
+    const columns = this.getCellColorOptions(column);
+    return columns[value];
+  }
+
+  getCellOptionValue(row: any, column: any): string {
+    let primaryValue = this.getNestedValue(row, column.key);
+
+    const options = this.getCellOptions(column);
+    return options[primaryValue];
+  }
+
   getCellValue(row: any, column: Column): any {
     let primaryValue = this.getNestedValue(row, column.key);
 
@@ -160,6 +201,10 @@ export class ViewDataComponent implements OnInit {
 
   getCellOptions(column: Column): string[] {
     return column.options || [];
+  }
+
+  getCellColorOptions(column: Column): string[] {
+    return column.colorOptions || [];
   }
 
   private getNestedValue(obj: any, key: string): any {
@@ -231,8 +276,14 @@ export class ViewDataComponent implements OnInit {
       case "check":
         this.onCheckButtonClick(row);
         break;
+      case "select":
+        this.onSelectButtonClick(row);
+        break;
       case "contract":
         this.onContractButtonClick(row);
+        break;
+      case "pay":
+        this.onPagoButtonClick(row);
         break;
       case "plan":
         this.onInfoPlan(row);
@@ -259,9 +310,15 @@ export class ViewDataComponent implements OnInit {
   onCheckButtonClick(data: any) {
     this.checkButtonClicked.emit(data);
   }
+  onSelectButtonClick(data: any) {
+    this.selectButtonClicked.emit(data);
+  }
 
   onContractButtonClick(data: any) {
     this.contractButtonClicked.emit(data);
+  }
+  onPagoButtonClick(data: any) {
+    this.pagoButtonClicked.emit(data);
   }
 
   async onDeleteButtonClick(data: any) {

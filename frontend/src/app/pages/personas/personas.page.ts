@@ -17,10 +17,10 @@ import { FormModels } from "src/app/shared/utils/forms-models";
 
 @Component({
   selector: "app-clientes",
-  templateUrl: "./clientes.page.html",
-  styleUrls: ["./clientes.page.scss"],
+  templateUrl: "./personas.page.html",
+  styleUrls: ["./personas.page.scss"],
 })
-export class ClientesPage implements OnInit {
+export class PersonasPage implements OnInit {
   @ViewChild(LoaderComponent) loaderComponent!: LoaderComponent;
   elements: Personas[] = [];
   element: Personas = {
@@ -78,7 +78,7 @@ export class ClientesPage implements OnInit {
     this.formModels = new FormModels(this.fb);
     this.formAdd = this.formModels.personasForm();
     this.formSelected = this.formAdd;
-    console.log("Formulario de cliente:", this.formAdd);
+    // console.log("Formulario de cliente:", this.formAdd);
   }
 
   ngOnInit() {}
@@ -91,7 +91,7 @@ export class ClientesPage implements OnInit {
 
   //TODO: ESPECIFICO
   goAction(action: string) {
-    console.log("Accion capturada: ", action);
+    // console.log("Accion capturada: ", action);
     this.title = action;
     this.action = action.toLowerCase();
     this.getCountElements();
@@ -101,7 +101,7 @@ export class ClientesPage implements OnInit {
   cargarOpciones() {
     this._globalService.Get("nacionalidades").subscribe((data: any) => {
       this.nacionalidades = data;
-      console.log(this.nacionalidades);
+      // console.log(this.nacionalidades);
     });
     this._globalService.Get("record-crediticios").subscribe((data: any) => {
       this.recordsCrediticios = data;

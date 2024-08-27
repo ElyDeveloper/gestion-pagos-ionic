@@ -148,3 +148,62 @@ ion-item {
   height: auto;
   object-fit: contain;
 }
+
+.stepper-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.step-indicator {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.step-indicator.active {
+  background-color: var(--ion-color-primary);
+  color: white;
+}
+.step-indicator.completed {
+  background-color: var(--ion-color-success);
+  color: white;
+}
+.navigation-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.task-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.task-list li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.task-list li span {
+  flex-grow: 1;
+  margin-right: 10px;
+}
+
+.task-list li.completed span {
+  text-decoration: line-through;
+  color: #888;
+}
+
+.task-list ion-icon {
+  font-size: 1.2em;
+}
+
+.bold-label {
+  font-weight: bold;
+  font-size: 20px !important;
+}

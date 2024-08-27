@@ -24,6 +24,7 @@
       (checkButtonClicked)="onCheckButtonClicked($event)"
       (planButtonClicked)="onPlanButtonClicked($event)"
       (contractButtonClicked)="onContractButtonClicked($event)"
+      (pagoButtonClicked)="onPagoButtonClicked($event)"
       (currentPageOut)="onPageChange($event)"
       (searchOut)="onSearchData($event)">
     </app-view-data>
@@ -35,12 +36,6 @@
       (saveData)="handleSave($event)">
     </app-reusable-modal>
 
-    <style>
-      .bold-label {
-        font-weight: bold;
-        font-size: 20px !important;
-      }
-    </style>
     <!-- Modal para autorizar prestamo -->
     <ng-template
       #modalAprobar

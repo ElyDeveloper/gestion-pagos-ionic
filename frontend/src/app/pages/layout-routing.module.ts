@@ -14,10 +14,10 @@ const routes: Routes = [
           import("./home/home.module").then((m) => m.HomePageModule),
       },
       {
-        path: "clientes",
+        path: "personas",
         loadChildren: () =>
-          import("./clientes/clientes.module").then(
-            (m) => m.ClientesPageModule
+          import("./personas/personas.module").then(
+            (m) => m.PersonasPageModule
           ),
       },
       {
