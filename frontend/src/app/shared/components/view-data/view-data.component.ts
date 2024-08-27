@@ -133,6 +133,36 @@ export class ViewDataComponent implements OnInit {
     );
   }
 
+  getClassForOption(column: any, row: any): string {
+    if (column.type !== "options") {
+      return "";
+    }
+
+    const color = this.getCellColor(row, column);
+    const defaultColor = "secondary";
+
+    if (color) {
+      // console.log("Color: ", color);
+      return `text-bg-${color}`;
+    }
+
+    return `text-bg-${defaultColor}`;
+  }
+
+  getCellColor(row: any, column: any): string {
+    const value = this.getCellValue(row, column);
+    // console.log("Value: ", value);
+    const columns = this.getCellColorOptions(column);
+    return columns[value];
+  }
+
+  getCellOptionValue(row: any, column: any): string {
+    let primaryValue = this.getNestedValue(row, column.key);
+
+    const options = this.getCellOptions(column);
+    return options[primaryValue];
+  }
+
   getCellValue(row: any, column: Column): any {
     let primaryValue = this.getNestedValue(row, column.key);
 
@@ -171,6 +201,10 @@ export class ViewDataComponent implements OnInit {
 
   getCellOptions(column: Column): string[] {
     return column.options || [];
+  }
+
+  getCellColorOptions(column: Column): string[] {
+    return column.colorOptions || [];
   }
 
   private getNestedValue(obj: any, key: string): any {

@@ -7,6 +7,9 @@ import { FechasPagos } from "src/app/shared/interfaces/fecha-pago";
 import { Column } from "src/app/shared/interfaces/table";
 import { GlobalService } from "src/app/shared/services/global.service";
 import { FormModels } from "src/app/shared/utils/forms-models";
+import { environment } from "src/environments/environment";
+
+const PERCENTAGE = environment.percentage;
 
 @Component({
   selector: "app-gestion-pago",
@@ -25,6 +28,10 @@ export class GestionPagoPage implements OnInit {
   pagoSeleccionado: any = {};
 
   hasAval: boolean = false;
+  hasMora: boolean = false;
+
+  mora: number = 0;
+  daysLate: number = 0;
 
   suscriptions: Subscription[] = [];
 
@@ -43,7 +50,40 @@ export class GestionPagoPage implements OnInit {
     this.buildColumns();
   }
 
-  save(data:any){}
+  save(data: any) {
+    console.log("Formulario de Registro de Pago: ", data);
+  }
+
+  changeDate() {
+    const date = this.pagoForm.get("fechaPago")?.value;
+    const diffDays = this.getDiffDays(this.pagoSeleccionado.fechaPago, date);
+    let mora = 0;
+    if (diffDays < 0) {
+      this.daysLate = Math.abs(diffDays);
+      mora = this.calculateMora(this.pagoSeleccionado.monto, this.daysLate);
+    }
+
+    if (mora > 0) {
+      this.hasMora = true;
+    } else {
+      this.hasMora = false;
+    }
+    this.pagoForm.get("mora")?.setValue(mora);
+  }
+
+  calculateMora(monto: number, daysLate: number) {
+    const moraForDay = Number(((PERCENTAGE / 30) * monto).toFixed(2));
+    return Number((daysLate * moraForDay).toFixed(2));
+  }
+
+  getDiffDays(fechaPagar: string, fechaRealizaPago: string) {
+    const currentDate = new Date(fechaRealizaPago);
+    const fechaPago = new Date(fechaPagar);
+
+    return Math.ceil(
+      (fechaPago.getTime() - currentDate.getTime()) / (1000 * 3600 * 24)
+    );
+  }
 
   isSuccessState(): boolean {
     return this.clienteSeleccionado?.id && this.pagoForm.valid;
@@ -89,12 +129,19 @@ export class GestionPagoPage implements OnInit {
     this.columnsData = [
       { key: "numero", alias: "No. Cuota" },
       { key: "fechaPago", alias: "Fecha de Pago", type: "date" },
-      { key: "cuota", alias: "Monto Cuota", type: "currency" },
+      { key: "monto", alias: "Monto Cuota", type: "currency" },
       {
         key: "estado",
         alias: "Estado",
         type: "boolean",
-        options: ["Pagado", "Pendiente"],
+        options: ["Pagado", "No Pagado"],
+      },
+      {
+        key: "verificacion",
+        alias: "Pago",
+        type: "options",
+        options: ["Pendiente", "En Mora", "Al día"],
+        colorOptions: ["warning", "danger", "success"],
       },
       {
         key: "actions",
@@ -103,7 +150,7 @@ export class GestionPagoPage implements OnInit {
           {
             alias: "Seleccionar",
             action: "select",
-            icon: "thumbs-up",
+            icon: "open",
             color: "primary",
             rolesAuthorized: [1, 2],
           },
@@ -112,9 +159,36 @@ export class GestionPagoPage implements OnInit {
     ];
   }
 
+  scrollToElement(section: string): void {
+    const element = document.getElementById(section);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
   onselectButtonClicked(data: any) {
     console.log("Elemento seleccionado:", data);
-    
+    this.pagoSeleccionado = data;
+
+    let fechaPago: string = "N/A";
+    if (data.fechaPago) {
+      fechaPago = this._globalService.formatDateForInput(
+        new Date().toISOString()
+      );
+    }
+
+    if (data.mora > 0) {
+      this.hasMora = true;
+    } else {
+      this.hasMora = false;
+    }
+    // this.mora = data.mora;
+    this.daysLate = data.daysLate;
+
+    this.pagoForm.patchValue(data);
+    this.pagoForm.get("fechaPago")?.setValue(fechaPago);
+
+    this.scrollToElement("pago-form");
   }
 
   onUploaderChange(uploader: any) {
@@ -127,14 +201,46 @@ export class GestionPagoPage implements OnInit {
       next: (response: any) => {
         console.log("Plan de pago:", response);
         this.elements = response;
+
+        let counter = 0;
+        let lastValue = 0;
         //Agregar columna numero correlativo
-        this.elements.forEach((plan: any) => {
-          plan.numero = this.elements.indexOf(plan) + 1;
+        this.elements.forEach((cuota: any) => {
+          counter++;
+          cuota.numero = this.elements.indexOf(cuota) + 1;
+          cuota.idFechaPago = cuota.id;
+          if (cuota.estado === false) {
+            // console.log("Días de atraso:", diffDays);
+            const fechaPagar = new Date().toISOString();
+            const diffDays = this.getDiffDays(cuota.fechaPago, fechaPagar);
+            if (diffDays < 0) {
+              cuota.verificacion = 1;
+              cuota.daysLate = Math.abs(diffDays);
+
+              cuota.mora = this.calculateMora(cuota.monto, cuota.daysLate);
+              console.log("Cuota Mora: ", cuota.mora);
+            } else {
+              cuota.verificacion = 0;
+              cuota.daysLate = 0;
+              cuota.mora = 0;
+            }
+          } else {
+            cuota.verificacion = 2;
+            cuota.daysLate = 0;
+            cuota.mora = 0;
+            lastValue = counter;
+          }
         });
+        this.selectPago(lastValue);
       },
       error: (error: any) => {
         console.error("Error al obtener el plan de pago:", error);
       },
     });
+  }
+
+  selectPago(index: number): void {
+    const pagoSelect = this.elements[index];
+    this.onselectButtonClicked(pagoSelect);
   }
 }

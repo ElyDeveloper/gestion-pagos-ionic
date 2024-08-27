@@ -21,6 +21,7 @@ export interface Column {
   texto?: string; // Nueva propiedad para adicionar texto
   addText?: (value1: any, value2: any) => string; //
   options?: string[];
+  colorOptions?: string[];
   imageUrl?: string; // Nueva propiedad para
 }
 

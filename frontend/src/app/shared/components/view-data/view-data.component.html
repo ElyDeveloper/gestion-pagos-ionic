@@ -75,6 +75,14 @@
                       <!-- {{ getCellValue(row, column) }} -->
                     </span>
                   </ng-container>
+                  <ng-container *ngSwitchCase="'options'">
+                    <span
+                      class="badge"
+                      [ngClass]="getClassForOption(column, row)">
+                      {{ getCellOptionValue(row, column) }}
+                    </span>
+                  </ng-container>
+                
                   <ng-container *ngSwitchCase="'date'">
                     {{
                       getCellValue(row, column) | customDate : 6 : "dd/MM/yyyy"

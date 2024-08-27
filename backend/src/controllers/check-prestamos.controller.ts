@@ -47,7 +47,7 @@ export class CheckPrestamosController {
       idPrestamo: string;
       planId: number;
       estado: boolean;
-      cuota: number;
+      monto: number;
       fechaInicio: string;
       periodoCobro: number;
       numeroCuotas: number;
@@ -58,7 +58,7 @@ export class CheckPrestamosController {
       idPrestamo,
       planId,
       estado,
-      cuota,
+      monto,
       fechaInicio,
       periodoCobro,
       numeroCuotas,
@@ -79,7 +79,7 @@ export class CheckPrestamosController {
       fechasPagos.push({
         planId: planId,
         estado: false,
-        cuota: cuota,
+        monto,
         fechaPago,
       });
 

@@ -1,40 +1,37 @@
-<section class="container">
+<section>
   <div class="row">
     <div class="wrapper">
-      <div class="container">
-        <h1>Subir Archivo</h1>
+      <div
+        class="upload-container"
+        ng2FileDrop
+        (fileOver)="fileOverAnother($event)"
+        [uploader]="uploader">
         <div
-          class="upload-container"
-          ng2FileDrop
-          (fileOver)="fileOverAnother($event)"
-          [uploader]="uploader">
-          <div
-            class="border-container"
-            [ngClass]="{
-              'border-container-green': hasAnotherDropZoneOver
-            }">
-            <div class="icons fa-4x">
-              <i
-                class="fas fa-file-image"
-                data-fa-transform="shrink-3 down-2 left-6 rotate--45"></i>
-              <i
-                class="fas fa-cloud-upload-alt"
-                data-fa-transform="shrink-2 up-4"></i>
-              <i
-                class="fas fa-file-pdf"
-                data-fa-transform="shrink-3 down-2 right-6 rotate-45"></i>
-            </div>
-            <p>
-              Arrastra y suelta imágenes o PDFs aquí, o
-              <a
-                class="text-success cursor-pointer"
-                (click)="selectFile()"
-                id="file-browser"
-                >explora</a
-              >
-              tu computadora.
-            </p>
+          class="border-container"
+          [ngClass]="{
+            'border-container-green': hasAnotherDropZoneOver
+          }">
+          <div class="icons fa-4x">
+            <i
+              class="fas fa-file-image"
+              data-fa-transform="shrink-3 down-2 left-6 rotate--45"></i>
+            <i
+              class="fas fa-cloud-upload-alt"
+              data-fa-transform="shrink-2 up-4"></i>
+            <i
+              class="fas fa-file-pdf"
+              data-fa-transform="shrink-3 down-2 right-6 rotate-45"></i>
           </div>
+          <p>
+            Arrastra y suelta aquí, o
+            <a
+              class="text-success cursor-pointer"
+              (click)="selectFile()"
+              id="file-browser"
+              >explora</a
+            >
+            tu computadora.
+          </p>
         </div>
       </div>
     </div>
@@ -80,7 +77,7 @@
         </tr>
       </tbody>
     </table>
-<!-- 
+    <!-- 
     <section id="uploader-buttons" class="mt-2">
       <button
         (click)="uploader.clearQueue()"
@@ -90,7 +87,5 @@
         Eliminar todo
       </button>
     </section> -->
-
-    
   </section>
 </section>

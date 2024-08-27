@@ -80,7 +80,7 @@ export class GlobalService {
     return obj;
   }
 
-  private formatDateForInput(dateString: string): string {
+  formatDateForInput(dateString: string): string {
     return dateString.split('T')[0];
   }
 

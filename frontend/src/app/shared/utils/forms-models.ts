@@ -46,10 +46,11 @@ export class FormModels {
 
   pagoForm(): FormGroup {
     return this.fb.group({
-      id: [null],
+      // id: [null],
       idFechaPago: [null, Validators.required],
       fechaPago: ["", Validators.required],
       monto: [null, [Validators.required, Validators.min(0)]],
+      mora: [null],
       estado: [true],
     });
   }
