@@ -172,8 +172,13 @@ export class GestionPagoPage implements OnInit {
 
     let fechaPago: string = "N/A";
     if (data.fechaPago) {
+      const fechaPagar = new Date();
+      // console.log("fechaPagar Antes:", fechaPagar);
+      //Setear hora a 00 de fechaPagar
+      fechaPagar.setHours(0, 0, 0, 0);
+      // console.log("fechaPagar Despues:", fechaPagar);
       fechaPago = this._globalService.formatDateForInput(
-        new Date().toISOString()
+        fechaPagar.toISOString()
       );
     }
 
@@ -211,8 +216,17 @@ export class GestionPagoPage implements OnInit {
           cuota.idFechaPago = cuota.id;
           if (cuota.estado === false) {
             // console.log("Días de atraso:", diffDays);
-            const fechaPagar = new Date().toISOString();
-            const diffDays = this.getDiffDays(cuota.fechaPago, fechaPagar);
+            const fechaPagar = new Date();
+            // console.log("fechaPagar Antes:", fechaPagar);
+            //Setear hora a 00 de fechaPagar
+            fechaPagar.setHours(0, 0, 0, 0);
+            // console.log("fechaPagar Despues:", fechaPagar);
+
+            const diffDays = this.getDiffDays(
+              cuota.fechaPago,
+              fechaPagar.toISOString()
+            );
+
             if (diffDays < 0) {
               cuota.verificacion = 1;
               cuota.daysLate = Math.abs(diffDays);
