@@ -21,6 +21,14 @@ import {viewOf} from '../core/library/views.library';
 import {Pagos} from '../models/pagos.model';
 import {PagosRepository} from '../repositories/pagos.repository';
 import { authenticate } from '@loopback/authentication';
+import { Documentos, DocumentosTipoDoc } from '../models';
+import { ContratosPagoRepository } from '../repositories/contratos-pago.repository';
+import { FILE_UPLOAD_SERVICE } from '../core/library/keys';
+import { FileUploadHandler } from '../core/library/types';
+import { inject } from '@loopback/core';
+import * as path from 'path';
+import * as fs from 'fs';
+import * as crypto from 'crypto';
 
 
 @authenticate('jwt')
@@ -28,6 +36,14 @@ export class PagosController {
   constructor(
     @repository(PagosRepository)
     public PagosRepository: PagosRepository,
+    @repository(Documentos)
+    public DocumentosRepository: Documentos,
+    @repository(DocumentosTipoDoc)
+    public DocumentosTipoDocRepository: DocumentosTipoDoc,
+    @repository(ContratosPagoRepository)
+    public contratosPagoRepository: ContratosPagoRepository,
+    @inject(FILE_UPLOAD_SERVICE) private fileHandler:FileUploadHandler
+
   ) {}
 
   @post('/pagos')
@@ -49,6 +65,95 @@ export class PagosController {
     Pagos: Omit<Pagos, 'id'>,
   ): Promise<Pagos> {
     return this.PagosRepository.create(Pagos);
+  }
+
+  @post('/pagos/crear')
+  async crearPago(
+    @requestBody({
+      description: 'Datos del pago y el archivo a subir (opcional)',
+      content:{
+        'multipart/form-data':{
+          schema: {
+            type: 'object',
+            properties:{
+              estado: {type: 'boolean'},
+              fechaPago: {type: 'string', format: 'date'},
+              idFechaPago: {type: 'number'},
+              monto: {type: 'number'},
+              idPrestamo: {type: 'number'},
+              documento: {type: 'string', format: 'binary'},
+            },
+            required: ['estado', 'fechaPago', 'idFechaPago', 'monto', 'idPrestamo'],
+          },
+        },
+      },
+    })
+    requestData:any,
+  ):Promise<void>{
+    const {
+      estado,
+      fechaPago,
+      idFechaPago,
+      monto,
+      idPrestamo,
+      documento,
+    } = requestData;
+    
+    const contratoPago = await this.contratosPagoRepository.findOne({
+      where: {idPrestamo: idPrestamo},
+    });
+
+    if(!contratoPago){
+      throw new Error(`Prestamo con id ${idPrestamo} no encontrado`);
+    }
+
+    let filePath = null;
+    if(documento){
+      //Si el archivo existe se guarda
+      filePath = await this.saveFile(documento);
+
+      //Insertar en la tabla Documentos
+      const nuevoDocumento = await this.DocumentosRepository.create({
+        urlDocumento: filePath,
+        fechaSubida: new Date().toISOString().split('T')[0],
+        idTipoDoc: null
+      })
+
+      //Insertar en la tabla DocumentosTipoDoc
+      await this.DocumentosTipoDocRepository.create({
+        idDocumento: nuevoDocumento.id,
+        idTipoDoc: 1,
+      })
+    }
+
+    await this.PagosRepository.create({
+      estado: estado,
+      fechaPago: fechaPago,
+      idFechaPago: idFechaPago,
+      monto: monto,
+    });
+
+
+    
+  }
+
+  private async saveFile(file: Express.Multer.File): Promise<string> {
+    const uploadDir = path.join(__dirname, '../../uploads');
+    if(!fs.existsSync(uploadDir)){
+      fs.mkdirSync(uploadDir);
+    }
+
+    const uniqueName = crypto.randomBytes(16).toString('hex');
+    const extension = path.extname(file.originalname);
+    const fileName = `${uniqueName}${extension}`;
+    const filePath = path.join(uploadDir, fileName);
+
+    return new Promise<string>((resolve, reject) => {
+      fs.writeFile(filePath, file.buffer, (err) => {
+        if(err)reject(err);
+          resolve(filePath);
+      });
+    })
   }
 
   @get('/pagos/count')
