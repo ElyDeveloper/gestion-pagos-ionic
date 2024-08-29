@@ -29,3 +29,4 @@ export * from './prestamos.model';
 export * from './fechas-pagos.model';
 export * from './pagos.model';
 export * from './nacionalidades.model';
+export * from './pagos.model';

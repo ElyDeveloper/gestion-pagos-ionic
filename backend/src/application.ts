@@ -28,6 +28,13 @@ export class gestionPagos extends BootMixin(
 ) {
   constructor(options: ApplicationConfig = {}) {
     super(options);
+
+    // Configurar Multer para manejar multipart/form-data
+    const multerOptions = {
+      storage: multer.memoryStorage(),
+    };
+    this.bind('middleware.multer').to(multer(multerOptions));
+
     this.bind('services.MailService').toClass(MailService);
 
     // Set up the custom sequence

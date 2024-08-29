@@ -85,10 +85,11 @@ export class PrestamosController {
       include: [
         {relation: 'cliente'},
         {relation: 'producto'},
-        {relation: 'periodo'},
-        {relation: 'estadoAprobacion'},
         {relation: 'planPago'},
         {relation: 'moneda'},
+        {relation: 'periodoCobro'},
+        {relation: 'estadoAprobacion'},
+        {relation: 'aval'},
       ],
     });
   }

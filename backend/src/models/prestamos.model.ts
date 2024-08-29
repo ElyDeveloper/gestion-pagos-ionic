@@ -99,8 +99,6 @@ export class Prestamos extends Entity {
   @belongsTo(() => Personas, {name: 'aval'})
   idAval: number;
 
-  @hasMany(() => Pagos, {keyTo: 'idPrestamo'})
-  pagos: Pagos[];
   // Define well-known properties here
 
   // Indexer property to allow additional data

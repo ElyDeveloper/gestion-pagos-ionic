@@ -2,7 +2,6 @@ import {Getter, inject} from '@loopback/core';
 import {BelongsToAccessor, DefaultCrudRepository, repository} from '@loopback/repository';
 import {GestionEdboDataSource} from '../datasources';
 import {Pagos, PagosRelations, Prestamos, FechasPagos} from '../models';
-import { PrestamosRepository } from './prestamos.repository';
 import {FechasPagosRepository} from './fechas-pagos.repository';
 
 export class PagosRepository extends DefaultCrudRepository<
@@ -16,13 +15,11 @@ export class PagosRepository extends DefaultCrudRepository<
 
   constructor(
     @inject('datasources.GestionEDBO') dataSource: GestionEdboDataSource,
-    @repository.getter('PrestamosRepository') protected prestamosRepositoryGetter: Getter<PrestamosRepository>, @repository.getter('FechasPagosRepository') protected fechasPagosRepositoryGetter: Getter<FechasPagosRepository>,
+    @repository.getter('FechasPagosRepository') protected fechasPagosRepositoryGetter: Getter<FechasPagosRepository>,
   ) {
     super(Pagos, dataSource);
     this.cuota = this.createBelongsToAccessorFor('cuota', fechasPagosRepositoryGetter,);
     this.registerInclusionResolver('cuota', this.cuota.inclusionResolver);
 
-    this.prestamos = this.createBelongsToAccessorFor('prestamos', prestamosRepositoryGetter);
-    this.registerInclusionResolver('prestamos', this.prestamos.inclusionResolver);
   }
 }

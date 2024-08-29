@@ -72,6 +72,8 @@ export class GestionPagoPage implements OnInit {
   }
 
   calculateMora(monto: number, daysLate: number) {
+    console.log('Monto:', monto);
+    console.log('Días de atraso:', daysLate);
     const moraForDay = Number(((PERCENTAGE / 30) * monto).toFixed(2));
     return Number((daysLate * moraForDay).toFixed(2));
   }
