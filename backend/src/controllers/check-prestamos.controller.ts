@@ -294,7 +294,6 @@ export class CheckPrestamosController {
         try{
           const file = req.file;
       
-          console.log('Url del archivo: ', file ? `${keys.URL_FILE}/${file.filename}` : undefined);
           //Actualizar el campo UrlDocumento en la tabla documentos si esta presente
           if(file !== undefined){
             await this.documentosRepository.updateById(id,{
