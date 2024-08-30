@@ -8,6 +8,7 @@ import {
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { debounceTime, distinctUntilChanged, Observable, Subject } from "rxjs";
 import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
+import { Personas } from "src/app/shared/interfaces/persona";
 import { Roles } from "src/app/shared/interfaces/rol";
 import { Column } from "src/app/shared/interfaces/table";
 import { Usuario } from "src/app/shared/interfaces/usuario";
@@ -67,6 +68,11 @@ export class UsuariosPage implements OnInit {
   // TODO: Atributos Especificos
   @ViewChild("modalResetPswd", { static: true })
   modalResetPswd!: TemplateRef<any>;
+  
+  selectedClients: any[] = [];
+  clients: Personas[] = [];
+
+  // 
 
   formResetPswd: FormGroup;
   roles: Roles[] = [];

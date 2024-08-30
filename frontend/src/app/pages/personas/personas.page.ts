@@ -7,7 +7,6 @@ import {
 } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
-import { MaskitoElementPredicate, MaskitoOptions } from "@maskito/core";
 import { Observable } from "rxjs";
 import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
 import { Personas } from "src/app/shared/interfaces/persona";
@@ -15,7 +14,6 @@ import { Column } from "src/app/shared/interfaces/table";
 import { GlobalService } from "src/app/shared/services/global.service";
 import { FieldAliases, ModalConfig } from "src/app/shared/utils/extra";
 import { FormModels } from "src/app/shared/utils/forms-models";
-import { maskDni } from "src/app/shared/utils/maskito-options";
 
 @Component({
   selector: "app-clientes",
@@ -24,10 +22,6 @@ import { maskDni } from "src/app/shared/utils/maskito-options";
 })
 export class PersonasPage implements OnInit {
   @ViewChild(LoaderComponent) loaderComponent!: LoaderComponent;
-
-
-  readonly optionsDni: MaskitoOptions = maskDni;
-
 
   elements: Personas[] = [];
   element: Personas = {

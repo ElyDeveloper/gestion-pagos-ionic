@@ -7,7 +7,6 @@ import {
 } from "@angular/core";
 import { FormBuilder, FormGroup } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
-import { MaskitoOptions } from "@maskito/core";
 import {
   catchError,
   debounceTime,
@@ -25,7 +24,6 @@ import { Prestamos } from "src/app/shared/interfaces/prestamo";
 import { Productos } from "src/app/shared/interfaces/producto";
 import { GlobalService } from "src/app/shared/services/global.service";
 import { FormModels } from "src/app/shared/utils/forms-models";
-import { maskPercentage } from "src/app/shared/utils/maskito-options";
 
 @Component({
   selector: "app-gestion-prestamo",
@@ -35,8 +33,7 @@ import { maskPercentage } from "src/app/shared/utils/maskito-options";
 export class GestionPrestamoPage implements OnInit {
   @ViewChild("modalPlanPago", { static: true })
   modalPlanPago!: TemplateRef<any>;
-  readonly optionsPercentage: MaskitoOptions = maskPercentage;
-
+  
   steps = [1, 2, 3];
   currentStep = 0;
 

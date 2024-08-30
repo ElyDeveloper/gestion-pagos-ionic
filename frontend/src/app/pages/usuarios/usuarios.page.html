@@ -218,6 +218,47 @@
       </ion-content>
     </ng-template>
 
+    <ng-template #modalResetPswd let-close="close" let-save="save">
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Restablecer Contraseña</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="close()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <section>
+          <ion-grid>
+            <ion-row>
+              <ion-col size-xs="12" size-sm="12" size-md="12">
+                <ion-item>
+                  <ion-label position="stacked" class="bold-label"
+                    >Asignar Clientes</ion-label
+                  >
+                  <ng-select [(ngModel)]="selectedClients">
+                    @for (client of clients; track client.id) {
+                    <ng-option [value]="client.id">{{client.nombres}} {{client.apellidos}} </ng-option>
+                    }
+                  </ng-select>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+
+          <ion-grid>
+            <ion-row class="ion-justify-content-center">
+              <ion-col size-xs="12" size-sm="8" size-md="6" size-lg="4">
+                <ion-button expand="block" type="submit" class="ion-margin-top">
+                  Guardar Selección
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </section>
+      </ion-content>
+    </ng-template>
+
     <ng-template #modalViewInfo let-close="close" let-save="save">
       <ion-header>
         <ion-toolbar>

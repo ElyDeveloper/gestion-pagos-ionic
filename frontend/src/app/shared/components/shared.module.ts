@@ -19,7 +19,7 @@ import { UploaderComponent } from "./uploader/uploader.component";
 import { FileUploadModule } from "ng2-file-upload";
 import { NumberToWordsPipe } from "../pipes/number-to-words.pipe";
 import { XmlToListPipe } from "../pipes/xml-to-list.pipe";
-import { MaskitoDirective } from "@maskito/angular";
+import { NgSelectModule } from "@ng-select/ng-select";
 
 @NgModule({
   declarations: [
@@ -34,11 +34,11 @@ import { MaskitoDirective } from "@maskito/angular";
     NumberToWordsPipe,
     XmlToListPipe,
   ],
-  imports: [AuthModule, FileUploadModule, MaskitoDirective],
+  imports: [AuthModule, FileUploadModule, NgSelectModule],
   exports: [
     AuthModule,
     FileUploadModule,
-    MaskitoDirective,
+    NgSelectModule,
     ViewDataComponent,
     ReusableModalComponent,
     NavbarComponent,
