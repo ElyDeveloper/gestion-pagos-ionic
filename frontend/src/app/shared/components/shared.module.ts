@@ -17,7 +17,9 @@ import { UploaderComponent } from "./uploader/uploader.component";
 
 //INFO MODULES
 import { FileUploadModule } from "ng2-file-upload";
-
+import { NumberToWordsPipe } from "../pipes/number-to-words.pipe";
+import { XmlToListPipe } from "../pipes/xml-to-list.pipe";
+import { MaskitoDirective } from "@maskito/angular";
 
 @NgModule({
   declarations: [
@@ -29,10 +31,14 @@ import { FileUploadModule } from "ng2-file-upload";
     UploaderComponent,
     CustomDatePipe,
     FormatDniPipe,
+    NumberToWordsPipe,
+    XmlToListPipe,
   ],
-  imports: [AuthModule, FileUploadModule],
+  imports: [AuthModule, FileUploadModule, MaskitoDirective],
   exports: [
     AuthModule,
+    FileUploadModule,
+    MaskitoDirective,
     ViewDataComponent,
     ReusableModalComponent,
     NavbarComponent,
@@ -41,6 +47,8 @@ import { FileUploadModule } from "ng2-file-upload";
     UploaderComponent,
     CustomDatePipe,
     FormatDniPipe,
+    NumberToWordsPipe,
+    XmlToListPipe,
   ],
   providers: [DatePipe],
 })

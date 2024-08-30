@@ -10,7 +10,7 @@ export class FormModels {
   personasForm(): FormGroup {
     return this.fb.group({
       id: [null],
-      dni: [null],
+      dni: ['', [Validators.required, Validators.minLength(15), Validators.maxLength(15)]],
       nombres: [null, [Validators.required, Validators.minLength(2)]],
       apellidos: [null, [Validators.required, Validators.minLength(2)]],
       cel: [null, [Validators.required, Validators.pattern(/^\d{4}-\d{4}$/)]],

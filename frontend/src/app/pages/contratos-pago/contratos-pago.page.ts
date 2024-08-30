@@ -6,10 +6,13 @@ import {
   ViewChild,
 } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { Router } from "@angular/router";
 import { Observable } from "rxjs";
 import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
+import { ContratosPago } from "src/app/shared/interfaces/contrato";
 import { Column } from "src/app/shared/interfaces/table";
 import { GlobalService } from "src/app/shared/services/global.service";
+import { FieldAliases, ModalConfig } from "src/app/shared/utils/extra";
 import { FormModels } from "src/app/shared/utils/forms-models";
 
 @Component({
@@ -20,30 +23,13 @@ import { FormModels } from "src/app/shared/utils/forms-models";
 export class ContratosPagoPage implements OnInit {
   @ViewChild(LoaderComponent) loaderComponent!: LoaderComponent;
 
-  // export interface Cliente {
-  //   Id?: number;
-  //   DNI?: string;
-  //   Nombres?: string;
-  //   Apellidos?: string;
-  //   Cel?: string;
-  //   Direccion?: string;
-  //   Email?: string;
-  //   FechaIngreso?: string;
-  //   FechaBaja?: string;
-  //   Estado?: boolean;
-  // }
+  elements: ContratosPago[] = [];
 
-  elements: any[] = [];
-  element: any = {
-    DNI: "",
-    Nombres: "",
-    Apellidos: "",
-    Cel: "",
-    Direccion: "",
-    Email: "",
-    FechaIngreso: "",
-    FechaBaja: "",
-    Estado: false,
+  element: ContratosPago = {
+    correlativo: "",
+    fechaGeneracion: "",
+    contenido: "",
+    idPrestamo: 0,
   };
 
   currentPage = 1;
@@ -60,24 +46,31 @@ export class ContratosPagoPage implements OnInit {
   isEdit = false;
 
   textLoader: string = "Cargando...";
-  toastMessage: string = "Usuario guardado correctamente";
+  toastMessage: string = "cliente guardado correctamente";
+  title: string = "Todos";
+  action: string = "todos";
 
   @ViewChild("modalAdd", { static: true }) modalAdd!: TemplateRef<any>;
   @ViewChild("modalViewInfo", { static: true })
   modalViewInfo!: TemplateRef<any>;
 
   modalSelected: TemplateRef<any> = this.modalAdd;
+  modalConfig: ModalConfig = { fieldAliases: {} };
   formSelected: FormGroup;
 
+  private _router = inject(Router);
   private _globalService = inject(GlobalService);
 
   constructor(private fb: FormBuilder) {
     this.formModels = new FormModels(this.fb);
-    this.formAdd = this.formModels.usuarioForm();
+    this.formAdd = this.formModels.personasForm();
     this.formSelected = this.formAdd;
+    // console.log("Formulario de cliente:", this.formAdd);
   }
 
-  ngOnInit() {
+  ngOnInit() {}
+
+  ionViewWillEnter() {
     this.getCountElements();
     this.buildColumns();
   }
@@ -88,71 +81,54 @@ export class ContratosPagoPage implements OnInit {
 
   cleanForm() {
     this.formAdd.reset();
-    this.formAdd = this.formModels.usuarioForm();
+    this.formAdd = this.formModels.personasForm();
   }
 
   buildColumns() {
     this.columnsData = [
       {
-        key: "DNI",
-        alias: "DNI",
+        key: "correlativo",
+        alias: "Código",
       },
       {
-        key: "Nombres",
-        alias: "Nombres",
-      },
-      {
-        key: "Apellidos",
-        alias: "Apellidos",
-      },
-      {
-        key: "Cel",
-        alias: "Celular",
-      },
-      {
-        key: "Direccion",
-        alias: "Dirección",
-      },
-      {
-        key: "Email",
-        alias: "Correo",
-      },
-      {
-        key: "FechaIngreso",
-        alias: "Fecha de Ingreso",
+        key: "fechaGeneracion",
+        alias: "Fecha Generación",
         type: "date",
       },
       {
-        key: "FechaBaja",
-        alias: "Fecha de Baja",
-        type: "date",
+        key: "contenido",
+        alias: "Contenido",
+        type: "xml",
       },
       {
-        key: "Estado",
-        alias: "Estado",
-        type: "boolean",
+        key: "prestamo.cliente.nombres",
+        alias: "Cliente",
+        combineWith: "prestamo.cliente.apellidos",
+        combineFormat: (nombres, apellidos) => `${nombres} ${apellidos}`,
       },
       {
         key: "actions",
         alias: "Acciones",
+        lstActions: [
+          {
+            alias: "Información",
+            action: "info",
+            icon: "information",
+            color: "tertiary",
+            rolesAuthorized: [1, 2, 3],
+          },
+        ],
       },
     ];
   }
 
-  getCellValue(row: any, key: string): any {
-    return key.split(".").reduce((o, k) => (o || {})[k], row);
-  }
-
-  getObjectValue(row: any, key: string): string {
-    const obj = row[key];
-    if (obj && typeof obj === "object") {
-      return obj.nombre || JSON.stringify(obj);
-    }
-    return "";
-  }
-
   private setModalState(isEdit: boolean, modalTemplate: any, formData?: any) {
     this.isEdit = isEdit;
+
+    if (formData) {
+      formData = this._globalService.parseObjectDates(formData);
+    }
+    console.log("Form Data:", formData);
 
     if (isEdit && formData) {
       this.formAdd.patchValue(formData);
@@ -160,18 +136,27 @@ export class ContratosPagoPage implements OnInit {
       this.cleanForm();
     }
 
+    const fieldAliases = this.columnsData.reduce<FieldAliases>((acc, col) => {
+      if (col.key !== "actions") {
+        acc[col.key] = col.alias;
+      }
+      return acc;
+    }, {});
+
+    // Asignar este objeto al modalConfig
+    this.modalConfig = {
+      fieldAliases: fieldAliases,
+      // ... otras configuraciones del modal si las tienes
+    };
+
     this.modalSelected = modalTemplate;
     this.formSelected = this.formAdd;
+
     this.isModalOpen = true;
   }
 
-  formatDateForInput(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toISOString().split('T')[0];
-  }
-
   onAddButtonClicked() {
-    this.setModalState(false, false, this.modalAdd);
+    this.setModalState(false, this.modalAdd);
   }
 
   onEditButtonClicked(data: any) {
@@ -179,68 +164,73 @@ export class ContratosPagoPage implements OnInit {
   }
 
   onInfoButtonClicked(data: any) {
-    // console.log("Información del usuario:", data);
+    // console.log("Información del cliente:", data);
     this.element = data;
     this.modalSelected = this.modalViewInfo;
     this.isModalOpen = true;
   }
 
   onDeleteButtonClicked(data: any) {
-    console.log("Eliminar usuario Obtenido:", data);
-    this.textLoader = "Eliminando Usuario";
+    console.log("Eliminar cliente Obtenido:", data);
+    this.textLoader = "Eliminando cliente";
     this.loaderComponent.show();
-    this._globalService.Delete("usuarios", data.id).subscribe({
+    this._globalService.Delete("personas", data.id).subscribe({
       next: (response: any) => {
-        console.log("Usuario eliminado:", response);
+        console.log("cliente eliminado:", response);
         this.getCountElements();
         this.loaderComponent.hide();
-        this.toastMessage = "Usuario eliminado correctamente";
+        this.toastMessage = "cliente eliminado correctamente";
         this.setOpenedToast(true);
       },
       error: (error: any) => {
-        console.error("Error al eliminar el usuario:", error);
+        console.error("Error al eliminar el cliente:", error);
         this.loaderComponent.hide();
-        this.toastMessage = "Error al eliminar el usuario";
+        this.toastMessage = "Error al eliminar el cliente";
         this.setOpenedToast(true);
       },
     });
   }
 
   handleUserOperation(operation: "edit" | "create", data: any) {
+    data.fechaIngreso = new Date(data.fechaIngreso);
+    console.log("Datos del cliente:", data);
+
+    // return;
     let operationText: string;
     let apiCall: Observable<any>;
 
     switch (operation) {
       case "edit":
-        operationText = "Editando";
-        apiCall = this._globalService.PutId("usuarios", data.id, data);
+        operationText = "Editado";
+        apiCall = this._globalService.PutId("personas", data.id, data);
         break;
       case "create":
-        operationText = "Guardando";
-        apiCall = this._globalService.Post("usuarios", data);
+        delete data.Id;
+        operationText = "Guardado";
+        apiCall = this._globalService.Post("personas", data);
         break;
     }
 
-    this.textLoader = `${operationText} Usuario`;
+    this.textLoader = `${operationText} cliente`;
     this.loaderComponent.show();
 
     apiCall.subscribe({
       next: (response: any) => {
-        console.log(`Usuario ${operationText.toLowerCase()}:`, response);
+        console.log(`cliente ${operationText.toLowerCase()}:`, response);
         this.isModalOpen = false;
         this.loaderComponent.hide();
-        this.toastMessage = `Usuario ${operationText.toLowerCase()} correctamente`;
+        this.toastMessage = `cliente ${operationText.toLowerCase()} correctamente`;
         this.setOpenedToast(true);
         this.cleanForm();
         this.getCountElements();
       },
       error: (error: any) => {
         console.error(
-          `Error al ${operationText.toLowerCase()} el usuario:`,
+          `Error al ${operationText.toLowerCase()} el cliente:`,
           error
         );
         this.loaderComponent.hide();
-        this.toastMessage = `Error al ${operationText.toLowerCase()} el usuario`;
+        this.toastMessage = `Error al ${operationText.toLowerCase()} el cliente`;
       },
     });
   }
@@ -265,15 +255,17 @@ export class ContratosPagoPage implements OnInit {
     if (event === "") {
       this.getCountElements();
     } else {
-      this._globalService.Get(`usuarios/search?query=${event}`).subscribe({
-        next: (response: any) => {
-          this.elements = response;
-          console.log("Elementos obtenidos:", response);
-        },
-        error: (error) => {
-          console.error("Error al obtener los elementos:", error);
-        },
-      });
+      this._globalService
+        .Get(`contratos-pagos/search?query=${event}`)
+        .subscribe({
+          next: (response: any) => {
+            this.elements = response;
+            console.log("Elementos obtenidos:", response);
+          },
+          error: (error) => {
+            console.error("Error al obtener los elementos:", error);
+          },
+        });
     }
   }
 
@@ -283,7 +275,7 @@ export class ContratosPagoPage implements OnInit {
     const limit = this.currentPageSize;
 
     this._globalService
-      .Get(`clientes/paginated?skip=${skip}&limit=${limit}`)
+      .Get(`contratos-pagos/paginated?skip=${skip}&limit=${limit}`)
       .subscribe({
         next: (response: any) => {
           this.elements = response;
@@ -296,7 +288,7 @@ export class ContratosPagoPage implements OnInit {
   }
 
   getCountElements() {
-    this._globalService.Get("clientes/count").subscribe({
+    this._globalService.Get("contratos-pagos/count").subscribe({
       next: (response: any) => {
         console.log("Cantidad de elementos:", response.count);
         const totalElements = response.count;

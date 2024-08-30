@@ -88,15 +88,43 @@ export class ContratosPagosController {
       limit: 1,
     });
 
-    if (!lastContrato) {
+    // console.log(lastContrato);
+
+    if (lastContrato.length === 0) {
       return {correlativo: 'CON-1'};
     }
 
     return {
       correlativo: `CON-${parseInt(lastContrato[0].correlativo.split('-')[1]) + 1}`,
-    }
+    };
+  }
 
+  @get('/contratos-pagos/paginated')
+  @response(200, {
+    description: 'List of Contratos model',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(ContratosPago, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async dataPaginate(
+    @param.query.number('skip') skip: number,
+    @param.query.number('limit') limit: number,
+  ): Promise<ContratosPago[]> {
+    console.log('Llamada de paginacion');
+    const contratos = await this.contratosPagoRepository.find({
+      include: [
+        {relation: 'prestamo', scope: {include: [{relation: 'cliente'}]}},
+      ],
+      skip,
+      limit,
+    });
 
+    return contratos;
   }
 
   @get('/contratos-pagos/verify/{id}')
@@ -223,5 +251,20 @@ export class ContratosPagosController {
   })
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.contratosPagoRepository.deleteById(id);
+  }
+
+  @get('/contratos-pagos/search')
+  async dataSearch(@param.query.string('query') search: string): Promise<any> {
+    let contratos = await this.contratosPagoRepository.find({
+      include: [
+        {relation: 'prestamo', scope: {include: [{relation: 'cliente'}]}},
+      ],
+      where: {
+        or: [
+          {correlativo: {like: `%${search}%`}},
+        ],
+      },
+    });
+    return contratos;
   }
 }

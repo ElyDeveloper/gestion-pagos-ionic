@@ -9,6 +9,8 @@
   <app-breadcrumb></app-breadcrumb>
   <section class="container">
     <app-view-data
+    [searchPlaceHolder]="'Buscar por Código...'"
+      [showAdd]="false"
       [currentPage]="1"
       [totalPages]="10"
       [title]="'Contratos Pago'"
@@ -125,38 +127,16 @@
     <ng-template #modalViewInfo let-close="close" let-save="save">
       <ion-header>
         <ion-toolbar>
-          <ion-title>Vista de Cliente</ion-title>
+          <ion-title>Vista de Contrato</ion-title>
           <ion-buttons slot="end">
             <ion-button (click)="close()">Cerrar</ion-button>
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
       <ion-content>
-        <ion-card>
-          <ion-card-content>
-            @for (column of columnsData; track column.key) { @if (column.key !==
-            'actions') {
-            <ion-item lines="none">
-              <ion-label>{{ column.alias }}</ion-label>
-              @switch (column.type) { @case ('boolean') {
-              <ion-badge
-                slot="end"
-                [color]="getCellValue(element, column.key) ? 'success' : 'medium'">
-                {{ getCellValue(element, column.key) ? "Activo" : "Inactivo" }}
-              </ion-badge>
-              } @case ('object') {
-              <ion-note slot="end"
-                >{{ getObjectValue(element, column.key) }}</ion-note
-              >
-              } @default {
-              <ion-note slot="end"
-                >{{ getCellValue(element, column.key) }}</ion-note
-              >
-              } }
-            </ion-item>
-            } }
-          </ion-card-content>
-        </ion-card>
+        <card-view-info
+          [element]="element"
+          [columnsData]="columnsData"></card-view-info>
       </ion-content>
     </ng-template>
   </section>

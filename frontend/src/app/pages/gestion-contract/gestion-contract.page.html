@@ -7,7 +7,7 @@
     (didDismiss)="setOpenedToast(false)"></ion-toast>
 
   <div
-    class="alert alert-danger"
+    class="alert alert-danger sticky-top"
     role="alert"
     *ngIf="!isPrint && existContrato">
     Ya existe un contrato generado para este préstamo, por políticas de
@@ -254,9 +254,11 @@
                 __________________ con documento nacional ________________ y con
                 domicilio en @if(direccionEmpresa===''){
                 <strong style="color: red">Pendiente Dirección</strong>
-                }@else { {{direccionEmpresa}}}, la cantidad de veinte y seis mil
-                lempiras exactos ({{this.prestamoSeleccionado?.totalMonto|
-                currency : "L" : "symbol"}}).
+                }@else { {{direccionEmpresa}}}, la cantidad de
+                {{this.prestamoSeleccionado?.totalMonto |
+                numberToWords:'lempiras'}}
+                ({{this.prestamoSeleccionado?.totalMonto| currency : "L" :
+                "symbol"}}).
               </p>
               <br />
               <p>
@@ -278,9 +280,11 @@
                 }@else { {{bancoDepositar}}}, en la Ciudad de
                 @if(ciudadBanco===''){
                 <strong style="color: red">Pendiente Ciudad</strong>
-                }@else { {{ciudadBanco}}}, la totalidad de veinte y seis mil
-                lempiras exactos ({{this.prestamoSeleccionado?.totalMonto|
-                currency : "L" : "symbol"}}) , por concepto de préstamo.
+                }@else { {{ciudadBanco}}}, la totalidad de
+                {{this.prestamoSeleccionado?.totalMonto |
+                numberToWords:'lempiras'}}
+                ({{this.prestamoSeleccionado?.totalMonto| currency : "L" :
+                "symbol"}}), por concepto de préstamo.
               </p>
               <br />
               <p>

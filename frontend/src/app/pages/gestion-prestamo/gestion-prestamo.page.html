@@ -70,6 +70,7 @@
         </ul>
       </div>
     </ion-card-content>
+    <input class="form-control" type="text" [maskito]="optionsPercentage">
   </ion-card>
 
   <div [ngSwitch]="currentStep">
@@ -212,8 +213,9 @@
                       >Tasa de Interés:</ion-label
                     >
                     <ion-input
-                      (ngModelChange)="calculateTotalMonto()"
-                      type="number"
+                    [maskito]="optionsPercentage"
+                      (keyup)="calculateTotalMonto()"
+                      type="text"
                       formControlName="tasaInteres"></ion-input>
                   </ion-item>
                 </ion-col>
