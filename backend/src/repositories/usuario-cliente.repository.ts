@@ -14,7 +14,7 @@ export class UsuarioClienteRepository extends DefaultCrudRepository<
   public readonly usuario: BelongsToAccessor<Usuario, typeof UsuarioCliente.prototype.id>;
   constructor(
     @inject('datasources.GestionEDBO') dataSource: GestionEdboDataSource,
-    @repository.getter('ClientesRepository') protected clientesRepositoryGetter: Getter<PersonasRepository>,
+    @repository.getter('PersonasRepository') protected clientesRepositoryGetter: Getter<PersonasRepository>,
     @repository.getter('UsuarioRepository') protected usuarioRepositoryGetter: Getter<UsuarioRepository>,
   ) {
     super(UsuarioCliente, dataSource);

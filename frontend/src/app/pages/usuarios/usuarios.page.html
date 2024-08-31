@@ -280,7 +280,7 @@
           <ion-grid>
             <ion-row class="ion-justify-content-center">
               <ion-col size-xs="12" size-sm="8" size-md="6" size-lg="4">
-                <ion-button expand="block" type="submit" class="ion-margin-top">
+                <ion-button expand="block" (click)="save(this.selectedClients, false)" class="ion-margin-top">
                   Guardar Selección
                 </ion-button>
               </ion-col>
