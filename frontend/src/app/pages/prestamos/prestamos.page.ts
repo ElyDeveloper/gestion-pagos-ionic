@@ -181,7 +181,7 @@ export class PrestamosPage implements OnInit {
         alias: "Aval",
         type: "concat",
         combineWith: "aval.apellidos",
-        combineFormat: (nombre, apellido) => `${nombre} ${apellido}`,
+        combineFormat: (nombres, apellidos) => `${nombres} ${apellidos}`,
       },
       {
         key: "producto.nombre",

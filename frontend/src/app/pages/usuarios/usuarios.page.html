@@ -22,6 +22,7 @@
       (deleteButtonClicked)="onDeleteButtonClicked($event)"
       (resetPasswordButtonClicked)="onResetPasswordButtonClicked($event)"
       (infoButtonClicked)="onInfoButtonClicked($event)"
+      (selectClientClicked)="onSelectClientsButtonClicked($event)"
       (currentPageOut)="onPageChange($event)"
       (searchOut)="onSearchData($event)">
     </app-view-data>
@@ -215,6 +216,77 @@
             </ion-row>
           </ion-grid>
         </form>
+      </ion-content>
+    </ng-template>
+
+    <ng-template #modalSelectClients let-close="close" let-save="save">
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Asignar Clientes</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="close()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <section>
+          <ion-grid>
+            <ion-row>
+              <ion-col size-xs="12" size-sm="12" size-md="12">
+                <ion-searchbar
+                  [placeholder]="searchPlaceHolder"
+                  [(ngModel)]="search"
+                  (ionInput)="searchValueChanged($event)">
+                </ion-searchbar>
+                <ion-list *ngIf="filteredClients.length > 0">
+                  @for (client of filteredClients; track client.id) {
+                  <ion-item
+                    class="user-select-none"
+                    (click)="toggleSelection(client)">
+                    <ion-label
+                      >{{client.nombres}} {{client.apellidos}} -
+                      {{client.dni}}</ion-label
+                    >
+                  </ion-item>
+                  }
+                </ion-list>
+                <div *ngIf="selectedClients.length > 0">
+                  <ion-list-header>
+                    <ion-label
+                      >Clientes Seleccionados ({{selectedClients.length}})
+                    </ion-label>
+                  </ion-list-header>
+                  <ion-list>
+                    @for (client of selectedClients; track client.id) {
+                    <ion-item>
+                      <ion-label>
+                        <h2>{{ client.nombres }} {{client.apellidos}}</h2>
+                        <p>Email: {{ client.email }}</p>
+                      </ion-label>
+                      <ion-button
+                        slot="end"
+                        fill="clear"
+                        (click)="removeClient(client)">
+                        <ion-icon name="close-circle-outline"></ion-icon>
+                      </ion-button>
+                    </ion-item>
+                    }
+                  </ion-list>
+                </div>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+
+          <ion-grid>
+            <ion-row class="ion-justify-content-center">
+              <ion-col size-xs="12" size-sm="8" size-md="6" size-lg="4">
+                <ion-button expand="block" type="submit" class="ion-margin-top">
+                  Guardar Selección
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </section>
       </ion-content>
     </ng-template>
 

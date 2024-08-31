@@ -33,7 +33,7 @@ import { FormModels } from "src/app/shared/utils/forms-models";
 export class GestionPrestamoPage implements OnInit {
   @ViewChild("modalPlanPago", { static: true })
   modalPlanPago!: TemplateRef<any>;
-
+  
   steps = [1, 2, 3];
   currentStep = 0;
 
@@ -117,12 +117,27 @@ export class GestionPrestamoPage implements OnInit {
 
   calculateTotalMonto() {
     const monto = this.prestamoForm.get("monto")?.value;
-    const tasa = this.prestamoForm.get("tasaInteres")?.value;
 
-    if (monto && tasa) {
-      const totalMonto = monto * (1 + tasa / 100);
-      this.prestamoForm.get("totalMonto")?.setValue(totalMonto);
-    }
+    setTimeout(() => {
+      const tasa = this.prestamoForm.get("tasaInteres")?.value;
+      console.log("Tasa: ", tasa);
+      console.log("Tasa: ", tasa);
+
+      //eliminar textos y simbolos, solo dejar numeros
+      let numero = this.extractNumber(tasa);
+
+      console.log("numero: ", numero);
+
+      if (monto && numero) {
+        const totalMonto = monto * (1 + numero / 100);
+        this.prestamoForm.get("totalMonto")?.setValue(totalMonto);
+      }
+    }, 1000);
+  }
+
+  extractNumber(input: string): number {
+    const numberString = input.replace(/\D/g, "");
+    return parseInt(numberString, 10) || 0;
   }
 
   nextStep() {

@@ -6,8 +6,20 @@ import {
   ViewChild,
 } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { debounceTime, distinctUntilChanged, Observable, Subject } from "rxjs";
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  map,
+  Observable,
+  of,
+  Subject,
+  switchMap,
+  takeUntil,
+  tap,
+} from "rxjs";
 import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
+import { Personas } from "src/app/shared/interfaces/persona";
 import { Roles } from "src/app/shared/interfaces/rol";
 import { Column } from "src/app/shared/interfaces/table";
 import { Usuario } from "src/app/shared/interfaces/usuario";
@@ -68,6 +80,18 @@ export class UsuariosPage implements OnInit {
   @ViewChild("modalResetPswd", { static: true })
   modalResetPswd!: TemplateRef<any>;
 
+  @ViewChild("modalSelectClients", { static: true })
+  modalSelectClients!: TemplateRef<any>;
+
+  selectedClients: Personas[] = [];
+  filteredClients: Personas[] = [];
+
+  searchPlaceHolder = "Buscar Cliente...";
+  search: string = "";
+  searchTerm$ = new Subject<string>();
+
+  loading = false;
+
   formResetPswd: FormGroup;
   roles: Roles[] = [];
   isResetPswd = false;
@@ -85,9 +109,70 @@ export class UsuariosPage implements OnInit {
   ngOnInit() {}
 
   ionViewWillEnter() {
+    this.initSearcher();
+
     this.getRoles();
     this.getCountElements();
     this.buildColumns();
+  }
+
+  initSearcher() {
+    this.searchTerm$
+      .pipe(
+        debounceTime(800), // Espera 300 ms después de que el usuario deja de escribir
+        distinctUntilChanged() // Asegura que solo se realice una búsqueda si el valor ha cambiado
+      )
+      .subscribe(() => {
+        if (this.search.trim() === "" || this.search.trim().length < 3) {
+          this.filteredClients = [];
+        } else {
+          this.searchData();
+        }
+        // this.searchEmpleado(); // Llama a la función de búsqueda cuando se cumplan las condiciones
+      });
+  }
+
+  searchValueChanged(event: any) {
+    this.searchTerm$.next(event);
+  }
+
+  searchData() {
+    this._globalService
+      .Get(`personas/clientes/search?query=${this.search}`)
+      .subscribe({
+        next: (data: any) => {
+          this.filteredClients = data;
+        },
+        error: (error) => {
+          console.error("Error al obtener clientes:", error);
+        },
+      });
+  }
+
+  toggleSelection(clientOp: any) {
+    //Eliminar o insertar cliente del array this.selectedClients segun caso.
+
+    // Verifica si el cliente ya está en la lista de seleccionados
+    if (this.selectedClients.some((client) => client.dni === clientOp.dni)) {
+      console.log("Remover Cliente:", clientOp);
+      this.removeClient(clientOp);
+    } else {
+      console.log("Agregar Cliente:", clientOp);
+      this.selectedClients.push(clientOp);
+    }
+
+  }
+
+  removeClient(clientRemove: Personas) {
+    this.selectedClients = this.selectedClients.filter(
+      (client) => client.dni !== clientRemove.dni
+    );
+  }
+
+  ionViewWillLeave() {}
+  // TODO ESPECIFICO
+  onSelect(items: Personas[]) {
+    console.log("Items SelectedItems:", this.selectedClients);
   }
 
   setOpenedToast(value: boolean) {
@@ -149,6 +234,13 @@ export class UsuariosPage implements OnInit {
             alias: "Editar",
             action: "edit",
             icon: "create",
+            color: "primary",
+            rolesAuthorized: [1],
+          },
+          {
+            alias: "Clientes",
+            action: "asignClients",
+            icon: "people",
             color: "primary",
             rolesAuthorized: [1],
           },
@@ -220,6 +312,15 @@ export class UsuariosPage implements OnInit {
   onResetPasswordButtonClicked(data: any) {
     console.log("Data: ", data);
     this.setModalState(false, true, this.modalResetPswd, data);
+  }
+
+  onSelectClientsButtonClicked(data: any) {
+    console.log("Data: ", data);
+    this.filteredClients = [];
+    this.selectedClients = [];
+
+    this.modalSelected = this.modalSelectClients;
+    this.isModalOpen = true;
   }
 
   onInfoButtonClicked(data: any) {

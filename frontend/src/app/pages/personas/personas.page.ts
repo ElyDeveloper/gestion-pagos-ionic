@@ -22,6 +22,7 @@ import { FormModels } from "src/app/shared/utils/forms-models";
 })
 export class PersonasPage implements OnInit {
   @ViewChild(LoaderComponent) loaderComponent!: LoaderComponent;
+
   elements: Personas[] = [];
   element: Personas = {
     dni: "",
@@ -174,7 +175,7 @@ export class PersonasPage implements OnInit {
         key: "nacionalidad.descripcion",
         alias: "Nacionalidad",
         imageUrl: "nacionalidad.urlBandera",
-        type: "image"
+        type: "image",
       },
       {
         key: "recordCrediticio.descripcion",
