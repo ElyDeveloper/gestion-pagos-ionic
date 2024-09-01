@@ -11,6 +11,8 @@ import { Observable } from "rxjs";
 import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
 import { Personas } from "src/app/shared/interfaces/persona";
 import { Column } from "src/app/shared/interfaces/table";
+import { Usuario } from "src/app/shared/interfaces/usuario";
+import { AuthService } from "src/app/shared/services/auth.service";
 import { GlobalService } from "src/app/shared/services/global.service";
 import { FieldAliases, ModalConfig } from "src/app/shared/utils/extra";
 import { FormModels } from "src/app/shared/utils/forms-models";
@@ -68,12 +70,15 @@ export class PersonasPage implements OnInit {
 
   private _router = inject(Router);
   private _globalService = inject(GlobalService);
+  private _authService = inject(AuthService);
 
   //TODO: ESPECIFICOS
   nacionalidades: any[] = [];
   recordsCrediticios: any[] = [];
   estadosCiviles: any[] = [];
   tiposPersona: any[] = [];
+
+  currentUser: Usuario | null = null;
 
   constructor(private fb: FormBuilder) {
     this.formModels = new FormModels(this.fb);
@@ -82,12 +87,27 @@ export class PersonasPage implements OnInit {
     // console.log("Formulario de cliente:", this.formAdd);
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.getCurrentUser();
+  }
 
   ionViewWillEnter() {
     this.getCountElements();
     this.buildColumns();
     this.cargarOpciones();
+  }
+
+  getCurrentUser() {
+    this._authService.getUserInfo().subscribe({
+      next: (user: any) => {
+        this.currentUser = user;
+        console.log("Usuario actual: ", this.currentUser);
+      },
+      error: (error: any) => {
+        console.error("Error al obtener información del usuario:", error);
+      },
+    })
+    console.log("Usuario actual: ", this.currentUser);
   }
 
   //TODO: ESPECIFICO

@@ -30,7 +30,13 @@ export class HomePage {
       name: "Clientes/Avales",
       count: 0,
       url: "/layout/personas",
-      rolesAuthorized: [1, 2, 3],
+      rolesAuthorized: [1, 2],
+    },
+    {
+      name: "Clientes",
+      count: 0,
+      url: "/layout/personas",
+      rolesAuthorized: [3],
     },
     {
       name: "Contratos Pago",

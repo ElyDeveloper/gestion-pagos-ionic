@@ -43,26 +43,32 @@ export class ReusableModalComponent {
     this.isOpenChange.emit(false);
   };
 
-  save = (data: any) => {
+  save = (data: any, isForm: boolean = true) => {
+    
     console.log("data", data);
-    if (this.formSave.invalid) {
-      const invalidFields: string[] = [];
-
-      Object.keys(this.formSave.controls).forEach((key) => {
-        const control = this.formSave.get(key);
-        if (control && control.invalid) {
-          // Usar el alias del campo si está disponible, de lo contrario usar la clave
-          const fieldName = this.modalConfig.fieldAliases[key] || key;
-          invalidFields.push(fieldName);
-        }
-      });
-
-      console.log("Campos inválidos:", invalidFields);
-
-      this.toastMessage = `Por favor, complete correctamente los siguientes campos: ${invalidFields.join(", ")}`;
-      this.setOpenedToast(true);
-      return;
+    if (isForm) {
+      if (this.formSave.invalid) {
+        const invalidFields: string[] = [];
+  
+        Object.keys(this.formSave.controls).forEach((key) => {
+          const control = this.formSave.get(key);
+          if (control && control.invalid) {
+            // Usar el alias del campo si está disponible, de lo contrario usar la clave
+            const fieldName = this.modalConfig.fieldAliases[key] || key;
+            invalidFields.push(fieldName);
+          }
+        });
+  
+        console.log("Campos inválidos:", invalidFields);
+  
+        this.toastMessage = `Por favor, complete correctamente los siguientes campos: ${invalidFields.join(
+          ", "
+        )}`;
+        this.setOpenedToast(true);
+        return;
+      }
     }
+    
 
     this.saveData.emit(data);
     this.close();
