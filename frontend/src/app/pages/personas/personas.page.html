@@ -8,7 +8,9 @@
 
   <app-breadcrumb></app-breadcrumb>
   <ion-grid>
-    <ion-row class="d-flex justify-content-center">
+    <ion-row
+      class="d-flex justify-content-center"
+      *ngIf="currentUser?.rolid!==3">
       <ion-col sizeSm="12" sizeMd="6">
         <ion-segment value="all">
           <ion-segment-button
@@ -77,9 +79,7 @@
                   <ion-label position="stacked" class="bold-label"
                     >DNI:</ion-label
                   >
-                  <ion-input
-                    type="text"
-                    formControlName="dni"></ion-input>
+                  <ion-input type="text" formControlName="dni"></ion-input>
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-sm="6" size-md="6">

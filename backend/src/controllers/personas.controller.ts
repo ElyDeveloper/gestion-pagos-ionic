@@ -19,14 +19,25 @@ import {
   HttpErrors,
 } from '@loopback/rest';
 import {Personas} from '../models';
-import {PersonasRepository} from '../repositories';
+import {
+  PersonasRepository,
+  UsuarioClienteRepository,
+  UsuarioRepository,
+} from '../repositories';
 import {JWTService} from '../services';
-import {service} from '@loopback/core';
+import {inject, service} from '@loopback/core';
+import {authenticate} from '@loopback/authentication';
+import {SecurityBindings, securityId, UserProfile} from '@loopback/security';
 
+@authenticate('jwt')
 export class PersonasController {
   constructor(
     @repository(PersonasRepository)
     public personasRepository: PersonasRepository,
+    @repository(UsuarioRepository)
+    public usuarioRepository: UsuarioRepository,
+    @repository(UsuarioClienteRepository)
+    public usuarioClienteRepository: UsuarioClienteRepository,
     @service(JWTService)
     private jwtService: JWTService,
   ) {}
@@ -119,9 +130,51 @@ export class PersonasController {
     },
   })
   async dataPaginate(
+    @inject(SecurityBindings.USER)
+    currentUser: UserProfile,
     @param.query.number('skip') skip: number,
     @param.query.number('limit') limit: number,
   ): Promise<Personas[]> {
+    console.log('Usuario Logueado: ', currentUser);
+    const userId = parseInt(currentUser[securityId], 10);
+    console.log('Id de Usuario Logueado: ', userId);
+
+    const user = await this.usuarioRepository.findById(userId);
+    if (!user) {
+      throw new HttpErrors.Unauthorized('Usuario no encontrado');
+    }
+    console.log('Usuario encontrado: ', user);
+
+    if (user.rolid === 3) {
+      const usuariosCliente = await this.usuarioClienteRepository.find({
+        where: {usuarioId: userId},
+        include: [
+          {
+            relation: 'Cliente',
+            scope: {
+              include: [
+                {relation: 'nacionalidad'},
+                {relation: 'recordCrediticio'},
+                {relation: 'estadoCivil'},
+                {relation: 'tipoPersona'},
+              ],
+            },
+          },
+        ],
+        skip,
+        limit,
+      });
+
+      const clients = usuariosCliente.map((uc: any) => uc.Cliente);
+
+      //Encriptar id de clientes
+      clients.forEach((c: any) => {
+        c.id = this.jwtService.encryptId(c.id || 0);
+      });
+
+      return clients;
+    }
+
     const personas = await this.personasRepository.find({
       include: [
         {relation: 'nacionalidad'},
@@ -157,9 +210,15 @@ export class PersonasController {
     },
   })
   async dataPaginateClientes(
+    @inject(SecurityBindings.USER)
+    currentUser: UserProfile,
     @param.query.number('skip') skip: number,
     @param.query.number('limit') limit: number,
   ): Promise<Personas[]> {
+    console.log('Usuario Logueado: ', currentUser);
+    const userId = parseInt(currentUser[securityId], 10);
+    console.log('Id de Usuario Logueado: ', userId);
+
     console.log('Consulta paginada: ', skip);
     const clientes = await this.personasRepository.find({
       where: {

@@ -72,10 +72,12 @@ export class AuthService {
 
     let userReturn: any = user;
     console.log('userReturn', userReturn);
-    const idEncrypted = await this.jwtService.encryptId(
-      credentials.id || 0,
-    );
-    userReturn.id = idEncrypted;
+    // const idEncrypted = await this.jwtService.encryptId(
+    //   credentials.id || 0,
+    // );
+    // userReturn.id = idEncrypted;
+
+    matchCredencials.id = userReturn.id;
 
     const token = await this.jwtService.createToken(matchCredencials, user);
     const auth = {

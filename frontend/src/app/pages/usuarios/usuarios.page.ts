@@ -333,16 +333,24 @@ export class UsuariosPage implements OnInit {
     this.filteredClients = [];
     this.selectedClients = [];
 
-    this._globalService.Get(`usuario-clientes/by-usuario/${data.id}`).subscribe({
-      next: (response: any) => {
-        console.log("Clientes del usuario:", response);
-        this.filteredClients = response.Cliente;
-        this.setModalState(false, false, false, true, this.modalSelectClients);
-      },
-      error: (error: any) => {
-        console.error("Error al obtener clientes del usuario:", error);
-      },
-    });
+    this._globalService
+      .Get(`usuario-clientes/by-usuario/${data.id}`)
+      .subscribe({
+        next: (response: any) => {
+          console.log("Clientes del usuario:", response);
+          this.setModalState(
+            false,
+            false,
+            false,
+            true,
+            this.modalSelectClients
+          );
+          this.selectedClients = response.map((uc: any) => uc.Cliente);
+        },
+        error: (error: any) => {
+          console.error("Error al obtener clientes del usuario:", error);
+        },
+      });
   }
 
   onInfoButtonClicked(data: any) {

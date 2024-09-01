@@ -47,69 +47,67 @@ export class UsuarioClienteController {
               usuarioId: {type: 'number'},
               clientsIds: {type: 'array', items: {type: 'string'}},
             },
-            required: ['usuarioId'],
+            required: ['usuarioId', 'clientsIds'],
           },
         },
       },
     })
-    usuarioCliente: any,
-  ): Promise<any> {
-    console.log('Usuario Cliente:', usuarioCliente);
+    usuarioCliente: {
+      usuarioId: number;
+      clientsIds: string[];
+    },
+  ): Promise<{message: string; changes: {added: number; removed: number}}> {
+    try {
+      if (!Array.isArray(usuarioCliente.clientsIds)) {
+        throw new Error('clientsIds debe ser un array');
+      }
 
-    //Obtener los clientes por usuario
-    const userClients = await this.usuarioClienteRepository.find({
-      where: {
-        usuarioId: usuarioCliente.usuarioId,
-      },
-    });
+      const userClients = await this.usuarioClienteRepository.find({
+        where: {usuarioId: usuarioCliente.usuarioId},
+      });
 
-    if (userClients.length > 0) {
-      //Comparar si el array de ids coincide con los que ya existen en la base de datos
-      const clientsIds = userClients.map(uc => uc.clientsIds);
-      const newClientsIds = usuarioCliente.clientsIds;
-
-      const decryptedNewClientsIds = newClientsIds.map((id: string) =>
+      const existingClientIds = userClients.map(uc => uc.clienteId);
+      const newClientIds = usuarioCliente.clientsIds.map(id =>
         this.jwtService.decryptId(id),
       );
 
-      const intersection = clientsIds.filter(id =>
-        decryptedNewClientsIds.includes(id),
+      const clientsToAdd = newClientIds.filter(
+        id => !existingClientIds.includes(id),
+      );
+      const clientsToRemove = existingClientIds.filter(
+        id => !newClientIds.includes(id),
       );
 
-      if (intersection.length === decryptedNewClientsIds.length) {
-        //Si coinciden, no hay cambios
-        return {message: 'No hay cambios en los clientes por usuario'};
+      if (clientsToAdd.length === 0 && clientsToRemove.length === 0) {
+        return {
+          message: 'No hay cambios en los clientes por usuario',
+          changes: {added: 0, removed: 0},
+        };
       }
 
-      //Si no coinciden, eliminar los clientes que no existen en el nuevo array
-      const clientsToDelete = clientsIds.filter(
-        id => !decryptedNewClientsIds.includes(id),
-      );
       await this.usuarioClienteRepository.deleteAll({
         usuarioId: usuarioCliente.usuarioId,
-        clienteId: clientsToDelete,
+        clienteId: {inq: clientsToRemove},
       });
 
-      //Agregar los nuevos clientes
-      const newClients = decryptedNewClientsIds.map((id: number) => ({
+      const newClients = clientsToAdd.map(id => ({
         usuarioId: usuarioCliente.usuarioId,
         clienteId: id,
       }));
 
       await this.usuarioClienteRepository.createAll(newClients);
-    } else {
-      //Si no hay clientes por usuario, crearlos
-      await this.usuarioClienteRepository.createAll(
-        usuarioCliente.clientsIds.map((id: string) => ({
-          usuarioId: usuarioCliente.usuarioId,
-          clienteId: this.jwtService.decryptId(id),
-        })),
-      );
+
+      return {
+        message: 'Clientes por usuario actualizados correctamente',
+        changes: {
+          added: clientsToAdd.length,
+          removed: clientsToRemove.length,
+        },
+      };
+    } catch (error) {
+      console.error('Error al actualizar clientes por usuario:', error);
+      throw new Error('Error al procesar la solicitud');
     }
-
-    console.log('Clientes por usuario:', userClients);
-
-    return {message: 'Usuario Cliente creado correctamente'};
   }
 
   @get('/usuario-clientes/count')
@@ -218,12 +216,25 @@ export class UsuarioClienteController {
     filter?: FilterExcludingWhere<UsuarioCliente>,
   ): Promise<UsuarioCliente[]> {
     console.log('Buscando Usuario Cliente:', id);
-    return this.usuarioClienteRepository.find({
+    const userClients = await this.usuarioClienteRepository.find({
       where: {
         usuarioId: id,
       },
       include: [{relation: 'Cliente'}, {relation: 'Usuario'}],
     });
+
+    //Encriptar el id de los clientes
+
+    if (userClients.length > 0) {
+      const clients = userClients.map(uc => {
+        uc.Cliente.id = this.jwtService.encryptId(uc.Cliente?.id);
+        return uc;
+      });
+
+      return clients;
+    }
+
+    return userClients;
   }
 
   @patch('/usuario-clientes/{id}')
