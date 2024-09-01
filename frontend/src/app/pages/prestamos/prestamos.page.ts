@@ -11,6 +11,8 @@ import { Observable } from "rxjs";
 import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
 import { Prestamos } from "src/app/shared/interfaces/prestamo";
 import { Column } from "src/app/shared/interfaces/table";
+import { Usuario } from "src/app/shared/interfaces/usuario";
+import { AuthService } from "src/app/shared/services/auth.service";
 import { GlobalService } from "src/app/shared/services/global.service";
 import { FormModels } from "src/app/shared/utils/forms-models";
 
@@ -66,8 +68,12 @@ export class PrestamosPage implements OnInit {
   modalSelected: TemplateRef<any> = this.modalAdd;
   formSelected: FormGroup;
 
+  currentUser: Usuario | null = null;
+
   private _globalService = inject(GlobalService);
   private _router = inject(Router);
+  private _authService = inject(AuthService);
+
   //TODO ESPECIFICO
   @ViewChild("modalAprobar", { static: true })
   modalAprobar!: TemplateRef<any>;
@@ -88,13 +94,28 @@ export class PrestamosPage implements OnInit {
     console.log("Formulario de cliente:", this.formAdd);
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.getCurrentUser();
+  }
 
   ionViewWillEnter() {
     this.getEstadosAprobacion();
     this.getCountElements();
     this.buildColumns();
     this.buildColumnsPlan();
+  }
+
+  getCurrentUser() {
+    this._authService.getUserInfo().subscribe({
+      next: (user: any) => {
+        this.currentUser = user;
+        console.log("Usuario actual: ", this.currentUser);
+      },
+      error: (error: any) => {
+        console.error("Error al obtener información del usuario:", error);
+      },
+    });
+    console.log("Usuario actual: ", this.currentUser);
   }
 
   //TODO: ESPECIFICO
@@ -282,7 +303,9 @@ export class PrestamosPage implements OnInit {
         formData.planPago.fechaInicio
       );
       if (formData.fechaFinal) {
-        formData.fechaFinal = this._globalService.formatDateForInput(formData.fechaFinal);
+        formData.fechaFinal = this._globalService.formatDateForInput(
+          formData.fechaFinal
+        );
       }
     }
     console.log("Form Data:", formData);

@@ -7,7 +7,7 @@
     (didDismiss)="setOpenedToast(false)"></ion-toast>
 
   <app-breadcrumb></app-breadcrumb>
-  <section>
+  <section *ngIf="currentUser?.rolid!==3">
     <app-view-data
       [currentPage]="1"
       [totalPages]="10"
