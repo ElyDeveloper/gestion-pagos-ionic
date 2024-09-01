@@ -366,8 +366,11 @@ export class PersonasController {
   @response(204, {
     description: 'Personas DELETE success',
   })
-  async deleteById(@param.path.number('id') id: number): Promise<void> {
-    await this.personasRepository.deleteById(id);
+  async deleteById(@param.path.string('id') id: string): Promise<void> {
+    //desencriptar id de prestamos con jwtService
+    const decryptedId = this.jwtService.decryptId(id.toString());
+    console.log('id de Persona a eliminar: ', decryptedId);
+    await this.personasRepository.deleteById(decryptedId);
   }
 
   @get('/personas/todos/search')
