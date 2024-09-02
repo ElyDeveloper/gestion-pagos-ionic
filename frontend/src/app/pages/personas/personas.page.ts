@@ -306,6 +306,21 @@ export class PersonasPage implements OnInit {
     });
   }
 
+  async handleSave(data: any) {
+    if (data.email === '' || data.email === null) {
+      data.email = 'no-email@example.com';
+    }
+
+    console.log("Datos del cliente antes guardar:", data);
+
+    if (this.isEdit) {
+      this.handleUserOperation("edit", data);
+    } else if (!this.isEdit) {
+      delete data.id;
+      this.handleUserOperation("create", data);
+    }
+  }
+
   handleUserOperation(operation: "edit" | "create", data: any) {
     data.fechaIngreso = new Date(data.fechaIngreso);
     console.log("Datos del cliente:", data);
@@ -348,15 +363,6 @@ export class PersonasPage implements OnInit {
         this.toastMessage = `Error al ${operationText.toLowerCase()} el cliente`;
       },
     });
-  }
-
-  async handleSave(data: any) {
-    if (this.isEdit) {
-      this.handleUserOperation("edit", data);
-    } else if (!this.isEdit) {
-      delete data.id;
-      this.handleUserOperation("create", data);
-    }
   }
 
   onPageChange(event: any) {

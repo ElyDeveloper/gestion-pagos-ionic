@@ -111,11 +111,11 @@ export class ContratosPagoPage implements OnInit {
         alias: "Acciones",
         lstActions: [
           {
-            alias: "Información",
-            action: "info",
-            icon: "information",
-            color: "tertiary",
-            rolesAuthorized: [1, 2, 3],
+            alias: "Ver",
+            action: "go",
+            icon: "open",
+            color: "primary",
+            rolesAuthorized: [1, 2],
           },
         ],
       },
@@ -168,6 +168,11 @@ export class ContratosPagoPage implements OnInit {
     this.element = data;
     this.modalSelected = this.modalViewInfo;
     this.isModalOpen = true;
+  }
+  onGoButtonClicked(data: any) {
+    console.log("Ir al detalle del cliente:", data);
+    //Redirigir al detalle del cliente
+    this._router.navigate(["/gestion-contrato", data.prestamo.id]);
   }
 
   onDeleteButtonClicked(data: any) {

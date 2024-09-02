@@ -28,7 +28,6 @@ import {EncriptDecryptService} from '../services/encript-decrypt.service';
 import {MailService} from '../services/mail.service';
 import {authenticate} from '@loopback/authentication';
 
-
 @authenticate('jwt')
 export class UserController {
   constructor(
@@ -213,6 +212,19 @@ export class UserController {
     @param.path.number('id') id: number,
     @requestBody() usuario: Usuario,
   ): Promise<void> {
+    const credenciales = await this.credencialesRepository.findOne({
+      where: {
+        correo: usuario.correo,
+      },
+    });
+
+    if (credenciales) {
+      await this.credencialesRepository.updateById(credenciales.id, {
+        username: usuario.correo?.split('@')[0],
+        correo: usuario.correo,
+      });
+    }
+
     await this.usuarioRepository.replaceById(id, usuario);
   }
 

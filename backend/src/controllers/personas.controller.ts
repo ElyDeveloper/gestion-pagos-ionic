@@ -70,7 +70,9 @@ export class PersonasController {
     content: {'application/json': {schema: CountSchema}},
   })
   async count(@param.where(Personas) where?: Where<Personas>): Promise<Count> {
-    return this.personasRepository.count(where);
+    return this.personasRepository.count({
+      estado: true,
+    });
   }
 
   @get('/personas/clientes/count')
@@ -83,6 +85,7 @@ export class PersonasController {
   ): Promise<Count> {
     return this.personasRepository.count({
       idTipoPersona: 1,
+      estado: true,
     });
   }
 
@@ -96,6 +99,7 @@ export class PersonasController {
   ): Promise<Count> {
     return this.personasRepository.count({
       idTipoPersona: 2,
+      estado: true,
     });
   }
 
@@ -147,16 +151,17 @@ export class PersonasController {
 
     if (user.rolid === 3) {
       const usuariosCliente = await this.usuarioClienteRepository.find({
-        where: {usuarioId: userId},
+        where: {usuarioId: userId, estado: true},
         include: [
           {
             relation: 'Cliente',
             scope: {
+              where: {estado: true},
               include: [
-                {relation: 'nacionalidad'},
-                {relation: 'recordCrediticio'},
-                {relation: 'estadoCivil'},
-                {relation: 'tipoPersona'},
+                'nacionalidad',
+                'recordCrediticio',
+                'estadoCivil',
+                'tipoPersona',
               ],
             },
           },
@@ -165,7 +170,17 @@ export class PersonasController {
         limit,
       });
 
-      const clients = usuariosCliente.map((uc: any) => uc.Cliente);
+      // console.log('UsuariosClientes encontrados: ', usuariosCliente);
+
+      const clients = usuariosCliente
+        .map((uc: any) => {
+          const ucC = uc?.Cliente;
+          console.log('Cliente encontrado: ', ucC);
+          return ucC;
+        })
+        .filter(
+          (client): client is NonNullable<typeof client> => client != null,
+        );
 
       //Encriptar id de clientes
       clients.forEach((c: any) => {
@@ -176,11 +191,14 @@ export class PersonasController {
     }
 
     const personas = await this.personasRepository.find({
+      where: {
+        estado: true,
+      },
       include: [
-        {relation: 'nacionalidad'},
-        {relation: 'recordCrediticio'},
-        {relation: 'estadoCivil'},
-        {relation: 'tipoPersona'},
+        'nacionalidad',
+        'recordCrediticio',
+        'estadoCivil',
+        'tipoPersona',
       ],
       skip,
       limit,
@@ -223,12 +241,13 @@ export class PersonasController {
     const clientes = await this.personasRepository.find({
       where: {
         idTipoPersona: 1,
+        estado: true,
       },
       include: [
-        {relation: 'nacionalidad'},
-        {relation: 'recordCrediticio'},
-        {relation: 'estadoCivil'},
-        {relation: 'tipoPersona'},
+        'nacionalidad',
+        'recordCrediticio',
+        'estadoCivil',
+        'tipoPersona',
       ],
       skip,
       limit,
@@ -264,12 +283,13 @@ export class PersonasController {
     const avales = await this.personasRepository.find({
       where: {
         idTipoPersona: 2,
+        estado: true,
       },
       include: [
-        {relation: 'nacionalidad'},
-        {relation: 'recordCrediticio'},
-        {relation: 'estadoCivil'},
-        {relation: 'tipoPersona'},
+        'nacionalidad',
+        'recordCrediticio',
+        'estadoCivil',
+        'tipoPersona',
       ],
       skip,
       limit,
@@ -370,7 +390,9 @@ export class PersonasController {
     //desencriptar id de prestamos con jwtService
     const decryptedId = this.jwtService.decryptId(id.toString());
     console.log('id de Persona a eliminar: ', decryptedId);
-    await this.personasRepository.deleteById(decryptedId);
+    await this.personasRepository.updateById(decryptedId, {
+      estado: false,
+    });
   }
 
   @get('/personas/todos/search')
@@ -385,6 +407,7 @@ export class PersonasController {
 
     const PersonasSearch = await this.personasRepository.find({
       where: {
+        estado: true,
         or: [
           {dni: {like: `%${search}%`}},
           {nombres: {like: `%${search}%`}},
@@ -392,10 +415,10 @@ export class PersonasController {
         ],
       },
       include: [
-        {relation: 'nacionalidad'},
-        {relation: 'recordCrediticio'},
-        {relation: 'estadoCivil'},
-        {relation: 'tipoPersona'},
+        'nacionalidad',
+        'recordCrediticio',
+        'estadoCivil',
+        'tipoPersona',
       ],
     });
 
@@ -424,6 +447,7 @@ export class PersonasController {
       where: {
         and: [
           {idTipoPersona: 1},
+          {estado: true},
           {
             or: [
               {dni: {like: `%${search}%`}},
@@ -434,10 +458,10 @@ export class PersonasController {
         ],
       },
       include: [
-        {relation: 'nacionalidad'},
-        {relation: 'recordCrediticio'},
-        {relation: 'estadoCivil'},
-        {relation: 'tipoPersona'},
+        'nacionalidad',
+        'recordCrediticio',
+        'estadoCivil',
+        'tipoPersona',
       ],
     });
     // clonar array
@@ -465,6 +489,7 @@ export class PersonasController {
       where: {
         and: [
           {idTipoPersona: 2},
+          {estado: true},
           {
             or: [
               {dni: {like: `%${search}%`}},
@@ -475,10 +500,10 @@ export class PersonasController {
         ],
       },
       include: [
-        {relation: 'nacionalidad'},
-        {relation: 'recordCrediticio'},
-        {relation: 'estadoCivil'},
-        {relation: 'tipoPersona'},
+        'nacionalidad',
+        'recordCrediticio',
+        'estadoCivil',
+        'tipoPersona',
       ],
     });
     // clonar array

@@ -116,18 +116,35 @@ export class HomePage {
       })
     );
 
-    this._globalService.Get("contratos-pagos/count").subscribe({
-      next: (data: any) => {
-        this.folders[2].count = data.count;
-      },
-      error: (error) => {
-        console.error("Error al obtener la cantidad de contratos de pago", error);
-      },
-    });
+    this.suscriptions.push(
+      this._globalService.Get("personas/clientes/count").subscribe({
+        next: (data: any) => {
+          this.folders[2].count = data.count;
+        },
+        error: (error) => {
+          console.error("Error al obtener la cantidad de clientes", error);
+        },
+      })
+    );
+
+    this.suscriptions.push(
+      this._globalService.Get("contratos-pagos/count").subscribe({
+        next: (data: any) => {
+          this.folders[3].count = data.count;
+        },
+        error: (error) => {
+          console.error(
+            "Error al obtener la cantidad de contratos de pago",
+            error
+          );
+        },
+      })
+    );
+    
     this.suscriptions.push(
       this._globalService.Get("prestamos/count").subscribe({
         next: (data: any) => {
-          this.folders[3].count = data.count;
+          this.folders[4].count = data.count;
         },
         error: (error) => {
           console.error("Error al obtener la cantidad de prestamos", error);

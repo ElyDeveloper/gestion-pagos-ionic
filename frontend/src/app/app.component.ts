@@ -1,6 +1,8 @@
 import { Component, inject } from "@angular/core";
 import { Platform } from "@ionic/angular";
 import { BackdropFixService } from "./shared/services/backdrop-fix.service";
+import { Title } from "@angular/platform-browser";
+import { environment } from "src/environments/environment";
 @Component({
   selector: "app-root",
   templateUrl: "app.component.html",
@@ -24,6 +26,7 @@ export class AppComponent {
   ];
 
   private backdropFixService = inject(BackdropFixService);
+  private _titleService = inject(Title);
 
   constructor(private platform: Platform) {
     this.initializeApp();
@@ -33,6 +36,8 @@ export class AppComponent {
     this.platform.ready().then(() => {
       this.checkDarkMode();
     });
+
+    this._titleService.setTitle(environment.appName || "LAP");
 
     this.backdropFixService.startObserving();
   }

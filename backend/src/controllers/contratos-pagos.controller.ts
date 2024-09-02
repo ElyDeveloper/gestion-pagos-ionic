@@ -20,7 +20,7 @@ import {
 import {ContratosPago} from '../models';
 import {ContratosPagoRepository} from '../repositories';
 import {service} from '@loopback/core';
-import {GlobalService} from '../services';
+import {AuthService, GlobalService, JWTService} from '../services';
 
 export class ContratosPagosController {
   constructor(
@@ -28,6 +28,8 @@ export class ContratosPagosController {
     public contratosPagoRepository: ContratosPagoRepository,
     @service(GlobalService)
     private globalService: GlobalService,
+    @service(JWTService)
+    private jWTService: JWTService,
   ) {}
 
   @post('/contratos-pagos')
@@ -122,6 +124,11 @@ export class ContratosPagosController {
       ],
       skip,
       limit,
+    });
+
+    //Encriptar el id de prestamo:
+    contratos.forEach((c) => {
+      c.prestamo.id = this.jWTService.encryptId(c.prestamo.id);
     });
 
     return contratos;

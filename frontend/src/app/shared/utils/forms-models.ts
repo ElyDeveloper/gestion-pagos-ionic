@@ -10,12 +10,12 @@ export class FormModels {
   personasForm(): FormGroup {
     return this.fb.group({
       id: [null],
-      dni: ['', [Validators.required, Validators.maxLength(15)]],
+      dni: ["", [Validators.required, Validators.maxLength(15)]],
       nombres: [null, [Validators.required, Validators.minLength(2)]],
       apellidos: [null, [Validators.required, Validators.minLength(2)]],
       cel: [null, [Validators.required, Validators.pattern(/^\d{4}-\d{4}$/)]],
       direccion: [null, Validators.required],
-      email: [null, [Validators.required, Validators.email]],
+      email: [null, [Validators.email]],
       fechaIngreso: [null, Validators.required],
       fechaBaja: [null],
       estado: [true],
