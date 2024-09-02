@@ -154,6 +154,7 @@ export class PrestamosController {
         ],
         skip,
         limit,
+        order: ['id DESC'],
       });
 
       // console.log('UsuariosClientes encontrados: ', usuariosCliente);
@@ -187,6 +188,7 @@ export class PrestamosController {
         ],
         skip,
         limit,
+        order: ['id DESC'],
       });
 
       // clonar array
@@ -215,6 +217,7 @@ export class PrestamosController {
       ],
       skip,
       limit,
+      order: ['id DESC'],
     });
 
     // clonar array

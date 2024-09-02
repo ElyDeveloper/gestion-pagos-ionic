@@ -311,6 +311,10 @@ export class PersonasPage implements OnInit {
       data.email = 'no-email@example.com';
     }
 
+    //Eliminar guiones de cadena de data.dni y data.cel
+    data.dni = data.dni.replace(/-/g, "");
+    data.cel = data.cel.replace(/-/g, "");
+
     console.log("Datos del cliente antes guardar:", data);
 
     if (this.isEdit) {

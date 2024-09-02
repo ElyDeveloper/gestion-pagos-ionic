@@ -1,23 +1,34 @@
-import { Directive, ElementRef, HostListener, Input } from '@angular/core';
+import { Directive, ElementRef, HostListener, Input, OnInit } from '@angular/core';
+import { NgControl } from '@angular/forms';
 
 @Directive({
   selector: '[appInputMask]'
 })
-export class InputMaskDirective {
+export class InputMaskDirective implements OnInit {
   @Input('appInputMask') maskPattern: string = '';
+  private previousValue: string = '';
 
-  constructor(private el: ElementRef) {}
+  constructor(private el: ElementRef, private control: NgControl) {}
 
-  @HostListener('input', ['$event'])
-  onInput(event: Event) {
-    const input = event.target as HTMLInputElement;
-    let value = input.value.replace(/\D/g, '');
+  ngOnInit() {
+    this.applyMask(this.el.nativeElement.value);
+  }
+
+  @HostListener('ionInput', ['$event.target.value'])
+  onInput(value: string) {
+    this.applyMask(value);
+  }
+
+  private applyMask(value: string) {
+    let newValue = value.replace(/\D/g, '');
+    if (newValue === this.previousValue) return;
+
     let formatted = '';
     let maskIndex = 0;
 
-    for (let i = 0; i < value.length && maskIndex < this.maskPattern.length; i++) {
+    for (let i = 0; i < newValue.length && maskIndex < this.maskPattern.length; i++) {
       if (this.maskPattern[maskIndex] === '#') {
-        formatted += value[i];
+        formatted += newValue[i];
         maskIndex++;
       } else {
         formatted += this.maskPattern[maskIndex];
@@ -26,6 +37,8 @@ export class InputMaskDirective {
       }
     }
 
-    input.value = formatted;
+    this.previousValue = formatted;
+    this.el.nativeElement.value = formatted;
+    this.control.control?.setValue(formatted, { emitEvent: false });
   }
 }

@@ -168,6 +168,7 @@ export class PersonasController {
         ],
         skip,
         limit,
+        order: ['id DESC'],
       });
 
       // console.log('UsuariosClientes encontrados: ', usuariosCliente);
@@ -202,6 +203,7 @@ export class PersonasController {
       ],
       skip,
       limit,
+      order: ['id DESC'],
     });
 
     // clonar array
@@ -251,6 +253,7 @@ export class PersonasController {
       ],
       skip,
       limit,
+      order: ['id DESC'],
     });
 
     // clonar array
@@ -293,6 +296,7 @@ export class PersonasController {
       ],
       skip,
       limit,
+      order: ['id DESC'],
     });
 
     // clonar array
