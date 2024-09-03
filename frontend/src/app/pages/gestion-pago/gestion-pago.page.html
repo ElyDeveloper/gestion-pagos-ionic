@@ -1,5 +1,6 @@
 <ion-content [fullscreen]="true">
   <app-breadcrumb></app-breadcrumb>
+
   <ion-card id="pago-form">
     <ion-card-content>
       <div
@@ -35,7 +36,19 @@
           </ion-button> -->
         </div>
       </div>
+
       <div
+        *ngIf="!existContrato"
+        class="alert alert-danger d-flex justify-content-between py-1"
+        role="alert">
+        <p>
+          No existe contrato registrado para este prestamo, debe generar uno
+          primero.
+        </p>
+      </div>
+
+      <div
+        *ngIf="existContrato"
         class="alert"
         [ngClass]="{
           'alert-warning': isWarningState(),
@@ -71,7 +84,7 @@
       </div>
     </ion-card-content>
   </ion-card>
-  <ion-card>
+  <ion-card *ngIf="existContrato">
     <ion-card-content>
       <section>
         <div class="container">

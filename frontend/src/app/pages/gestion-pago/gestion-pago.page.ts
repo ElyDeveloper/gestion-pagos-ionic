@@ -19,7 +19,7 @@ const MILLISECONDS_PER_DAY = 1000 * 3600 * 24;
   templateUrl: "./gestion-pago.page.html",
   styleUrls: ["./gestion-pago.page.scss"],
 })
-export class GestionPagoPage implements OnInit, OnDestroy {
+export class GestionPagoPage implements OnInit {
   @ViewChild(LoaderComponent) private loaderComponent!: LoaderComponent;
 
   @ViewChild(UploaderComponent) uploaderComponent:
@@ -36,6 +36,7 @@ export class GestionPagoPage implements OnInit, OnDestroy {
 
   hasAval = false;
   hasMora = false;
+  existContrato = false;
 
   mora = 0;
   daysLate = 0;
@@ -55,12 +56,36 @@ export class GestionPagoPage implements OnInit, OnDestroy {
     this.pagoForm = this.formModels.pagoForm();
   }
 
-  ngOnInit(): void {
+  ngOnInit(): void {}
+
+  verifyExist() {
+    this.suscriptions.push(
+      this.globalService
+        .Get(`contratos-pagos/verify/${this.prestamoSeleccionado.id}`)
+        .subscribe({
+          next: (data: any) => {
+            const { exist } = data;
+
+            console.log("Contrato existente", data);
+            if (exist) {
+              this.existContrato = true;
+              this.getFechasPago(this.prestamoSeleccionado);
+            } else {
+              this.existContrato = false;
+            }
+          },
+          error: (error: any) => {
+            console.error("Error al verificar si existe el contrato", error);
+          },
+        })
+    );
+  }
+
+  ionViewDidEnter() {
     this.getIdByUrl();
     this.buildColumns();
   }
-
-  ngOnDestroy(): void {
+  ionViewDidLeave() {
     this.suscriptions.forEach((sub) => sub.unsubscribe());
   }
 
@@ -71,11 +96,12 @@ export class GestionPagoPage implements OnInit, OnDestroy {
 
     console.log("Archivo subido: ", file);
 
-    data.idPrestamo=this.prestamoSeleccionado.id;
+    data.idPrestamo = this.prestamoSeleccionado.id;
 
     this.globalService.PostWithFile("pagos/saveFile", data, file).subscribe({
       next: (response) => {
         console.log("Respuesta del Servidor: ", response);
+        this.getFechasPago(this.prestamoSeleccionado);
         // TODO: Mostrar mensaje de éxito
       },
       error: (error) => {
@@ -151,7 +177,8 @@ export class GestionPagoPage implements OnInit, OnDestroy {
     this.clienteSeleccionado = prestamo.cliente;
     this.avalSeleccionado = prestamo.aval;
     this.hasAval = !!prestamo.idAval;
-    this.getFechasPago(this.prestamoSeleccionado);
+
+    this.verifyExist();
   }
 
   private buildColumns(): void {
