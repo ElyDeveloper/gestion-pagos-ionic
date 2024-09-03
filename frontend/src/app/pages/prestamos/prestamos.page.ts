@@ -232,13 +232,6 @@ export class PrestamosPage implements OnInit {
         alias: "Acciones",
         lstActions: [
           {
-            alias: "Cliente",
-            action: "client",
-            icon: "person",
-            color: "primary",
-            rolesAuthorized: [1, 2],
-          },
-          {
             alias: "Editar",
             action: "edit",
             icon: "create",

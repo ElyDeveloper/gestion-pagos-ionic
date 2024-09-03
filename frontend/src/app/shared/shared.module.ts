@@ -22,6 +22,8 @@ import { FileUploadModule } from "ng2-file-upload";
 import { NgSelectModule } from "@ng-select/ng-select";
 import { InputMaskDirective } from "./directives/input-mask.directive";
 
+import { NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
+
 @NgModule({
   declarations: [
     ViewDataComponent,
@@ -34,9 +36,10 @@ import { InputMaskDirective } from "./directives/input-mask.directive";
     FormatDniPipe,
     NumberToWordsPipe,
     XmlToListPipe,
-    InputMaskDirective
+    InputMaskDirective,
+    
   ],
-  imports: [AuthModule, FileUploadModule, NgSelectModule],
+  imports: [AuthModule, FileUploadModule, NgSelectModule, NgbDatepickerModule ],
   exports: [
     AuthModule,
     FileUploadModule,
@@ -52,6 +55,7 @@ import { InputMaskDirective } from "./directives/input-mask.directive";
     NumberToWordsPipe,
     XmlToListPipe,
     InputMaskDirective,
+    NgbDatepickerModule,
   ],
   providers: [DatePipe],
 })

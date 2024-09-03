@@ -8,12 +8,43 @@ const API_URL = environment.apiURL;
   providedIn: "root",
 })
 export class GlobalService {
-  private unidades: string[] = ['', 'uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve'];
-  private decenas: string[] = ['diez', 'veinte', 'treinta', 'cuarenta', 'cincuenta', 'sesenta', 'setenta', 'ochenta', 'noventa'];
-  private especiales: string[] = ['once', 'doce', 'trece', 'catorce', 'quince', 'dieciséis', 'diecisiete', 'dieciocho', 'diecinueve'];
+  private unidades: string[] = [
+    "",
+    "uno",
+    "dos",
+    "tres",
+    "cuatro",
+    "cinco",
+    "seis",
+    "siete",
+    "ocho",
+    "nueve",
+  ];
+  private decenas: string[] = [
+    "diez",
+    "veinte",
+    "treinta",
+    "cuarenta",
+    "cincuenta",
+    "sesenta",
+    "setenta",
+    "ochenta",
+    "noventa",
+  ];
+  private especiales: string[] = [
+    "once",
+    "doce",
+    "trece",
+    "catorce",
+    "quince",
+    "dieciséis",
+    "diecisiete",
+    "dieciocho",
+    "diecinueve",
+  ];
 
   private _http = inject(HttpClient);
-  constructor() { }
+  constructor() {}
 
   Get(endPoint: string) {
     return this._http.get(`${API_URL}${endPoint}`);
@@ -35,10 +66,15 @@ export class GlobalService {
     return this._http.post(`${API_URL}${endPoint}`, body);
   }
 
-  PostWithFile(endPoint: string, selectedFile: File, dataSend: any) {
+  PostWithFile(endPoint: string, dataSend: any, selectedFile?: File) {
     const formData = new FormData();
-    formData.append("documento", selectedFile);
-    formData.append("dataSend", JSON.stringify(dataSend));
+
+    formData.append("data", JSON.stringify(dataSend));
+
+    // Añadir el archivo si existe
+    if (selectedFile) {
+      formData.append("file", selectedFile, selectedFile.name);
+    }
 
     return this._http.post(`${API_URL}${endPoint}`, formData);
   }
@@ -61,16 +97,16 @@ export class GlobalService {
   }
 
   parseObjectDates(obj: any): any {
-    if (obj === null || typeof obj !== 'object') {
+    if (obj === null || typeof obj !== "object") {
       return obj;
     }
 
     for (const key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
         const value = obj[key];
-        if (typeof value === 'string' && this.isISODate(value)) {
+        if (typeof value === "string" && this.isISODate(value)) {
           obj[key] = this.formatDateForInput(value);
-        } else if (typeof value === 'object') {
+        } else if (typeof value === "object") {
           // Aquí es donde maneja la anidación
           this.parseObjectDates(value);
         }
@@ -81,18 +117,16 @@ export class GlobalService {
   }
 
   formatDateForInput(dateString: string): string {
-    return dateString.split('T')[0];
+    return dateString.split("T")[0];
   }
 
   private isISODate(str: string): boolean {
     return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(str);
   }
 
-  
-
   numberToText(numero: number): string {
     if (numero < 0 || numero > 99) {
-      return 'Número fuera de rango';
+      return "Número fuera de rango";
     }
 
     if (numero < 10) {
@@ -112,6 +146,4 @@ export class GlobalService {
 
     return `${this.decenas[decena - 1]} y ${this.unidades[unidad]}`;
   }
-
-  
 }

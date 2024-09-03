@@ -4,25 +4,34 @@ import {
   DocumentosRepository,
   DocumentosTipoDocRepository,
   FechasPagosRepository,
+  MorasRepository,
   PagosRepository,
   PlanesPagoRepository,
   PrestamosRepository,
 } from '../repositories';
 import {FechasPagos, Prestamos} from '../models';
-import {HttpErrors, param, patch, post, requestBody, RestBindings, Response as RestResponse,} from '@loopback/rest';
+import {
+  HttpErrors,
+  param,
+  patch,
+  post,
+  requestBody,
+  RestBindings,
+  Response as RestResponse,
+} from '@loopback/rest';
 import {inject, service} from '@loopback/core';
 import {JWTService} from '../services';
 import multer from 'multer';
 import path from 'path';
 import {Request as ExpressRequest, Response as ExpressResponse} from 'express';
-import { keys } from '../env/interfaces/Servicekeys.interface';
-
+import {keys} from '../env/interfaces/Servicekeys.interface';
+import {deflate} from 'zlib';
 
 // Configuración de multer para la carga de archivos
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     // cb(null, path.join(__dirname, '../../../../../../DocumetosPrestamo'));
-    cb(null, path.join(__dirname, `${keys.URL_FILE}`));
+    cb(null, path.join(keys.URL_FILE, 'Pagos'));
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
@@ -35,6 +44,8 @@ const upload = multer({storage: storage});
 
 export class CheckPrestamosController {
   constructor(
+    @repository(MorasRepository)
+    public morasRepository: MorasRepository,
     @repository(PrestamosRepository)
     public prestamosRepository: PrestamosRepository,
     @repository(PlanesPagoRepository)
@@ -72,11 +83,7 @@ export class CheckPrestamosController {
           schema: {
             type: 'object',
             properties: {
-              estado: {type: 'boolean'},
-              fechaPago: {type: 'string', format: 'date'},
-              idFechaPago: {type: 'number'},
-              monto: {type: 'number'},
-              idPrestamo: {type: 'number'},
+              data: {type: 'string'},
               file: {type: 'string', format: 'binary'},
             },
           },
@@ -89,23 +96,61 @@ export class CheckPrestamosController {
     return new Promise((resolve, reject) => {
       upload.single('file')(req, res, async (err: any) => {
         if (err) {
+          console.error('Error al cargar el archivo:', err);
           return reject({error: 'Error al cargar el archivo.'});
         }
 
         try {
-          const {estado, fechaPago, idFechaPago, monto, idPrestamo} = req.body;
+          const dataSend = JSON.parse(req.body.data);
+          const {estado, fechaPago, idFechaPago, monto, mora, idPrestamo} =
+            dataSend;
           const file = req.file;
+          console.log('Datos enviados:', dataSend);
+          console.log('Archivo cargado:', file);
 
           // Buscar el IdDocumento usando el IDPrestamo
           const contrato = await this.contratosPagoRepository.findOne({
             where: {idPrestamo},
           });
 
+          const fechasPago =
+            await this.fechasPagosRepository.findById(idFechaPago);
+
+          const prestamo = await this.prestamosRepository.findById(idPrestamo);
+
           if (!contrato) {
-            throw new HttpErrors.NotFound(`Contrato de pago no encontrado para el préstamo ID ${idPrestamo}`);
+            throw new HttpErrors.NotFound(
+              `Contrato de pago no encontrado para el préstamo ID ${idPrestamo}`,
+            );
           }
-         
-          // Crear el registro en Pagos
+          //Calcular dias de retraso
+          const fechaContrato = new Date(fechasPago.fechaPago);
+          const diasRetraso = Math.round(
+            (new Date().getTime() - fechaContrato.getTime()) /
+              (1000 * 60 * 60 * 24),
+          );
+
+          console.log('Dias de retraso:', diasRetraso);
+
+          //INFO INSERTAR EN MORAS
+          await this.morasRepository.create({
+            idCliente: prestamo.idCliente,
+            idPrestamo,
+            idPlan: prestamo.idPlan,
+            idFechaPago,
+            diasRetraso,
+            mora,
+            estado: true,
+          });
+
+
+          //INFO INSERTAR EN FECHAS_PAGOS
+          await this.fechasPagosRepository.updateById(idFechaPago, {
+            estado: true,
+          });
+
+
+          //INFO INSERTAR EN PAGOS
           const pago = await this.pagosRepository.create({
             estado: estado,
             fechaPago: new Date(fechaPago).toISOString(),
@@ -135,6 +180,7 @@ export class CheckPrestamosController {
             path: file ? file.path : null,
           });
         } catch (error) {
+          console.error('Error al procesar la solicitud:', error);
           return reject({error: 'Error al procesar la solicitud.'});
         }
       });
@@ -272,7 +318,7 @@ export class CheckPrestamosController {
     @param.path.number('id') id: number,
     @requestBody({
       content: {
-        'multipart/form-data': { 
+        'multipart/form-data': {
           'x-parser': 'stream',
           schema: {
             type: 'object',
@@ -292,12 +338,12 @@ export class CheckPrestamosController {
           return reject({error: 'Error al cargar el archivo.'});
         }
 
-        try{
+        try {
           const file = req.file;
-      
+
           //Actualizar el campo UrlDocumento en la tabla documentos si esta presente
-          if(file !== undefined){
-            await this.documentosRepository.updateById(id,{
+          if (file !== undefined) {
+            await this.documentosRepository.updateById(id, {
               urlDocumento: file ? file.path : undefined,
               fechaSubida: new Date().toISOString(),
             });
@@ -306,10 +352,9 @@ export class CheckPrestamosController {
               message: 'Archivo cargado y datos guardados exitosamente.',
               filename: file ? file.filename : null,
               path: file ? file.path : null,
-            })
+            });
           }
-        }
-        catch(error){
+        } catch (error) {
           return reject({error: 'Error al procesar la solicitud.'});
         }
       });
