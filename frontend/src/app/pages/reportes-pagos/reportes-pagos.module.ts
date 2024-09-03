@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
-import { SharedModule } from 'src/app/shared/components/shared.module';
 
 import { ReportesPagosPageRoutingModule } from './reportes-pagos-routing.module';
 
 import { ReportesPagosPage } from './reportes-pagos.page';
+import { SharedModule } from 'src/app/shared/shared.module';
 
 @NgModule({
   imports: [

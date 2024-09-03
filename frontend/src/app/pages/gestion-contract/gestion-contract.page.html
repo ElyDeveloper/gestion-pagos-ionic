@@ -6,13 +6,21 @@
     [duration]="5000"
     (didDismiss)="setOpenedToast(false)"></ion-toast>
 
+  <div
+    class="alert alert-danger sticky-top"
+    role="alert"
+    *ngIf="!isPrint && existContrato">
+    Ya existe un contrato generado para este préstamo, por políticas de
+    seguridad no se puede modificar el contenido de este documento.
+  </div>
+
   <ion-card *ngIf="!isPrint">
     <ion-card-header>
       <ion-card-title>Datos Empresa/Bancarios</ion-card-title>
       <div class="d-flex justify-content-end">
-        <button class="btn btn-danger me-2" (click)="generatePDF()">
-          Generar PDF
-          <i class="fa-regular fa-file-pdf"></i>
+        <button class="btn btn-danger me-2" (click)="generateContract()">
+          Generar Contrato
+          <i class="fa-solid fa-file-signature"></i>
         </button>
         <button class="btn btn-success" routerLink="/layout/prestamos">
           Ver Prestamos
@@ -36,7 +44,8 @@
                   style="flex: 1">
                 </ion-input>
                 <ion-button
-                  fill="clear"
+                  [disabled]="existContrato"
+                  shape="round"
                   (click)="editarBancoDepositar = !editarBancoDepositar"
                   style="margin-left: 8px">
                   <ion-icon
@@ -60,7 +69,8 @@
                   style="flex: 1">
                 </ion-input>
                 <ion-button
-                  fill="clear"
+                  [disabled]="existContrato"
+                  shape="round"
                   (click)="editarCuentaBancaria = !editarCuentaBancaria"
                   style="margin-left: 8px">
                   <ion-icon
@@ -84,7 +94,8 @@
                   style="flex: 1">
                 </ion-input>
                 <ion-button
-                  fill="clear"
+                  [disabled]="existContrato"
+                  shape="round"
                   (click)="editarDireccionEmpresa = !editarDireccionEmpresa"
                   style="margin-left: 8px">
                   <ion-icon
@@ -108,7 +119,8 @@
                   style="flex: 1">
                 </ion-input>
                 <ion-button
-                  fill="clear"
+                  [disabled]="existContrato"
+                  shape="round"
                   (click)="editarCiudadBanco = !editarCiudadBanco"
                   style="margin-left: 8px">
                   <ion-icon
@@ -133,7 +145,8 @@
                   style="flex: 1">
                 </ion-input>
                 <ion-button
-                  fill="clear"
+                  [disabled]="existContrato"
+                  shape="round"
                   (click)="editarFechaAcuerdo = !editarFechaAcuerdo"
                   style="margin-left: 8px">
                   <ion-icon
@@ -157,7 +170,8 @@
                   style="flex: 1">
                 </ion-input>
                 <ion-button
-                  fill="clear"
+                  [disabled]="existContrato"
+                  shape="round"
                   (click)="editarLugarAcuerdo = !editarLugarAcuerdo"
                   style="margin-left: 8px">
                   <ion-icon
@@ -178,6 +192,12 @@
       <div class="carta">
         <div class="container">
           <div class="row">
+            <ion-item>
+              <img src="assets/logo.png" alt="" width="100" />
+              <ion-badge slot="end" color="primary"
+                >Contrato #: {{correlativo}}</ion-badge
+              >
+            </ion-item>
             <h6 class="text-center mt-5 fw-bold">
               PAGARÉ POR {{this.prestamoSeleccionado?.totalMonto| currency : "L"
               : "symbol"}}
@@ -203,8 +223,8 @@
                 {{avalSeleccionado?.dni|formatDni}}, en condición de aval
                 solidario, mayor de edad,
                 {{toLowerCase(avalSeleccionado?.estadoCivil?.descripcion)}},
-                {{toLowerCase(avalSeleccionado?.nacionalidad?.gentilicio)}},
-                con domicilio en {{avalSeleccionado?.direccion}}; por medio del
+                {{toLowerCase(avalSeleccionado?.nacionalidad?.gentilicio)}}, con
+                domicilio en {{avalSeleccionado?.direccion}}; por medio del
                 presente documento:
               </p>
               }@else {
@@ -234,9 +254,11 @@
                 __________________ con documento nacional ________________ y con
                 domicilio en @if(direccionEmpresa===''){
                 <strong style="color: red">Pendiente Dirección</strong>
-                }@else { {{direccionEmpresa}}}, la cantidad de veinte y seis mil
-                lempiras exactos ({{this.prestamoSeleccionado?.totalMonto|
-                currency : "L" : "symbol"}}).
+                }@else { {{direccionEmpresa}}}, la cantidad de
+                {{this.prestamoSeleccionado?.totalMonto |
+                numberToWords:'lempiras'}}
+                ({{this.prestamoSeleccionado?.totalMonto| currency : "L" :
+                "symbol"}}).
               </p>
               <br />
               <p>
@@ -258,9 +280,11 @@
                 }@else { {{bancoDepositar}}}, en la Ciudad de
                 @if(ciudadBanco===''){
                 <strong style="color: red">Pendiente Ciudad</strong>
-                }@else { {{ciudadBanco}}}, la totalidad de veinte y seis mil
-                lempiras exactos ({{this.prestamoSeleccionado?.totalMonto|
-                currency : "L" : "symbol"}}) , por concepto de préstamo.
+                }@else { {{ciudadBanco}}}, la totalidad de
+                {{this.prestamoSeleccionado?.totalMonto |
+                numberToWords:'lempiras'}}
+                ({{this.prestamoSeleccionado?.totalMonto| currency : "L" :
+                "symbol"}}), por concepto de préstamo.
               </p>
               <br />
               <p>
@@ -276,8 +300,9 @@
               <p class="mt-4">
                 En fe de lo cual y para los fines legales correspondientes,
                 firmo el presente PAGARE en @if(this.lugarAcuerdo){
-                  {{this.lugarAcuerdo}} }@else {
-                  <strong style="color: red">Pendiente lugar acuerdo</strong>}, a los días, @if(this.fechaAcuerdo){
+                {{this.lugarAcuerdo}} }@else {
+                <strong style="color: red">Pendiente lugar acuerdo</strong>}, a
+                los días, @if(this.fechaAcuerdo){
                 {{formatDate(this.fechaAcuerdo)}} }@else {
                 <strong style="color: red">Pendiente fecha acuerdo</strong>}.
               </p>
@@ -304,8 +329,6 @@
   </div>
 
   <style>
-    
-
     @media print {
       @page {
         size: letter;

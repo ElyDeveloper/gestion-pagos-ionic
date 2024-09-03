@@ -11,22 +11,30 @@
         {{ getCellValue(element, column) ? "Activo" : "Inactivo" }}
       </ion-badge>
       } @case ('object') {
-      <ion-note slot="end"
-        >{{ getCellValue(element, column) }}</ion-note
-      >
+      <ion-note slot="end">{{ getCellValue(element, column) }}</ion-note>
       } @case ('date') {
-      <ion-note slot="end"
-        >{{ getCellValue(element, column) | customDate : 6 :
-        "dd/MM/yyyy" }}</ion-note
-      >
+      <ion-note slot="end">{{
+        getCellValue(element, column) | customDate : 6 : "dd/MM/yyyy"
+      }}</ion-note>
       } @case ('dni') {
-      <ion-note slot="end"
-        >{{ getCellValue(element, column) | formatDni}}</ion-note
-      >
+      <ion-note slot="end">{{
+        getCellValue(element, column) | formatDni
+      }}</ion-note>
+      } @case ('xml') {
+      <div class="ms-2">
+        <ul>
+          @for (item of getCellValue(element, column) | xmlToList; track item) {
+            <li>{{ item }}</li>
+            } @empty {
+            <li>No existen Elementos para mostrar.</li>
+            }
+        </ul>
+      </div>
+      <!-- <ion-note slot="end">{{
+        getCellValue(element, column) | formatDni
+      }}</ion-note> -->
       }@default {
-      <ion-note slot="end"
-        >{{ getCellValue(element, column) }}</ion-note
-      >
+      <ion-note slot="end">{{ getCellValue(element, column) }}</ion-note>
       }}
     </ion-item>
     } }

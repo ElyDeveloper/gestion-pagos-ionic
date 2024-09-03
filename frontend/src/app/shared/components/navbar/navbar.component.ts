@@ -3,6 +3,7 @@ import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { filter } from "rxjs";
 import { AuthService } from "../../services/auth.service";
 import { Usuario } from "../../interfaces/usuario";
+import { environment } from "src/environments/environment";
 
 @Component({
   selector: "app-navbar",
@@ -11,6 +12,7 @@ import { Usuario } from "../../interfaces/usuario";
 })
 export class NavbarComponent implements OnInit {
   selectionProfile: any;
+  appName: string = environment.appName;
   user: Usuario = {
     nombre: "",
     apellido: "",

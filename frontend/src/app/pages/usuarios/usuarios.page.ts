@@ -6,8 +6,21 @@ import {
   ViewChild,
 } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { debounceTime, distinctUntilChanged, Observable, Subject } from "rxjs";
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  isEmpty,
+  map,
+  Observable,
+  of,
+  Subject,
+  switchMap,
+  takeUntil,
+  tap,
+} from "rxjs";
 import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
+import { Personas } from "src/app/shared/interfaces/persona";
 import { Roles } from "src/app/shared/interfaces/rol";
 import { Column } from "src/app/shared/interfaces/table";
 import { Usuario } from "src/app/shared/interfaces/usuario";
@@ -68,9 +81,25 @@ export class UsuariosPage implements OnInit {
   @ViewChild("modalResetPswd", { static: true })
   modalResetPswd!: TemplateRef<any>;
 
+  @ViewChild("modalSelectClients", { static: true })
+  modalSelectClients!: TemplateRef<any>;
+
+  selectedClients: Personas[] = [];
+  filteredClients: Personas[] = [];
+
+  searchPlaceHolder = "Buscar Cliente...";
+  search: string = "";
+  searchTerm$ = new Subject<string>();
+
+  loading = false;
+
   formResetPswd: FormGroup;
   roles: Roles[] = [];
+
+  isElement = false;
+  //TODO ESPECIFICOS
   isResetPswd = false;
+  isSelectClients = false;
 
   constructor(private fb: FormBuilder) {
     this.formModels = new FormModels(this.fb);
@@ -85,9 +114,69 @@ export class UsuariosPage implements OnInit {
   ngOnInit() {}
 
   ionViewWillEnter() {
+    this.initSearcher();
+
     this.getRoles();
     this.getCountElements();
     this.buildColumns();
+  }
+
+  initSearcher() {
+    this.searchTerm$
+      .pipe(
+        debounceTime(800), // Espera 300 ms después de que el usuario deja de escribir
+        distinctUntilChanged() // Asegura que solo se realice una búsqueda si el valor ha cambiado
+      )
+      .subscribe(() => {
+        if (this.search.trim() === "" || this.search.trim().length < 3) {
+          this.filteredClients = [];
+        } else {
+          this.searchData();
+        }
+        // this.searchEmpleado(); // Llama a la función de búsqueda cuando se cumplan las condiciones
+      });
+  }
+
+  searchValueChanged(event: any) {
+    this.searchTerm$.next(event);
+  }
+
+  searchData() {
+    this._globalService
+      .Get(`personas/clientes/search?query=${this.search}`)
+      .subscribe({
+        next: (data: any) => {
+          this.filteredClients = data;
+        },
+        error: (error) => {
+          console.error("Error al obtener clientes:", error);
+        },
+      });
+  }
+
+  toggleSelection(clientOp: any) {
+    //Eliminar o insertar cliente del array this.selectedClients segun caso.
+
+    // Verifica si el cliente ya está en la lista de seleccionados
+    if (this.selectedClients.some((client) => client.dni === clientOp.dni)) {
+      console.log("Remover Cliente:", clientOp);
+      this.removeClient(clientOp);
+    } else {
+      console.log("Agregar Cliente:", clientOp);
+      this.selectedClients.push(clientOp);
+    }
+  }
+
+  removeClient(clientRemove: Personas) {
+    this.selectedClients = this.selectedClients.filter(
+      (client) => client.dni !== clientRemove.dni
+    );
+  }
+
+  ionViewWillLeave() {}
+  // TODO ESPECIFICO
+  onSelect(items: Personas[]) {
+    console.log("Items SelectedItems:", this.selectedClients);
   }
 
   setOpenedToast(value: boolean) {
@@ -153,6 +242,13 @@ export class UsuariosPage implements OnInit {
             rolesAuthorized: [1],
           },
           {
+            alias: "Asignar clientes",
+            action: "asignClients",
+            icon: "people",
+            color: "primary",
+            rolesAuthorized: [1],
+          },
+          {
             alias: "Contraseña",
             action: "resetPswd",
             icon: "key",
@@ -188,45 +284,79 @@ export class UsuariosPage implements OnInit {
 
   private setModalState(
     isEdit: boolean,
+    isElement: boolean,
     isResetPswd: boolean,
-    modalTemplate: any,
-    formData?: any
+    isSelectClients: boolean,
+    modalTemplate: TemplateRef<any>,
+    formSelected?: FormGroup<any>
   ) {
     this.isEdit = isEdit;
+    this.isElement = isElement;
     this.isResetPswd = isResetPswd;
-
-    if (isEdit && formData && !isResetPswd) {
-      this.formAdd.patchValue(formData);
-    } else if (!isEdit && !isResetPswd) {
-      this.cleanForm();
-    } else if (isResetPswd) {
-      this.formResetPswd.get("identificator")?.setValue(formData.correo);
-    }
+    this.isSelectClients = isSelectClients;
 
     this.modalSelected = modalTemplate;
-    this.formSelected = isResetPswd ? this.formResetPswd : this.formAdd;
+    if (formSelected) {
+      this.formSelected = formSelected;
+    }
     this.isModalOpen = true;
   }
 
   onAddButtonClicked() {
-    this.setModalState(false, false, this.modalAdd);
+    this.cleanForm();
+    this.setModalState(false, true, false, false, this.modalAdd, this.formAdd);
   }
 
   onEditButtonClicked(data: any) {
-    this.setModalState(true, false, this.modalAdd, data);
+    this.formAdd.patchValue(data);
+    this.setModalState(true, true, false, false, this.modalAdd, this.formAdd);
   }
 
   //TODO ESPECIFICO
   onResetPasswordButtonClicked(data: any) {
     console.log("Data: ", data);
-    this.setModalState(false, true, this.modalResetPswd, data);
+    this.formResetPswd.get("identificator")?.setValue(data.correo);
+
+    this.setModalState(
+      false,
+      false,
+      true,
+      false,
+      this.modalResetPswd,
+      this.formResetPswd
+    );
+  }
+
+  onSelectClientsButtonClicked(data: any) {
+    console.log("Data: ", data);
+    this.element = data;
+    this.filteredClients = [];
+    this.selectedClients = [];
+
+    this._globalService
+      .Get(`usuario-clientes/by-usuario/${data.id}`)
+      .subscribe({
+        next: (response: any) => {
+          console.log("Clientes del usuario:", response);
+          this.setModalState(
+            false,
+            false,
+            false,
+            true,
+            this.modalSelectClients
+          );
+          this.selectedClients = response.map((uc: any) => uc.Cliente);
+        },
+        error: (error: any) => {
+          console.error("Error al obtener clientes del usuario:", error);
+        },
+      });
   }
 
   onInfoButtonClicked(data: any) {
     // console.log("Información del usuario:", data);
     this.element = data;
-    this.modalSelected = this.modalViewInfo;
-    this.isModalOpen = true;
+    this.setModalState(false, false, false, false, this.modalViewInfo);
   }
 
   onDeleteButtonClicked(data: any) {
@@ -250,7 +380,33 @@ export class UsuariosPage implements OnInit {
     });
   }
 
-  handleUserOperation(operation: "edit" | "create" | "resetPswd", data: any) {
+  async handleSave(data: any) {
+    if (this.isSelectClients) {
+      console.log("Data de clientes seleccionados: ", data);
+      const clientsIds = data.map((client: Personas) => client.id);
+      const saveData = {
+        usuarioId: this.element.id,
+        clientsIds,
+      };
+
+      console.log("Data para guardar: ", saveData);
+      this.handleUserOperation("asignClients", saveData);
+    } else if (this.isResetPswd) {
+      this.handleUserOperation("resetPswd", data);
+    } else if (this.isElement) {
+      if (this.isEdit) {
+        this.handleUserOperation("edit", data);
+      } else {
+        delete data.id;
+        this.handleUserOperation("create", data);
+      }
+    }
+  }
+
+  handleUserOperation(
+    operation: "edit" | "create" | "resetPswd" | "asignClients",
+    data: any
+  ) {
     let operationText: string;
     let apiCall: Observable<any>;
 
@@ -266,6 +422,10 @@ export class UsuariosPage implements OnInit {
       case "resetPswd":
         operationText = "Restableciendo contraseña de";
         apiCall = this._globalService.Post("reset-password", data);
+        break;
+      case "asignClients":
+        operationText = "Asignando clientes a";
+        apiCall = this._globalService.Post("usuario-clientes", data);
         break;
     }
 
@@ -291,17 +451,6 @@ export class UsuariosPage implements OnInit {
         this.toastMessage = `Error al ${operationText.toLowerCase()} el usuario`;
       },
     });
-  }
-
-  async handleSave(data: any) {
-    if (this.isEdit && !this.isResetPswd) {
-      this.handleUserOperation("edit", data);
-    } else if (!this.isResetPswd && !this.isEdit) {
-      delete data.id;
-      this.handleUserOperation("create", data);
-    } else if (this.isResetPswd) {
-      this.handleUserOperation("resetPswd", data);
-    }
   }
 
   onPageChange(event: any) {

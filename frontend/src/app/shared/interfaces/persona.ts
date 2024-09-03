@@ -5,10 +5,11 @@ import { TipoPersonas } from "./tipo-persona";
 
 
 export interface Personas {
-  id?: number;
+  id?: number | string;
   dni?: string;
   nombres: string;
   apellidos: string;
+  nombreCompleto?: string;
   cel: string;
   direccion: string;
   email: string;

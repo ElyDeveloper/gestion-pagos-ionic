@@ -8,7 +8,9 @@
 
   <app-breadcrumb></app-breadcrumb>
   <ion-grid>
-    <ion-row class="d-flex justify-content-center">
+    <ion-row
+      class="d-flex justify-content-center"
+      *ngIf="currentUser?.rolid!==3">
       <ion-col sizeSm="12" sizeMd="6">
         <ion-segment value="all">
           <ion-segment-button
@@ -78,8 +80,10 @@
                     >DNI:</ion-label
                   >
                   <ion-input
-                    formControlName="dni"
-                    placeholder="Ingrese DNI"></ion-input>
+                    [appInputMask]="'####-####-#####'"
+                    type="text"
+                    placeholder="0000-0000-00000"
+                    formControlName="dni"></ion-input>
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-sm="6" size-md="6">
@@ -108,6 +112,7 @@
                     >Celular:</ion-label
                   >
                   <ion-input
+                    [appInputMask]="'####-####'"
                     type="tel"
                     formControlName="cel"
                     placeholder="0000-0000"></ion-input>

@@ -37,7 +37,7 @@
 
     <div class="row" *ngIf="showSearch">
       <ion-searchbar
-        placeholder="Buscar..."
+        [placeholder]="searchPlaceHolder"
         [(ngModel)]="search"
         (ngModelChange)="searchValueChanged($event)"></ion-searchbar>
     </div>
@@ -82,7 +82,7 @@
                       {{ getCellOptionValue(row, column) }}
                     </span>
                   </ng-container>
-                
+
                   <ng-container *ngSwitchCase="'date'">
                     {{
                       getCellValue(row, column) | customDate : 6 : "dd/MM/yyyy"
@@ -96,6 +96,16 @@
                   </ng-container>
                   <ng-container *ngSwitchCase="'dni'">
                     {{ getCellValue(row, column) | formatDni }}
+                  </ng-container>
+                  <ng-container *ngSwitchCase="'xml'">
+                    @for (item of getCellValue(row, column) | xmlToList; track
+                    item) {
+                    <p>{{ item }}</p>
+                    } @empty {
+                    <p>No existen Elementos para mostrar.</p>
+                    }
+
+                    <!-- {{ getCellValue(row, column) | xmlToList }} -->
                   </ng-container>
                   <ng-container *ngSwitchCase="'image'">
                     <!-- {{ getCellValue(row, column) }} <br /> -->

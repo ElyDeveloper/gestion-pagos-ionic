@@ -19,14 +19,25 @@ import {
   HttpErrors,
 } from '@loopback/rest';
 import {Personas} from '../models';
-import {PersonasRepository} from '../repositories';
+import {
+  PersonasRepository,
+  UsuarioClienteRepository,
+  UsuarioRepository,
+} from '../repositories';
 import {JWTService} from '../services';
-import {service} from '@loopback/core';
+import {inject, service} from '@loopback/core';
+import {authenticate} from '@loopback/authentication';
+import {SecurityBindings, securityId, UserProfile} from '@loopback/security';
 
+@authenticate('jwt')
 export class PersonasController {
   constructor(
     @repository(PersonasRepository)
     public personasRepository: PersonasRepository,
+    @repository(UsuarioRepository)
+    public usuarioRepository: UsuarioRepository,
+    @repository(UsuarioClienteRepository)
+    public usuarioClienteRepository: UsuarioClienteRepository,
     @service(JWTService)
     private jwtService: JWTService,
   ) {}
@@ -59,7 +70,9 @@ export class PersonasController {
     content: {'application/json': {schema: CountSchema}},
   })
   async count(@param.where(Personas) where?: Where<Personas>): Promise<Count> {
-    return this.personasRepository.count(where);
+    return this.personasRepository.count({
+      estado: true,
+    });
   }
 
   @get('/personas/clientes/count')
@@ -72,6 +85,7 @@ export class PersonasController {
   ): Promise<Count> {
     return this.personasRepository.count({
       idTipoPersona: 1,
+      estado: true,
     });
   }
 
@@ -85,6 +99,7 @@ export class PersonasController {
   ): Promise<Count> {
     return this.personasRepository.count({
       idTipoPersona: 2,
+      estado: true,
     });
   }
 
@@ -119,18 +134,76 @@ export class PersonasController {
     },
   })
   async dataPaginate(
+    @inject(SecurityBindings.USER)
+    currentUser: UserProfile,
     @param.query.number('skip') skip: number,
     @param.query.number('limit') limit: number,
   ): Promise<Personas[]> {
+    console.log('Usuario Logueado: ', currentUser);
+    const userId = parseInt(currentUser[securityId], 10);
+    console.log('Id de Usuario Logueado: ', userId);
+
+    const user = await this.usuarioRepository.findById(userId);
+    if (!user) {
+      throw new HttpErrors.Unauthorized('Usuario no encontrado');
+    }
+    console.log('Usuario encontrado: ', user);
+
+    if (user.rolid === 3) {
+      const usuariosCliente = await this.usuarioClienteRepository.find({
+        where: {usuarioId: userId, estado: true},
+        include: [
+          {
+            relation: 'Cliente',
+            scope: {
+              where: {estado: true},
+              include: [
+                'nacionalidad',
+                'recordCrediticio',
+                'estadoCivil',
+                'tipoPersona',
+              ],
+            },
+          },
+        ],
+        skip,
+        limit,
+        order: ['id DESC'],
+      });
+
+      // console.log('UsuariosClientes encontrados: ', usuariosCliente);
+
+      const clients = usuariosCliente
+        .map((uc: any) => {
+          const ucC = uc?.Cliente;
+          console.log('Cliente encontrado: ', ucC);
+          return ucC;
+        })
+        .filter(
+          (client): client is NonNullable<typeof client> => client != null,
+        );
+
+      //Encriptar id de clientes
+      clients.forEach((c: any) => {
+        c.id = this.jwtService.encryptId(c.id || 0);
+      });
+
+      return clients;
+    }
+
     const personas = await this.personasRepository.find({
+      where: {
+        estado: true,
+      },
       include: [
-        {relation: 'nacionalidad'},
-        {relation: 'recordCrediticio'},
-        {relation: 'estadoCivil'},
-        {relation: 'tipoPersona'},
+        'nacionalidad',
+        'recordCrediticio',
+        'estadoCivil',
+        'tipoPersona',
       ],
       skip,
       limit,
+      order: ['id DESC'],
     });
 
     // clonar array
@@ -157,22 +230,30 @@ export class PersonasController {
     },
   })
   async dataPaginateClientes(
+    @inject(SecurityBindings.USER)
+    currentUser: UserProfile,
     @param.query.number('skip') skip: number,
     @param.query.number('limit') limit: number,
   ): Promise<Personas[]> {
+    console.log('Usuario Logueado: ', currentUser);
+    const userId = parseInt(currentUser[securityId], 10);
+    console.log('Id de Usuario Logueado: ', userId);
+
     console.log('Consulta paginada: ', skip);
     const clientes = await this.personasRepository.find({
       where: {
         idTipoPersona: 1,
+        estado: true,
       },
       include: [
-        {relation: 'nacionalidad'},
-        {relation: 'recordCrediticio'},
-        {relation: 'estadoCivil'},
-        {relation: 'tipoPersona'},
+        'nacionalidad',
+        'recordCrediticio',
+        'estadoCivil',
+        'tipoPersona',
       ],
       skip,
       limit,
+      order: ['id DESC'],
     });
 
     // clonar array
@@ -205,15 +286,17 @@ export class PersonasController {
     const avales = await this.personasRepository.find({
       where: {
         idTipoPersona: 2,
+        estado: true,
       },
       include: [
-        {relation: 'nacionalidad'},
-        {relation: 'recordCrediticio'},
-        {relation: 'estadoCivil'},
-        {relation: 'tipoPersona'},
+        'nacionalidad',
+        'recordCrediticio',
+        'estadoCivil',
+        'tipoPersona',
       ],
       skip,
       limit,
+      order: ['id DESC'],
     });
 
     // clonar array
@@ -307,8 +390,13 @@ export class PersonasController {
   @response(204, {
     description: 'Personas DELETE success',
   })
-  async deleteById(@param.path.number('id') id: number): Promise<void> {
-    await this.personasRepository.deleteById(id);
+  async deleteById(@param.path.string('id') id: string): Promise<void> {
+    //desencriptar id de prestamos con jwtService
+    const decryptedId = this.jwtService.decryptId(id.toString());
+    console.log('id de Persona a eliminar: ', decryptedId);
+    await this.personasRepository.updateById(decryptedId, {
+      estado: false,
+    });
   }
 
   @get('/personas/todos/search')
@@ -323,6 +411,7 @@ export class PersonasController {
 
     const PersonasSearch = await this.personasRepository.find({
       where: {
+        estado: true,
         or: [
           {dni: {like: `%${search}%`}},
           {nombres: {like: `%${search}%`}},
@@ -330,10 +419,10 @@ export class PersonasController {
         ],
       },
       include: [
-        {relation: 'nacionalidad'},
-        {relation: 'recordCrediticio'},
-        {relation: 'estadoCivil'},
-        {relation: 'tipoPersona'},
+        'nacionalidad',
+        'recordCrediticio',
+        'estadoCivil',
+        'tipoPersona',
       ],
     });
 
@@ -362,6 +451,7 @@ export class PersonasController {
       where: {
         and: [
           {idTipoPersona: 1},
+          {estado: true},
           {
             or: [
               {dni: {like: `%${search}%`}},
@@ -372,10 +462,10 @@ export class PersonasController {
         ],
       },
       include: [
-        {relation: 'nacionalidad'},
-        {relation: 'recordCrediticio'},
-        {relation: 'estadoCivil'},
-        {relation: 'tipoPersona'},
+        'nacionalidad',
+        'recordCrediticio',
+        'estadoCivil',
+        'tipoPersona',
       ],
     });
     // clonar array
@@ -403,6 +493,7 @@ export class PersonasController {
       where: {
         and: [
           {idTipoPersona: 2},
+          {estado: true},
           {
             or: [
               {dni: {like: `%${search}%`}},
@@ -413,10 +504,10 @@ export class PersonasController {
         ],
       },
       include: [
-        {relation: 'nacionalidad'},
-        {relation: 'recordCrediticio'},
-        {relation: 'estadoCivil'},
-        {relation: 'tipoPersona'},
+        'nacionalidad',
+        'recordCrediticio',
+        'estadoCivil',
+        'tipoPersona',
       ],
     });
     // clonar array

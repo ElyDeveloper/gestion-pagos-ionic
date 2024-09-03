@@ -11,6 +11,8 @@ import { Observable } from "rxjs";
 import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
 import { Personas } from "src/app/shared/interfaces/persona";
 import { Column } from "src/app/shared/interfaces/table";
+import { Usuario } from "src/app/shared/interfaces/usuario";
+import { AuthService } from "src/app/shared/services/auth.service";
 import { GlobalService } from "src/app/shared/services/global.service";
 import { FieldAliases, ModalConfig } from "src/app/shared/utils/extra";
 import { FormModels } from "src/app/shared/utils/forms-models";
@@ -22,6 +24,7 @@ import { FormModels } from "src/app/shared/utils/forms-models";
 })
 export class PersonasPage implements OnInit {
   @ViewChild(LoaderComponent) loaderComponent!: LoaderComponent;
+
   elements: Personas[] = [];
   element: Personas = {
     dni: "",
@@ -67,12 +70,15 @@ export class PersonasPage implements OnInit {
 
   private _router = inject(Router);
   private _globalService = inject(GlobalService);
+  private _authService = inject(AuthService);
 
   //TODO: ESPECIFICOS
   nacionalidades: any[] = [];
   recordsCrediticios: any[] = [];
   estadosCiviles: any[] = [];
   tiposPersona: any[] = [];
+
+  currentUser: Usuario | null = null;
 
   constructor(private fb: FormBuilder) {
     this.formModels = new FormModels(this.fb);
@@ -81,12 +87,27 @@ export class PersonasPage implements OnInit {
     // console.log("Formulario de cliente:", this.formAdd);
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.getCurrentUser();
+  }
 
   ionViewWillEnter() {
     this.getCountElements();
     this.buildColumns();
     this.cargarOpciones();
+  }
+
+  getCurrentUser() {
+    this._authService.getUserInfo().subscribe({
+      next: (user: any) => {
+        this.currentUser = user;
+        console.log("Usuario actual: ", this.currentUser);
+      },
+      error: (error: any) => {
+        console.error("Error al obtener información del usuario:", error);
+      },
+    })
+    console.log("Usuario actual: ", this.currentUser);
   }
 
   //TODO: ESPECIFICO
@@ -174,7 +195,7 @@ export class PersonasPage implements OnInit {
         key: "nacionalidad.descripcion",
         alias: "Nacionalidad",
         imageUrl: "nacionalidad.urlBandera",
-        type: "image"
+        type: "image",
       },
       {
         key: "recordCrediticio.descripcion",
@@ -285,6 +306,25 @@ export class PersonasPage implements OnInit {
     });
   }
 
+  async handleSave(data: any) {
+    if (data.email === '' || data.email === null) {
+      data.email = 'no-email@example.com';
+    }
+
+    //Eliminar guiones de cadena de data.dni y data.cel
+    data.dni = data.dni.replace(/-/g, "");
+    data.cel = data.cel.replace(/-/g, "");
+
+    console.log("Datos del cliente antes guardar:", data);
+
+    if (this.isEdit) {
+      this.handleUserOperation("edit", data);
+    } else if (!this.isEdit) {
+      delete data.id;
+      this.handleUserOperation("create", data);
+    }
+  }
+
   handleUserOperation(operation: "edit" | "create", data: any) {
     data.fechaIngreso = new Date(data.fechaIngreso);
     console.log("Datos del cliente:", data);
@@ -327,15 +367,6 @@ export class PersonasPage implements OnInit {
         this.toastMessage = `Error al ${operationText.toLowerCase()} el cliente`;
       },
     });
-  }
-
-  async handleSave(data: any) {
-    if (this.isEdit) {
-      this.handleUserOperation("edit", data);
-    } else if (!this.isEdit) {
-      delete data.id;
-      this.handleUserOperation("create", data);
-    }
   }
 
   onPageChange(event: any) {
