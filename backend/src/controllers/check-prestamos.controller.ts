@@ -128,25 +128,25 @@ export class CheckPrestamosController {
               (1000 * 60 * 60 * 24),
           );
 
-          console.log('Dias de retraso:', diasRetraso);
+          // console.log('Dias de retraso:', diasRetraso);
 
           //INFO INSERTAR EN MORAS
-          await this.morasRepository.create({
-            idCliente: prestamo.idCliente,
-            idPrestamo,
-            idPlan: prestamo.idPlan,
-            idFechaPago,
-            diasRetraso,
-            mora,
-            estado: true,
-          });
-
+          if (mora > 0) {
+            await this.morasRepository.create({
+              idCliente: prestamo.idCliente,
+              idPrestamo,
+              idPlan: prestamo.idPlan,
+              idFechaPago,
+              diasRetraso,
+              mora,
+              estado: true,
+            });
+          }
 
           //INFO INSERTAR EN FECHAS_PAGOS
           await this.fechasPagosRepository.updateById(idFechaPago, {
             estado: true,
           });
-
 
           //INFO INSERTAR EN PAGOS
           const pago = await this.pagosRepository.create({
@@ -171,7 +171,6 @@ export class CheckPrestamosController {
             idDocTipDoc: idDocumentoTipoDoc,
           });
 
-          
           resolve({
             message: 'Archivo cargado y datos guardados exitosamente.',
             filename: file ? file.filename : null,
@@ -343,12 +342,12 @@ export class CheckPrestamosController {
           const {fechaPago} = req.body;
           const idPago = req.body.idPago;
           //Actualizar la fechaPago de la tabla Pagos
-          if(fechaPago != undefined && idPago != undefined) {
+          if (fechaPago != undefined && idPago != undefined) {
             await this.pagosRepository.updateById(idPago, {
               fechaPago: new Date(fechaPago).toISOString(),
             });
           }
-          
+
           //Actualizar el campo UrlDocumento en la tabla documentos si esta presente
           if (file !== undefined) {
             await this.documentosRepository.updateById(idDocumento, {
