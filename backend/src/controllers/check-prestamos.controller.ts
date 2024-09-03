@@ -9,14 +9,21 @@ import {
   PrestamosRepository,
 } from '../repositories';
 import {FechasPagos, Prestamos} from '../models';
-import {HttpErrors, param, patch, post, requestBody, RestBindings, Response as RestResponse,} from '@loopback/rest';
+import {
+  HttpErrors,
+  param,
+  patch,
+  post,
+  requestBody,
+  RestBindings,
+  Response as RestResponse,
+} from '@loopback/rest';
 import {inject, service} from '@loopback/core';
 import {JWTService} from '../services';
 import multer from 'multer';
 import path from 'path';
 import {Request as ExpressRequest, Response as ExpressResponse} from 'express';
-import { keys } from '../env/interfaces/Servicekeys.interface';
-
+import {keys} from '../env/interfaces/Servicekeys.interface';
 
 // Configuración de multer para la carga de archivos
 const storage = multer.diskStorage({
@@ -93,6 +100,7 @@ export class CheckPrestamosController {
         }
 
         try {
+          console.log('Request body: ', req.body);
           const {estado, fechaPago, idFechaPago, monto, idPrestamo} = req.body;
           const file = req.file;
 
@@ -102,9 +110,11 @@ export class CheckPrestamosController {
           });
 
           if (!contrato) {
-            throw new HttpErrors.NotFound(`Contrato de pago no encontrado para el préstamo ID ${idPrestamo}`);
+            throw new HttpErrors.NotFound(
+              `Contrato de pago no encontrado para el préstamo ID ${idPrestamo}`,
+            );
           }
-         
+
           // Crear el registro en Pagos
           const pago = await this.pagosRepository.create({
             estado: estado,
@@ -271,7 +281,7 @@ export class CheckPrestamosController {
     @param.path.number('id') id: number,
     @requestBody({
       content: {
-        'multipart/form-data': { 
+        'multipart/form-data': {
           'x-parser': 'stream',
           schema: {
             type: 'object',
@@ -291,12 +301,12 @@ export class CheckPrestamosController {
           return reject({error: 'Error al cargar el archivo.'});
         }
 
-        try{
+        try {
           const file = req.file;
-      
+
           //Actualizar el campo UrlDocumento en la tabla documentos si esta presente
-          if(file !== undefined){
-            await this.documentosRepository.updateById(id,{
+          if (file !== undefined) {
+            await this.documentosRepository.updateById(id, {
               urlDocumento: file ? file.path : undefined,
               fechaSubida: new Date().toISOString(),
             });
@@ -305,10 +315,9 @@ export class CheckPrestamosController {
               message: 'Archivo cargado y datos guardados exitosamente.',
               filename: file ? file.filename : null,
               path: file ? file.path : null,
-            })
+            });
           }
-        }
-        catch(error){
+        } catch (error) {
           return reject({error: 'Error al procesar la solicitud.'});
         }
       });
