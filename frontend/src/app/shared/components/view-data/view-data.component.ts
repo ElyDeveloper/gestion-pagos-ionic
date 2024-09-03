@@ -12,6 +12,7 @@ import { AlertController } from "@ionic/angular";
 import { debounceTime, distinctUntilChanged, Subject } from "rxjs";
 import { AuthService } from "../../services/auth.service";
 import { Router } from "@angular/router";
+import { NgbCalendar, NgbDate, NgbDateParserFormatter } from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
   selector: "app-view-data",
@@ -52,23 +53,13 @@ export class ViewDataComponent implements OnInit {
 
   userLogged: any = {};
 
-  selectedMonth: number | null = null;
-  selectedYear: number | null = null;
-  months = [
-    { name: "Enero", value: 1 },
-    { name: "Febrero", value: 2 },
-    { name: "Marzo", value: 3 },
-    { name: "Abril", value: 4 },
-    { name: "Mayo", value: 5 },
-    { name: "Junio", value: 6 },
-    { name: "Julio", value: 7 },
-    { name: "Agosto", value: 8 },
-    { name: "Septiembre", value: 9 },
-    { name: "Octubre", value: 10 },
-    { name: "Noviembre", value: 11 },
-    { name: "Diciembre", value: 12 },
-  ];
-  years: number[] = [];
+
+  calendar = inject(NgbCalendar);
+	formatter = inject(NgbDateParserFormatter);
+
+	hoveredDate: NgbDate | null = null;
+	fromDate: NgbDate | null = this.calendar.getToday();
+	toDate: NgbDate | null = this.calendar.getNext(this.calendar.getToday(), 'd', 10);
 
   private _alertController = inject(AlertController);
   private _authService = inject(AuthService);
@@ -80,13 +71,47 @@ export class ViewDataComponent implements OnInit {
     this.getUserLoggedIn();
   }
 
+  onDateSelection(date: any) {
+		if (!this.fromDate && !this.toDate) {
+			this.fromDate = date;
+		} else if (this.fromDate && !this.toDate && date && date.after(this.fromDate)) {
+			this.toDate = date;
+		} else {
+			this.toDate = null;
+			this.fromDate = date;
+		}
+	}
+
+	isHovered(date: NgbDate) {
+		return (
+			this.fromDate && !this.toDate && this.hoveredDate && date.after(this.fromDate) && date.before(this.hoveredDate)
+		);
+	}
+
+	isInside(date: NgbDate) {
+		return this.toDate && date.after(this.fromDate) && date.before(this.toDate);
+	}
+
+	isRange(date: NgbDate) {
+		return (
+			date.equals(this.fromDate) ||
+			(this.toDate && date.equals(this.toDate)) ||
+			this.isInside(date) ||
+			this.isHovered(date)
+		);
+	}
+
+	validateInput(currentValue: NgbDate | null, input: string): NgbDate | null {
+		const parsed = this.formatter.parse(input);
+		return parsed && this.calendar.isValid(NgbDate.from(parsed)) ? NgbDate.from(parsed) : currentValue;
+	}
+
   getUserLoggedIn() {
     this._authService.getUserInfo().subscribe({
       next: (user: any) => {
         this.userLogged = user;
         // console.log("User logged: ", this.userLogged);
         this.initSearcher();
-        this.initCalendar();
         this.updateVisiblePages();
       },
       error: (error) => {
@@ -229,32 +254,6 @@ export class ViewDataComponent implements OnInit {
 
   changePage(page: number) {
     this.currentPageOut.emit(page);
-  }
-
-  initCalendar() {
-    this.selectedMonth = new Date().getMonth() + 1;
-    this.selectedYear = new Date().getFullYear();
-    const currentYear = new Date().getFullYear();
-
-    // this.getYears();
-    for (let year = currentYear - 10; year <= currentYear + 10; year++) {
-      this.years.push(year);
-    }
-  }
-
-  getYears() {
-    //TODO: Consultar años desde el backend
-    return this.years;
-  }
-
-  onMonthChange() {
-    console.log(
-      "Selected month and year:",
-      this.selectedMonth,
-      this.selectedYear
-    );
-    // Realiza aquí la lógica necesaria al cambiar el mes y el año
-    //TODO: Consultar datos desde el backend
   }
 
   hasActionsColumn(): boolean {

@@ -81,8 +81,25 @@ export class PersonasController {
     content: {'application/json': {schema: CountSchema}},
   })
   async countClientes(
+    @inject(SecurityBindings.USER)
+    currentUser: UserProfile,
     @param.where(Personas) where?: Where<Personas>,
   ): Promise<Count> {
+    console.log('Usuario Logueado: ', currentUser);
+    const userId = parseInt(currentUser[securityId], 10);
+    console.log('Id de Usuario Logueado: ', userId);
+
+    const user = await this.usuarioRepository.findById(userId);
+    if (!user) {
+      throw new HttpErrors.Unauthorized('Usuario no encontrado');
+    }
+    console.log('Usuario encontrado: ', user);
+
+    if (user.rolid === 3) {
+      return this.usuarioClienteRepository.count({
+        where: {usuarioId: userId, estado: true},
+      });
+    }
     return this.personasRepository.count({
       idTipoPersona: 1,
       estado: true,

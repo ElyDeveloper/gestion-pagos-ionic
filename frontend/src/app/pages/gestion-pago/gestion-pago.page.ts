@@ -1,8 +1,10 @@
 import { Component, inject, OnInit, ViewChild, OnDestroy } from "@angular/core";
 import { FormBuilder, FormGroup } from "@angular/forms";
 import { ActivatedRoute } from "@angular/router";
+import { FileUploader } from "ng2-file-upload";
 import { Subscription } from "rxjs";
 import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
+import { UploaderComponent } from "src/app/shared/components/uploader/uploader.component";
 import { FechasPagos } from "src/app/shared/interfaces/fecha-pago";
 import { Column } from "src/app/shared/interfaces/table";
 import { GlobalService } from "src/app/shared/services/global.service";
@@ -19,6 +21,10 @@ const MILLISECONDS_PER_DAY = 1000 * 3600 * 24;
 })
 export class GestionPagoPage implements OnInit, OnDestroy {
   @ViewChild(LoaderComponent) private loaderComponent!: LoaderComponent;
+
+  @ViewChild(UploaderComponent) uploaderComponent:
+    | UploaderComponent
+    | undefined;
 
   elements: FechasPagos[] = [];
   columnsData: Column[] = [];
@@ -39,6 +45,8 @@ export class GestionPagoPage implements OnInit, OnDestroy {
   formModels: FormModels;
   pagoForm: FormGroup;
 
+  uploader!: FileUploader;
+
   private globalService = inject(GlobalService);
   private route = inject(ActivatedRoute);
 
@@ -58,6 +66,23 @@ export class GestionPagoPage implements OnInit, OnDestroy {
 
   save(data: any): void {
     console.log("Formulario de Registro de Pago: ", data);
+
+    const file = this.uploaderComponent?.uploader?.queue[0]?._file;
+
+    console.log("Archivo subido: ", file);
+
+    data.idPrestamo=this.prestamoSeleccionado.id;
+
+    this.globalService.PostWithFile("pagos/saveFile", data, file).subscribe({
+      next: (response) => {
+        console.log("Respuesta del Servidor: ", response);
+        // TODO: Mostrar mensaje de éxito
+      },
+      error: (error) => {
+        console.error("Error en el Servidor: ", error);
+        // TODO: Mostrar mensaje de error
+      },
+    });
   }
 
   changeDate(): void {

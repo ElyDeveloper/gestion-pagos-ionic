@@ -52,6 +52,7 @@ export class UploaderComponent {
   }
 
   onSelect() {
+    console.log("File Selected");
     this.uploaderChange.emit(this.uploader);
   }
 
