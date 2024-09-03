@@ -23,8 +23,8 @@ export class GestionPagoPage implements OnInit, OnDestroy {
   @ViewChild(LoaderComponent) private loaderComponent!: LoaderComponent;
 
   @ViewChild(UploaderComponent) uploaderComponent:
-  | UploaderComponent
-  | undefined;
+    | UploaderComponent
+    | undefined;
 
   elements: FechasPagos[] = [];
   columnsData: Column[] = [];
@@ -69,10 +69,11 @@ export class GestionPagoPage implements OnInit, OnDestroy {
 
     const file = this.uploaderComponent?.uploader?.queue[0]?._file;
 
-
     console.log("Archivo subido: ", file);
 
-    this.globalService.PostWithFile('pagos/saveFile', data, file).subscribe({
+    data.idPrestamo=this.prestamoSeleccionado.id;
+
+    this.globalService.PostWithFile("pagos/saveFile", data, file).subscribe({
       next: (response) => {
         console.log("Respuesta del Servidor: ", response);
         // TODO: Mostrar mensaje de éxito
@@ -81,7 +82,7 @@ export class GestionPagoPage implements OnInit, OnDestroy {
         console.error("Error en el Servidor: ", error);
         // TODO: Mostrar mensaje de error
       },
-    })
+    });
   }
 
   changeDate(): void {

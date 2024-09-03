@@ -83,12 +83,7 @@ export class CheckPrestamosController {
           schema: {
             type: 'object',
             properties: {
-              estado: {type: 'boolean'},
-              fechaPago: {type: 'string', format: 'date'},
-              idFechaPago: {type: 'number'},
-              monto: {type: 'number'},
-              mora: {type: 'number'},
-              idPrestamo: {type: 'number'},
+              data: {type: 'string'},
               file: {type: 'string', format: 'binary'},
             },
           },
@@ -106,15 +101,20 @@ export class CheckPrestamosController {
         }
 
         try {
-          console.log('Archivo cargado:', req.body);
+          const dataSend = JSON.parse(req.body.data);
           const {estado, fechaPago, idFechaPago, monto, mora, idPrestamo} =
-            req.body;
+            dataSend;
           const file = req.file;
+          console.log('Datos enviados:', dataSend);
+          console.log('Archivo cargado:', file);
 
           // Buscar el IdDocumento usando el IDPrestamo
           const contrato = await this.contratosPagoRepository.findOne({
             where: {idPrestamo},
           });
+
+          const fechasPago =
+            await this.fechasPagosRepository.findById(idFechaPago);
 
           const prestamo = await this.prestamosRepository.findById(idPrestamo);
 
@@ -124,12 +124,15 @@ export class CheckPrestamosController {
             );
           }
           //Calcular dias de retraso
-          const fechaContrato = new Date(contrato.fechaContrato);
+          const fechaContrato = new Date(fechasPago.fechaPago);
           const diasRetraso = Math.round(
             (new Date().getTime() - fechaContrato.getTime()) /
               (1000 * 60 * 60 * 24),
           );
 
+          console.log('Dias de retraso:', diasRetraso);
+
+          //INFO INSERTAR EN MORAS
           await this.morasRepository.create({
             idCliente: prestamo.idCliente,
             idPrestamo,
@@ -137,9 +140,17 @@ export class CheckPrestamosController {
             idFechaPago,
             diasRetraso,
             mora,
+            estado: true,
           });
 
-          // Crear el registro en Pagos
+
+          //INFO INSERTAR EN FECHAS_PAGOS
+          await this.fechasPagosRepository.updateById(idFechaPago, {
+            estado: true,
+          });
+
+
+          //INFO INSERTAR EN PAGOS
           const pago = await this.pagosRepository.create({
             estado: estado,
             fechaPago: new Date(fechaPago).toISOString(),
@@ -168,7 +179,7 @@ export class CheckPrestamosController {
             path: file ? file.path : null,
           });
         } catch (error) {
-          console.error('Error al cargar el archivo:', error);
+          console.error('Error al procesar la solicitud:', error);
           return reject({error: 'Error al procesar la solicitud.'});
         }
       });

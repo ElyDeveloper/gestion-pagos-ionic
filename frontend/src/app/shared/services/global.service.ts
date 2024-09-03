@@ -68,16 +68,12 @@ export class GlobalService {
 
   PostWithFile(endPoint: string, dataSend: any, selectedFile?: File) {
     const formData = new FormData();
-    formData.append('estado', dataSend.estado);
-    formData.append('fechaPago', dataSend.fechaPago);
-    formData.append('idFechaPago', dataSend.idFechaPago);
-    formData.append('monto', dataSend.monto);
-    formData.append('mora', dataSend.mora);
-    formData.append('idPrestamo', dataSend.idPrestamo);
 
-    // Añadir el documento si existe
+    formData.append("data", JSON.stringify(dataSend));
+
+    // Añadir el archivo si existe
     if (selectedFile) {
-      formData.append('file', selectedFile, selectedFile.name);
+      formData.append("file", selectedFile, selectedFile.name);
     }
 
     return this._http.post(`${API_URL}${endPoint}`, formData);
