@@ -36,6 +36,7 @@ export class GestionPagoPage implements OnInit {
 
   hasAval = false;
   hasMora = false;
+  isEditar = false;
   existContrato = false;
 
   mora = 0;
@@ -58,7 +59,7 @@ export class GestionPagoPage implements OnInit {
 
   ngOnInit(): void {}
 
-  verifyExist() {
+  verifyExistContract() {
     this.suscriptions.push(
       this.globalService
         .Get(`contratos-pagos/verify/${this.prestamoSeleccionado.id}`)
@@ -90,6 +91,14 @@ export class GestionPagoPage implements OnInit {
   }
 
   save(data: any): void {
+    if (data.estado === true) {
+      console.log("Modo Edicion");
+      this.isEditar = true;
+    } else {
+      console.log("Modo Creación");
+      this.isEditar = false;
+    }
+
     console.log("Formulario de Registro de Pago: ", data);
 
     const file = this.uploaderComponent?.uploader?.queue[0]?._file;
@@ -98,17 +107,32 @@ export class GestionPagoPage implements OnInit {
 
     data.idPrestamo = this.prestamoSeleccionado.id;
 
-    this.globalService.PostWithFile("pagos/saveFile", data, file).subscribe({
-      next: (response) => {
-        console.log("Respuesta del Servidor: ", response);
-        this.getFechasPago(this.prestamoSeleccionado);
-        // TODO: Mostrar mensaje de éxito
-      },
-      error: (error) => {
-        console.error("Error en el Servidor: ", error);
-        // TODO: Mostrar mensaje de error
-      },
-    });
+    if (!this.isEditar) {
+      this.globalService.PostWithFile("pagos/saveFile", data, file).subscribe({
+        next: (response) => {
+          console.log("Respuesta del Servidor: ", response);
+          this.getFechasPago(this.prestamoSeleccionado);
+          // TODO: Mostrar mensaje de éxito
+        },
+        error: (error) => {
+          console.error("Error en el Servidor: ", error);
+          // TODO: Mostrar mensaje de error
+        },
+      });
+    }
+    {
+      this.globalService.PutWithFile("pagos/updateFile", data, file).subscribe({
+        next: (response) => {
+          console.log("Respuesta del Servidor: ", response);
+          this.getFechasPago(this.prestamoSeleccionado);
+          // TODO: Mostrar mensaje de éxito
+        },
+        error: (error) => {
+          console.error("Error en el Servidor: ", error);
+          // TODO: Mostrar mensaje de error
+        },
+      });
+    }
   }
 
   changeDate(): void {
@@ -178,7 +202,7 @@ export class GestionPagoPage implements OnInit {
     this.avalSeleccionado = prestamo.aval;
     this.hasAval = !!prestamo.idAval;
 
-    this.verifyExist();
+    this.verifyExistContract();
   }
 
   private buildColumns(): void {
