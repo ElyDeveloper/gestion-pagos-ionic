@@ -33,6 +33,7 @@
     "@ionic/angular": "^8.0.0",
     "@ng-select/ng-select": "^13.7.0",
     "bootstrap": "^5.3.3",
+    "bootstrap-icons": "^1.11.3",
     "html2canvas": "^1.4.1",
     "ionicons": "^7.0.0",
     "jspdf": "^2.5.1",
