@@ -77,7 +77,7 @@ export class GlobalService {
 
     // Añadir el documento si existe
     if (selectedFile) {
-      formData.append('documento', selectedFile, selectedFile.name);
+      formData.append('file', selectedFile, selectedFile.name);
     }
 
     return this._http.post(`${API_URL}${endPoint}`, formData);

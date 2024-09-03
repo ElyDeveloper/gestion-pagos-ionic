@@ -72,7 +72,7 @@ export class GestionPagoPage implements OnInit, OnDestroy {
 
     console.log("Archivo subido: ", file);
 
-    this.globalService.PostWithFile('pagos/crear', data, file).subscribe({
+    this.globalService.PostWithFile('pagos/saveFile', data, file).subscribe({
       next: (response) => {
         console.log("Respuesta del Servidor: ", response);
         // TODO: Mostrar mensaje de éxito

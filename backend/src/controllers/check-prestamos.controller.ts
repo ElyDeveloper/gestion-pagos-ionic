@@ -4,6 +4,7 @@ import {
   DocumentosRepository,
   DocumentosTipoDocRepository,
   FechasPagosRepository,
+  MorasRepository,
   PagosRepository,
   PlanesPagoRepository,
   PrestamosRepository,
@@ -24,12 +25,13 @@ import multer from 'multer';
 import path from 'path';
 import {Request as ExpressRequest, Response as ExpressResponse} from 'express';
 import {keys} from '../env/interfaces/Servicekeys.interface';
+import {deflate} from 'zlib';
 
 // Configuración de multer para la carga de archivos
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     // cb(null, path.join(__dirname, '../../../../../../DocumetosPrestamo'));
-    cb(null, path.join(__dirname, `${keys.URL_FILE}`));
+    cb(null, path.join(keys.URL_FILE, 'Pagos'));
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
@@ -42,6 +44,8 @@ const upload = multer({storage: storage});
 
 export class CheckPrestamosController {
   constructor(
+    @repository(MorasRepository)
+    public morasRepository: MorasRepository,
     @repository(PrestamosRepository)
     public prestamosRepository: PrestamosRepository,
     @repository(PlanesPagoRepository)
@@ -83,6 +87,7 @@ export class CheckPrestamosController {
               fechaPago: {type: 'string', format: 'date'},
               idFechaPago: {type: 'number'},
               monto: {type: 'number'},
+              mora: {type: 'number'},
               idPrestamo: {type: 'number'},
               file: {type: 'string', format: 'binary'},
             },
@@ -96,12 +101,14 @@ export class CheckPrestamosController {
     return new Promise((resolve, reject) => {
       upload.single('file')(req, res, async (err: any) => {
         if (err) {
+          console.error('Error al cargar el archivo:', err);
           return reject({error: 'Error al cargar el archivo.'});
         }
 
         try {
-          console.log('Request body: ', req.body);
-          const {estado, fechaPago, idFechaPago, monto, idPrestamo} = req.body;
+          console.log('Archivo cargado:', req.body);
+          const {estado, fechaPago, idFechaPago, monto, mora, idPrestamo} =
+            req.body;
           const file = req.file;
 
           // Buscar el IdDocumento usando el IDPrestamo
@@ -109,11 +116,28 @@ export class CheckPrestamosController {
             where: {idPrestamo},
           });
 
+          const prestamo = await this.prestamosRepository.findById(idPrestamo);
+
           if (!contrato) {
             throw new HttpErrors.NotFound(
               `Contrato de pago no encontrado para el préstamo ID ${idPrestamo}`,
             );
           }
+          //Calcular dias de retraso
+          const fechaContrato = new Date(contrato.fechaContrato);
+          const diasRetraso = Math.round(
+            (new Date().getTime() - fechaContrato.getTime()) /
+              (1000 * 60 * 60 * 24),
+          );
+
+          await this.morasRepository.create({
+            idCliente: prestamo.idCliente,
+            idPrestamo,
+            idPlan: prestamo.idPlan,
+            idFechaPago,
+            diasRetraso,
+            mora,
+          });
 
           // Crear el registro en Pagos
           const pago = await this.pagosRepository.create({
@@ -144,6 +168,7 @@ export class CheckPrestamosController {
             path: file ? file.path : null,
           });
         } catch (error) {
+          console.error('Error al cargar el archivo:', error);
           return reject({error: 'Error al procesar la solicitud.'});
         }
       });
