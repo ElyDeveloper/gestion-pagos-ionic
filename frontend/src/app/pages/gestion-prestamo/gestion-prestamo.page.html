@@ -212,8 +212,8 @@
                       >Tasa de Interés:</ion-label
                     >
                     <ion-input
-                      (ngModelChange)="calculateTotalMonto()"
-                      type="number"
+                      (keyup)="calculateTotalMonto()"
+                      type="text"
                       formControlName="tasaInteres"></ion-input>
                   </ion-item>
                 </ion-col>

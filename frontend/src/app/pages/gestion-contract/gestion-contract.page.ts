@@ -14,6 +14,7 @@ import html2canvas from "html2canvas";
 import { environment } from "src/environments/environment";
 import { filter, map } from "rxjs";
 import { Title } from "@angular/platform-browser";
+import { ContratosPago } from "src/app/shared/interfaces/contrato";
 const COMPANY = environment.company || "No Aún";
 @Component({
   selector: "app-gestion-contract",
@@ -42,6 +43,7 @@ export class GestionContractPage implements OnInit {
   isToastOpen = false;
   isEdit = false;
   hasAval = false;
+  existContrato: boolean = false;
 
   editarBancoDepositar: boolean = false;
   editarCuentaBancaria: boolean = false;
@@ -63,6 +65,8 @@ export class GestionContractPage implements OnInit {
   title: string = "Todos";
   action: string = "todos";
 
+  correlativo: string = "";
+
   clienteSeleccionado: any = null;
   avalSeleccionado: any = null;
   prestamoSeleccionado: any = {};
@@ -76,6 +80,50 @@ export class GestionContractPage implements OnInit {
 
   ngOnInit() {
     this.getPrestamo();
+    this.getCorrelativo();
+  }
+
+  verifyExist() {
+    this._globalService
+      .Get(`contratos-pagos/verify/${this.prestamoSeleccionado.id}`)
+      .subscribe({
+        next: (data: any) => {
+          const { exist, content, correlativo } = data;
+
+          console.log("Contrato existente", data);
+          if (exist) {
+            this.existContrato = true;
+            this.correlativo = correlativo;
+            //INFO: Otra Data
+            this.nombreEmpresa = content.nombreEmpresa;
+            this.bancoDepositar = content.bancoDepositar;
+            this.ciudadBanco = content.ciudadBanco;
+            this.cuentaBancaria = content.cuentaBancaria;
+            this.direccionEmpresa = content.direccionEmpresa;
+            this.fechaAcuerdo = content.fechaAcuerdo;
+            this.lugarAcuerdo = content.lugarAcuerdo;
+          } else {
+            // this.saveContract();
+          }
+        },
+        error: (error: any) => {
+          console.error("Error al verificar si existe el contrato", error);
+        },
+      });
+  }
+
+  getCorrelativo() {
+    this._globalService.Get("contratos-pagos/correlativo").subscribe({
+      next: (data: any) => {
+        this.correlativo = data.correlativo;
+      },
+      error: (error: any) => {
+        console.error(
+          "Error al obtener la cantidad de contratos de pago",
+          error
+        );
+      },
+    });
   }
 
   setTitle() {
@@ -97,20 +145,64 @@ export class GestionContractPage implements OnInit {
     this.changeView.emit();
   }
 
-  generatePDF() {
-    // this.exportToPDF(
-    //   `${this.clienteSeleccionado.nombres} ${this.clienteSeleccionado.apellidos}`,
-    //   "print-element"
-    // );
+  generateContract() {
+    //Validar que todos los campos estén llenos
+    if (
+      !this.nombreEmpresa ||
+      !this.bancoDepositar ||
+      !this.ciudadBanco ||
+      !this.cuentaBancaria ||
+      !this.direccionEmpresa ||
+      !this.fechaAcuerdo ||
+      !this.lugarAcuerdo
+    ) {
+      this.toastMessage = "Por favor, complete correctamente todos los campos.";
+      this.setOpenedToast(true);
+      return;
+    }
 
-    this.printSection();
+    if (this.existContrato) {
+      this.loaderComponent.show();
+
+      this.printSection();
+      return;
+    }
+
+    const content = {
+      nombreEmpresa: this.nombreEmpresa,
+      bancoDepositar: this.bancoDepositar,
+      ciudadBanco: this.ciudadBanco,
+      cuentaBancaria: this.cuentaBancaria,
+      direccionEmpresa: this.direccionEmpresa,
+      fechaAcuerdo: this.fechaAcuerdo,
+      lugarAcuerdo: this.lugarAcuerdo,
+    };
+    const contractSave: ContratosPago = {
+      correlativo: this.correlativo,
+      fechaGeneracion: new Date().toISOString(),
+      contenido: JSON.stringify(content),
+      idPrestamo: this.prestamoSeleccionado.id,
+    };
+
+    this.loaderComponent.show();
+    this._globalService.Post("contratos-pagos", contractSave).subscribe({
+      next: (data: any) => {
+        console.log("Contrato guardado correctamente", data);
+        this.isPrint = false;
+        this.printSection();
+      },
+      error: (error: any) => {
+        this.loaderComponent.show();
+
+        console.error("Error al guardar el contrato", error);
+      },
+    });
   }
 
   printSection() {
     this.isPrint = true;
     this.changeViewState();
     //Esperar 1 segundo para que se muestre el loader
-    this.loaderComponent.show();
     setTimeout(() => {
       this.loaderComponent.hide();
 
@@ -269,6 +361,7 @@ export class GestionContractPage implements OnInit {
               this.setTitle();
 
               this.isEdit = true;
+              this.verifyExist();
             }
           },
           error: (error) => console.error(error),

@@ -24,6 +24,7 @@ export class ViewDataComponent implements OnInit {
   @Input() showAdd: boolean = true;
   @Input() showSearch: boolean = true;
   @Input() context: string = "elemento";
+  @Input() searchPlaceHolder: string = "Buscar...";
   @Input() showCalendar: boolean = false;
   @Input() currentPage: number = 1;
   @Input() totalPages: number = 10; // Esto debería ser dinámico basado en tus datos
@@ -35,8 +36,10 @@ export class ViewDataComponent implements OnInit {
   @Output() editButtonClicked = new EventEmitter<any>();
   @Output() deleteButtonClicked = new EventEmitter<any>();
   @Output() infoButtonClicked = new EventEmitter<any>();
+  @Output() selectClientClicked = new EventEmitter<any>();
   @Output() checkButtonClicked = new EventEmitter<any>();
   @Output() selectButtonClicked = new EventEmitter<any>();
+  @Output() goButtonClicked = new EventEmitter<any>();
   @Output() contractButtonClicked = new EventEmitter<any>();
   @Output() pagoButtonClicked = new EventEmitter<any>();
   @Output() resetPasswordButtonClicked = new EventEmitter<any>();
@@ -279,6 +282,9 @@ export class ViewDataComponent implements OnInit {
       case "select":
         this.onSelectButtonClick(row);
         break;
+      case "go":
+        this.onGoButtonClicked(row);
+        break;
       case "contract":
         this.onContractButtonClick(row);
         break;
@@ -287,6 +293,9 @@ export class ViewDataComponent implements OnInit {
         break;
       case "plan":
         this.onInfoPlan(row);
+        break;
+      case "asignClients":
+        this.onSelectClients(row);
         break;
       case "resetPswd":
         this.onResetPassword(row);
@@ -312,6 +321,9 @@ export class ViewDataComponent implements OnInit {
   }
   onSelectButtonClick(data: any) {
     this.selectButtonClicked.emit(data);
+  }
+  onGoButtonClicked(data: any) {
+    this.goButtonClicked.emit(data);
   }
 
   onContractButtonClick(data: any) {
@@ -353,6 +365,11 @@ export class ViewDataComponent implements OnInit {
   onInfoPlan(data: any) {
     console.log("Se click en plan");
     this.planButtonClicked.emit(data);
+  }
+
+  onSelectClients(data: any) {
+    console.log("Se click en seleccionar clientes");
+    this.selectClientClicked.emit(data);
   }
 
   updateVisiblePages() {

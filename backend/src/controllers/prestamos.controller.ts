@@ -10,6 +10,7 @@ import {
   del,
   get,
   getModelSchemaRef,
+  HttpErrors,
   param,
   patch,
   post,
@@ -21,14 +22,20 @@ import {viewOf} from '../core/library/views.library';
 import {Prestamos} from '../models';
 import {PrestamosRepository} from '../repositories/prestamos.repository';
 import {authenticate} from '@loopback/authentication';
-import {service} from '@loopback/core';
+import {inject, service} from '@loopback/core';
 import {JWTService} from '../services';
+import {SecurityBindings, securityId, UserProfile} from '@loopback/security';
+import {UsuarioClienteRepository, UsuarioRepository} from '../repositories';
 
 // @authenticate('jwt')
 export class PrestamosController {
   constructor(
+    @repository(UsuarioClienteRepository)
+    public usuarioClienteRepository: UsuarioClienteRepository,
+    @repository(UsuarioRepository)
+    public usuarioRepository: UsuarioRepository,
     @repository(PrestamosRepository)
-    public PrestamosRepository: PrestamosRepository,
+    public prestamosRepository: PrestamosRepository,
     @service(JWTService)
     private jwtService: JWTService,
   ) {}
@@ -54,7 +61,7 @@ export class PrestamosController {
     if (typeof prestamos.idAval === 'string') {
       prestamos.idAval = this.jwtService.decryptId(prestamos.idAval);
     }
-    return this.PrestamosRepository.create(prestamos);
+    return this.prestamosRepository.create(prestamos);
   }
 
   @get('/prestamos/count')
@@ -65,7 +72,9 @@ export class PrestamosController {
   async count(
     @param.where(Prestamos) where?: Where<Prestamos>,
   ): Promise<Count> {
-    return this.PrestamosRepository.count(where);
+    return this.prestamosRepository.count({
+      estado: true,
+    });
   }
 
   @get('/prestamos')
@@ -81,15 +90,18 @@ export class PrestamosController {
     },
   })
   async find(): Promise<Prestamos[]> {
-    return this.PrestamosRepository.find({
+    return this.prestamosRepository.find({
+      where: {
+        estado: true,
+      },
       include: [
-        {relation: 'cliente'},
-        {relation: 'producto'},
-        {relation: 'planPago'},
-        {relation: 'moneda'},
-        {relation: 'periodoCobro'},
-        {relation: 'estadoAprobacion'},
-        {relation: 'aval'},
+        'cliente',
+        'producto',
+        'planPago',
+        'moneda',
+        'periodoCobro',
+        'estadoAprobacion',
+        'aval',
       ],
     });
   }
@@ -107,22 +119,105 @@ export class PrestamosController {
     },
   })
   async dataPaginate(
+    @inject(SecurityBindings.USER)
+    currentUser: UserProfile,
     @param.query.number('skip') skip: number,
     @param.query.number('limit') limit: number,
   ): Promise<Prestamos[]> {
+    console.log('Usuario Logueado: ', currentUser);
+    const userId = parseInt(currentUser[securityId], 10);
+    console.log('Id de Usuario Logueado: ', userId);
     console.log('Llamada de paginacion');
-    const prestamos = await this.PrestamosRepository.find({
+
+    const user = await this.usuarioRepository.findById(userId);
+    if (!user) {
+      throw new HttpErrors.Unauthorized('Usuario no encontrado');
+    }
+    console.log('Usuario encontrado: ', user);
+
+    if (user.rolid === 3) {
+      const usuariosCliente = await this.usuarioClienteRepository.find({
+        where: {usuarioId: userId, estado: true},
+        include: [
+          {
+            relation: 'Cliente',
+            scope: {
+              where: {estado: true},
+              include: [
+                'nacionalidad',
+                'recordCrediticio',
+                'estadoCivil',
+                'tipoPersona',
+              ],
+            },
+          },
+        ],
+        skip,
+        limit,
+        order: ['id DESC'],
+      });
+
+      // console.log('UsuariosClientes encontrados: ', usuariosCliente);
+
+      const clients = usuariosCliente
+        .map((uc: any) => {
+          const ucC = uc?.Cliente;
+          console.log('Cliente encontrado: ', ucC);
+          return ucC;
+        })
+        .filter(
+          (client): client is NonNullable<typeof client> => client != null,
+        );
+
+      //Obtener los prestamos por clientes
+      const prestamos = await this.prestamosRepository.find({
+        where: {
+          and: [
+            {idCliente: {inq: clients.map((c: any) => c.id)}},
+            {estado: true},
+          ],
+        },
+        include: [
+          'cliente',
+          'producto',
+          'planPago',
+          'moneda',
+          'periodoCobro',
+          'estadoAprobacion',
+          'aval',
+        ],
+        skip,
+        limit,
+        order: ['id DESC'],
+      });
+
+      // clonar array
+      const copia: any = Array.from(prestamos);
+
+      //encriptar id de prestamos con jwtService
+      copia.forEach((prestamo: any) => {
+        prestamo.id = this.jwtService.encryptId(prestamo.id || 0);
+      });
+
+      return copia;
+    }
+
+    const prestamos = await this.prestamosRepository.find({
+      where: {
+        estado: true,
+      },
       include: [
-        {relation: 'cliente'},
-        {relation: 'producto'},
-        {relation: 'planPago'},
-        {relation: 'moneda'},
-        {relation: 'periodoCobro'},
-        {relation: 'estadoAprobacion'},
-        {relation: 'aval'},
+        'cliente',
+        'producto',
+        'planPago',
+        'moneda',
+        'periodoCobro',
+        'estadoAprobacion',
+        'aval',
       ],
       skip,
       limit,
+      order: ['id DESC'],
     });
 
     // clonar array
@@ -152,7 +247,7 @@ export class PrestamosController {
     Prestamos: Prestamos,
     @param.where(Prestamos) where?: Where<Prestamos>,
   ): Promise<Count> {
-    return this.PrestamosRepository.updateAll(Prestamos, where);
+    return this.prestamosRepository.updateAll(Prestamos, where);
   }
 
   @get('/prestamos/{id}')
@@ -168,23 +263,23 @@ export class PrestamosController {
     console.log('Id Encrypted: ', id);
     const idDecrypted = this.jwtService.decryptId(id);
     console.log('Id Decrypted: ', idDecrypted);
-    return this.PrestamosRepository.findById(idDecrypted, {
+    return this.prestamosRepository.findById(idDecrypted, {
       include: [
         {
           relation: 'cliente',
           scope: {
-            include: [{relation: 'estadoCivil'}, {relation: 'nacionalidad'}],
+            include: ['estadoCivil', 'nacionalidad'],
           },
         },
-        {relation: 'producto'},
-        {relation: 'planPago'},
-        {relation: 'moneda'},
-        {relation: 'periodoCobro'},
-        {relation: 'estadoAprobacion'},
+        'producto',
+        'planPago',
+        'moneda',
+        'periodoCobro',
+        'estadoAprobacion',
         {
           relation: 'aval',
           scope: {
-            include: [{relation: 'estadoCivil'}, {relation: 'nacionalidad'}],
+            include: ['estadoCivil', 'nacionalidad'],
           },
         },
       ],
@@ -206,7 +301,7 @@ export class PrestamosController {
     })
     Prestamos: Prestamos,
   ): Promise<void> {
-    await this.PrestamosRepository.updateById(id, Prestamos);
+    await this.prestamosRepository.updateById(id, Prestamos);
   }
 
   @put('/prestamos/{id}')
@@ -227,7 +322,7 @@ export class PrestamosController {
 
     console.log('Prestamo: ', prestamos);
 
-    await this.PrestamosRepository.replaceById(id, prestamos);
+    await this.prestamosRepository.replaceById(id, prestamos);
   }
 
   @del('/prestamos/{id}')
@@ -236,7 +331,7 @@ export class PrestamosController {
   })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
     const decryptedId = await this.jwtService.decryptId(id);
-    await this.PrestamosRepository.updateById(decryptedId, {
+    await this.prestamosRepository.updateById(decryptedId, {
       estado: false,
     });
   }
@@ -245,15 +340,15 @@ export class PrestamosController {
   async dataPrestamosSearch(
     @param.query.string('query') search: string,
   ): Promise<any> {
-    let PrestamosSearch = await this.PrestamosRepository.find({
+    let PrestamosSearch = await this.prestamosRepository.find({
       include: [
-        {relation: 'cliente'},
-        {relation: 'producto'},
-        {relation: 'periodo'},
-        {relation: 'estadoAprobacion'},
-        {relation: 'planPago'},
-        {relation: 'moneda'},
-        {relation: 'aval'},
+        'cliente',
+        'producto',
+        'periodo',
+        'estadoAprobacion',
+        'planPago',
+        'moneda',
+        'aval',
       ],
       where: {
         or: [

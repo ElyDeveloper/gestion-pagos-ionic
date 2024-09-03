@@ -1,0 +1,2 @@
+2024-09-01 15:50:02 - Starting C:\Program Files\nodejs\node.exe  --harmony X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\node_modules\node-windows\lib\wrapper.js --file X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\server.js --scriptoptions= --log "MiAppAngularService wrapper" --grow 0.25 --wait 1 --maxrestarts 3 --abortonerror n --stopparentfirst undefined
+2024-09-01 15:50:02 - Started 20500
