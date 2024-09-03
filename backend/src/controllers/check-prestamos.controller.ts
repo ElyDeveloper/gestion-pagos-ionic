@@ -105,8 +105,6 @@ export class CheckPrestamosController {
           const {estado, fechaPago, idFechaPago, monto, mora, idPrestamo} =
             dataSend;
           const file = req.file;
-          console.log('Datos enviados:', dataSend);
-          console.log('Archivo cargado:', file);
 
           // Buscar el IdDocumento usando el IDPrestamo
           const contrato = await this.contratosPagoRepository.findOne({
@@ -315,7 +313,7 @@ export class CheckPrestamosController {
     },
   })
   async updatePagoFile(
-    @param.path.number('id') id: number,
+    @param.path.number('id') idDocumento: number,
     @requestBody({
       content: {
         'multipart/form-data': {
@@ -323,6 +321,8 @@ export class CheckPrestamosController {
           schema: {
             type: 'object',
             properties: {
+              idPago: {type: 'number'},
+              fechaPago: {type: 'string'},
               file: {type: 'string', format: 'binary'},
             },
           },
@@ -340,10 +340,18 @@ export class CheckPrestamosController {
 
         try {
           const file = req.file;
-
+          const {fechaPago} = req.body;
+          const idPago = req.body.idPago;
+          //Actualizar la fechaPago de la tabla Pagos
+          if(fechaPago != undefined && idPago != undefined) {
+            await this.pagosRepository.updateById(idPago, {
+              fechaPago: new Date(fechaPago).toISOString(),
+            });
+          }
+          
           //Actualizar el campo UrlDocumento en la tabla documentos si esta presente
           if (file !== undefined) {
-            await this.documentosRepository.updateById(id, {
+            await this.documentosRepository.updateById(idDocumento, {
               urlDocumento: file ? file.path : undefined,
               fechaSubida: new Date().toISOString(),
             });
