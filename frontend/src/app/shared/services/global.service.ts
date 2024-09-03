@@ -84,6 +84,10 @@ export class GlobalService {
   Delete(endPoint: string, Id: number) {
     return this._http.delete(`${API_URL}${endPoint}/${Id}`);
   }
+
+  DeleteString(endPoint: string, Id: string) {
+    return this._http.delete(`${API_URL}${endPoint}/${Id}`);
+  }
   Patch(endPoint: string, Id: number, body: any) {
     return this._http.patch(`${API_URL}${endPoint}/${Id}`, body);
   }

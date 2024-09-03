@@ -274,6 +274,20 @@ export class UsuarioClienteController {
     await this.usuarioClienteRepository.deleteById(id);
   }
 
+  @del('/usuario-clientes/by-cliente/{id}')
+  @response(204, {
+    description: 'UsuarioCliente DELETE success',
+  })
+  async deleteByIdCliente(@param.path.string('id') id: string): Promise<void> {
+    const idDecrypted = this.jwtService.decryptId(id);
+    const usuarioCliente = await this.usuarioClienteRepository.findOne({
+      where: {
+        clienteId: idDecrypted,
+      },
+    });
+    await this.usuarioClienteRepository.deleteById(usuarioCliente?.id);
+  }
+
   @put('/usuario-clientes/transferir-cartera/{id}&{id2}')
   @response(204, {
     description: 'UsuarioCliente PUT success',

@@ -104,6 +104,26 @@ export class UserController {
     return this.usuarioRepository.find();
   }
 
+  @get('/usuarios/roles/{id}')
+  @response(200, {
+    description: 'Array of Usuario model instances',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Usuario, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async findByRol(
+    @param.path.number('id') id: number,
+  ): Promise<Usuario[]> {
+    return this.usuarioRepository.find({
+      where: {rolid: id},
+    });
+  }
+
   @patch('/usuarios')
   @response(200, {
     description: 'Usuario PATCH success count',

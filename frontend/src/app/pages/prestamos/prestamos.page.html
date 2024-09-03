@@ -3,6 +3,7 @@
   <ion-toast
     [isOpen]="isToastOpen"
     message="{{toastMessage}}"
+    [color]="toastColor"
     [duration]="5000"
     (didDismiss)="setOpenedToast(false)"></ion-toast>
 

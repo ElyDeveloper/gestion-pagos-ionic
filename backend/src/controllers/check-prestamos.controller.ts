@@ -26,6 +26,8 @@ import path from 'path';
 import {Request as ExpressRequest, Response as ExpressResponse} from 'express';
 import {keys} from '../env/interfaces/Servicekeys.interface';
 import {deflate} from 'zlib';
+import {error} from 'console';
+import {throws} from 'assert';
 
 // Configuración de multer para la carga de archivos
 const storage = multer.diskStorage({
@@ -186,122 +188,147 @@ export class CheckPrestamosController {
 
   // Crear fechas de pagos
   @post('/check-prestamos/crear-fechas-pagos')
-  async createFechasPagos(
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: {
-            type: 'object',
-            properties: {
-              idPrestamo: {type: 'string'},
-              planId: {type: 'number'},
-              estado: {type: 'boolean'},
-              cuota: {type: 'number'},
-              fechaInicio: {type: 'string'},
-              periodoCobro: {type: 'number'},
-              numeroCuotas: {type: 'number'},
-              idEstadoAprobacion: {type: 'number'},
-            },
+async createFechasPagos(
+  @requestBody({
+    content: {
+      'application/json': {
+        schema: {
+          type: 'object',
+          properties: {
+            idPrestamo: {type: 'string'},
+            planId: {type: 'number'},
+            estado: {type: 'boolean'},
+            cuota: {type: 'number'},
+            fechaInicio: {type: 'string'},
+            periodoCobro: {type: 'number'},
+            numeroCuotas: {type: 'number'},
+            idEstadoAprobacion: {type: 'number'},
           },
         },
       },
-    })
-    datos: {
-      idPrestamo: string;
-      planId: number;
-      estado: boolean;
-      monto: number;
-      fechaInicio: string;
-      periodoCobro: number;
-      numeroCuotas: number;
-      idEstadoAprobacion: number;
     },
-  ): Promise<any> {
-    const {
-      idPrestamo,
-      planId,
-      estado,
-      monto,
-      fechaInicio,
-      periodoCobro,
-      numeroCuotas,
-      idEstadoAprobacion,
-    } = datos;
-    // console.log('Datos recibidos: ', datos);
+  })
+  datos: {
+    idPrestamo: string;
+    planId: number;
+    estado: boolean;
+    monto: number;
+    fechaInicio: string;
+    periodoCobro: number;
+    numeroCuotas: number;
+    idEstadoAprobacion: number;
+  },
+): Promise<any> {
+  const {
+    idPrestamo,
+    planId,
+    monto,
+    fechaInicio,
+    periodoCobro,
+    numeroCuotas,
+    idEstadoAprobacion,
+  } = datos;
 
-    const prestamoId = this.jwtService.decryptId(idPrestamo);
+  await this.validateExistingPayments(planId);
 
-    // return;
-    let fechaActual = new Date(fechaInicio);
-    const fechasPagos = [];
+  const prestamoId = this.jwtService.decryptId(idPrestamo);
+  const fechasPagos = this.generatePaymentDates(fechaInicio, periodoCobro, numeroCuotas, monto, planId);
+  const latestDate = this.getLatestPaymentDate(fechasPagos);
 
-    for (let i = 0; i < numeroCuotas; i++) {
-      // Crear una copia de la fecha actual
-      const fechaPago = new Date(fechaActual);
+  await this.updatePlanAndLoan(planId, prestamoId, fechaInicio, latestDate, idEstadoAprobacion);
 
-      fechasPagos.push({
-        planId: planId,
-        estado: false,
-        monto,
-        fechaPago,
-      });
+  return this.saveOrUpdatePaymentDates(planId, fechasPagos);
+}
 
-      // Incrementar la fecha según el periodo de cobro
-      switch (periodoCobro) {
-        case 1:
-          fechaActual.setDate(fechaActual.getDate() + 7);
-          break;
-        case 2:
-          fechaActual.setDate(fechaActual.getDate() + 15);
-          break;
-        case 3:
-          fechaActual.setMonth(fechaActual.getMonth() + 1);
-          break;
-        default:
-          throw new Error('Periodo de Cobro no válido');
-      }
-    }
+private async validateExistingPayments(planId: number): Promise<void> {
+  const historialPagos = await this.fechasPagosRepository.find({
+    where: {planId, estado: true},
+  });
 
-    const latestDate =
-      fechasPagos.length > 0
-        ? fechasPagos[fechasPagos.length - 1].fechaPago.toISOString()
-        : undefined;
-    console.log('Ultima fecha: ', latestDate);
-
-    const fechasPagosData: DataObject<FechasPagos>[] = fechasPagos.map(fp => ({
-      ...fp,
-      fechaPago: fp.fechaPago.toISOString(), // Convert Date to string
-    }));
-
-    await this.planesPagoRepository.updateById(planId, {
-      fechaInicio,
-      fechaFin: latestDate,
-    });
-
-    // Actualizar el estado del préstamo según el estado de aprobación
-    await this.prestamosRepository.updateById(prestamoId, {
-      idEstadoAprobacion,
-      fechaAprobacion: new Date().toISOString(), // Convert Date to string
-    });
-
-    if (idEstadoAprobacion === 1 || idEstadoAprobacion === 3) {
-      return {message: 'Datos actualizados correctamente'};
-    }
-
-    const existeHistorial = await this.fechasPagosRepository.count({
-      where: {planId},
-    });
-
-    if (existeHistorial.count === 0) {
-      return await this.fechasPagosRepository.createAll(fechasPagosData);
-    } else {
-      //Eliminar los elementos del historial por planId
-      await this.fechasPagosRepository.deleteAll({planId});
-      // Crear nuevos elementos en el historial
-      return await this.fechasPagosRepository.createAll(fechasPagosData);
-    }
-    // console.log('fechas pagos: ', fechasPagos);
+  if (historialPagos.length !== 0) {
+    throw new HttpErrors.Conflict('Ya existe pago registrado para este plan.');
   }
+}
+
+private generatePaymentDates(
+  fechaInicio: string,
+  periodoCobro: number,
+  numeroCuotas: number,
+  monto: number,
+  planId: number
+): Array<{planId: number; estado: boolean; monto: number; fechaPago: Date}> {
+  let fechaActual = new Date(fechaInicio);
+  const fechasPagos = [];
+
+  for (let i = 0; i < numeroCuotas; i++) {
+    fechaActual = this.incrementDate(fechaActual, periodoCobro);
+    const fechaPago = new Date(fechaActual);
+    fechasPagos.push({planId, estado: false, monto, fechaPago});
+  }
+
+  return fechasPagos;
+}
+
+private incrementDate(date: Date, periodoCobro: number): Date {
+  const newDate = new Date(date);
+  switch (periodoCobro) {
+    case 1:
+      newDate.setDate(newDate.getDate() + 7);
+      break;
+    case 2:
+      newDate.setDate(newDate.getDate() + 15);
+      break;
+    case 3:
+      newDate.setMonth(newDate.getMonth() + 1);
+      break;
+    default:
+      throw new Error('Periodo de Cobro no válido');
+  }
+  return newDate;
+}
+
+private getLatestPaymentDate(fechasPagos: Array<{fechaPago: Date}>): string | undefined {
+  return fechasPagos.length > 0
+    ? fechasPagos[fechasPagos.length - 1].fechaPago.toISOString()
+    : undefined;
+}
+
+private async updatePlanAndLoan(
+  planId: number,
+  prestamoId: number,
+  fechaInicio: string,
+  latestDate: string | undefined,
+  idEstadoAprobacion: number
+): Promise<void> {
+  await this.planesPagoRepository.updateById(planId, {
+    fechaInicio,
+    fechaFin: latestDate,
+  });
+
+  await this.prestamosRepository.updateById(prestamoId, {
+    idEstadoAprobacion,
+    fechaAprobacion: new Date().toISOString(),
+  });
+}
+
+private async saveOrUpdatePaymentDates(
+  planId: number,
+  fechasPagos: Array<{planId: number; estado: boolean; monto: number; fechaPago: Date}>
+): Promise<any> {
+  const fechasPagosData: DataObject<FechasPagos>[] = fechasPagos.map(fp => ({
+    ...fp,
+    fechaPago: fp.fechaPago.toISOString(),
+  }));
+
+  const existeHistorial = await this.fechasPagosRepository.count({where: {planId}});
+
+  if (existeHistorial.count === 0) {
+    return this.fechasPagosRepository.createAll(fechasPagosData);
+  } else {
+    await this.fechasPagosRepository.deleteAll({planId});
+    return this.fechasPagosRepository.createAll(fechasPagosData);
+  }
+}
 
   //Modificar la url del archivo
   @patch('/pagos/updateFile/{id}', {

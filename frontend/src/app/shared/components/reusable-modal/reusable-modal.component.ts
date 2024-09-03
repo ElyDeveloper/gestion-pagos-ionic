@@ -6,6 +6,7 @@ import {
   TemplateRef,
 } from "@angular/core";
 import { FormGroup } from "@angular/forms";
+import { ModalConfig } from "../../utils/extra";
 
 @Component({
   selector: "app-reusable-modal",
@@ -31,12 +32,13 @@ export class ReusableModalComponent {
   @Input() isOpen: boolean = false;
   @Input() content!: TemplateRef<any>;
   @Input() formSave!: FormGroup;
-  @Input() modalConfig: any;
+  @Input() modalConfig: ModalConfig = { fieldAliases: {} };
   @Output() isOpenChange = new EventEmitter<boolean>();
   @Output() saveData = new EventEmitter<any>();
 
   isToastOpen = false;
   toastMessage = "Guardado correctamente";
+  // toastColor = "primary";
 
   close = () => {
     this.isOpen = false;
@@ -44,12 +46,11 @@ export class ReusableModalComponent {
   };
 
   save = (data: any, isForm: boolean = true) => {
-    
     console.log("data", data);
     if (isForm) {
       if (this.formSave.invalid) {
         const invalidFields: string[] = [];
-  
+
         Object.keys(this.formSave.controls).forEach((key) => {
           const control = this.formSave.get(key);
           if (control && control.invalid) {
@@ -58,9 +59,10 @@ export class ReusableModalComponent {
             invalidFields.push(fieldName);
           }
         });
-  
+
         console.log("Campos inválidos:", invalidFields);
-  
+
+        // this.toastColor = "danger";
         this.toastMessage = `Por favor, complete correctamente los siguientes campos: ${invalidFields.join(
           ", "
         )}`;
@@ -68,7 +70,6 @@ export class ReusableModalComponent {
         return;
       }
     }
-    
 
     this.saveData.emit(data);
     this.close();

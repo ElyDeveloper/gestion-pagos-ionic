@@ -4,6 +4,7 @@
     [isOpen]="isToastOpen"
     message="{{toastMessage}}"
     [duration]="5000"
+    [color]="toastColor"
     (didDismiss)="setOpenedToast(false)"></ion-toast>
 
   <app-breadcrumb></app-breadcrumb>
@@ -30,6 +31,7 @@
     <app-reusable-modal
       [(isOpen)]="isModalOpen"
       [content]="modalSelected"
+      [modalConfig]="modalConfig"
       [formSave]="formSelected"
       (saveData)="handleSave($event)">
     </app-reusable-modal>
@@ -222,7 +224,7 @@
     <ng-template #modalSelectClients let-close="close" let-save="save">
       <ion-header>
         <ion-toolbar>
-          <ion-title>Asignar Clientes</ion-title>
+          <ion-title>Clientes Asignados</ion-title>
           <ion-buttons slot="end">
             <ion-button (click)="close()">Cerrar</ion-button>
           </ion-buttons>
@@ -233,7 +235,7 @@
           <ion-grid>
             <ion-row>
               <ion-col size-xs="12" size-sm="12" size-md="12">
-                <ion-searchbar
+                <!-- <ion-searchbar
                   [placeholder]="searchPlaceHolder"
                   [(ngModel)]="search"
                   (ionInput)="searchValueChanged($event)">
@@ -249,11 +251,11 @@
                     >
                   </ion-item>
                   }
-                </ion-list>
+                </ion-list> -->
                 <div *ngIf="selectedClients.length > 0">
                   <ion-list-header>
                     <ion-label
-                      >Clientes Seleccionados ({{selectedClients.length}})
+                      >Cantidad de clientes ({{selectedClients.length}})
                     </ion-label>
                   </ion-list-header>
                   <ion-list>
@@ -277,15 +279,18 @@
             </ion-row>
           </ion-grid>
 
-          <ion-grid>
+          <!-- <ion-grid>
             <ion-row class="ion-justify-content-center">
               <ion-col size-xs="12" size-sm="8" size-md="6" size-lg="4">
-                <ion-button expand="block" (click)="save(this.selectedClients, false)" class="ion-margin-top">
+                <ion-button
+                  expand="block"
+                  (click)="save(this.selectedClients, false)"
+                  class="ion-margin-top">
                   Guardar Selección
                 </ion-button>
               </ion-col>
             </ion-row>
-          </ion-grid>
+          </ion-grid> -->
         </section>
       </ion-content>
     </ng-template>
