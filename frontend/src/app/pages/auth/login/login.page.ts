@@ -9,6 +9,7 @@ import { LoaderComponent } from "src/app/shared/components/loader/loader.compone
 import { AuthService } from "src/app/shared/services/auth.service";
 import { Usuario } from "src/app/shared/interfaces/usuario";
 import { AlertController } from "@ionic/angular";
+import { Subscription } from "rxjs";
 
 interface Login {
   identificator: string;
@@ -34,6 +35,8 @@ export class LoginPage implements OnInit {
     password: "",
   };
 
+  suscriptions: Subscription[] = [];
+
   private _router = inject(Router);
   private _globalService = inject(GlobalService);
   private _cookieService = inject(CookieService);
@@ -48,59 +51,66 @@ export class LoginPage implements OnInit {
     this.isToastOpen = value;
   }
 
+  ionViewWillLeave() {
+    this.suscriptions.forEach((sub) => sub.unsubscribe());
+    this.suscriptions = [];
+  }
+
   async login() {
     if (this.validateForm()) {
       this.textLoader = "Iniciando Sesión";
       this.loaderComponent.show();
 
-      this._globalService.Post("login", this.user).subscribe({
-        next: (result: any) => {
-          console.log('Login Result',result);
+      this.suscriptions.push(
+        this._globalService.Post("login", this.user).subscribe({
+          next: (result: any) => {
+            console.log("Login Result", result);
 
-          const { token, usuario } = result;
+            const { token, usuario } = result;
 
-          if (usuario && usuario.changedPassword === false) {
-            this.loaderComponent.hide();
-            this.toastMessage = "Por favor, cambie su contraseña.";
-            this.setOpenedToast(true);
-
-            //Preguntar si se redirige a la página de cambio de contraseña
-            this.questRedirect(usuario.id);
-            return;
-          }
-
-          if (token) {
-            //Eliminar todas las cookies
-            this._cookieService.deleteAll();
-            this._cookieService.set(
-              "tokensession",
-              result.token,
-              key.TOKEN_EXPIRATION_TIME,
-              ""
-            );
-
-            // Usar el AuthService para almacenar la información del usuario
-            this._authService.setUserInfo(result.usuario);
-
-            this.toastMessage = "Bienvenido " + this.user.identificator;
-            this.setOpenedToast(true);
-            setTimeout(() => {
+            if (usuario && usuario.changedPassword === false) {
               this.loaderComponent.hide();
-              this._router.navigate(["/layout"]);
-            }, 2000);
-          } else {
+              this.toastMessage = "Por favor, cambie su contraseña.";
+              this.setOpenedToast(true);
+
+              //Preguntar si se redirige a la página de cambio de contraseña
+              this.questRedirect(usuario.id);
+              return;
+            }
+
+            if (token) {
+              //Eliminar todas las cookies
+              this._cookieService.delete("tokensession");
+              this._cookieService.set(
+                "tokensession",
+                result.token,
+                key.TOKEN_EXPIRATION_TIME,
+                ""
+              );
+
+              // Usar el AuthService para almacenar la información del usuario
+              this._authService.setUserInfo(result.usuario);
+
+              this.toastMessage = "Bienvenido " + this.user.identificator;
+              this.setOpenedToast(true);
+              setTimeout(() => {
+                this.loaderComponent.hide();
+                this._router.navigate(["/layout"]);
+              }, 2000);
+            } else {
+              this.loaderComponent.hide();
+              this.toastMessage = "Usuario o contraseña incorrectos.";
+              this.setOpenedToast(true);
+            }
+          },
+          error: (error: any) => {
+            console.error(error);
             this.loaderComponent.hide();
-            this.toastMessage = "Usuario o contraseña incorrectos.";
+            this.toastMessage = "Error al iniciar sesión";
             this.setOpenedToast(true);
-          }
-        },
-        error: (error: any) => {
-          console.error(error);
-          this.loaderComponent.hide();
-          this.toastMessage = "Error al iniciar sesión";
-          this.setOpenedToast(true);
-        },
-      });
+          },
+        })
+      );
     } else {
       this.toastMessage = "Por favor, corrija los errores en el formulario.";
       this.setOpenedToast(true);

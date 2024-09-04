@@ -84,7 +84,7 @@ export class NavbarComponent implements OnInit {
   logout() {
     console.log("logout");
     //Eliminar las cookies
-    this._cookieService.deleteAll();
+    this._cookieService.delete('tokensession');
     this.router.navigate(["/login"]);
   }
 }

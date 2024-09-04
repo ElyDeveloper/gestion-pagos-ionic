@@ -1,4 +1,12 @@
-import { Component, inject, OnInit, ViewChild, OnDestroy } from "@angular/core";
+import {
+  Component,
+  inject,
+  OnInit,
+  ViewChild,
+  OnDestroy,
+  EventEmitter,
+  Output,
+} from "@angular/core";
 import { FormBuilder, FormGroup } from "@angular/forms";
 import { ActivatedRoute } from "@angular/router";
 import { FileUploader } from "ng2-file-upload";
@@ -26,6 +34,8 @@ export class GestionPagoPage implements OnInit {
     | UploaderComponent
     | undefined;
 
+  @Output() changeView: EventEmitter<void> = new EventEmitter();
+
   elements: FechasPagos[] = [];
   columnsData: Column[] = [];
 
@@ -38,10 +48,12 @@ export class GestionPagoPage implements OnInit {
   hasMora = false;
   isEditar = false;
   existContrato = false;
+  isPrint = false;
 
   isToastOpen = false;
   toastMessage: string = "cliente guardado correctamente";
   toastColor: string = "primary";
+  textLoader: string = "primary";
 
   idPrestamoUrl: string = "primary";
 
@@ -70,6 +82,65 @@ export class GestionPagoPage implements OnInit {
   }
 
   ngOnInit(): void {}
+
+  printSection() {
+    this.textLoader = "Importando...";
+    this.isPrint = true;
+    this.changeViewState();
+    this.loaderComponent.show();
+    //Esperar 1 segundo para que se muestre el loader
+    setTimeout(() => {
+      this.loaderComponent.hide();
+
+      var contentToPrint = document.getElementById(
+        "contentToPrint"
+      ) as HTMLElement;
+
+      //Verificar si hay contenido para imprimir
+      if (!contentToPrint) {
+        this.isPrint = false;
+        this.changeViewState();
+        return;
+      }
+
+      // Ocultar la URL del documento durante la impresión
+      const style = document.createElement("style");
+      style.innerHTML = `
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+  
+      @media print {
+        @page { margin-bottom: 0; margin-top: 0; }
+        body::after { content: none !important;
+      }
+    `;
+
+      // contentToPrint.innerHTML = contentToPrint.innerHTML;
+      contentToPrint.appendChild(style);
+
+      // var contentToPrint = document.getElementById('contentToPrint').innerHTML;
+      // document.body.innerHTML = contentToPrint.innerHTML;
+
+      //Esperar a que se cargue la imagen
+      setTimeout(() => {
+        // Imprimir el contenido
+        window.print();
+        //Eliminar los estilos
+        contentToPrint.removeChild(style);
+        this.isPrint = false;
+        console.log("Valor isPrint desde RangePicker: ", this.isPrint);
+        this.changeViewState();
+        console.log("Se ha restablecido el componente...");
+        // window.location.reload();
+      }, 3000);
+    }, 1000);
+  }
+
+  changeViewState() {
+    this.changeView.emit();
+  }
 
   setOpenedToast(value: boolean) {
     this.isToastOpen = value;

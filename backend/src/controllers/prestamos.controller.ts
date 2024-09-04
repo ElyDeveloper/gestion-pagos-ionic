@@ -196,7 +196,7 @@ export class PrestamosController {
 
       const clients = usuariosCliente
         .map((uc: any) => {
-          const ucC = uc?.Cliente;
+          const ucC = uc?.cliente;
           console.log('Cliente encontrado: ', ucC);
           return ucC;
         })
