@@ -53,10 +53,10 @@ export class PersonasPage implements OnInit {
 
   isModalOpen = false;
   isModalOpenX = false;
-  isToastOpen = false;
   isEdit = false;
-
+  
   textLoader: string = "Cargando...";
+  isToastOpen = false;
   toastMessage: string = "cliente guardado correctamente";
   toastColor: string = "primary";
   title: string = "Todos";

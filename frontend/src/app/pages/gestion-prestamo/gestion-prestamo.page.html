@@ -1,5 +1,11 @@
 <ion-content [fullscreen]="true">
   <app-breadcrumb></app-breadcrumb>
+  <ion-toast
+  [isOpen]="isToastOpen"
+  message="{{toastMessage}}"
+  [duration]="5000"
+  [color]="toastColor"
+  (didDismiss)="setOpenedToast(false)"></ion-toast>
   <ion-card>
     <ion-card-content>
       <div

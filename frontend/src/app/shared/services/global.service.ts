@@ -79,18 +79,17 @@ export class GlobalService {
     return this._http.post(`${API_URL}${endPoint}`, formData);
   }
 
-  PutWithFile(
-    endPoint: string,
-    dataSend: any,
-    selectedFile?: File
-  ) {
+  PutWithFile(endPoint: string, dataSend: any, selectedFile?: File) {
     const formData = new FormData();
     formData.append("data", JSON.stringify(dataSend));
     // Añadir el archivo si existe
     if (selectedFile) {
       formData.append("file", selectedFile, selectedFile.name);
     }
-    return this._http.put(`${API_URL}${endPoint}`, formData);
+
+    console.log("Data a enviar en acualizacion: ", dataSend);
+
+    return this._http.patch(`${API_URL}${endPoint}`, formData);
   }
 
   PutId(endPoint: string, Id: number, body: any) {

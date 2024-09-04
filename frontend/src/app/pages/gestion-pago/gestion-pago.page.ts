@@ -39,6 +39,12 @@ export class GestionPagoPage implements OnInit {
   isEditar = false;
   existContrato = false;
 
+  isToastOpen = false;
+  toastMessage: string = "cliente guardado correctamente";
+  toastColor: string = "primary";
+
+  fileUrl: string = "";
+
   mora = 0;
   daysLate = 0;
 
@@ -58,6 +64,10 @@ export class GestionPagoPage implements OnInit {
   }
 
   ngOnInit(): void {}
+
+  setOpenedToast(value: boolean) {
+    this.isToastOpen = value;
+  }
 
   verifyExistContract() {
     this.suscriptions.push(
@@ -90,6 +100,20 @@ export class GestionPagoPage implements OnInit {
     this.suscriptions.forEach((sub) => sub.unsubscribe());
   }
 
+  getFileIfExist(idPago: number) {
+    this.globalService.GetId("documentos/by-fecha-pago", idPago).subscribe({
+      next: (response: any) => {
+        console.log("Respuesta del Servidor: ", response);
+        if (response) {
+          this.fileUrl = response.urlDocumento;
+        }
+      },
+      error: (error) => {
+        console.error("Error en el Servidor: ", error);
+      },
+    });
+  }
+
   save(data: any): void {
     if (data.estado === true) {
       console.log("Modo Edicion");
@@ -112,11 +136,19 @@ export class GestionPagoPage implements OnInit {
         next: (response) => {
           console.log("Respuesta del Servidor: ", response);
           this.getFechasPago(this.prestamoSeleccionado);
+          this.uploaderComponent?.uploader?.clearQueue();
+
           // TODO: Mostrar mensaje de éxito
+          this.toastColor = "success";
+          this.toastMessage = "Pago guardado correctamente";
+          this.isToastOpen = true;
         },
         error: (error) => {
           console.error("Error en el Servidor: ", error);
           // TODO: Mostrar mensaje de error
+          this.toastColor = "danger";
+          this.toastMessage = "Error al guardar el pago";
+          this.isToastOpen = true;
         },
       });
     }
@@ -125,11 +157,20 @@ export class GestionPagoPage implements OnInit {
         next: (response) => {
           console.log("Respuesta del Servidor: ", response);
           this.getFechasPago(this.prestamoSeleccionado);
+          this.uploaderComponent?.uploader?.clearQueue();
+
           // TODO: Mostrar mensaje de éxito
+          this.toastColor = "success";
+          this.toastMessage = "Pago modificado correctamente";
+          this.isToastOpen = true;
         },
         error: (error) => {
           console.error("Error en el Servidor: ", error);
+
           // TODO: Mostrar mensaje de error
+          this.toastColor = "danger";
+          this.toastMessage = "Error al modificar el pago";
+          this.isToastOpen = true;
         },
       });
     }
@@ -249,6 +290,8 @@ export class GestionPagoPage implements OnInit {
   onselectButtonClicked(data: any): void {
     console.log("Elemento seleccionado:", data);
     this.pagoSeleccionado = data;
+
+    this.getFileIfExist(data.id);
 
     const fechaPagar = new Date();
     fechaPagar.setHours(0, 0, 0, 0);

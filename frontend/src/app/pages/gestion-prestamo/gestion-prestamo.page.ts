@@ -57,6 +57,9 @@ export class GestionPrestamoPage implements OnInit {
   isEdit = false;
   hasAval = false;
 
+  toastMessage: string = "cliente guardado correctamente";
+  toastColor: string = "primary";
+
   searchClient: string = "";
   searchAval: string = "";
   searchTermClient$ = new Subject<string>();
@@ -81,6 +84,10 @@ export class GestionPrestamoPage implements OnInit {
     this.initSearcherAval();
     this.getInfoSelects();
     this.getPrestamo();
+  }
+
+  setOpenedToast(value: boolean) {
+    this.isToastOpen = value;
   }
 
   getPrestamo() {

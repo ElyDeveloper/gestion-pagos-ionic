@@ -152,7 +152,7 @@ export class CheckPrestamosController {
 
           //INFO INSERTAR EN PAGOS
           const pago = await this.pagosRepository.create({
-            estado: estado,
+            estado: true,
             fechaPago: new Date(fechaPago).toISOString(),
             monto: monto,
             idFechaPago: idFechaPago,
@@ -188,150 +188,173 @@ export class CheckPrestamosController {
 
   // Crear fechas de pagos
   @post('/check-prestamos/crear-fechas-pagos')
-async createFechasPagos(
-  @requestBody({
-    content: {
-      'application/json': {
-        schema: {
-          type: 'object',
-          properties: {
-            idPrestamo: {type: 'string'},
-            planId: {type: 'number'},
-            estado: {type: 'boolean'},
-            cuota: {type: 'number'},
-            fechaInicio: {type: 'string'},
-            periodoCobro: {type: 'number'},
-            numeroCuotas: {type: 'number'},
-            idEstadoAprobacion: {type: 'number'},
+  async createFechasPagos(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            properties: {
+              idPrestamo: {type: 'string'},
+              planId: {type: 'number'},
+              estado: {type: 'boolean'},
+              cuota: {type: 'number'},
+              fechaInicio: {type: 'string'},
+              periodoCobro: {type: 'number'},
+              numeroCuotas: {type: 'number'},
+              idEstadoAprobacion: {type: 'number'},
+            },
           },
         },
       },
+    })
+    datos: {
+      idPrestamo: string;
+      planId: number;
+      estado: boolean;
+      monto: number;
+      fechaInicio: string;
+      periodoCobro: number;
+      numeroCuotas: number;
+      idEstadoAprobacion: number;
     },
-  })
-  datos: {
-    idPrestamo: string;
-    planId: number;
-    estado: boolean;
-    monto: number;
-    fechaInicio: string;
-    periodoCobro: number;
-    numeroCuotas: number;
-    idEstadoAprobacion: number;
-  },
-): Promise<any> {
-  const {
-    idPrestamo,
-    planId,
-    monto,
-    fechaInicio,
-    periodoCobro,
-    numeroCuotas,
-    idEstadoAprobacion,
-  } = datos;
+  ): Promise<any> {
+    const {
+      idPrestamo,
+      planId,
+      monto,
+      fechaInicio,
+      periodoCobro,
+      numeroCuotas,
+      idEstadoAprobacion,
+    } = datos;
 
-  await this.validateExistingPayments(planId);
+    await this.validateExistingPayments(planId);
 
-  const prestamoId = this.jwtService.decryptId(idPrestamo);
-  const fechasPagos = this.generatePaymentDates(fechaInicio, periodoCobro, numeroCuotas, monto, planId);
-  const latestDate = this.getLatestPaymentDate(fechasPagos);
+    const prestamoId = this.jwtService.decryptId(idPrestamo);
+    const fechasPagos = this.generatePaymentDates(
+      fechaInicio,
+      periodoCobro,
+      numeroCuotas,
+      monto,
+      planId,
+    );
+    const latestDate = this.getLatestPaymentDate(fechasPagos);
 
-  await this.updatePlanAndLoan(planId, prestamoId, fechaInicio, latestDate, idEstadoAprobacion);
+    await this.updatePlanAndLoan(
+      planId,
+      prestamoId,
+      fechaInicio,
+      latestDate,
+      idEstadoAprobacion,
+    );
 
-  return this.saveOrUpdatePaymentDates(planId, fechasPagos);
-}
-
-private async validateExistingPayments(planId: number): Promise<void> {
-  const historialPagos = await this.fechasPagosRepository.find({
-    where: {planId, estado: true},
-  });
-
-  if (historialPagos.length !== 0) {
-    throw new HttpErrors.Conflict('Ya existe pago registrado para este plan.');
-  }
-}
-
-private generatePaymentDates(
-  fechaInicio: string,
-  periodoCobro: number,
-  numeroCuotas: number,
-  monto: number,
-  planId: number
-): Array<{planId: number; estado: boolean; monto: number; fechaPago: Date}> {
-  let fechaActual = new Date(fechaInicio);
-  const fechasPagos = [];
-
-  for (let i = 0; i < numeroCuotas; i++) {
-    fechaActual = this.incrementDate(fechaActual, periodoCobro);
-    const fechaPago = new Date(fechaActual);
-    fechasPagos.push({planId, estado: false, monto, fechaPago});
+    return this.saveOrUpdatePaymentDates(planId, fechasPagos);
   }
 
-  return fechasPagos;
-}
+  private async validateExistingPayments(planId: number): Promise<void> {
+    const historialPagos = await this.fechasPagosRepository.find({
+      where: {planId, estado: true},
+    });
 
-private incrementDate(date: Date, periodoCobro: number): Date {
-  const newDate = new Date(date);
-  switch (periodoCobro) {
-    case 1:
-      newDate.setDate(newDate.getDate() + 7);
-      break;
-    case 2:
-      newDate.setDate(newDate.getDate() + 15);
-      break;
-    case 3:
-      newDate.setMonth(newDate.getMonth() + 1);
-      break;
-    default:
-      throw new Error('Periodo de Cobro no válido');
+    if (historialPagos.length !== 0) {
+      throw new HttpErrors.Conflict(
+        'Ya existe pago registrado para este plan.',
+      );
+    }
   }
-  return newDate;
-}
 
-private getLatestPaymentDate(fechasPagos: Array<{fechaPago: Date}>): string | undefined {
-  return fechasPagos.length > 0
-    ? fechasPagos[fechasPagos.length - 1].fechaPago.toISOString()
-    : undefined;
-}
+  private generatePaymentDates(
+    fechaInicio: string,
+    periodoCobro: number,
+    numeroCuotas: number,
+    monto: number,
+    planId: number,
+  ): Array<{planId: number; estado: boolean; monto: number; fechaPago: Date}> {
+    let fechaActual = new Date(fechaInicio);
+    const fechasPagos = [];
 
-private async updatePlanAndLoan(
-  planId: number,
-  prestamoId: number,
-  fechaInicio: string,
-  latestDate: string | undefined,
-  idEstadoAprobacion: number
-): Promise<void> {
-  await this.planesPagoRepository.updateById(planId, {
-    fechaInicio,
-    fechaFin: latestDate,
-  });
+    for (let i = 0; i < numeroCuotas; i++) {
+      fechaActual = this.incrementDate(fechaActual, periodoCobro);
+      const fechaPago = new Date(fechaActual);
+      fechasPagos.push({planId, estado: false, monto, fechaPago});
+    }
 
-  await this.prestamosRepository.updateById(prestamoId, {
-    idEstadoAprobacion,
-    fechaAprobacion: new Date().toISOString(),
-  });
-}
-
-private async saveOrUpdatePaymentDates(
-  planId: number,
-  fechasPagos: Array<{planId: number; estado: boolean; monto: number; fechaPago: Date}>
-): Promise<any> {
-  const fechasPagosData: DataObject<FechasPagos>[] = fechasPagos.map(fp => ({
-    ...fp,
-    fechaPago: fp.fechaPago.toISOString(),
-  }));
-
-  const existeHistorial = await this.fechasPagosRepository.count({where: {planId}});
-
-  if (existeHistorial.count === 0) {
-    return this.fechasPagosRepository.createAll(fechasPagosData);
-  } else {
-    await this.fechasPagosRepository.deleteAll({planId});
-    return this.fechasPagosRepository.createAll(fechasPagosData);
+    return fechasPagos;
   }
-}
+
+  private incrementDate(date: Date, periodoCobro: number): Date {
+    const newDate = new Date(date);
+    switch (periodoCobro) {
+      case 1:
+        newDate.setDate(newDate.getDate() + 7);
+        break;
+      case 2:
+        newDate.setDate(newDate.getDate() + 15);
+        break;
+      case 3:
+        newDate.setMonth(newDate.getMonth() + 1);
+        break;
+      default:
+        throw new Error('Periodo de Cobro no válido');
+    }
+    return newDate;
+  }
+
+  private getLatestPaymentDate(
+    fechasPagos: Array<{fechaPago: Date}>,
+  ): string | undefined {
+    return fechasPagos.length > 0
+      ? fechasPagos[fechasPagos.length - 1].fechaPago.toISOString()
+      : undefined;
+  }
+
+  private async updatePlanAndLoan(
+    planId: number,
+    prestamoId: number,
+    fechaInicio: string,
+    latestDate: string | undefined,
+    idEstadoAprobacion: number,
+  ): Promise<void> {
+    await this.planesPagoRepository.updateById(planId, {
+      fechaInicio,
+      fechaFin: latestDate,
+    });
+
+    await this.prestamosRepository.updateById(prestamoId, {
+      idEstadoAprobacion,
+      fechaAprobacion: new Date().toISOString(),
+    });
+  }
+
+  private async saveOrUpdatePaymentDates(
+    planId: number,
+    fechasPagos: Array<{
+      planId: number;
+      estado: boolean;
+      monto: number;
+      fechaPago: Date;
+    }>,
+  ): Promise<any> {
+    const fechasPagosData: DataObject<FechasPagos>[] = fechasPagos.map(fp => ({
+      ...fp,
+      fechaPago: fp.fechaPago.toISOString(),
+    }));
+
+    const existeHistorial = await this.fechasPagosRepository.count({
+      where: {planId},
+    });
+
+    if (existeHistorial.count === 0) {
+      return this.fechasPagosRepository.createAll(fechasPagosData);
+    } else {
+      await this.fechasPagosRepository.deleteAll({planId});
+      return this.fechasPagosRepository.createAll(fechasPagosData);
+    }
+  }
 
   //Modificar la url del archivo
-  @patch('/pagos/updateFile/{id}', {
+  @patch('/pagos/updateFile', {
     responses: {
       '204': {
         description: 'Pago PATCH success',
@@ -339,7 +362,6 @@ private async saveOrUpdatePaymentDates(
     },
   })
   async updatePagoFile(
-    @param.path.number('id') idDocumento: number,
     @requestBody({
       content: {
         'multipart/form-data': {
@@ -347,8 +369,7 @@ private async saveOrUpdatePaymentDates(
           schema: {
             type: 'object',
             properties: {
-              idPago: {type: 'number'},
-              fechaPago: {type: 'string'},
+              data: {type: 'string'},
               file: {type: 'string', format: 'binary'},
             },
           },
@@ -365,27 +386,44 @@ private async saveOrUpdatePaymentDates(
         }
 
         try {
+          const dataSend = JSON.parse(req.body.data);
+          const {fechaPago, idFechaPago} = dataSend;
           const file = req.file;
-          const {fechaPago} = req.body;
-          const idPago = req.body.idPago;
+
+          const pago = await this.pagosRepository.findOne({
+            where: {idFechaPago},
+          });
+
+          console.log('Archivo cargado:', file);
+          console.log('Fecha de pago:', new Date(fechaPago));
+          console.log('Pago:', pago);
+
+          const documento = await this.documentosRepository.findOne({
+            where: {idDocumento: pago?.id},
+          });
+
           //Actualizar la fechaPago de la tabla Pagos
-          if (fechaPago != undefined && idPago != undefined) {
-            await this.pagosRepository.updateById(idPago, {
+          if (fechaPago != undefined && pago?.id != undefined) {
+            await this.pagosRepository.updateById(pago?.id, {
               fechaPago: new Date(fechaPago).toISOString(),
             });
           }
 
           //Actualizar el campo UrlDocumento en la tabla documentos si esta presente
           if (file !== undefined) {
-            await this.documentosRepository.updateById(idDocumento, {
-              urlDocumento: file ? file.path : undefined,
+            await this.documentosRepository.updateById(documento?.id, {
+              urlDocumento: file ? file?.path : undefined,
               fechaSubida: new Date().toISOString(),
             });
 
             resolve({
               message: 'Archivo cargado y datos guardados exitosamente.',
-              filename: file ? file.filename : null,
-              path: file ? file.path : null,
+              filename: file ? file?.filename : null,
+              path: file ? file?.path : null,
+            });
+          } else {
+            resolve({
+              message: 'Archivo no cargado. Datos guardados exitosamente.',
             });
           }
         } catch (error) {

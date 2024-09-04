@@ -1,6 +1,11 @@
 <ion-content [fullscreen]="true">
   <app-breadcrumb></app-breadcrumb>
-
+  <ion-toast
+    [isOpen]="isToastOpen"
+    message="{{toastMessage}}"
+    [duration]="5000"
+    [color]="toastColor"
+    (didDismiss)="setOpenedToast(false)"></ion-toast>
   <ion-card id="pago-form">
     <ion-card-content>
       <div
@@ -108,6 +113,15 @@
                 <ion-label>
                   Dias de retraso:
                   <ion-text color="danger">{{ daysLate }}</ion-text>
+                </ion-label>
+                } @if(fileUrl!==''){
+                <ion-label>
+                  Archivo adjunto:
+                  <ion-text class="poin" color="success"
+                    ><a routerLink="/layout/view-file/{{fileUrl}}"
+                      >{{fileUrl.substring(fileUrl.lastIndexOf('/') + 1)}}</a
+                    ></ion-text
+                  >
                 </ion-label>
                 }
               </div>

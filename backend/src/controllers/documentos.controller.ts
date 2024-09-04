@@ -18,15 +18,19 @@ import {
   response,
 } from '@loopback/rest';
 import {Documentos} from '../models';
-import {DocumentosRepository} from '../repositories';
-import { authenticate } from '@loopback/authentication';
-
+import {
+  DocumentosRepository,
+  DocumentosTipoDocRepository,
+} from '../repositories';
+import {authenticate} from '@loopback/authentication';
 
 // @authenticate('jwt')
 export class DocumentosController {
   constructor(
+    @repository(DocumentosTipoDocRepository)
+    public documentosTipoDocRepository: DocumentosTipoDocRepository,
     @repository(DocumentosRepository)
-    public documentosRepository : DocumentosRepository,
+    public documentosRepository: DocumentosRepository,
   ) {}
 
   @post('/documentos')
@@ -40,7 +44,6 @@ export class DocumentosController {
         'application/json': {
           schema: getModelSchemaRef(Documentos, {
             title: 'NewDocumentos',
-            
           }),
         },
       },
@@ -75,10 +78,30 @@ export class DocumentosController {
   })
   async find(): Promise<Documentos[]> {
     return this.documentosRepository.find({
-      include: [{relation: 'documentosTipoDoc'}]
+      include: [{relation: 'documentosTipoDoc'}],
     });
   }
 
+  @get('/documentos/by-fecha-pago/{id}')
+  @response(200, {
+    description: 'Documentos model instance',
+    content: {
+      'application/json': {
+        schema: getModelSchemaRef(Documentos, {includeRelations: true}),
+      },
+    },
+  })
+  async findByIdFechaPago(@param.path.number('id') id: number): Promise<any> {
+    const docTipoDoc = await this.documentosTipoDocRepository.findOne({
+      where: {idDocumento: id},
+    });
+
+    const documento = await this.documentosRepository.findOne({
+      where: {idDocTipDoc: docTipoDoc?.id},
+    });
+
+    return documento;
+  }
 
   @get('/documentos/paginated')
   @response(200, {
@@ -88,9 +111,9 @@ export class DocumentosController {
         schema: {
           type: 'array',
           items: getModelSchemaRef(Documentos, {includeRelations: true}),
-        }
+        },
       },
-    }
+    },
   })
   async findPaginated(
     @param.query.number('skip') skip: number,
@@ -99,7 +122,7 @@ export class DocumentosController {
     return this.documentosRepository.find({
       include: [{relation: 'documentosTipoDoc'}],
       skip,
-      limit
+      limit,
     });
   }
 
@@ -131,12 +154,10 @@ export class DocumentosController {
       },
     },
   })
-  async findById(
-    @param.path.number('id') id: number
-  ): Promise<Documentos> {
-    return this.documentosRepository.findById(id, 
-      {include: [{relation: 'documentosTipoDoc'}]}
-    );
+  async findById(@param.path.number('id') id: number): Promise<Documentos> {
+    return this.documentosRepository.findById(id, {
+      include: [{relation: 'documentosTipoDoc'}],
+    });
   }
 
   @patch('/documentos/{id}')

@@ -40,6 +40,10 @@ const routes: Routes = [
           import("./pagos/pagos.module").then((m) => m.PagosPageModule),
       },
       {
+        path: 'view-file/:url',
+        loadChildren: () => import('./view-files/view-files.module').then( m => m.ViewFilesPageModule)
+      },
+      {
         path: "reportes-pagos",
         loadChildren: () =>
           import("./reportes-pagos/reportes-pagos.module").then(
@@ -89,6 +93,8 @@ const routes: Routes = [
       },
     ],
   },
+  
+
 ];
 
 @NgModule({
