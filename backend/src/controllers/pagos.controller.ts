@@ -10,6 +10,7 @@ import {
   del,
   get,
   getModelSchemaRef,
+  HttpErrors,
   param,
   patch,
   post,
@@ -22,14 +23,20 @@ import {Pagos} from '../models/pagos.model';
 import {authenticate} from '@loopback/authentication';
 import {Documentos, DocumentosTipoDoc} from '../models';
 import {ContratosPagoRepository} from '../repositories/contratos-pago.repository';
-import { DocumentosRepository, DocumentosTipoDocRepository, PagosRepository } from '../repositories';
+import {
+  DocumentosRepository,
+  DocumentosTipoDocRepository,
+  FechasPagosRepository,
+  PagosRepository,
+} from '../repositories';
 
 @authenticate('jwt')
 export class PagosController {
   constructor(
-    
     @repository(PagosRepository)
     public pagosRepository: PagosRepository,
+    @repository(FechasPagosRepository)
+    public fechasPagosRepository: FechasPagosRepository,
     @repository(DocumentosRepository)
     public documentosRepository: DocumentosRepository,
     @repository(DocumentosTipoDocRepository)
@@ -193,6 +200,47 @@ export class PagosController {
     description: 'Pagos DELETE success',
   })
   async deleteById(@param.path.number('id') id: number): Promise<void> {
+    const pago = await this.pagosRepository.findById(id);
+    if (!pago) {
+      throw new HttpErrors.NotFound(`No se encontró el pago con id=${id}`);
+    }
+
+    //Eliminar mora por idFechaPago
+    const mora = await this.documentosRepository.findOne({
+      where: {
+        idFechaPago: pago.idFechaPago,
+      },
+    });
+
+    if (mora) {
+      await this.documentosRepository.deleteById(mora.id);
+    }
+
+    await this.fechasPagosRepository.updateById(pago.idFechaPago, {
+      estado: false,
+    });
+
+    const documentoTipoDoc = await this.documentosTipoDocRepository.findOne({
+      where: {
+        idDocumento: pago.id,
+      },
+    });
+
+    if (documentoTipoDoc) {
+      
+      const documento = await this.documentosRepository.findOne({
+        where: {
+          idDocTipDoc: documentoTipoDoc.id,
+        },
+      });
+      
+      if (documento) {
+        await this.documentosRepository.deleteById(documento.id);
+      }
+
+      await this.documentosTipoDocRepository.deleteById(documentoTipoDoc.id);
+    }
+
     await this.pagosRepository.deleteById(id);
   }
 

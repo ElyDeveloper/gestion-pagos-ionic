@@ -232,11 +232,15 @@ export class UserController {
     @param.path.number('id') id: number,
     @requestBody() usuario: Usuario,
   ): Promise<void> {
+
+    const usuarioLocate = await this.usuarioRepository.findById(id);
     const credenciales = await this.credencialesRepository.findOne({
       where: {
-        correo: usuario.correo,
+        correo: usuarioLocate.correo,
       },
     });
+
+    console.log('credenciales: ', credenciales);
 
     if (credenciales) {
       await this.credencialesRepository.updateById(credenciales.id, {

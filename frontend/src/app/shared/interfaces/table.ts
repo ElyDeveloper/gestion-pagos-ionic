@@ -22,7 +22,8 @@ export interface Column {
   addText?: (value1: any, value2: any) => string; //
   options?: string[];
   colorOptions?: string[];
-  imageUrl?: string; // Nueva propiedad para
+  imageUrl?: string;
+  propsVisibles?: string[]; // Nueva propiedad para
 }
 
 export interface Row {

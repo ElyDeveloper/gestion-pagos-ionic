@@ -109,7 +109,7 @@ export class PersonasController {
   ): Promise<Count> {
     console.log('Usuario Logueado: ', currentUser);
     const userId = parseInt(currentUser[securityId], 10);
-    console.log('Id de Usuario Logueado: ', userId);
+    console.log('Id de Usuario Logueado en Clientes: ', userId);
 
     const user = await this.usuarioRepository.findById(userId);
     if (!user) {
@@ -119,7 +119,7 @@ export class PersonasController {
 
     if (user.rolid === 3) {
       return this.usuarioClienteRepository.count({
-        where: {usuarioId: userId, estado: true},
+        usuarioId: userId,
       });
     }
     return this.personasRepository.count({
@@ -193,7 +193,7 @@ export class PersonasController {
         where: {usuarioId: userId, estado: true},
         include: [
           {
-            relation: 'Cliente',
+            relation: 'cliente',
             scope: {
               where: {estado: true},
               include: [
@@ -401,7 +401,7 @@ export class PersonasController {
       where: {
         clienteId: idDecrypted,
       },
-      include: ['Usuario'],
+      include: ['usuario'],
     });
   }
 

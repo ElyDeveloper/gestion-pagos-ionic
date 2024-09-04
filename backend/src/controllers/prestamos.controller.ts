@@ -25,13 +25,19 @@ import {authenticate} from '@loopback/authentication';
 import {inject, service} from '@loopback/core';
 import {JWTService} from '../services';
 import {SecurityBindings, securityId, UserProfile} from '@loopback/security';
-import {UsuarioClienteRepository, UsuarioRepository} from '../repositories';
+import {
+  PersonasRepository,
+  UsuarioClienteRepository,
+  UsuarioRepository,
+} from '../repositories';
 
 // @authenticate('jwt')
 export class PrestamosController {
   constructor(
     @repository(UsuarioClienteRepository)
     public usuarioClienteRepository: UsuarioClienteRepository,
+    @repository(PersonasRepository)
+    public personasRepository: PersonasRepository,
     @repository(UsuarioRepository)
     public usuarioRepository: UsuarioRepository,
     @repository(PrestamosRepository)
@@ -70,8 +76,37 @@ export class PrestamosController {
     content: {'application/json': {schema: CountSchema}},
   })
   async count(
+    @inject(SecurityBindings.USER)
+    currentUser: UserProfile,
     @param.where(Prestamos) where?: Where<Prestamos>,
   ): Promise<Count> {
+    const userId = parseInt(currentUser[securityId], 10);
+
+    const user = await this.usuarioRepository.findById(userId);
+    if (!user) {
+      throw new HttpErrors.Unauthorized('Usuario no encontrado');
+    }
+
+    console.log('Usuario Logueado en prestamos: ', user);
+
+    if (user.rolid === 3) {
+      console.log('Consultando prestamos de todos los clientes');
+      const usuariosClientes = await this.usuarioClienteRepository.find({
+        where: {
+          usuarioId: userId,
+        },
+        include: ['cliente'],
+      });
+
+      console.log('Clientes del Usuario Logueado: ', usuariosClientes);
+      const idsClientes = usuariosClientes.map(u => u.clienteId);
+      console.log('Ids de Clientes del Usuario Logueado: ', idsClientes);
+      return this.prestamosRepository.count({
+        idCliente: {inq: idsClientes},
+        estado: true,
+      });
+    }
+
     return this.prestamosRepository.count({
       estado: true,
     });
@@ -140,7 +175,7 @@ export class PrestamosController {
         where: {usuarioId: userId, estado: true},
         include: [
           {
-            relation: 'Cliente',
+            relation: 'cliente',
             scope: {
               where: {estado: true},
               include: [
@@ -260,9 +295,7 @@ export class PrestamosController {
     },
   })
   async findById(@param.path.string('id') id: string): Promise<Prestamos> {
-    console.log('Id Encrypted: ', id);
     const idDecrypted = this.jwtService.decryptId(id);
-    console.log('Id Decrypted: ', idDecrypted);
     return this.prestamosRepository.findById(idDecrypted, {
       include: [
         {
@@ -320,8 +353,6 @@ export class PrestamosController {
       prestamos.idAval = this.jwtService.decryptId(prestamos.idAval);
     }
 
-    console.log('Prestamo: ', prestamos);
-
     await this.prestamosRepository.replaceById(id, prestamos);
   }
 
@@ -338,25 +369,75 @@ export class PrestamosController {
 
   @get('/prestamos/search')
   async dataPrestamosSearch(
+    @inject(SecurityBindings.USER)
+    currentUser: UserProfile,
     @param.query.string('query') search: string,
-  ): Promise<any> {
-    let PrestamosSearch = await this.prestamosRepository.find({
+  ): Promise<Prestamos[]> {
+    const userId = parseInt(currentUser[securityId], 10);
+    const user = await this.usuarioRepository.findById(userId);
+    if (!user) {
+      throw new HttpErrors.Unauthorized('Usuario no encontrado');
+    }
+
+    let idsClientes: number[];
+    if (user.rolid === 3) {
+      const clientes = await this.personasRepository.find({
+        where: {
+          or: [
+            {nombres: {like: `%${search}%`}},
+            {apellidos: {like: `%${search}%`}},
+          ],
+        },
+      });
+      idsClientes = clientes.map(u => u.clienteId);
+    } else {
+      const clientes = await this.personasRepository.find({
+        where: {
+          idTipoPersona: 1,
+          or: [
+            {nombres: {like: `%${search}%`}},
+            {apellidos: {like: `%${search}%`}},
+            {dni: {like: `%${search}%`}},
+          ],
+        },
+      });
+      idsClientes = clientes
+        .map(u => u.id!)
+        .filter((id): id is number => id !== undefined);
+    }
+
+    console.log('Ids de Clientes: ', idsClientes);
+
+    const prestamos = await this.prestamosRepository.find({
+      where: {
+        and: [
+          {
+            idCliente: {
+              inq: idsClientes,
+            },
+          },
+          {estado: true},
+        ],
+      },
       include: [
         'cliente',
         'producto',
-        'periodo',
+        'periodoCobro',
         'estadoAprobacion',
         'planPago',
         'moneda',
         'aval',
       ],
-      where: {
-        or: [
-          {nombres: {like: `%${search}%`}},
-          {apellidos: {like: `%${search}%`}},
-        ],
-      },
     });
-    return PrestamosSearch;
+
+    // clonar array
+    const copia: any = Array.from(prestamos);
+
+    //encriptar id de prestamos con jwtService
+    copia.forEach((prestamo: any) => {
+      prestamo.id = this.jwtService.encryptId(prestamo.id || 0);
+    });
+
+    return copia;
   }
 }

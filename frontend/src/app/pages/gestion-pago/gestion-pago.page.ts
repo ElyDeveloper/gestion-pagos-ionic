@@ -43,6 +43,8 @@ export class GestionPagoPage implements OnInit {
   toastMessage: string = "cliente guardado correctamente";
   toastColor: string = "primary";
 
+  idPrestamoUrl: string = "primary";
+
   fileUrl: string = "";
 
   mora: number = 0;
@@ -154,6 +156,7 @@ export class GestionPagoPage implements OnInit {
     console.log("Archivo subido: ", file);
 
     data.idPrestamo = this.prestamoSeleccionado.id;
+    data.mora = this.mora;
 
     if (!this.isEditar) {
       this.globalService.PostWithFile("pagos/saveFile", data, file).subscribe({
@@ -217,7 +220,7 @@ export class GestionPagoPage implements OnInit {
 
   calculateMora(monto: number, daysLate: number): number {
     const moraForDay = Number(((PERCENTAGE / 30) * monto).toFixed(2));
-    console.log('Mora por dia: ', moraForDay);
+    console.log("Mora por dia: ", moraForDay);
     return Number((daysLate * moraForDay).toFixed(2));
   }
 
@@ -242,6 +245,7 @@ export class GestionPagoPage implements OnInit {
     this.suscriptions.push(
       this.route.paramMap.subscribe((params) => {
         const id = params.get("id");
+        this.idPrestamoUrl = id || "";
         if (id) {
           this.fetchPrestamo(id);
         } else {
@@ -285,8 +289,14 @@ export class GestionPagoPage implements OnInit {
         options: ["Pagado", "No Pagado"],
       },
       {
+        key: "pagos",
+        alias: "Pagos Realizados",
+        type: "array",
+        propsVisibles: ["fechaPago", "monto"],
+      },
+      {
         key: "verificacion",
-        alias: "Pago",
+        alias: "Pago Total",
         type: "options",
         options: ["Pendiente", "En Mora", "Al día"],
         colorOptions: ["warning", "danger", "success"],
@@ -302,6 +312,13 @@ export class GestionPagoPage implements OnInit {
             color: "primary",
             rolesAuthorized: [1, 2],
           },
+          // {
+          //   alias: "Pagos - ",
+          //   action: "info",
+          //   icon: "information",
+          //   color: "primary",
+          //   rolesAuthorized: [1, 2, 3],
+          // },
         ],
       },
     ];
@@ -315,95 +332,96 @@ export class GestionPagoPage implements OnInit {
   }
 
   onselectButtonClicked(data: any): void {
+    this.resetPaymentValues();
+    // console.log("Elemento seleccionado:", data);
+    this.pagoSeleccionado = data;
+
+    this.calculatePaymentDetails(data);
+    this.getFileIfExist(data.id);
+
+    this.hasMora = data.mora > 0;
+    this.mora = data.mora;
+    this.getMora(data.id);
+    this.daysLate = data.daysLate;
+
+    this.pagoForm.patchValue({
+      ...data,
+      fechaPago: this.getFormattedPaymentDate(),
+    });
+    this.scrollToElement("pago-form");
+  }
+
+  onDeleteButtonClicked(data: any) {
+    console.log("Elemento eliminado:", data);
+    this.globalService.Delete("pagos", data.id).subscribe({
+      next: () => {
+        this.toastColor = "success";
+        this.toastMessage = "Pago eliminado exitosamente.";
+        this.isToastOpen = true;
+        this.fetchPrestamo(this.idPrestamoUrl);
+      },
+      error: (error: any) => {
+        this.toastColor = "danger";
+        this.toastMessage = "Error al eliminar el pago.";
+        this.isToastOpen = true;
+        console.error("Error al eliminar el pago:", error);
+      },
+    });
+  }
+
+  private resetPaymentValues(): void {
     this.mora = 0;
     this.adeudoCuota = 0;
     this.adeudoMora = 0;
     this.adeudoTotal = 0;
     this.montoPagado = 0;
     this.daysLate = 0;
+  }
 
-    console.log("Elemento seleccionado:", data);
-    this.pagoSeleccionado = data;
+  private calculatePaymentDetails(data: any): void {
+    this.adeudoCuota = data.monto;
+    if (data?.pagos?.length > 0) {
+      const total = data.pagos.reduce(
+        (acc: number, current: any) => acc + current.monto,
+        0
+      );
+      this.montoPagado = total;
+      this.adeudoCuota = total >= data.monto ? 0 : data.monto - total;
+      // console.log("Total pagado:", total);
+    }
+  }
 
-    this.globalService.GetId("pagos/fecha-pago", data.id).subscribe({
-      next: (response: any) => {
-        console.log("Pagos realizado:", response);
-
-        this.adeudoCuota = data.monto;
-        if (response.length > 0) {
-          const total = response.reduce(
-            (acc: any, current: any) => acc + current.monto,
-            0
-          );
-
-          this.montoPagado = total;
-          if (total >= data.monto) {
-            this.adeudoCuota = 0;
-          } else {
-            this.adeudoCuota = data.monto - total;
-          }
-
-          console.log("Total pagado:", total);
-        }
-        // this.selectPago(response.id);
-        this.getFileIfExist(data.id);
-
-        const fechaPagar = new Date();
-        fechaPagar.setHours(0, 0, 0, 0);
-        const fechaPago = this.globalService.formatDateForInput(
-          fechaPagar.toISOString()
-        );
-
-        this.hasMora = data.mora > 0;
-        this.mora = data.mora;
-        this.getMora(data.id);
-        this.daysLate = data.daysLate;
-
-        this.pagoForm.patchValue({ ...data, fechaPago });
-
-        this.scrollToElement("pago-form");
-      },
-      error: (error: any) => {
-        console.error("Error al obtener el pago seleccionado:", error);
-      },
-    });
+  private getFormattedPaymentDate(): string {
+    return this.globalService.formatDateForInput(new Date().toISOString());
   }
 
   getMora(id: number): void {
     this.globalService.GetId("moras/fecha-pago", id).subscribe({
       next: (response: any) => {
-        console.log("Mora:", response);
-
-        if (response.length > 0) {
-          const total = response.reduce(
-            (acc: any, current: any) => acc + current.mora,
-            0
-          );
-          this.mora = total;
-        }
-
+        // console.log("Mora:", response);
+        this.mora = this.calculateTotalMora(response);
         this.calculateTotales();
       },
-      error: (error: any) => {
-        console.error("Error al obtener la mora:", error);
-      },
+      error: (error: any) => console.error("Error al obtener la mora:", error),
     });
   }
 
-  calculateTotales() {
+  private calculateTotalMora(moraData: any[]): number {
+    return moraData.reduce(
+      (acc: number, current: any) => acc + current.mora,
+      0
+    );
+  }
+
+  calculateTotales(): void {
     const diferencia = Math.abs(
       this.montoPagado - (this.mora + this.pagoSeleccionado.monto)
     );
-
-    if (this.montoPagado > this.pagoSeleccionado.monto) {
-      this.adeudoMora = diferencia;
-    } else {
-      this.adeudoMora = this.mora;
-    }
-
-    console.log("Diferencia:", diferencia);
-
+    this.adeudoMora =
+      this.montoPagado > this.pagoSeleccionado.monto ? diferencia : this.mora;
     this.adeudoTotal = diferencia;
+    // console.log("Diferencia:", diferencia);
+    this.pagoForm.get("monto")?.setValue(this.adeudoTotal.toFixed(2));
   }
 
   onUploaderChange(uploader: any): void {

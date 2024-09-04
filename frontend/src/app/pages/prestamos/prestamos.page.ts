@@ -538,6 +538,7 @@ export class PrestamosPage implements OnInit {
     this.currentPage = event;
     this.getElementsPag();
   }
+  
 
   onSearchData(event: any) {
     console.log("Evento de búsqueda:", event);

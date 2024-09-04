@@ -30,16 +30,6 @@
             </strong>
           </p>
         </div>
-        <div>
-          <button class="btn btn-success" routerLink="/layout/prestamos">
-            Ver Prestamos
-            <ion-icon class="ms-2" name="open-outline"></ion-icon>
-          </button>
-          <!-- <ion-button routerLink="/layout/prestamos">
-            Ver Prestamos
-            <ion-icon class="ms-2" name="open-outline"></ion-icon>
-          </ion-button> -->
-        </div>
       </div>
 
       <div
@@ -51,41 +41,15 @@
           primero.
         </p>
       </div>
-
-      <div
-        *ngIf="existContrato"
-        class="alert"
-        [ngClass]="{
-          'alert-warning': isWarningState(),
-          'alert-success': isSuccessState()
-        }"
-        role="alert">
-        <ul class="task-list">
-          <li [class.completed]="clienteSeleccionado?.id">
-            <span>* Selecciona un cliente</span>
-            @if (clienteSeleccionado?.id) {
-            <ion-icon name="checkmark-done-outline" color="success"></ion-icon>
-            } @else {
-            <ion-icon name="close-outline" color="danger"></ion-icon>
-            }
-          </li>
-          <li [class.completed]="pagoSeleccionado?.id">
-            <span>* Selecciona un pago a realizar</span>
-            @if (pagoSeleccionado?.id) {
-            <ion-icon name="checkmark-done-outline" color="success"></ion-icon>
-            } @else {
-            <ion-icon name="close-outline" color="danger"></ion-icon>
-            }
-          </li>
-          <li [class.completed]="pagoForm.valid">
-            <span>* LLenar campos de formulario de pago</span>
-            @if (pagoForm.valid) {
-            <ion-icon name="checkmark-done-outline" color="success"></ion-icon>
-            } @else {
-            <ion-icon name="close-outline" color="danger"></ion-icon>
-            }
-          </li>
-        </ul>
+      <div class="d-flex justify-content-end">
+        <button class="btn btn-success" routerLink="/layout/prestamos">
+          Ver Prestamos
+          <ion-icon class="ms-2" name="open-outline"></ion-icon>
+        </button>
+        <!-- <ion-button routerLink="/layout/prestamos">
+          Ver Prestamos
+          <ion-icon class="ms-2" name="open-outline"></ion-icon>
+        </ion-button> -->
       </div>
     </ion-card-content>
   </ion-card>
@@ -200,19 +164,48 @@
             <div class="col-md-8 col-sm-12">
               <app-view-data
                 [showAdd]="false"
+                [showTitle]="false"
                 [showPagination]="false"
                 [showSearch]="false"
                 [currentPage]="1"
                 [totalPages]="10"
-                [title]="'Fechas de Pago'"
                 [context]="'fecha de pago'"
                 [data]="elements"
                 [columnsData]="columnsData"
-                (selectButtonClicked)="onselectButtonClicked($event)">
+                (selectButtonClicked)="onselectButtonClicked($event)"
+                (deleteButtonClicked)="onDeleteButtonClicked($event)">
+                <div headerContent>
+                  <div class="row">
+                    <div class="col-sm-12 col-md-8">
+                      <h2>
+                        <span class="fw-bold">Estado de Cuenta</span> - @if
+                        (clienteSeleccionado?.id) {
+                        {{clienteSeleccionado.nombres}}
+                        {{clienteSeleccionado.apellidos}} }@else { No Aún }
+                      </h2>
+                      <h2>
+                        <span class="fw-bold">Identitad #</span> - @if
+                        (clienteSeleccionado?.id) { {{clienteSeleccionado.dni |
+                        formatDni}} }@else { No Aún }
+                      </h2>
+                      <h2>
+                        <span class="fw-bold"> Prestamo: </span>
+                        {{prestamoSeleccionado.totalMonto | currency : "L" :
+                        "symbol" }}
+                      </h2>
+                    </div>
+                    <div class="col-sm-12 col-md-4 d-flex justify-content-end">
+                      <img src="assets/logo.png" width="100" alt="" />
+                    </div>
+                  </div>
+                </div>
               </app-view-data>
             </div>
 
-            <div class="col-sm-12">
+            <div
+              class="col-sm-12"
+              *ngIf="!pagoSeleccionado.estado
+            ">
               <ion-card>
                 <div class="row">
                   <div class="col-6">
