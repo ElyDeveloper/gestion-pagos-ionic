@@ -12,22 +12,22 @@ import {
 import {FechasPagos, Prestamos} from '../models';
 import {
   HttpErrors,
+  get,
   param,
   patch,
   post,
   requestBody,
   RestBindings,
-  Response as RestResponse,
+  Response,
 } from '@loopback/rest';
 import {inject, service} from '@loopback/core';
 import {JWTService} from '../services';
 import multer from 'multer';
-import path from 'path';
 import {Request as ExpressRequest, Response as ExpressResponse} from 'express';
 import {keys} from '../env/interfaces/Servicekeys.interface';
-import {deflate} from 'zlib';
-import {error} from 'console';
-import {throws} from 'assert';
+import * as fs from 'fs';
+import * as path from 'path';
+
 
 // Configuración de multer para la carga de archivos
 const storage = multer.diskStorage({
@@ -520,4 +520,62 @@ export class CheckPrestamosController {
     // Actualizar el préstamo con el estado y, opcionalmente, la fecha de aprobación
     await this.prestamosRepository.updateById(id, updateData);
   }
+
+  // Método para obtener un archivo
+  @get('/getFile', {
+    responses: {
+      '200': {
+        description: 'Return the requested file',
+        content: {'*/*': {}},
+      },
+    },
+  })
+  async getFile(
+    @param.query.string('filepath') filepath: string, // Recibe el parámetro filepath desde la query string
+    @inject(RestBindings.Http.RESPONSE) response: Response, // Inyecta la respuesta HTTP
+  ): Promise<any> {
+    try {
+      // Construye la ruta completa del archivo
+      const fullPath = path.resolve(filepath);
+
+      // Verifica si el archivo existe
+      if (!fs.existsSync(fullPath)) {
+        response.status(404).send('File not found');
+        return;
+      }
+
+      // Obtén la extensión del archivo para determinar el tipo MIME
+      const mimeType = this.getMimeType(fullPath);
+
+      // Establece los encabezados para la respuesta, incluyendo el tipo MIME adecuado
+      response.setHeader('Content-Type', mimeType);
+
+      // Devuelve el archivo como respuesta
+      return fs.createReadStream(fullPath).pipe(response);
+    } catch (error) {
+      response.status(500).send(`Error fetching file: ${error.message}`);
+    }
+  }
+
+  // Método para obtener el tipo MIME basado en la extensión del archivo
+  getMimeType(filePath: string): string {
+    const ext = path.extname(filePath).toLowerCase();
+    switch (ext) {
+      case '.jpg':
+      case '.jpeg':
+        return 'image/jpeg';
+      case '.png':
+        return 'image/png';
+      case '.gif':
+        return 'image/gif';
+      case '.pdf':
+        return 'application/pdf';
+      case '.txt':
+        return 'text/plain';
+        default:
+        return 'application/octet-stream';
+    }
+  }
+
+
 }
