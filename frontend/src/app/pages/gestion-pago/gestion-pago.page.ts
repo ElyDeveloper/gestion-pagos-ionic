@@ -45,8 +45,12 @@ export class GestionPagoPage implements OnInit {
 
   fileUrl: string = "";
 
-  mora = 0;
-  daysLate = 0;
+  mora: number = 0;
+  montoPagado: number = 0;
+  adeudoCuota: number = 0;
+  adeudoMora: number = 0;
+  adeudoTotal: number = 0;
+  daysLate: number = 0;
 
   private suscriptions: Subscription[] = [];
 
@@ -104,7 +108,7 @@ export class GestionPagoPage implements OnInit {
     this.globalService.GetId("documentos/by-fecha-pago", idPago).subscribe({
       next: (response: any) => {
         console.log("Respuesta del Servidor: ", response);
-        if (response) {
+        if (response?.urlDocumento) {
           this.fileUrl = response.urlDocumento;
         }
       },
@@ -115,12 +119,32 @@ export class GestionPagoPage implements OnInit {
   }
 
   save(data: any): void {
+    if (data.monto > this.adeudoTotal) {
+      this.toastColor = "danger";
+      this.toastMessage = "El monto no puede ser mayor al adeudo total";
+      this.isToastOpen = true;
+      return;
+    }
     if (data.estado === true) {
       console.log("Modo Edicion");
       this.isEditar = true;
     } else {
       console.log("Modo Creación");
       this.isEditar = false;
+    }
+
+    if (data.fechaPago === "" || data.fechaPago === null) {
+      this.toastColor = "danger";
+      this.toastMessage = "Debe seleccionar una fecha de pago";
+      this.isToastOpen = true;
+      return;
+    }
+
+    if (data.monto === null || data.monto <= 0) {
+      this.toastColor = "danger";
+      this.toastMessage = "Debe ingresar un monto válido";
+      this.isToastOpen = true;
+      return;
     }
 
     console.log("Formulario de Registro de Pago: ", data);
@@ -183,6 +207,8 @@ export class GestionPagoPage implements OnInit {
     if (diffDays < 0) {
       this.daysLate = Math.abs(diffDays);
       mora = this.calculateMora(this.pagoSeleccionado.monto, this.daysLate);
+      this.mora = mora;
+      this.calculateTotales();
     }
 
     this.hasMora = mora > 0;
@@ -288,23 +314,95 @@ export class GestionPagoPage implements OnInit {
   }
 
   onselectButtonClicked(data: any): void {
+    this.mora = 0;
+    this.adeudoCuota = 0;
+    this.adeudoMora = 0;
+    this.adeudoTotal = 0;
+    this.montoPagado = 0;
+    this.daysLate = 0;
+
     console.log("Elemento seleccionado:", data);
     this.pagoSeleccionado = data;
 
-    this.getFileIfExist(data.id);
+    this.globalService.GetId("pagos/fecha-pago", data.id).subscribe({
+      next: (response: any) => {
+        console.log("Pagos realizado:", response);
 
-    const fechaPagar = new Date();
-    fechaPagar.setHours(0, 0, 0, 0);
-    const fechaPago = this.globalService.formatDateForInput(
-      fechaPagar.toISOString()
+        this.adeudoCuota = data.monto;
+        if (response.length > 0) {
+          const total = response.reduce(
+            (acc: any, current: any) => acc + current.monto,
+            0
+          );
+
+          this.montoPagado = total;
+          if (total >= data.monto) {
+            this.adeudoCuota = 0;
+          } else {
+            this.adeudoCuota = data.monto - total;
+          }
+
+          console.log("Total pagado:", total);
+        }
+        // this.selectPago(response.id);
+        this.getFileIfExist(data.id);
+
+        const fechaPagar = new Date();
+        fechaPagar.setHours(0, 0, 0, 0);
+        const fechaPago = this.globalService.formatDateForInput(
+          fechaPagar.toISOString()
+        );
+
+        this.hasMora = data.mora > 0;
+        this.mora = data.mora;
+        this.getMora(data.id);
+        this.daysLate = data.daysLate;
+
+        this.pagoForm.patchValue({ ...data, fechaPago });
+
+        this.scrollToElement("pago-form");
+      },
+      error: (error: any) => {
+        console.error("Error al obtener el pago seleccionado:", error);
+      },
+    });
+  }
+
+  getMora(id: number): void {
+    this.globalService.GetId("moras/fecha-pago", id).subscribe({
+      next: (response: any) => {
+        console.log("Mora:", response);
+
+        if (response.length > 0) {
+          const total = response.reduce(
+            (acc: any, current: any) => acc + current.mora,
+            0
+          );
+          this.mora = total;
+        }
+
+        this.calculateTotales();
+      },
+      error: (error: any) => {
+        console.error("Error al obtener la mora:", error);
+      },
+    });
+  }
+
+  calculateTotales() {
+    const diferencia = Math.abs(
+      this.montoPagado - (this.mora + this.pagoSeleccionado.monto)
     );
 
-    this.hasMora = data.mora > 0;
-    this.daysLate = data.daysLate;
+    if (this.montoPagado > this.pagoSeleccionado.monto) {
+      this.adeudoMora = diferencia;
+    } else {
+      this.adeudoMora = this.mora;
+    }
 
-    this.pagoForm.patchValue({ ...data, fechaPago });
+    console.log("Diferencia:", diferencia);
 
-    this.scrollToElement("pago-form");
+    this.adeudoTotal = diferencia;
   }
 
   onUploaderChange(uploader: any): void {

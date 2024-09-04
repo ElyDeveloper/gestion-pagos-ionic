@@ -113,6 +113,7 @@ export class CheckPrestamosController {
             where: {idPrestamo},
           });
 
+          //INFO OBTENER FECHA PAGO ACTUAL
           const fechasPago =
             await this.fechasPagosRepository.findById(idFechaPago);
 
@@ -132,24 +133,6 @@ export class CheckPrestamosController {
 
           // console.log('Dias de retraso:', diasRetraso);
 
-          //INFO INSERTAR EN MORAS
-          if (mora > 0) {
-            await this.morasRepository.create({
-              idCliente: prestamo.idCliente,
-              idPrestamo,
-              idPlan: prestamo.idPlan,
-              idFechaPago,
-              diasRetraso,
-              mora,
-              estado: true,
-            });
-          }
-
-          //INFO INSERTAR EN FECHAS_PAGOS
-          await this.fechasPagosRepository.updateById(idFechaPago, {
-            estado: true,
-          });
-
           //INFO INSERTAR EN PAGOS
           const pago = await this.pagosRepository.create({
             estado: true,
@@ -157,6 +140,73 @@ export class CheckPrestamosController {
             monto: monto,
             idFechaPago: idFechaPago,
           });
+
+          //INFO OBTENER MORAS
+          const moraActual = await this.morasRepository.findOne({
+            where: {idFechaPago, estado: true},
+          });
+
+          if (!moraActual) {
+            console.log(
+              'No hay moras para este pago: ################################',
+            );
+            //INFO INSERTAR EN MORAS
+            if (mora > 0) {
+              await this.morasRepository.create({
+                idCliente: prestamo.idCliente,
+                idPrestamo,
+                idPlan: prestamo.idPlan,
+                idFechaPago,
+                diasRetraso,
+                mora,
+                estado: true,
+              });
+            }
+          } else {
+            console.log(
+              'Moras ya existen para este pago: ################################',
+            );
+            //INFO ACTUALIZAR EN MORAS
+            await this.morasRepository.updateById(moraActual.id, {
+              diasRetraso,
+              mora: moraActual.mora + mora,
+            });
+          }
+
+          const pagosRealizados = await this.pagosRepository.find({
+            where: {
+              idFechaPago,
+            },
+          });
+
+          const totalPagado = pagosRealizados.reduce(
+            (acc, current) => acc + current.monto,
+            0,
+          );
+
+          const pagos = await this.pagosRepository.find({
+            where: {
+              idFechaPago,
+            },
+          });
+
+          const totalPagos = pagos.reduce(
+            (acc, current) => acc + current.monto,
+            0,
+          );
+
+          const deuda = fechasPago.monto + (moraActual?.mora || mora);
+
+          console.log('Total pagado:', totalPagado);
+          console.log('Deuda:', deuda);
+
+          if (totalPagado >= deuda) {
+            //INFO INSERTAR EN FECHAS_PAGOS
+            await this.fechasPagosRepository.updateById(idFechaPago, {
+              estado: true,
+            });
+          }
+
           const idPago = pago.id;
 
           // Crear el registro en documentosTipoDoc

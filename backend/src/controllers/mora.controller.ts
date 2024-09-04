@@ -107,6 +107,24 @@ export class MoraController {
     );
   }
 
+  @get('/moras/fecha-pago/{id}')
+  @response(200, {
+    description: 'Moras model instance',
+    content: {
+      'application/json': {
+        schema: getModelSchemaRef(Moras, {includeRelations: true}),
+      },
+    },
+  })
+  async findByIdFechaPago(
+    @param.path.number('id') id: number,
+  ): Promise<Moras[]> {
+    console.log('Buscando moras por fecha de pago:', id);
+    return this.morasRepository.find({
+      where: {idFechaPago: id},
+    });
+  }
+
   @patch('/moras')
   @response(200, {
     description: 'Moras PATCH success count',

@@ -19,31 +19,23 @@ import {
 } from '@loopback/rest';
 import {viewOf} from '../core/library/views.library';
 import {Pagos} from '../models/pagos.model';
-import {PagosRepository} from '../repositories/pagos.repository';
-import { authenticate } from '@loopback/authentication';
-import { Documentos, DocumentosTipoDoc } from '../models';
-import { ContratosPagoRepository } from '../repositories/contratos-pago.repository';
-import { FILE_UPLOAD_SERVICE } from '../core/library/keys';
-import { FileUploadHandler } from '../core/library/types';
-import { inject } from '@loopback/core';
-import * as path from 'path';
-import * as fs from 'fs';
-import * as crypto from 'crypto';
-
+import {authenticate} from '@loopback/authentication';
+import {Documentos, DocumentosTipoDoc} from '../models';
+import {ContratosPagoRepository} from '../repositories/contratos-pago.repository';
+import { DocumentosRepository, DocumentosTipoDocRepository, PagosRepository } from '../repositories';
 
 @authenticate('jwt')
 export class PagosController {
   constructor(
+    
     @repository(PagosRepository)
-    public PagosRepository: PagosRepository,
-    @repository(Documentos)
-    public DocumentosRepository: Documentos,
-    @repository(DocumentosTipoDoc)
-    public DocumentosTipoDocRepository: DocumentosTipoDoc,
+    public pagosRepository: PagosRepository,
+    @repository(DocumentosRepository)
+    public documentosRepository: DocumentosRepository,
+    @repository(DocumentosTipoDocRepository)
+    public documentosTipoDocRepository: DocumentosTipoDocRepository,
     @repository(ContratosPagoRepository)
     public contratosPagoRepository: ContratosPagoRepository,
-    @inject(FILE_UPLOAD_SERVICE) private fileHandler:FileUploadHandler
-
   ) {}
 
   @post('/pagos')
@@ -64,7 +56,7 @@ export class PagosController {
     })
     Pagos: Omit<Pagos, 'id'>,
   ): Promise<Pagos> {
-    return this.PagosRepository.create(Pagos);
+    return this.pagosRepository.create(Pagos);
   }
 
   @get('/pagos/count')
@@ -72,8 +64,8 @@ export class PagosController {
     description: 'Pagos model count',
     content: {'application/json': {schema: CountSchema}},
   })
-  async count(@param.where(Pagos) where?: Where<Pagos>): Promise<Count> {
-    return this.PagosRepository.count(where);
+  async count(): Promise<Count> {
+    return this.pagosRepository.count();
   }
 
   @get('/pagos')
@@ -89,7 +81,7 @@ export class PagosController {
     },
   })
   async find(): Promise<Pagos[]> {
-    return this.PagosRepository.find({
+    return this.pagosRepository.find({
       include: [{relation: 'prestamos'}],
     });
   }
@@ -110,7 +102,7 @@ export class PagosController {
     @param.query.number('skip') skip: number,
     @param.query.number('limit') limit: number,
   ): Promise<Pagos[]> {
-    return this.PagosRepository.find({
+    return this.pagosRepository.find({
       include: [{relation: 'prestamos'}],
       skip,
       limit,
@@ -133,7 +125,7 @@ export class PagosController {
     Pagos: Pagos,
     @param.where(Pagos) where?: Where<Pagos>,
   ): Promise<Count> {
-    return this.PagosRepository.updateAll(Pagos, where);
+    return this.pagosRepository.updateAll(Pagos, where);
   }
 
   @get('/pagos/{id}')
@@ -146,7 +138,7 @@ export class PagosController {
     },
   })
   async findById(@param.path.number('id') id: number): Promise<Pagos> {
-    return this.PagosRepository.findById(id);
+    return this.pagosRepository.findById(id);
   }
 
   @get('/pagos/fecha-pago/{id}')
@@ -161,7 +153,8 @@ export class PagosController {
   async findByIdFechaPago(
     @param.path.number('id') id: number,
   ): Promise<Pagos[]> {
-    return this.PagosRepository.find({
+    console.log('Buscando pagos por fecha de pago:', id);
+    return this.pagosRepository.find({
       where: {idFechaPago: id},
     });
   }
@@ -181,7 +174,7 @@ export class PagosController {
     })
     Pagos: Pagos,
   ): Promise<void> {
-    await this.PagosRepository.updateById(id, Pagos);
+    await this.pagosRepository.updateById(id, Pagos);
   }
 
   @put('/pagos/{id}')
@@ -192,7 +185,7 @@ export class PagosController {
     @param.path.number('id') id: number,
     @requestBody() Pagos: Pagos,
   ): Promise<void> {
-    await this.PagosRepository.replaceById(id, Pagos);
+    await this.pagosRepository.replaceById(id, Pagos);
   }
 
   @del('/pagos/{id}')
@@ -200,7 +193,7 @@ export class PagosController {
     description: 'Pagos DELETE success',
   })
   async deleteById(@param.path.number('id') id: number): Promise<void> {
-    await this.PagosRepository.deleteById(id);
+    await this.pagosRepository.deleteById(id);
   }
 
   @get('/pagos/search')
@@ -212,7 +205,7 @@ export class PagosController {
   }
 
   async getPagosSearch(search: string) {
-    return await this.PagosRepository.dataSource.execute(
+    return await this.pagosRepository.dataSource.execute(
       `${viewOf.getViewPagos} Where ClienteNombre like '%${search}%' or ClienteApellidos like '%${search}%' or TipoPrestamoNombre like '%${search}%'  or Monto like '%${search}%'  or FechaPago like '%${search}%' or FechaInicial like '%${search}%' or FechaFinal like '%${search}%'`,
     );
   }

@@ -8,6 +8,7 @@ export * from './limite-cuotas.controller';
 export * from './monedas.controller';
 export * from './periodos-cobro.controller';
 export * from './planes-pago.controller';
+export * from './pagos.controller';
 export * from './tipo-documentos.controller';
 export * from './mora.controller';
 export * from './record-crediticio.controller';
