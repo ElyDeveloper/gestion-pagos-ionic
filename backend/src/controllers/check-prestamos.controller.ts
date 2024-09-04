@@ -22,10 +22,11 @@ import {
 import {inject, service} from '@loopback/core';
 import {JWTService} from '../services';
 import multer from 'multer';
-import path from 'path';
 import {Request as ExpressRequest, Response as ExpressResponse} from 'express';
 import {keys} from '../env/interfaces/Servicekeys.interface';
-import {deflate} from 'zlib';
+import * as fs from 'fs';
+import * as path from 'path';
+import {promisify} from 'util';
 
 // Configuración de multer para la carga de archivos
 const storage = multer.diskStorage({
@@ -406,4 +407,36 @@ export class CheckPrestamosController {
     // Actualizar el préstamo con el estado y, opcionalmente, la fecha de aprobación
     await this.prestamosRepository.updateById(id, updateData);
   }
+
+
+  //Endpoint para traer un archivo recibiendo la ruta
+  @post('/pagos/getFile', {
+    responses: {
+      '200': {
+        description: 'Archivo obtenido exitosamente',
+        content: {'application/json': {schema: {type: 'object'}}},
+      },
+    },
+  })
+  async getFile(
+    @param.query.string('filePath') filePath: string,
+  ):Promise<fs.ReadStream>{
+    const fileExists = promisify(fs.exists);
+    const stat = promisify(fs.stat);
+
+    //Verificar si el archivo existe
+    if(!(await fileExists(filePath))){
+      throw new HttpErrors.NotFound('El archivo no existe o no se encontro en la ruta especificada');
+    }
+
+    const fileStat = await stat(filePath);
+  
+    //Verifica si es un archivo
+    if(!fileStat.isFile()){
+      throw new HttpErrors.BadRequest('La ruta especificada no corresponde a un archivo');
+    }
+    
+    return fs.createReadStream(filePath);
+  }
+
 }
