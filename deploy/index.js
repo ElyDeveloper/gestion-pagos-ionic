@@ -8,7 +8,7 @@ const rl = readline.createInterface({
 
 // Configuración del servicio
 const svc = new Service({
-    name: 'BackendPrestamosFICRE',
+    name: 'BackendLAPService',
     description: 'Servicio de Backend para Sistema de Prestamos',
   script: '../backend/dist/index.js'
 });
