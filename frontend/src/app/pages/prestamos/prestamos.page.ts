@@ -57,6 +57,7 @@ export class PrestamosPage implements OnInit {
 
   textLoader: string = "Cargando...";
   toastMessage: string = "cliente guardado correctamente";
+  toastColor: string = "primary";
   typeFormSelected: string = "formAdd";
   elementType: string = "prestamo";
 
@@ -84,8 +85,9 @@ export class PrestamosPage implements OnInit {
   proyeccionesPlan: any[] = [];
   estadosAprobacion: any[] = [];
   columnsDataPlan: Column[] = []; // Aquí deberías recibir los datos a mostrar en la tabla (cabeceras)
-
   formAprobar: FormGroup;
+
+
   constructor(private fb: FormBuilder) {
     this.formModels = new FormModels(this.fb);
     this.formAdd = this.formModels.prestamoForm();
@@ -389,6 +391,27 @@ export class PrestamosPage implements OnInit {
     });
   }
 
+  handleSave(data: any) {
+    //TODO ONLY DEBUG
+    // console.log(`Datos del formulario: `, data);
+    switch (this.typeFormSelected) {
+      case "formAdd":
+        if (this.isEdit) {
+          this.handleUserOperation("edit", data);
+        } else if (!this.isEdit) {
+          delete data.id;
+          this.handleUserOperation("create", data);
+        }
+        break;
+      case "formAprobar":
+        this.handleAprobar("create", data);
+        break;
+
+      default:
+        throw new Error(`Formulario no soportado: ${this.typeFormSelected}`);
+    }
+  }
+
   handleUserOperation(operation: "edit" | "create", data: any): void {
     const { operationText, apiCall } = this.getOperationConfigElement(
       operation,
@@ -408,7 +431,7 @@ export class PrestamosPage implements OnInit {
     });
   }
 
-  handleAprobar(operation: "edit" | "create", data: any): void {
+  handleAprobar(operation: "create", data: any): void {
     const { operationText, apiCall } = this.getOperationConfigCheck(
       operation,
       data
@@ -449,7 +472,7 @@ export class PrestamosPage implements OnInit {
   }
 
   private getOperationConfigCheck(
-    operation: "edit" | "create",
+    operation: "create",
     data: any
   ): { operationText: string; apiCall: Observable<any> } {
     const monto =
@@ -466,15 +489,6 @@ export class PrestamosPage implements OnInit {
       idEstadoAprobacion: data.idEstadoAprobacion || 0,
     };
     switch (operation) {
-      case "edit":
-        return {
-          operationText: "Editando",
-          apiCall: this._globalService.PutId(
-            "check-prestamos/crear-fechas-pagos",
-            data.id,
-            dataSave
-          ),
-        };
       case "create":
         //TODO ONLY DEBUG
         console.log("Entro aquí: ", dataSave);
@@ -495,6 +509,7 @@ export class PrestamosPage implements OnInit {
     console.log(`cliente ${operationText.toLowerCase()}:`, response);
     this.isModalOpen = false;
     this.loaderComponent.hide();
+    this.toastColor = "success";
     this.toastMessage = `${
       this.elementType
     } ${operationText.toLowerCase()} correctamente`;
@@ -506,35 +521,17 @@ export class PrestamosPage implements OnInit {
   private handleOperationError(error: any, operationText: string): void {
     console.error(
       `Error al ${operationText.toLowerCase()} el ${this.elementType}:`,
-      error
+      error.error.error.message
     );
     this.loaderComponent.hide();
-    this.toastMessage = `Error al ${operationText.toLowerCase()} el ${
+    this.toastColor = "danger";
+    this.toastMessage = `Error ${operationText.toLowerCase()} el ${
       this.elementType
-    }`;
+    }, detalles: ${error.error.error.message || "Ocurrió un error inesperado"}`;
     this.setOpenedToast(true);
   }
 
-  handleSave(data: any) {
-    //TODO ONLY DEBUG
-    // console.log(`Datos del formulario: `, data);
-    switch (this.typeFormSelected) {
-      case "formAdd":
-        if (this.isEdit) {
-          this.handleUserOperation("edit", data);
-        } else if (!this.isEdit) {
-          delete data.id;
-          this.handleUserOperation("create", data);
-        }
-        break;
-      case "formAprobar":
-        this.handleAprobar("create", data);
-        break;
 
-      default:
-        throw new Error(`Formulario no soportado: ${this.typeFormSelected}`);
-    }
-  }
 
   onPageChange(event: any) {
     console.log("Evento de cambio de página:", event);

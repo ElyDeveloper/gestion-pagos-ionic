@@ -67,6 +67,7 @@ const routes: Routes = [
             (m) => m.GestionPrestamoPageModule
           ),
       },
+
       {
         path: "gestion-prestamo/:id",
         loadChildren: () =>

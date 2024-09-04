@@ -18,7 +18,7 @@ import {
   response,
   HttpErrors,
 } from '@loopback/rest';
-import {Personas} from '../models';
+import {Personas, Usuario, UsuarioCliente} from '../models';
 import {
   PersonasRepository,
   UsuarioClienteRepository,
@@ -62,6 +62,28 @@ export class PersonasController {
   ): Promise<Personas> {
     console.log('create persona: ', personas);
     return this.personasRepository.create(personas);
+  }
+
+  @post('/personas/asesor')
+  @response(200, {
+    description: 'UsuarioCliente model instance',
+    content: {'application/json': {schema: getModelSchemaRef(UsuarioCliente)}},
+  })
+  async createUsuarioCliente(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(UsuarioCliente, {
+            title: 'NewUsuarioCliente',
+            exclude: ['id'],
+          }),
+        },
+      },
+    })
+    usuarioCliente: Omit<UsuarioCliente, 'id'>,
+  ): Promise<UsuarioCliente> {
+    console.log('create usuario/cliente: ', usuarioCliente);
+    return this.usuarioClienteRepository.create(usuarioCliente);
   }
 
   @get('/personas/count')
@@ -363,6 +385,26 @@ export class PersonasController {
     return this.personasRepository.findById(id, filter);
   }
 
+  @get('/personas/asesor/{id}')
+  @response(200, {
+    description: 'Personas model instance',
+    content: {
+      'application/json': {
+        schema: getModelSchemaRef(Personas, {includeRelations: true}),
+      },
+    },
+  })
+  async findByIdAsesor(@param.path.string('id') id: string): Promise<any> {
+    const idDecrypted = this.jwtService.decryptId(id);
+    console.log('Id de Cliente Desencriptado: ', idDecrypted);
+    return this.usuarioClienteRepository.findOne({
+      where: {
+        clienteId: idDecrypted,
+      },
+      include: ['Usuario'],
+    });
+  }
+
   @patch('/personas/{id}')
   @response(204, {
     description: 'Personas PATCH success',
@@ -403,6 +445,41 @@ export class PersonasController {
     }
   }
 
+  @put('/personas/asesor/{id}')
+  @response(204, {
+    description: 'UsuarioCliente PUT success',
+  })
+  async replaceByIdCliente(
+    @param.path.string('id') id: string,
+    @requestBody() usuarioCliente: any,
+  ): Promise<void> {
+    // console.log('personas', id, usuarioCliente);
+
+    const decryptedId = this.jwtService.decryptId(id);
+    console.log('decryptedId', decryptedId);
+
+    usuarioCliente.clienteId = decryptedId;
+
+    const userClient = await this.usuarioClienteRepository.findOne({
+      where: {
+        clienteId: decryptedId,
+      },
+    });
+
+    console.log('Usuario Cliente', usuarioCliente);
+    console.log('User Client', userClient);
+
+    try {
+      await this.usuarioClienteRepository.replaceById(
+        userClient?.id,
+        usuarioCliente,
+      );
+    } catch (error) {
+      console.error('Error updating persona:', error);
+      throw new HttpErrors.InternalServerError('Error updating persona');
+    }
+  }
+
   @del('/personas/{id}')
   @response(204, {
     description: 'Personas DELETE success',
@@ -414,6 +491,23 @@ export class PersonasController {
     await this.personasRepository.updateById(decryptedId, {
       estado: false,
     });
+  }
+
+  @del('/personas/asesor/{id}')
+  @response(204, {
+    description: 'Personas DELETE success',
+  })
+  async deleteByIdCliente(@param.path.string('id') id: string): Promise<void> {
+    //desencriptar id de prestamos con jwtService
+    const decryptedId = this.jwtService.decryptId(id.toString());
+    console.log('id de Persona a eliminar: ', decryptedId);
+
+    const usuarioCliente = await this.usuarioClienteRepository.findOne({
+      where: {
+        clienteId: decryptedId,
+      },
+    });
+    await this.usuarioClienteRepository.deleteById(usuarioCliente?.id);
   }
 
   @get('/personas/todos/search')

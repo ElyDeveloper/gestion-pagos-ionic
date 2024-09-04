@@ -4,6 +4,7 @@
     [isOpen]="isToastOpen"
     message="{{toastMessage}}"
     [duration]="5000"
+    [color]="toastColor"
     (didDismiss)="setOpenedToast(false)"></ion-toast>
 
   <app-breadcrumb></app-breadcrumb>
@@ -59,6 +60,13 @@
       [content]="modalSelected"
       [formSave]="formSelected"
       (saveData)="handleSave($event)">
+    </app-reusable-modal>
+
+    <app-reusable-modal
+      [(isOpen)]="isModalOpenX"
+      [modalConfig]="modalConfigX"
+      [content]="modalSelectedX"
+      (saveData)="handleSaveX($event)">
     </app-reusable-modal>
 
     <ng-template #modalAdd let-close="close" let-save="save" let-form="form">
@@ -176,32 +184,15 @@
                   <ion-label position="stacked" class="bold-label"
                     >Nacionalidad:</ion-label
                   >
-
-                  <ion-select
-                    formControlName="idNacionalidad"
+                  <ion-input
+                    (click)="openSelector('nacionalidad')"
+                    readonly
+                    [value]="selectedNacionalidad ? selectedNacionalidad.descripcion : ''"
                     placeholder="Seleccione nacionalidad">
-                    <ion-select-option
-                      *ngFor="let nacionalidad of nacionalidades"
-                      [value]="nacionalidad.id">
-                      <ion-row class="ion-align-items-center">
-                        <ion-col>
-                          <ion-img
-                            [src]="nacionalidad.urlBandera"
-                            [alt]="'Bandera de ' + nacionalidad.descripcion"
-                            style="
-                              width: 30px;
-                              height: 20px;
-                              object-fit: cover;
-                            ">
-                          </ion-img>
-                          {{ nacionalidad.abreviatura }}
-                        </ion-col>
-                        <ion-col> - {{ nacionalidad.descripcion }} </ion-col>
-                      </ion-row>
-                    </ion-select-option>
-                  </ion-select>
+                  </ion-input>
                 </ion-item>
               </ion-col>
+
               <ion-col size-xs="12" size-sm="6" size-md="6">
                 <ion-item>
                   <ion-label position="stacked" class="bold-label"
@@ -234,6 +225,20 @@
                   </ion-select>
                 </ion-item>
               </ion-col>
+              <ion-col size-xs="12" size-sm="6" size-md="6">
+                <ion-item
+                  [disabled]="this.formAdd.get('idTipoPersona')?.value ===2">
+                  <ion-label position="stacked" class="bold-label"
+                    >Asesor:</ion-label
+                  >
+                  <ion-input
+                    (click)="openSelector('asesor')"
+                    readonly
+                    [value]="selectedAsesor ? selectedAsesor.nombre + ' '+selectedAsesor.apellido  : ''"
+                    placeholder="Seleccione asesor">
+                  </ion-input>
+                </ion-item>
+              </ion-col>
             </ion-row>
           </ion-grid>
           <ion-grid>
@@ -246,6 +251,73 @@
             </ion-row>
           </ion-grid>
         </form>
+      </ion-content>
+    </ng-template>
+
+    <ng-template #modalNacionalidadSelector let-close="close" let-save="save">
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Seleccionar Nacionalidad</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="close()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <ion-searchbar
+          (ionInput)="filterNacionalidades($event)"
+          placeholder="Buscar nacionalidad"></ion-searchbar>
+        <ion-list>
+          <ion-item
+            class="user-select-none"
+            *ngFor="let nacionalidad of filteredNacionalidades"
+            (click)="selectNacionalidad(nacionalidad)">
+            <ion-avatar slot="start">
+              <img
+                [src]="nacionalidad.urlBandera"
+                [alt]="'Bandera de ' + nacionalidad.descripcion" />
+            </ion-avatar>
+            <ion-label>
+              <h2>{{ nacionalidad.abreviatura }}</h2>
+              <p>{{ nacionalidad.descripcion }}</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-content>
+    </ng-template>
+
+    <ng-template #modalAsesorSelector let-close="close" let-save="save">
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Seleccionar Asesor</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="close()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <ion-searchbar
+          (ionInput)="filterAsesores($event)"
+          placeholder="Buscar asesor"></ion-searchbar>
+        <ion-list>
+          <ion-item
+            class="user-select-none"
+            *ngFor="let asesor of filteredAsesores"
+            (click)="selectAsesor(asesor)">
+            <ion-label>
+              <h2>{{ asesor.nombre }} {{asesor.apellido}}</h2>
+              <p>{{ asesor.correo }}</p>
+            </ion-label>
+          </ion-item>
+          <ion-item
+            class="user-select-none"
+            (click)="selectAsesor(null)">
+            <ion-label>
+              <h2>Sin Selección</h2>
+              <p>N/D</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
       </ion-content>
     </ng-template>
 

@@ -6,6 +6,7 @@ import {
   ViewChild,
 } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { AlertController } from "@ionic/angular";
 import {
   catchError,
   debounceTime,
@@ -25,6 +26,7 @@ import { Roles } from "src/app/shared/interfaces/rol";
 import { Column } from "src/app/shared/interfaces/table";
 import { Usuario } from "src/app/shared/interfaces/usuario";
 import { GlobalService } from "src/app/shared/services/global.service";
+import { FieldAliases, ModalConfig } from "src/app/shared/utils/extra";
 import { FormModels } from "src/app/shared/utils/forms-models";
 
 @Component({
@@ -67,6 +69,7 @@ export class UsuariosPage implements OnInit {
 
   textLoader: string = "Cargando...";
   toastMessage: string = "Usuario guardado correctamente";
+  toastColor: string = "primary";
 
   @ViewChild("modalAdd", { static: true }) modalAdd!: TemplateRef<any>;
   @ViewChild("modalViewInfo", { static: true })
@@ -76,6 +79,7 @@ export class UsuariosPage implements OnInit {
   formSelected: FormGroup;
 
   private _globalService = inject(GlobalService);
+  private _alertController = inject(AlertController);
 
   // TODO: Atributos Especificos
   @ViewChild("modalResetPswd", { static: true })
@@ -83,6 +87,8 @@ export class UsuariosPage implements OnInit {
 
   @ViewChild("modalSelectClients", { static: true })
   modalSelectClients!: TemplateRef<any>;
+
+  modalConfig: ModalConfig = { fieldAliases: {} };
 
   selectedClients: Personas[] = [];
   filteredClients: Personas[] = [];
@@ -167,10 +173,50 @@ export class UsuariosPage implements OnInit {
     }
   }
 
-  removeClient(clientRemove: Personas) {
-    this.selectedClients = this.selectedClients.filter(
-      (client) => client.dni !== clientRemove.dni
-    );
+  async removeClient(clientRemove: Personas) {
+    const alert = await this._alertController.create({
+      header: "Eliminar elemento",
+      message: "¿Realmente deseas eliminar este elemento?",
+      buttons: [
+        {
+          text: "Cancelar",
+          role: "cancel",
+          cssClass: "secondary",
+          handler: () => {
+            console.log("Eliminación cancelada");
+          },
+        },
+        {
+          text: "Eliminar",
+          handler: () => {
+            this._globalService
+              .DeleteString(
+                "usuario-clientes/by-cliente",
+                clientRemove?.id?.toString() || ""
+              )
+              .subscribe({
+                next: () => {
+                  console.log("Cliente eliminado correctamente");
+                  this.toastColor = "success";
+                  this.toastMessage = "Cliente eliminado correctamente";
+                  this.isToastOpen = true;
+                  this.selectedClients = this.selectedClients.filter(
+                    (client) => client.dni !== clientRemove.dni
+                  );
+                },
+                error: (error) => {
+                  console.error("Error al eliminar cliente:", error);
+                  this.toastColor = "danger";
+                  this.toastMessage = "Error al eliminar cliente";
+                  this.isToastOpen = true;
+                },
+              });
+          },
+        },
+      ],
+    });
+
+    await alert.present();
   }
 
   ionViewWillLeave() {}
@@ -302,12 +348,32 @@ export class UsuariosPage implements OnInit {
     this.isModalOpen = true;
   }
 
+  setFieldAliases() {
+    const fieldAliases: FieldAliases = {
+      ad: "AD",
+      apellido: "Apellido",
+      changedPassword: "Contraseña modificada",
+      correo: "Correo electrónico",
+      estado: "Estado",
+      nombre: "Nombre",
+      observacion: "Observación",
+      rolid: "Rol",
+      telefono: "Teléfono",
+    };
+
+    this.modalConfig = {
+      fieldAliases,
+    };
+  }
+
   onAddButtonClicked() {
     this.cleanForm();
+    this.setFieldAliases();
     this.setModalState(false, true, false, false, this.modalAdd, this.formAdd);
   }
 
   onEditButtonClicked(data: any) {
+    this.setFieldAliases();
     this.formAdd.patchValue(data);
     this.setModalState(true, true, false, false, this.modalAdd, this.formAdd);
   }
@@ -316,6 +382,14 @@ export class UsuariosPage implements OnInit {
   onResetPasswordButtonClicked(data: any) {
     console.log("Data: ", data);
     this.formResetPswd.get("identificator")?.setValue(data.correo);
+
+    const fieldAliases: FieldAliases = {
+      identificator: "Correo electrónico",
+      newPassword: "Contraseña",
+    };
+    this.modalConfig = {
+      fieldAliases,
+    };
 
     this.setModalState(
       false,

@@ -130,7 +130,7 @@ export class FormModels {
   resetPswdForm(): FormGroup {
     return this.fb.group({
       identificator: ["", Validators.required],
-      newPassword: ["", Validators.required],
+      newPassword: [null, Validators.required],
     });
   }
 }

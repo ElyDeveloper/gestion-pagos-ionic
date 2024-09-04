@@ -52,11 +52,13 @@ export class PersonasPage implements OnInit {
   formModels: FormModels;
 
   isModalOpen = false;
+  isModalOpenX = false;
   isToastOpen = false;
   isEdit = false;
 
   textLoader: string = "Cargando...";
   toastMessage: string = "cliente guardado correctamente";
+  toastColor: string = "primary";
   title: string = "Todos";
   action: string = "todos";
 
@@ -64,9 +66,17 @@ export class PersonasPage implements OnInit {
   @ViewChild("modalViewInfo", { static: true })
   modalViewInfo!: TemplateRef<any>;
 
+  @ViewChild("modalNacionalidadSelector")
+  modalNacionalidadSelector!: TemplateRef<any>;
+  @ViewChild("modalAsesorSelector")
+  modalAsesorSelector!: TemplateRef<any>;
+
   modalSelected: TemplateRef<any> = this.modalAdd;
   modalConfig: ModalConfig = { fieldAliases: {} };
+  modalSelectedX: TemplateRef<any> = this.modalAdd;
+  modalConfigX: ModalConfig = { fieldAliases: {} };
   formSelected: FormGroup;
+  formSelectedX: FormGroup;
 
   private _router = inject(Router);
   private _globalService = inject(GlobalService);
@@ -74,16 +84,23 @@ export class PersonasPage implements OnInit {
 
   //TODO: ESPECIFICOS
   nacionalidades: any[] = [];
+  asesores: any[] = [];
   recordsCrediticios: any[] = [];
   estadosCiviles: any[] = [];
   tiposPersona: any[] = [];
 
   currentUser: Usuario | null = null;
 
+  filteredNacionalidades = this.nacionalidades;
+  selectedNacionalidad: any = null;
+  filteredAsesores = this.asesores;
+  selectedAsesor: any = null;
+
   constructor(private fb: FormBuilder) {
     this.formModels = new FormModels(this.fb);
     this.formAdd = this.formModels.personasForm();
     this.formSelected = this.formAdd;
+    this.formSelectedX = this.formAdd;
     // console.log("Formulario de cliente:", this.formAdd);
   }
 
@@ -97,6 +114,64 @@ export class PersonasPage implements OnInit {
     this.cargarOpciones();
   }
 
+  openSelector(type: "nacionalidad" | "asesor") {
+    switch (type) {
+      case "nacionalidad":
+        this.modalSelectedX = this.modalNacionalidadSelector;
+
+        break;
+      case "asesor":
+        this.modalSelectedX = this.modalAsesorSelector;
+        break;
+      default:
+        console.error("Tipo de selector no válido");
+        return;
+    }
+    this.isModalOpenX = true;
+  }
+
+  filterNacionalidades(event: any) {
+    
+    const searchTerm = event.target.value.toLowerCase();
+    if (searchTerm === "") {
+      this.filteredNacionalidades = [];
+      return;
+    }
+
+    this.filteredNacionalidades = this.nacionalidades.filter(
+      (nacionalidad) =>
+        nacionalidad.descripcion.toLowerCase().includes(searchTerm) ||
+        nacionalidad.abreviatura.toLowerCase().includes(searchTerm)
+    );
+  }
+
+  selectNacionalidad(nacionalidad: any) {
+    this.selectedNacionalidad = nacionalidad;
+    console.log("Nacionalidad seleccionada: ", this.selectedNacionalidad);
+    this.formAdd.patchValue({ idNacionalidad: nacionalidad.id });
+    this.isModalOpenX = false;
+  }
+
+  filterAsesores(event: any) {
+    const searchTerm = event.target.value.toLowerCase();
+    if (searchTerm === "") {
+      this.filteredAsesores = [];
+      return;
+    }
+    this.filteredAsesores = this.asesores.filter(
+      (asesor) =>
+        asesor.nombre.toLowerCase().includes(searchTerm) ||
+        asesor.apellido.toLowerCase().includes(searchTerm) ||
+        asesor.correo.toLowerCase().includes(searchTerm)
+    );
+  }
+
+  selectAsesor(asesor: any) {
+    this.selectedAsesor = asesor;
+    console.log("Asesor seleccionada: ", this.selectedAsesor);
+    this.isModalOpenX = false;
+  }
+
   getCurrentUser() {
     this._authService.getUserInfo().subscribe({
       next: (user: any) => {
@@ -106,7 +181,7 @@ export class PersonasPage implements OnInit {
       error: (error: any) => {
         console.error("Error al obtener información del usuario:", error);
       },
-    })
+    });
     console.log("Usuario actual: ", this.currentUser);
   }
 
@@ -123,6 +198,10 @@ export class PersonasPage implements OnInit {
     this._globalService.Get("nacionalidades").subscribe((data: any) => {
       this.nacionalidades = data;
       // console.log(this.nacionalidades);
+    });
+    this._globalService.GetId("usuarios/roles", 3).subscribe((data: any) => {
+      this.asesores = data;
+      console.log("Asesores: ", this.asesores);
     });
     this._globalService.Get("record-crediticios").subscribe((data: any) => {
       this.recordsCrediticios = data;
@@ -245,8 +324,25 @@ export class PersonasPage implements OnInit {
     }
     console.log("Form Data:", formData);
 
+    this.selectedNacionalidad = null;
+    this.selectedAsesor = null;
+    this.filteredNacionalidades = [];
+    this.filteredAsesores = [];
+
     if (isEdit && formData) {
       this.formAdd.patchValue(formData);
+      this.selectedNacionalidad = this.nacionalidades.find(
+        (n) => n.id === formData.idNacionalidad
+      );
+      this._globalService.GetId("personas/asesor", formData.id).subscribe({
+        next: (asesor: any) => {
+          this.selectedAsesor = asesor?.Usuario || null;
+          console.log("Asesor seleccionado: ", this.selectedAsesor);
+        },
+        error: (error: any) => {
+          console.error("Error al obtener información del asesor:", error);
+        },
+      });
     } else if (!isEdit) {
       this.cleanForm();
     }
@@ -306,19 +402,25 @@ export class PersonasPage implements OnInit {
     });
   }
 
+  async handleSaveX(data: any) {
+    console.log("Datos del cliente antes guardar:", data);
+  }
+
   async handleSave(data: any) {
-    if (data.email === '' || data.email === null) {
-      data.email = 'no-email@example.com';
+    if (data.email === "" || data.email === null) {
+      data.email = "no-email@example.com";
     }
 
     //Eliminar guiones de cadena de data.dni y data.cel
     data.dni = data.dni.replace(/-/g, "");
     data.cel = data.cel.replace(/-/g, "");
+    data.idNacionalidad = this.selectedNacionalidad.id;
 
     console.log("Datos del cliente antes guardar:", data);
 
     if (this.isEdit) {
       this.handleUserOperation("edit", data);
+      
     } else if (!this.isEdit) {
       delete data.id;
       this.handleUserOperation("create", data);
@@ -351,12 +453,76 @@ export class PersonasPage implements OnInit {
     apiCall.subscribe({
       next: (response: any) => {
         console.log(`cliente ${operationText.toLowerCase()}:`, response);
-        this.isModalOpen = false;
-        this.loaderComponent.hide();
-        this.toastMessage = `cliente ${operationText.toLowerCase()} correctamente`;
-        this.setOpenedToast(true);
-        this.cleanForm();
-        this.getCountElements();
+        if (this.selectedAsesor && operation==='create') {
+          this._globalService
+            .Post("personas/asesor", {
+              usuarioId: this.selectedAsesor.id,
+              clienteId: response.id,
+            })
+            .subscribe({
+              next: (response: any) => {
+                console.log("Asesor guardado:", response);
+                this.isModalOpen = false;
+                this.loaderComponent.hide();
+                this.toastColor = "success";
+                this.toastMessage = `cliente ${operationText.toLowerCase()} correctamente`;
+                this.setOpenedToast(true);
+                this.cleanForm();
+                this.getCountElements();
+              },
+              error: (error: any) => {
+                console.error("Error al guardar el asesor:", error);
+                this.toastColor = "danger";
+                this.toastMessage = `Error al guardar el asesor`;
+                this.setOpenedToast(true);
+              },
+            });
+        }
+
+        if (this.selectedAsesor && operation === 'edit') {
+          this._globalService.PutId('personas/asesor', data.id, {
+            usuarioId: this.selectedAsesor.id,
+            clienteId: data.id,
+          }).subscribe({
+            next: (response: any) => {
+              console.log("Asesor actualizado:", response);
+              this.isModalOpen = false;
+              this.loaderComponent.hide();
+              this.toastColor = "success";
+              this.toastMessage = `cliente ${operationText.toLowerCase()} correctamente`;
+              this.setOpenedToast(true);
+              this.cleanForm();
+              this.getCountElements();
+            },
+            error: (error: any) => {
+              console.error("Error al actualizar el asesor:", error);
+              this.loaderComponent.hide();
+              this.toastColor = "danger";
+              this.toastMessage = `Error al actualizar el asesor`;
+              this.setOpenedToast(true);
+            },
+          })
+        } else {
+          this._globalService.Delete("personas/asesor", data.id).subscribe({
+            next: (response: any) => {
+              console.log("Asesor eliminado:", response);
+              this.isModalOpen = false;
+              this.loaderComponent.hide();
+              this.toastColor = "success";
+              this.toastMessage = `cliente ${operationText.toLowerCase()} correctamente`;
+              this.setOpenedToast(true);
+              this.cleanForm();
+              this.getCountElements();
+            },
+            error: (error: any) => {
+              console.error("Error al eliminar el asesor:", error);
+              this.toastColor = "danger";
+              this.toastMessage = `Error al eliminar el asesor`;
+              this.setOpenedToast(true);
+            },
+          });
+        }
+
       },
       error: (error: any) => {
         console.error(
