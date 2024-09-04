@@ -25,13 +25,19 @@ import {authenticate} from '@loopback/authentication';
 import {inject, service} from '@loopback/core';
 import {JWTService} from '../services';
 import {SecurityBindings, securityId, UserProfile} from '@loopback/security';
-import {UsuarioClienteRepository, UsuarioRepository} from '../repositories';
+import {
+  PersonasRepository,
+  UsuarioClienteRepository,
+  UsuarioRepository,
+} from '../repositories';
 
 // @authenticate('jwt')
 export class PrestamosController {
   constructor(
     @repository(UsuarioClienteRepository)
     public usuarioClienteRepository: UsuarioClienteRepository,
+    @repository(PersonasRepository)
+    public personasRepository: PersonasRepository,
     @repository(UsuarioRepository)
     public usuarioRepository: UsuarioRepository,
     @repository(PrestamosRepository)
@@ -70,8 +76,35 @@ export class PrestamosController {
     content: {'application/json': {schema: CountSchema}},
   })
   async count(
+    @inject(SecurityBindings.USER)
+    currentUser: UserProfile,
     @param.where(Prestamos) where?: Where<Prestamos>,
   ): Promise<Count> {
+    console.log('Usuario Logueado: ', currentUser);
+    const userId = parseInt(currentUser[securityId], 10);
+    console.log('Id de Usuario Logueado: ', userId);
+
+    const user = await this.usuarioRepository.findById(userId);
+    if (!user) {
+      throw new HttpErrors.Unauthorized('Usuario no encontrado');
+    }
+    console.log('Usuario encontrado: ', user);
+
+    if (user.rolid === 3) {
+      const usuariosClientes = await this.usuarioClienteRepository.find({
+        where: {usuarioId: userId, estado: true},
+        include: ['cliente'],
+      });
+
+      console.log('Clientes del Usuario Logueado: ', usuariosClientes);
+      const idsClientes = usuariosClientes.map(u => u.clienteId);
+      console.log('Ids de Clientes del Usuario Logueado: ', idsClientes);
+      return this.prestamosRepository.count({
+        idCliente: {inq: idsClientes},
+        estado: true,
+      });
+    }
+
     return this.prestamosRepository.count({
       estado: true,
     });
@@ -338,9 +371,74 @@ export class PrestamosController {
 
   @get('/prestamos/search')
   async dataPrestamosSearch(
+    @inject(SecurityBindings.USER)
+    currentUser: UserProfile,
     @param.query.string('query') search: string,
   ): Promise<any> {
-    let PrestamosSearch = await this.prestamosRepository.find({
+
+    console.log('Query a buscar: ', search);
+    console.log('Usuario Logueado: ', currentUser);
+    const userId = parseInt(currentUser[securityId], 10);
+    console.log('Id de Usuario Logueado: ', userId);
+
+    const user = await this.usuarioRepository.findById(userId);
+    if (!user) {
+      throw new HttpErrors.Unauthorized('Usuario no encontrado');
+    }
+    console.log('Usuario encontrado: ', user);
+
+    if (user.rolid === 3) {
+      const clientes = await this.personasRepository.find({
+        where: {
+          or: [
+            {nombres: {like: `%${search}%`}},
+            {apellidos: {like: `%${search}%`}},
+          ],
+        },
+      });
+
+      console.log('Clientes del Usuario Logueado: ', clientes);
+      const idsClientes = clientes.map(u => u.clienteId);
+
+      const prestamos = await this.prestamosRepository.find({
+        where: {
+          clienteId: {
+            inq: idsClientes,
+          },
+          estado: true,
+        },
+        include: [
+          'cliente',
+          'producto',
+          'periodo',
+          'estadoAprobacion',
+          'planPago',
+          'moneda',
+          'aval',
+        ],
+      });
+      return prestamos;
+    }
+
+    const clientes = await this.personasRepository.find({
+      where: {
+        or: [
+          {nombres: {like: `%${search}%`}},
+          {apellidos: {like: `%${search}%`}},
+        ],
+      },
+    });
+
+    console.log('Clientes del Usuario Logueado: ', clientes);
+    const idsClientes = clientes.map(u => u.id);
+
+    const prestamos = await this.prestamosRepository.find({
+      where: {
+        clienteId: {
+          inq: idsClientes,
+        },
+        estado: true,
+      },
       include: [
         'cliente',
         'producto',
@@ -350,13 +448,7 @@ export class PrestamosController {
         'moneda',
         'aval',
       ],
-      where: {
-        or: [
-          {nombres: {like: `%${search}%`}},
-          {apellidos: {like: `%${search}%`}},
-        ],
-      },
     });
-    return PrestamosSearch;
+    return prestamos;
   }
 }
