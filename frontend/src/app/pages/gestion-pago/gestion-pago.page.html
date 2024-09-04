@@ -178,13 +178,13 @@
                   <div class="row">
                     <div class="col-sm-12 col-md-8">
                       <h2>
-                        <span class="fw-bold">Estado de Cuenta</span> - @if
+                        <span class="fw-bold">Estado de Cuenta</span>: @if
                         (clienteSeleccionado?.id) {
                         {{clienteSeleccionado.nombres}}
                         {{clienteSeleccionado.apellidos}} }@else { No Aún }
                       </h2>
                       <h2>
-                        <span class="fw-bold">Identitad #</span> - @if
+                        <span class="fw-bold">Identitad #</span>: @if
                         (clienteSeleccionado?.id) { {{clienteSeleccionado.dni |
                         formatDni}} }@else { No Aún }
                       </h2>
