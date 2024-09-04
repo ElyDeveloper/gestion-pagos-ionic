@@ -12,12 +12,13 @@ import {
 import {FechasPagos, Prestamos} from '../models';
 import {
   HttpErrors,
+  get,
   param,
   patch,
   post,
   requestBody,
   RestBindings,
-  Response as RestResponse,
+  Response,
 } from '@loopback/rest';
 import {inject, service} from '@loopback/core';
 import {JWTService} from '../services';
@@ -26,10 +27,7 @@ import {Request as ExpressRequest, Response as ExpressResponse} from 'express';
 import {keys} from '../env/interfaces/Servicekeys.interface';
 import * as fs from 'fs';
 import * as path from 'path';
-import {promisify} from 'util';
-import {deflate} from 'zlib';
-import {error} from 'console';
-import {throws} from 'assert';
+
 
 // Configuración de multer para la carga de archivos
 const storage = multer.diskStorage({
@@ -435,35 +433,61 @@ private async saveOrUpdatePaymentDates(
     await this.prestamosRepository.updateById(id, updateData);
   }
 
-
-  //Endpoint para traer un archivo recibiendo la ruta
-  @post('/pagos/getFile', {
+  // Método para obtener un archivo
+  @get('/getFile', {
     responses: {
       '200': {
-        description: 'Archivo obtenido exitosamente',
-        content: {'application/json': {schema: {type: 'object'}}},
+        description: 'Return the requested file',
+        content: {'*/*': {}},
       },
     },
   })
   async getFile(
-    @param.query.string('filePath') filePath: string,
-  ):Promise<fs.ReadStream>{
-    const fileExists = promisify(fs.exists);
-    const stat = promisify(fs.stat);
+    @param.query.string('filepath') filepath: string, // Recibe el parámetro filepath desde la query string
+    @inject(RestBindings.Http.RESPONSE) response: Response, // Inyecta la respuesta HTTP
+  ): Promise<any> {
+    try {
+      // Construye la ruta completa del archivo
+      const fullPath = path.resolve(filepath);
 
-    //Verificar si el archivo existe
-    if(!(await fileExists(filePath))){
-      throw new HttpErrors.NotFound('El archivo no existe o no se encontro en la ruta especificada');
-    }
+      // Verifica si el archivo existe
+      if (!fs.existsSync(fullPath)) {
+        response.status(404).send('File not found');
+        return;
+      }
 
-    const fileStat = await stat(filePath);
-  
-    //Verifica si es un archivo
-    if(!fileStat.isFile()){
-      throw new HttpErrors.BadRequest('La ruta especificada no corresponde a un archivo');
+      // Obtén la extensión del archivo para determinar el tipo MIME
+      const mimeType = this.getMimeType(fullPath);
+
+      // Establece los encabezados para la respuesta, incluyendo el tipo MIME adecuado
+      response.setHeader('Content-Type', mimeType);
+
+      // Devuelve el archivo como respuesta
+      return fs.createReadStream(fullPath).pipe(response);
+    } catch (error) {
+      response.status(500).send(`Error fetching file: ${error.message}`);
     }
-    
-    return fs.createReadStream(filePath);
   }
+
+  // Método para obtener el tipo MIME basado en la extensión del archivo
+  getMimeType(filePath: string): string {
+    const ext = path.extname(filePath).toLowerCase();
+    switch (ext) {
+      case '.jpg':
+      case '.jpeg':
+        return 'image/jpeg';
+      case '.png':
+        return 'image/png';
+      case '.gif':
+        return 'image/gif';
+      case '.pdf':
+        return 'application/pdf';
+      case '.txt':
+        return 'text/plain';
+        default:
+        return 'application/octet-stream';
+    }
+  }
+
 
 }
