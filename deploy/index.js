@@ -8,9 +8,9 @@ const rl = readline.createInterface({
 
 // Configuración del servicio
 const svc = new Service({
-  name: 'MiAppAngularService',
-  description: 'Servicio para mi aplicación Angular/Ionic',
-  script: './server.js'
+    name: 'BackendPrestamosFICRE',
+    description: 'Servicio de Backend para Sistema de Prestamos',
+  script: '../backend/dist/index.js'
 });
 
 // Función para instalar el servicio
