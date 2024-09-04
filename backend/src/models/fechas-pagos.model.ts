@@ -1,5 +1,6 @@
-import {Entity, model, property, belongsTo} from '@loopback/repository';
+import {Entity, model, property, belongsTo, hasMany} from '@loopback/repository';
 import {PlanesPago} from './planes-pago.model';
+import {Pagos} from './pagos.model';
 
 @model({settings: {idInjection: false, mssql: {schema: 'dbo', table: 'FechasPagos'}}})
 export class FechasPagos extends Entity {
@@ -43,6 +44,9 @@ export class FechasPagos extends Entity {
 
   @belongsTo(() => PlanesPago, {name: 'planPago'})
   planId: number;
+
+  @hasMany(() => Pagos, {keyTo: 'idFechaPago'})
+  pagos: Pagos[];
   // Define well-known properties here
 
   // Indexer property to allow additional data

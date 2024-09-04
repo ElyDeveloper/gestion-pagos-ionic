@@ -18,11 +18,11 @@ export class UsuarioClienteRepository extends DefaultCrudRepository<
     @repository.getter('UsuarioRepository') protected usuarioRepositoryGetter: Getter<UsuarioRepository>,
   ) {
     super(UsuarioCliente, dataSource);
-    this.cliente = this.createBelongsToAccessorFor('Cliente', clientesRepositoryGetter);
-    this.registerInclusionResolver('Cliente', this.cliente.inclusionResolver);
+    this.cliente = this.createBelongsToAccessorFor('cliente', clientesRepositoryGetter);
+    this.registerInclusionResolver('cliente', this.cliente.inclusionResolver);
 
-    this.usuario = this.createBelongsToAccessorFor('Usuario', usuarioRepositoryGetter);
-    this.registerInclusionResolver('Usuario', this.usuario.inclusionResolver);
+    this.usuario = this.createBelongsToAccessorFor('usuario', usuarioRepositoryGetter);
+    this.registerInclusionResolver('usuario', this.usuario.inclusionResolver);
   }
 
 

@@ -149,7 +149,12 @@ export class FechasPagosController {
   ): Promise<FechasPagos[]> {
     return await this.FechasPagosRepository.find({
       where: {planId: id},
-      include: [{ relation: 'planPago' }],
+      include: ['planPago', {
+        relation: 'pagos',
+        scope: {
+          order: ['id DESC'],
+        },
+      }],
       order: ['fechaPago ASC'],
 
     });

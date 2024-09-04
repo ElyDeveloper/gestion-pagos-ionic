@@ -69,11 +69,12 @@ export class HomePage {
   constructor() {}
 
   ngOnInit(): void {
-    this.getUserLoggedIn();
   }
 
-  ionViewWillEnter() {
-    this.updateFolderCounts();
+  ionViewDidEnter() {
+    console.log("Llamado a obtencion de usuario");
+    this.getUserLoggedIn();
+
   }
 
   ionViewWillLeave() {
@@ -82,16 +83,19 @@ export class HomePage {
   }
 
   getUserLoggedIn() {
-    this._authService.getUserInfo().subscribe({
-      next: (user: any) => {
-        this.userLogged = user;
-        console.log("User logged: ", this.userLogged);
-      },
-      error: (error) => {
-        console.error("Error al obtener usuario logueado", error);
-        this._router.navigate(["/login"]);
-      },
-    });
+    this.suscriptions.push(
+      this._authService.getUserInfo().subscribe({
+        next: (user: any) => {
+          this.userLogged = user;
+          console.log("User logged: ", this.userLogged);
+          this.updateFolderCounts();
+        },
+        error: (error) => {
+          console.error("Error al obtener usuario logueado", error);
+          this._router.navigate(["/login"]);
+        },
+      })
+    );
   }
 
   async updateFolderCounts() {
@@ -140,7 +144,7 @@ export class HomePage {
         },
       })
     );
-    
+
     this.suscriptions.push(
       this._globalService.Get("prestamos/count").subscribe({
         next: (data: any) => {

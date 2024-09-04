@@ -39,7 +39,6 @@
                 </span>
               </ng-template>
             </div>
-            
           </div>
           <div class="input-group">
             <input
@@ -86,115 +85,145 @@
   </ion-card-header>
 
   <ion-card-content>
-    <div class="table-responsive d-none d-md-block">
-      <table class="custom-table">
-        <thead>
-          <tr>
-            <th *ngFor="let column of columnsData" class="text-center">
-              {{ column.alias }}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let row of data">
-            <td *ngFor="let column of columnsData" class="text-center">
-              <ng-container
-                *ngIf="column.key !== 'actions'; else actionsTemplate">
-                <ng-container [ngSwitch]="column.type">
-                  <ng-container *ngSwitchCase="'boolean'">
-                    <span
-                      class="badge"
-                      [ngClass]="{
-                        'text-bg-success': getCellValue(row, column) === 'true',
-                        'text-bg-secondary':
-                          getCellValue(row, column) === 'false'
-                      }">
+    <ng-container>
+      <section>
+        <ng-content select="[headerContent]"></ng-content>
+      </section>
+      <div class="table-responsive d-none d-md-block">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th *ngFor="let column of columnsData" class="text-center">
+                {{ column.alias }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of data">
+              <td *ngFor="let column of columnsData" class="text-center">
+                <ng-container
+                  *ngIf="column.key !== 'actions'; else actionsTemplate">
+                  <ng-container [ngSwitch]="column.type">
+                    <ng-container *ngSwitchCase="'boolean'">
+                      <span
+                        class="badge"
+                        [ngClass]="{
+                          'text-bg-success':
+                            getCellValue(row, column) === 'true',
+                          'text-bg-secondary':
+                            getCellValue(row, column) === 'false'
+                        }">
+                        {{
+                          getCellValue(row, column) === "true"
+                            ? getCellOptions(column)[0]
+                            : getCellOptions(column)[1]
+                        }}
+                        <!-- {{ getCellValue(row, column) }} -->
+                      </span>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'options'">
+                      <span
+                        class="badge"
+                        [ngClass]="getClassForOption(column, row)">
+                        {{ getCellOptionValue(row, column) }}
+                      </span>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'array'">
+                      <ng-container
+                        *ngFor="let item of getValuesArray(row, column)">
+                        <ion-chip>
+                          <ion-label
+                            >{{
+                              item[getCellPropsVisibles(column)[0]]
+                                | customDate : 6 : "dd/MM/yyyy"
+                            }}
+
+                            <strong>{{
+                              item[getCellPropsVisibles(column)[1]]
+                                | currency : "L" : "symbol"
+                            }}</strong></ion-label
+                          >
+                          <ion-icon
+                            (click)="onDeleteButtonClick(item)"
+                            name="close-circle"></ion-icon>
+                        </ion-chip>
+                      </ng-container>
+                    </ng-container>
+
+                    <ng-container *ngSwitchCase="'date'">
                       {{
-                        getCellValue(row, column) === "true"
-                          ? getCellOptions(column)[0]
-                          : getCellOptions(column)[1]
+                        getCellValue(row, column)
+                          | customDate : 6 : "dd/MM/yyyy"
                       }}
-                      <!-- {{ getCellValue(row, column) }} -->
-                    </span>
-                  </ng-container>
-                  <ng-container *ngSwitchCase="'options'">
-                    <span
-                      class="badge"
-                      [ngClass]="getClassForOption(column, row)">
-                      {{ getCellOptionValue(row, column) }}
-                    </span>
-                  </ng-container>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'percentage'">
+                      {{ getCellValue(row, column) | number : "1.2-2" }}%
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'currency'">
+                      {{
+                        getCellValue(row, column) | currency : "L" : "symbol"
+                      }}
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'dni'">
+                      {{ getCellValue(row, column) | formatDni }}
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'xml'">
+                      @for (item of getCellValue(row, column) | xmlToList; track
+                      item) {
+                      <p>{{ item }}</p>
+                      } @empty {
+                      <p>No existen Elementos para mostrar.</p>
+                      }
 
-                  <ng-container *ngSwitchCase="'date'">
-                    {{
-                      getCellValue(row, column) | customDate : 6 : "dd/MM/yyyy"
-                    }}
-                  </ng-container>
-                  <ng-container *ngSwitchCase="'percentage'">
-                    {{ getCellValue(row, column) | number : "1.2-2" }}%
-                  </ng-container>
-                  <ng-container *ngSwitchCase="'currency'">
-                    {{ getCellValue(row, column) | currency : "L" : "symbol" }}
-                  </ng-container>
-                  <ng-container *ngSwitchCase="'dni'">
-                    {{ getCellValue(row, column) | formatDni }}
-                  </ng-container>
-                  <ng-container *ngSwitchCase="'xml'">
-                    @for (item of getCellValue(row, column) | xmlToList; track
-                    item) {
-                    <p>{{ item }}</p>
-                    } @empty {
-                    <p>No existen Elementos para mostrar.</p>
-                    }
-
-                    <!-- {{ getCellValue(row, column) | xmlToList }} -->
-                  </ng-container>
-                  <ng-container *ngSwitchCase="'image'">
-                    <!-- {{ getCellValue(row, column) }} <br /> -->
-                    <img
-                      [src]="'assets/flags/' + getImageUrl(row, column)"
-                      [alt]="getCellValue(row, column)"
-                      class="flag-image" />
-                  </ng-container>
-                  <ng-container *ngSwitchDefault>
-                    {{ getCellValue(row, column) }}
+                      <!-- {{ getCellValue(row, column) | xmlToList }} -->
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'image'">
+                      <!-- {{ getCellValue(row, column) }} <br /> -->
+                      <img
+                        [src]="'assets/flags/' + getImageUrl(row, column)"
+                        [alt]="getCellValue(row, column)"
+                        class="flag-image" />
+                    </ng-container>
+                    <ng-container *ngSwitchDefault>
+                      {{ getCellValue(row, column) }}
+                    </ng-container>
                   </ng-container>
                 </ng-container>
-              </ng-container>
-              <ng-template #actionsTemplate>
-                <div class="d-flex justify-content-around">
-                  <ng-container
-                    *ngFor="let action of column.lstActions; let i = index">
-                    @if (!action.rolesAuthorized || (userLogged.rolid &&
-                    action.rolesAuthorized.includes(userLogged.rolid))) {
-                    <div>
-                      <ion-button
-                        [id]="'action-button-' + i"
-                        [color]="action.color"
-                        (click)="onActionClick(row, action.action)"
-                        [attr.aria-label]="action.alias"
-                        shape="round"
-                        class="me-2"
-                        data-bs-toggle="tooltip"
-                        data-bs-placement="top"
-                        [title]="
-                          action.alias + ' ' + context ||
-                          'Descripción no disponible'
-                        ">
-                        <ion-icon
-                          slot="icon-only"
-                          [name]="action.icon"></ion-icon>
-                      </ion-button>
-                    </div>
-                    }
-                  </ng-container>
-                </div>
-              </ng-template>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+                <ng-template #actionsTemplate>
+                  <div class="d-flex justify-content-around">
+                    <ng-container
+                      *ngFor="let action of column.lstActions; let i = index">
+                      @if (!action.rolesAuthorized || (userLogged.rolid &&
+                      action.rolesAuthorized.includes(userLogged.rolid))) {
+                      <div>
+                        <ion-button
+                          [id]="'action-button-' + i"
+                          [color]="action.color"
+                          (click)="onActionClick(row, action.action)"
+                          [attr.aria-label]="action.alias"
+                          shape="round"
+                          class="me-2"
+                          data-bs-toggle="tooltip"
+                          data-bs-placement="top"
+                          [title]="
+                            action.alias + ' ' + context ||
+                            'Descripción no disponible'
+                          ">
+                          <ion-icon
+                            slot="icon-only"
+                            [name]="action.icon"></ion-icon>
+                        </ion-button>
+                      </div>
+                      }
+                    </ng-container>
+                  </div>
+                </ng-template>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </ng-container>
   </ion-card-content>
 </ion-card>
 

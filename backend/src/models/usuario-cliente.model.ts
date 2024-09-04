@@ -19,10 +19,10 @@ export class UsuarioCliente extends Entity {
   id?: number;
 
   // Define well-known properties here
-  @belongsTo(() => Usuario, {name: 'Usuario'})
+  @belongsTo(() => Usuario, {name: 'usuario'})
   usuarioId:number;
   
-  @belongsTo(() => Personas, {name: 'Cliente'})
+  @belongsTo(() => Personas, {name: 'cliente'})
   clienteId:number;
   
   // Indexer property to allow additional data
