@@ -61,6 +61,7 @@ export class GestionContractPage implements OnInit {
   lugarAcuerdo: string = "";
 
   textLoader: string = "Cargando...";
+  toastColor: string = "primary";
   toastMessage: string = "cliente guardado correctamente";
   title: string = "Todos";
   action: string = "todos";

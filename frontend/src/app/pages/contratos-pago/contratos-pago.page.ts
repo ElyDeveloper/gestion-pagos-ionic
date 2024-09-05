@@ -46,6 +46,7 @@ export class ContratosPagoPage implements OnInit {
   isEdit = false;
 
   textLoader: string = "Cargando...";
+  toastColor: string = "primary";
   toastMessage: string = "cliente guardado correctamente";
   title: string = "Todos";
   action: string = "todos";

@@ -1,15 +1,12 @@
 <ion-content [fullscreen]="true">
-  <app-loader [textLoader]="textLoader"></app-loader>
-
-  <ion-toast
-    [isOpen]="isToastOpen"
-    message="{{toastMessage}}"
-    [duration]="5000"
-    [color]="toastColor"
-    (didDismiss)="setOpenedToast(false)"></ion-toast>
   <ng-container>
-    <app-breadcrumb></app-breadcrumb>
-
+    <app-wrapper
+      [textLoader]="textLoader"
+      [toastMessage]="toastMessage"
+      [toastColor]="toastColor"
+      [isToastOpen]="isToastOpen"
+      (isToastOpenChange)="setOpenedToast($event)">
+    </app-wrapper>
     <ion-card id="pago-form">
       <ion-card-content>
         <div
@@ -51,7 +48,7 @@
             <ion-icon class="ms-2" name="open-outline"></ion-icon>
           </button>
           <button class="ms-2 btn btn-danger" (click)="printSection()">
-            Imprimir Estado de Cuenta
+            Imprimir Detalle de Pagos
             <ion-icon name="print-outline"></ion-icon>
           </button>
         </div>
@@ -183,7 +180,7 @@
                   (deleteButtonClicked)="onDeleteButtonClicked($event)">
                   <div headerContent>
                     <div class="row">
-                      <h1 style="text-align: center;">Estado de Cuenta</h1>
+                      <h1 style="text-align: center">Detalle de Pagos</h1>
                       <div class="col-sm-12 col-md-8">
                         <h2>
                           <span class="fw-bold">Cliente</span>: @if

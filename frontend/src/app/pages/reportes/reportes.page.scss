@@ -1,0 +1,71 @@
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+th,
+td {
+  border: 1px solid #ddd;
+  padding: 4px;
+  text-align: left;
+}
+th {
+  background-color: #f2f2f2;
+  text-align: center;
+}
+
+.especial-right {
+  text-align: right !important;
+}
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.section {
+  margin-top: 15px;
+  font-weight: bold;
+}
+
+
+.cliente-info {
+  font-family: Arial, sans-serif;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+.info-item {
+  margin-bottom: 10px;
+  padding-right: 10px;
+  border-right: 1px solid #ccc; /* Borde derecho añadido */
+}
+.info-label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+}
+.info-value {
+  display: block;
+}
+/* Quitar el borde derecho del último elemento en cada fila */
+.info-item:last-child,
+.info-item:nth-child(3n) {
+  border-right: none;
+}
+@media (max-width: 600px) {
+  .info-grid {
+      grid-template-columns: 1fr;
+  }
+  .info-item {
+      border-right: none;
+      border-bottom: 1px solid #ccc; /* Borde inferior para vista móvil */
+  }
+  .info-item:last-child {
+      border-bottom: none;
+  }
+}

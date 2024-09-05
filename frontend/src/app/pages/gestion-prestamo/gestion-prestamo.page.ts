@@ -58,6 +58,7 @@ export class GestionPrestamoPage implements OnInit {
   hasAval = false;
 
   toastMessage: string = "cliente guardado correctamente";
+  textLoader: string = "cargando";
   toastColor: string = "primary";
 
   searchClient: string = "";

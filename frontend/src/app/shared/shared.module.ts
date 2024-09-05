@@ -6,7 +6,6 @@ import { AuthModule } from "src/app/pages/auth/auth.module";
 import { ViewDataComponent } from "./components/view-data/view-data.component";
 import { ReusableModalComponent } from "./components/reusable-modal/reusable-modal.component";
 import { NavbarComponent } from "./components/navbar/navbar.component";
-import { BreadcrumbComponent } from "./components/breadcrumb/breadcrumb.component";
 import { CardViewInfoComponent } from "./components/card-view-info/card-view-info.component";
 import { UploaderComponent } from "./components/uploader/uploader.component";
 
@@ -22,15 +21,17 @@ import { FileUploadModule } from "ng2-file-upload";
 import { NgSelectModule } from "@ng-select/ng-select";
 import { InputMaskDirective } from "./directives/input-mask.directive";
 import { NgxPrintModule } from "ngx-print";
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { NzResultModule } from 'ng-zorro-antd/result';
+import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
+import { NzListModule } from 'ng-zorro-antd/list';
 
-import { NgbDatepickerModule } from "@ng-bootstrap/ng-bootstrap";
 
 @NgModule({
   declarations: [
     ViewDataComponent,
     ReusableModalComponent,
     NavbarComponent,
-    BreadcrumbComponent,
     CardViewInfoComponent,
     UploaderComponent,
     CustomDatePipe,
@@ -43,8 +44,12 @@ import { NgbDatepickerModule } from "@ng-bootstrap/ng-bootstrap";
     AuthModule,
     FileUploadModule,
     NgSelectModule,
-    NgbDatepickerModule,
     NgxPrintModule,
+    NzDatePickerModule,  // IMPORTANT: for Ant Design DatePicker
+    NzResultModule,  // IMPORTANT: for Ant Design Result Module
+    NzSkeletonModule,  // IMPORTANT: for Ant Design Skeleton Module
+    NzListModule,  // IMPORTANT: for Ant Design List Module
+    
   ],
   exports: [
     AuthModule,
@@ -53,7 +58,6 @@ import { NgbDatepickerModule } from "@ng-bootstrap/ng-bootstrap";
     ViewDataComponent,
     ReusableModalComponent,
     NavbarComponent,
-    BreadcrumbComponent,
     CardViewInfoComponent,
     UploaderComponent,
     CustomDatePipe,
@@ -61,8 +65,11 @@ import { NgbDatepickerModule } from "@ng-bootstrap/ng-bootstrap";
     NumberToWordsPipe,
     XmlToListPipe,
     InputMaskDirective,
-    NgbDatepickerModule,
     NgxPrintModule,
+    NzDatePickerModule,  // IMPORTANT: for Ant Design DatePicker
+    NzResultModule,  // IMPORTANT: for Ant Design Result Module
+    NzSkeletonModule,  // IMPORTANT: for Ant Design Skeleton Module
+    NzListModule,  // IMPORTANT: for Ant Design List Module
   ],
   providers: [DatePipe],
 })

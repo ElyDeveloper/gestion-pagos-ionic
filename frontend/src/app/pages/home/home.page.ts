@@ -54,7 +54,7 @@ export class HomePage {
     {
       name: "Reportes",
       count: 0,
-      url: "/layout/reportes-pagos",
+      url: "/layout/reportes",
       rolesAuthorized: [1, 2],
     },
   ];

@@ -1,10 +1,11 @@
 <ion-content [fullscreen]="true">
-  <app-loader [textLoader]="textLoader"></app-loader>
-  <ion-toast
-    [isOpen]="isToastOpen"
-    message="{{toastMessage}}"
-    [duration]="5000"
-    (didDismiss)="setOpenedToast(false)"></ion-toast>
+  <app-wrapper
+    [textLoader]="textLoader"
+    [toastMessage]="toastMessage"
+    [toastColor]="toastColor"
+    [isToastOpen]="isToastOpen"
+    (isToastOpenChange)="setOpenedToast($event)">
+  </app-wrapper>
 
   <div
     class="alert alert-danger sticky-top"
@@ -188,8 +189,11 @@
 
   <div>
     <!-- <ion-card-content id="print-element" > -->
-    <div id="contentToPrint" #contentToPrint class="d-flex justify-content-center ">
-      <div  [ngClass]="{'container': !isPrint, 'm-2':isPrint}">
+    <div
+      id="contentToPrint"
+      #contentToPrint
+      class="d-flex justify-content-center">
+      <div [ngClass]="{'container': !isPrint, 'm-2':isPrint}">
         <div class="row">
           <ion-item>
             <img src="assets/logo.png" alt="" width="100" />

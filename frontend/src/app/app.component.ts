@@ -22,7 +22,7 @@ export class AppComponent {
     },
     { title: "Préstamos", url: "/layout/prestamos", icon: "cash" },
     { title: "Pagos", url: "/layout/pagos", icon: "card" },
-    { title: "Reportes", url: "/layout/reportes-pagos", icon: "stats-chart" },
+    { title: "Reportes", url: "/layout/reportes", icon: "stats-chart" },
   ];
 
   private backdropFixService = inject(BackdropFixService);
