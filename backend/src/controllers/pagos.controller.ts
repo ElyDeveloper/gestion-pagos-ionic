@@ -27,6 +27,7 @@ import {
   DocumentosRepository,
   DocumentosTipoDocRepository,
   FechasPagosRepository,
+  MorasRepository,
   PagosRepository,
 } from '../repositories';
 
@@ -35,6 +36,8 @@ export class PagosController {
   constructor(
     @repository(PagosRepository)
     public pagosRepository: PagosRepository,
+    @repository(MorasRepository)
+    public morasRepository: MorasRepository,
     @repository(FechasPagosRepository)
     public fechasPagosRepository: FechasPagosRepository,
     @repository(DocumentosRepository)
@@ -206,14 +209,14 @@ export class PagosController {
     }
 
     //Eliminar mora por idFechaPago
-    const mora = await this.documentosRepository.findOne({
+    const mora = await this.morasRepository.findOne({
       where: {
         idFechaPago: pago.idFechaPago,
       },
     });
 
     if (mora) {
-      await this.documentosRepository.deleteById(mora.id);
+      await this.morasRepository.deleteById(mora.id);
     }
 
     await this.fechasPagosRepository.updateById(pago.idFechaPago, {

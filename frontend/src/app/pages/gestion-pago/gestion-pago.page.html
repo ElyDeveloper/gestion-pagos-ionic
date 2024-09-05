@@ -7,7 +7,7 @@
     [duration]="5000"
     [color]="toastColor"
     (didDismiss)="setOpenedToast(false)"></ion-toast>
-  <ng-container *ngIf="!isPrint">
+  <ng-container>
     <app-breadcrumb></app-breadcrumb>
 
     <ion-card id="pago-form">
@@ -50,10 +50,10 @@
             Ver Prestamos
             <ion-icon class="ms-2" name="open-outline"></ion-icon>
           </button>
-          <!-- <button class=" ms-2 btn btn-danger" (click)="printSection()">
+          <button class="ms-2 btn btn-danger" (click)="printSection()">
             Imprimir Estado de Cuenta
             <ion-icon name="print-outline"></ion-icon>
-          </button> -->
+          </button>
         </div>
       </ion-card-content>
     </ion-card>
@@ -167,12 +167,13 @@
                   </ion-card-content>
                 </ion-card>
               </div>
-              <div class="col-md-8 col-sm-12">
+              <div class="col-md-8 col-sm-12" id="print-section">
                 <app-view-data
                   [showAdd]="false"
                   [showTitle]="false"
                   [showPagination]="false"
                   [showSearch]="false"
+                  [isPrint]="isPrint"
                   [currentPage]="1"
                   [totalPages]="10"
                   [context]="'fecha de pago'"
@@ -182,12 +183,18 @@
                   (deleteButtonClicked)="onDeleteButtonClicked($event)">
                   <div headerContent>
                     <div class="row">
+                      <h1 style="text-align: center;">Estado de Cuenta</h1>
                       <div class="col-sm-12 col-md-8">
                         <h2>
-                          <span class="fw-bold">Estado de Cuenta</span>: @if
+                          <span class="fw-bold">Cliente</span>: @if
                           (clienteSeleccionado?.id) {
                           {{clienteSeleccionado.nombres}}
                           {{clienteSeleccionado.apellidos}} }@else { No Aún }
+                          <img
+                            *ngIf="isPrint"
+                            src="assets/logo.png"
+                            width="100"
+                            alt="" />
                         </h2>
                         <h2>
                           <span class="fw-bold">Identitad #</span>: @if
@@ -202,7 +209,11 @@
                       </div>
                       <div
                         class="col-sm-12 col-md-4 d-flex justify-content-end">
-                        <img src="assets/logo.png" width="100" alt="" />
+                        <img
+                          *ngIf="!isPrint"
+                          src="assets/logo.png"
+                          width="100"
+                          alt="" />
                       </div>
                     </div>
                   </div>
@@ -235,7 +246,7 @@
                             <ion-col size="12">
                               <ion-item>
                                 <ion-label position="stacked" class="bold-label"
-                                  >Monto Cuota:</ion-label
+                                  >Monto Pago:</ion-label
                                 >
                                 <ion-input
                                   type="number"
@@ -288,45 +299,4 @@
       </ion-card-content>
     </ion-card></ng-container
   >
-
-  <ng-container *ngIf="isPrint">
-    <app-view-data
-      id="contentToPrint"
-      #contentToPrint
-      [showAdd]="false"
-      [showTitle]="false"
-      [showPagination]="false"
-      [showSearch]="false"
-      [currentPage]="1"
-      [totalPages]="10"
-      [context]="'fecha de pago'"
-      [data]="elements"
-      [columnsData]="columnsData"
-      (selectButtonClicked)="onselectButtonClicked($event)"
-      (deleteButtonClicked)="onDeleteButtonClicked($event)">
-      <div headerContent>
-        <div class="row">
-          <div class="col-sm-12 col-md-8">
-            <h2>
-              <span class="fw-bold">Estado de Cuenta</span>: @if
-              (clienteSeleccionado?.id) { {{clienteSeleccionado.nombres}}
-              {{clienteSeleccionado.apellidos}} }@else { No Aún }
-            </h2>
-            <h2>
-              <span class="fw-bold">Identitad #</span>: @if
-              (clienteSeleccionado?.id) { {{clienteSeleccionado.dni |
-              formatDni}} }@else { No Aún }
-            </h2>
-            <h2>
-              <span class="fw-bold"> Prestamo: </span>
-              {{prestamoSeleccionado.totalMonto | currency : "L" : "symbol" }}
-            </h2>
-          </div>
-          <div class="col-sm-12 col-md-4 d-flex justify-content-end">
-            <img src="assets/logo.png" width="100" alt="" />
-          </div>
-        </div>
-      </div>
-    </app-view-data>
-  </ng-container>
 </ion-content>

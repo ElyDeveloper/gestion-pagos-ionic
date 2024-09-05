@@ -10,6 +10,7 @@ import {
 import { FormBuilder, FormGroup } from "@angular/forms";
 import { ActivatedRoute } from "@angular/router";
 import { FileUploader } from "ng2-file-upload";
+import { NgxPrintService, PrintOptions } from "ngx-print";
 import { Subscription } from "rxjs";
 import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
 import { UploaderComponent } from "src/app/shared/components/uploader/uploader.component";
@@ -34,8 +35,6 @@ export class GestionPagoPage implements OnInit {
     | UploaderComponent
     | undefined;
 
-  @Output() changeView: EventEmitter<void> = new EventEmitter();
-
   elements: FechasPagos[] = [];
   columnsData: Column[] = [];
 
@@ -46,7 +45,6 @@ export class GestionPagoPage implements OnInit {
 
   hasAval = false;
   hasMora = false;
-  isEditar = false;
   existContrato = false;
   isPrint = false;
 
@@ -75,6 +73,7 @@ export class GestionPagoPage implements OnInit {
 
   private globalService = inject(GlobalService);
   private route = inject(ActivatedRoute);
+  private printService = inject(NgxPrintService);
 
   constructor(private fb: FormBuilder) {
     this.formModels = new FormModels(this.fb);
@@ -84,62 +83,46 @@ export class GestionPagoPage implements OnInit {
   ngOnInit(): void {}
 
   printSection() {
-    this.textLoader = "Importando...";
     this.isPrint = true;
-    this.changeViewState();
+    this.textLoader = "Imprimiendo...";
     this.loaderComponent.show();
-    //Esperar 1 segundo para que se muestre el loader
+    const customPrintOptions: PrintOptions = new PrintOptions({
+      printSectionId: "print-section",
+
+      // Add any other print options as needed
+    });
+    this.printService.styleSheetFile = "assets/css/print.css";
+
+    //eliminar elemento         key: "actions", del objeto columnsData
+    const indexActions = this.columnsData.findIndex(
+      (column) => column.key === "actions"
+    );
+    if (indexActions !== -1) {
+      this.columnsData.splice(indexActions, 1);
+    }
+
+    //esperar 1 segundo para que se muestre el loader
     setTimeout(() => {
+      this.printService.print(customPrintOptions);
+
+      //Volver a colocar la columna actions
+      this.columnsData.splice(indexActions, 0, {
+        key: "actions",
+        alias: "Acciones",
+        lstActions: [
+          {
+            alias: "Seleccionar",
+            action: "select",
+            icon: "open",
+            color: "primary",
+            rolesAuthorized: [1, 2],
+          },
+        ],
+      });
+
+      this.isPrint = false;
       this.loaderComponent.hide();
-
-      var contentToPrint = document.getElementById(
-        "contentToPrint"
-      ) as HTMLElement;
-
-      //Verificar si hay contenido para imprimir
-      if (!contentToPrint) {
-        this.isPrint = false;
-        this.changeViewState();
-        return;
-      }
-
-      // Ocultar la URL del documento durante la impresión
-      const style = document.createElement("style");
-      style.innerHTML = `
-      @page {
-        size: A4 portrait;
-        margin: 0;
-      }
-  
-      @media print {
-        @page { margin-bottom: 0; margin-top: 0; }
-        body::after { content: none !important;
-      }
-    `;
-
-      // contentToPrint.innerHTML = contentToPrint.innerHTML;
-      contentToPrint.appendChild(style);
-
-      // var contentToPrint = document.getElementById('contentToPrint').innerHTML;
-      // document.body.innerHTML = contentToPrint.innerHTML;
-
-      //Esperar a que se cargue la imagen
-      setTimeout(() => {
-        // Imprimir el contenido
-        window.print();
-        //Eliminar los estilos
-        contentToPrint.removeChild(style);
-        this.isPrint = false;
-        console.log("Valor isPrint desde RangePicker: ", this.isPrint);
-        this.changeViewState();
-        console.log("Se ha restablecido el componente...");
-        // window.location.reload();
-      }, 3000);
     }, 1000);
-  }
-
-  changeViewState() {
-    this.changeView.emit();
   }
 
   setOpenedToast(value: boolean) {
@@ -200,10 +183,8 @@ export class GestionPagoPage implements OnInit {
     }
     if (data.estado === true) {
       console.log("Modo Edicion");
-      this.isEditar = true;
     } else {
       console.log("Modo Creación");
-      this.isEditar = false;
     }
 
     if (data.fechaPago === "" || data.fechaPago === null) {
@@ -229,62 +210,61 @@ export class GestionPagoPage implements OnInit {
     data.idPrestamo = this.prestamoSeleccionado.id;
     data.mora = this.mora;
 
-    if (!this.isEditar) {
-      this.globalService.PostWithFile("pagos/saveFile", data, file).subscribe({
-        next: (response) => {
-          console.log("Respuesta del Servidor: ", response);
-          this.getFechasPago(this.prestamoSeleccionado);
-          this.uploaderComponent?.uploader?.clearQueue();
+    this.globalService.PostWithFile("pagos/saveFile", data, file).subscribe({
+      next: (response) => {
+        console.log("Respuesta del Servidor: ", response);
+        this.getFechasPago(this.prestamoSeleccionado);
+        this.uploaderComponent?.uploader?.clearQueue();
 
-          // TODO: Mostrar mensaje de éxito
-          this.toastColor = "success";
-          this.toastMessage = "Pago guardado correctamente";
-          this.isToastOpen = true;
-        },
-        error: (error) => {
-          console.error("Error en el Servidor: ", error);
-          // TODO: Mostrar mensaje de error
-          this.toastColor = "danger";
-          this.toastMessage = "Error al guardar el pago";
-          this.isToastOpen = true;
-        },
-      });
-    }
-    {
-      this.globalService.PutWithFile("pagos/updateFile", data, file).subscribe({
-        next: (response) => {
-          console.log("Respuesta del Servidor: ", response);
-          this.getFechasPago(this.prestamoSeleccionado);
-          this.uploaderComponent?.uploader?.clearQueue();
-
-          // TODO: Mostrar mensaje de éxito
-          this.toastColor = "success";
-          this.toastMessage = "Pago modificado correctamente";
-          this.isToastOpen = true;
-        },
-        error: (error) => {
-          console.error("Error en el Servidor: ", error);
-
-          // TODO: Mostrar mensaje de error
-          this.toastColor = "danger";
-          this.toastMessage = "Error al modificar el pago";
-          this.isToastOpen = true;
-        },
-      });
-    }
+        // TODO: Mostrar mensaje de éxito
+        this.toastColor = "success";
+        this.toastMessage = "Pago guardado correctamente";
+        this.isToastOpen = true;
+      },
+      error: (error) => {
+        console.error("Error en el Servidor: ", error);
+        // TODO: Mostrar mensaje de error
+        this.toastColor = "danger";
+        this.toastMessage = "Error al guardar el pago";
+        this.isToastOpen = true;
+      },
+    });
   }
 
   changeDate(): void {
     const date = this.pagoForm.get("fechaPago")?.value;
-    const diffDays = this.getDiffDays(this.pagoSeleccionado.fechaPago, date);
+    let diffDays = this.getDiffDays(this.pagoSeleccionado.fechaPago, date);
     let mora = 0;
+    this.daysLate = 0;
+
     if (diffDays < 0) {
       this.daysLate = Math.abs(diffDays);
-      mora = this.calculateMora(this.pagoSeleccionado.monto, this.daysLate);
-      this.mora = mora;
-      this.calculateTotales();
     }
 
+    let oldDaysLate = 0;
+    if (this.pagoSeleccionado?.pagos) {
+      const fechasPagos = this.pagoSeleccionado.pagos.reduce(
+        (acc: any, pago: any) => {
+          acc.push(pago.fechaPago);
+          return acc;
+        },
+        []
+      );
+
+      fechasPagos.forEach((fecha: any) => {
+        const diffDaysOld = this.getDiffDays(this.pagoSeleccionado.fechaPago, fecha);
+        if (diffDaysOld < 0) {
+          oldDaysLate += Math.abs(diffDaysOld);
+        }
+      });
+
+      console.log("Fechas de pagos: ", fechasPagos);
+    }
+    this.daysLate += oldDaysLate;
+    console.log("Días de atraso: ", this.daysLate);
+    mora = this.calculateMora(this.pagoSeleccionado.monto, this.daysLate);
+    this.mora = mora;
+    this.calculateTotales();
     this.hasMora = mora > 0;
     this.pagoForm.get("mora")?.setValue(mora);
   }
@@ -302,14 +282,6 @@ export class GestionPagoPage implements OnInit {
     return Math.ceil(
       (fechaPago.getTime() - currentDate.getTime()) / MILLISECONDS_PER_DAY
     );
-  }
-
-  isSuccessState(): boolean {
-    return !!this.clienteSeleccionado?.id && this.pagoForm.valid;
-  }
-
-  isWarningState(): boolean {
-    return !this.clienteSeleccionado?.id || !this.pagoForm.valid;
   }
 
   private getIdByUrl(): void {
@@ -353,17 +325,18 @@ export class GestionPagoPage implements OnInit {
       { key: "numero", alias: "No. Cuota" },
       { key: "fechaPago", alias: "Fecha de Pago", type: "date" },
       { key: "monto", alias: "Monto Cuota", type: "currency" },
-      {
-        key: "estado",
-        alias: "Estado",
-        type: "boolean",
-        options: ["Pagado", "No Pagado"],
-      },
+      { key: "mora", alias: "Monto Mora", type: "currency" },
       {
         key: "pagos",
         alias: "Pagos Realizados",
         type: "array",
         propsVisibles: ["fechaPago", "monto"],
+      },
+      {
+        key: "estado",
+        alias: "Estado",
+        type: "boolean",
+        options: ["Pagado", "No Pagado"],
       },
       {
         key: "verificacion",
@@ -469,8 +442,11 @@ export class GestionPagoPage implements OnInit {
   getMora(id: number): void {
     this.globalService.GetId("moras/fecha-pago", id).subscribe({
       next: (response: any) => {
-        // console.log("Mora:", response);
-        this.mora = this.calculateTotalMora(response);
+        console.log("Mora:", response);
+        const mora = this.calculateTotalMora(response);
+        if (mora > 0) {
+          this.mora = this.calculateTotalMora(response);
+        }
         this.calculateTotales();
       },
       error: (error: any) => console.error("Error al obtener la mora:", error),
@@ -540,6 +516,11 @@ export class GestionPagoPage implements OnInit {
         cuota.verificacion = 2;
         cuota.daysLate = 0;
         cuota.mora = 0;
+      }
+
+      if (cuota?.moras) {
+        cuota.mora = cuota.moras.mora;
+        console.log("Mora en DB:", cuota.mora);
       }
 
       return cuota;

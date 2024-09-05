@@ -250,6 +250,7 @@ export class GestionContractPage implements OnInit {
   
       @media print {
         @page { margin-bottom: 0; margin-top: 0; }
+        
         body::after { content: none !important;
       }
     `;

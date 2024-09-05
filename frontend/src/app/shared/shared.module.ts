@@ -21,8 +21,9 @@ import { XmlToListPipe } from "./pipes/xml-to-list.pipe";
 import { FileUploadModule } from "ng2-file-upload";
 import { NgSelectModule } from "@ng-select/ng-select";
 import { InputMaskDirective } from "./directives/input-mask.directive";
+import { NgxPrintModule } from "ngx-print";
 
-import { NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDatepickerModule } from "@ng-bootstrap/ng-bootstrap";
 
 @NgModule({
   declarations: [
@@ -37,9 +38,14 @@ import { NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
     NumberToWordsPipe,
     XmlToListPipe,
     InputMaskDirective,
-    
   ],
-  imports: [AuthModule, FileUploadModule, NgSelectModule, NgbDatepickerModule ],
+  imports: [
+    AuthModule,
+    FileUploadModule,
+    NgSelectModule,
+    NgbDatepickerModule,
+    NgxPrintModule,
+  ],
   exports: [
     AuthModule,
     FileUploadModule,
@@ -56,6 +62,7 @@ import { NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
     XmlToListPipe,
     InputMaskDirective,
     NgbDatepickerModule,
+    NgxPrintModule,
   ],
   providers: [DatePipe],
 })

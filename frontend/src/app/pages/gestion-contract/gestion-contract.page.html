@@ -188,139 +188,138 @@
 
   <div>
     <!-- <ion-card-content id="print-element" > -->
-    <div id="contentToPrint" #contentToPrint>
-      <div class="carta">
-        <div class="container">
-          <div class="row">
-            <ion-item>
-              <img src="assets/logo.png" alt="" width="100" />
-              <ion-badge slot="end" color="primary"
-                >Contrato #: {{correlativo}}</ion-badge
-              >
-            </ion-item>
-            <h6 class="text-center mt-5 fw-bold">
-              PAGARÉ POR {{this.prestamoSeleccionado?.totalMonto| currency : "L"
-              : "symbol"}}
-            </h6>
+    <div id="contentToPrint" #contentToPrint class="d-flex justify-content-center ">
+      <div  [ngClass]="{'container': !isPrint, 'm-2':isPrint}">
+        <div class="row">
+          <ion-item>
+            <img src="assets/logo.png" alt="" width="100" />
+            <ion-badge slot="end" color="primary"
+              >Contrato #: {{correlativo}}</ion-badge
+            >
+          </ion-item>
+          <h6 class="text-center mt-5 fw-bold">
+            PAGARÉ POR {{this.prestamoSeleccionado?.totalMonto| currency : "L" :
+            "symbol"}}
+          </h6>
 
-            <div class="col-12">
-              @if(hasAval){
-              <!-- Párrafo con aval -->
-              <p>
-                Nosotros,
-                <strong>
-                  {{clienteSeleccionado?.nombres}}
-                  {{clienteSeleccionado?.apellidos}} </strong
-                >, mayor de edad,
-                {{toLowerCase(clienteSeleccionado?.estadoCivil?.descripcion)}},
-                {{toLowerCase(clienteSeleccionado?.nacionalidad?.gentilicio)}},
-                con documento nacional de identificación
-                {{clienteSeleccionado?.dni}}, con domicilio en
-                {{clienteSeleccionado?.direccion}} y Yo
-                <strong
-                  >{{avalSeleccionado?.nombres}} {{avalSeleccionado?.apellidos}} </strong
-                >, con documento nacional de identificación
-                {{avalSeleccionado?.dni|formatDni}}, en condición de aval
-                solidario, mayor de edad,
-                {{toLowerCase(avalSeleccionado?.estadoCivil?.descripcion)}},
-                {{toLowerCase(avalSeleccionado?.nacionalidad?.gentilicio)}}, con
-                domicilio en {{avalSeleccionado?.direccion}}; por medio del
-                presente documento:
-              </p>
+          <div class="col-12">
+            @if(hasAval){
+            <!-- Párrafo con aval -->
+            <p>
+              Nosotros,
+              <strong>
+                {{clienteSeleccionado?.nombres}}
+                {{clienteSeleccionado?.apellidos}} </strong
+              >, mayor de edad,
+              {{toLowerCase(clienteSeleccionado?.estadoCivil?.descripcion)}},
+              {{toLowerCase(clienteSeleccionado?.nacionalidad?.gentilicio)}},
+              con documento nacional de identificación
+              {{clienteSeleccionado?.dni}}, con domicilio en
+              {{clienteSeleccionado?.direccion}} y Yo
+              <strong
+                >{{avalSeleccionado?.nombres}} {{avalSeleccionado?.apellidos}} </strong
+              >, con documento nacional de identificación
+              {{avalSeleccionado?.dni|formatDni}}, en condición de aval
+              solidario, mayor de edad,
+              {{toLowerCase(avalSeleccionado?.estadoCivil?.descripcion)}},
+              {{toLowerCase(avalSeleccionado?.nacionalidad?.gentilicio)}}, con
+              domicilio en {{avalSeleccionado?.direccion}}; por medio del
+              presente documento:
+            </p>
+            }@else {
+            <!-- Párrafo sin aval -->
+            <p>
+              Yo,
+              <strong
+                >{{clienteSeleccionado?.nombres}}
+                {{clienteSeleccionado?.apellidos}}</strong
+              >, mayor de edad,
+              {{toLowerCase(clienteSeleccionado?.estadoCivil?.descripcion)}},
+              {{toLowerCase(clienteSeleccionado?.nacionalidad?.gentilicio)}},
+              con documento nacional de identificación
+              {{clienteSeleccionado?.dni |formatDni}}, con domicilio en
+              {{clienteSeleccionado?.direccion}}; por medio del presente
+              documento:
+            </p>
+            }
+
+            <h6 class="mt-4 mb-3 fw-bold">DECLARO Y HAGO CONSTAR</h6>
+
+            <p>
+              <strong>PRIMERO:</strong> Que estoy en adeudarle a
+              @if(nombreEmpresa===''){
+              <strong style="color: red">Pendiente Empresa</strong>
+              }@else { {{nombreEmpresa}}} quien es representada legalmente por
+              ____________________________________ con documento nacional
+              ________________________________ y con domicilio en
+              @if(direccionEmpresa===''){
+              <strong style="color: red">Pendiente Dirección</strong>
+              }@else { {{direccionEmpresa}}}, la cantidad de
+              {{this.prestamoSeleccionado?.totalMonto |
+              numberToWords:'lempiras'}}
+              ({{this.prestamoSeleccionado?.totalMonto| currency : "L" :
+              "symbol"}}).
+            </p>
+            <br />
+            <p>
+              <strong>SEGUNDO:</strong> Los cuales me comprometo a pagarlos, sin
+              retraso alguno, en un lapso de tiempo de
+              {{convertirNumero(prestamoSeleccionado?.planPago?.cuotasPagar)}}
+              @switch (prestamoSeleccionado.idPeriodoCobro) { @case (1) {
+              semanas} @case (2) { quincenas}@case (3) { meses} @default {
+              Ninguno.} }, que serán pagaderos en fecha
+              @if(this.prestamoSeleccionado?.planPago?.fechaFin){
+              {{formatDate(this.prestamoSeleccionado?.planPago?.fechaFin)}}
               }@else {
-              <!-- Párrafo sin aval -->
-              <p>
-                Yo,
-                <strong
-                  >{{clienteSeleccionado?.nombres}}
-                  {{clienteSeleccionado?.apellidos}}</strong
-                >, mayor de edad,
-                {{toLowerCase(clienteSeleccionado?.estadoCivil?.descripcion)}},
-                {{toLowerCase(clienteSeleccionado?.nacionalidad?.gentilicio)}},
-                con documento nacional de identificación
-                {{clienteSeleccionado?.dni |formatDni}}, con domicilio en
-                {{clienteSeleccionado?.direccion}}; por medio del presente
-                documento:
-              </p>
-              }
+              <strong style="color: red">No Aún</strong>
+              } el cual se hará mediante depósito a cuenta número
+              @if(cuentaBancaria===''){
+              <strong style="color: red">Pendiente Cuenta Bancaria</strong>
+              }@else { {{cuentaBancaria}}}, de @if(bancoDepositar===''){
+              <strong style="color: red">Pendiente Banco</strong>
+              }@else { {{bancoDepositar}}}, en la Ciudad de
+              @if(ciudadBanco===''){
+              <strong style="color: red">Pendiente Ciudad</strong>
+              }@else { {{ciudadBanco}}}, la totalidad de
+              {{this.prestamoSeleccionado?.totalMonto |
+              numberToWords:'lempiras'}}
+              ({{this.prestamoSeleccionado?.totalMonto| currency : "L" :
+              "symbol"}}), por concepto de préstamo.
+            </p>
+            <br />
+            <p>
+              <strong>TERCERO:</strong> El incumplimiento de pago de la
+              obligación pactada, dará derecho al Acreedor a proceder por vía
+              Judicial, SIN PROTESTO, reclamando el total de la obligación,
+              todos los gastos y honorarios de profesionales del Derecho, para
+              el cumplimiento Judicial de lo adeudado, serán de cuenta del
+              Deudor. Sirviendo este Documento, como TITULO EJECUTIVO, con
+              aparejada Ejecución.
+            </p>
 
-              <h6 class="mt-4 mb-3 fw-bold">DECLARO Y HAGO CONSTAR</h6>
-
-              <p>
-                <strong>PRIMERO:</strong> Que estoy en adeudarle a
-                @if(nombreEmpresa===''){
-                <strong style="color: red">Pendiente Empresa</strong>
-                }@else { {{nombreEmpresa}}} quien es representada legalmente por
-                __________________ con documento nacional ________________ y con
-                domicilio en @if(direccionEmpresa===''){
-                <strong style="color: red">Pendiente Dirección</strong>
-                }@else { {{direccionEmpresa}}}, la cantidad de
-                {{this.prestamoSeleccionado?.totalMonto |
-                numberToWords:'lempiras'}}
-                ({{this.prestamoSeleccionado?.totalMonto| currency : "L" :
-                "symbol"}}).
-              </p>
-              <br />
-              <p>
-                <strong>SEGUNDO:</strong> Los cuales me comprometo a pagarlos,
-                sin retraso alguno, en un lapso de tiempo de
-                {{convertirNumero(prestamoSeleccionado?.planPago?.cuotasPagar)}}
-                @switch (prestamoSeleccionado.idPeriodoCobro) { @case (1) {
-                semanas} @case (2) { quincenas}@case (3) { meses} @default {
-                Ninguno.} }, que serán pagaderos en fecha
-                @if(this.prestamoSeleccionado?.planPago?.fechaFin){
-                {{formatDate(this.prestamoSeleccionado?.planPago?.fechaFin)}}
-                }@else {
-                <strong style="color: red">No Aún</strong>
-                } el cual se hará mediante depósito a cuenta número
-                @if(cuentaBancaria===''){
-                <strong style="color: red">Pendiente Cuenta Bancaria</strong>
-                }@else { {{cuentaBancaria}}}, de @if(bancoDepositar===''){
-                <strong style="color: red">Pendiente Banco</strong>
-                }@else { {{bancoDepositar}}}, en la Ciudad de
-                @if(ciudadBanco===''){
-                <strong style="color: red">Pendiente Ciudad</strong>
-                }@else { {{ciudadBanco}}}, la totalidad de
-                {{this.prestamoSeleccionado?.totalMonto |
-                numberToWords:'lempiras'}}
-                ({{this.prestamoSeleccionado?.totalMonto| currency : "L" :
-                "symbol"}}), por concepto de préstamo.
-              </p>
-              <br />
-              <p>
-                <strong>TERCERO:</strong> El incumplimiento de pago de la
-                obligación pactada, dará derecho al Acreedor a proceder por vía
-                Judicial, SIN PROTESTO, reclamando el total de la obligación,
-                todos los gastos y honorarios de profesionales del Derecho, para
-                el cumplimiento Judicial de lo adeudado, serán de cuenta del
-                Deudor. Sirviendo este Documento, como TITULO EJECUTIVO, con
-                aparejada Ejecución.
-              </p>
-
-              <p class="mt-4">
-                En fe de lo cual y para los fines legales correspondientes,
-                firmo el presente PAGARE en @if(this.lugarAcuerdo){
-                {{this.lugarAcuerdo}} }@else {
-                <strong style="color: red">Pendiente lugar acuerdo</strong>}, a
-                los días, @if(this.fechaAcuerdo){
-                {{formatDate(this.fechaAcuerdo)}} }@else {
-                <strong style="color: red">Pendiente fecha acuerdo</strong>}.
-              </p>
-              <div
-                class="row mt-5 diplay-flex justify-content-center align-content-center">
-                <div class="col-4 text-center m-5">
-                  <div class="border-top pt-2">
-                    <p class="text-center">Firma</p>
-                  </div>
+            <p class="mt-4">
+              En fe de lo cual y para los fines legales correspondientes, firmo
+              el presente PAGARE en @if(this.lugarAcuerdo){
+              {{this.lugarAcuerdo}}}@else {
+              <strong style="color: red">Pendiente lugar acuerdo</strong>}, a
+              los días, @if(this.fechaAcuerdo){
+              {{formatDate(this.fechaAcuerdo)}} }@else {
+              <strong style="color: red">Pendiente fecha acuerdo</strong>}.
+            </p>
+            <div
+              class="row mt-5 diplay-flex justify-content-center align-content-center">
+              <div class="col-4 text-center m-5">
+                <div class="border-top pt-2">
+                  <p class="text-center">Firma</p>
                 </div>
-                @if(hasAval){
-                <div class="col-4 text-center m-5">
-                  <div class="border-top pt-2">
-                    <p class="text-center">Firma (Aval)</p>
-                  </div>
-                </div>
-                }
               </div>
+              @if(hasAval){
+              <div class="col-4 text-center m-5">
+                <div class="border-top pt-2">
+                  <p class="text-center">Firma (Aval)</p>
+                </div>
+              </div>
+              }
             </div>
           </div>
         </div>

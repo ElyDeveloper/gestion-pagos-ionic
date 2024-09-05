@@ -28,6 +28,7 @@ export class ViewDataComponent implements OnInit {
   @Input() showPagination: boolean = true;
   @Input() showAdd: boolean = true;
   @Input() showSearch: boolean = true;
+  @Input() isPrint: boolean = false;
   @Input() context: string = "elemento";
   @Input() searchPlaceHolder: string = "Buscar...";
   @Input() showCalendar: boolean = false;

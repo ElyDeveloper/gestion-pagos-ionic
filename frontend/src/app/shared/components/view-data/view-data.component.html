@@ -130,14 +130,33 @@
                     </ng-container>
                     <ng-container *ngSwitchCase="'array'">
                       <ng-container
-                        *ngFor="let item of getValuesArray(row, column)">
+                        *ngFor="
+                          let item of getValuesArray(row, column);
+                          index as i
+                        ">
+                        @if(isPrint){
+                        <p>
+                          {{
+                            item[getCellPropsVisibles(column)[0]]
+                              | customDate : 6 : "dd/MM/yyyy"
+                          }}
+                          <br />
+                          <strong>{{
+                            item[getCellPropsVisibles(column)[1]]
+                              | currency : "L" : "symbol"
+                          }}</strong>
+                        </p>
+                        <hr *ngIf="i === 0"/>
+                        }@else{
                         <ion-chip>
-                          <ion-label
-                            >{{
-                              item[getCellPropsVisibles(column)[0]]
-                                | customDate : 6 : "dd/MM/yyyy"
-                            }}
-
+                          <ion-label>
+                            <span>
+                              {{
+                                item[getCellPropsVisibles(column)[0]]
+                                  | customDate : 6 : "dd/MM/yyyy"
+                              }}
+                            </span>
+                            <br />
                             <strong>{{
                               item[getCellPropsVisibles(column)[1]]
                                 | currency : "L" : "symbol"
@@ -147,6 +166,7 @@
                             (click)="onDeleteButtonClick(item)"
                             name="close-circle"></ion-icon>
                         </ion-chip>
+                        }
                       </ng-container>
                     </ng-container>
 
@@ -228,7 +248,7 @@
 </ion-card>
 
 <!-- Sección de vista móvil -->
-<section class="d-md-none">
+<!-- <section class="d-md-none">
   <ion-list>
     @for (row of data; track row.id) {
     <ion-item>
@@ -238,7 +258,6 @@
           src="https://ionicframework.com/docs/demos/api/avatar/avatar.svg" />
       </ion-thumbnail>
       <ion-label>
-        <!-- Título dinámico -->
         <h2>
           {{ getCellValue(row, columnsData[0]) }}
           {{
@@ -264,7 +283,6 @@
           </ng-container>
         </ng-container>
 
-        <!-- Acciones -->
         <div class="d-flex justify-content-between align-items-center">
           @if (getEstadoColumn()) {
           <ion-badge
@@ -296,7 +314,7 @@
     </ion-item>
     }
   </ion-list>
-</section>
+</section> -->
 
 <!-- Seccion de paginacion -->
 <section
