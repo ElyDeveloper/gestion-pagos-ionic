@@ -20,3 +20,4 @@ export * from './estado-civil.controller';
 export * from './tipo-personas.controller';
 export * from './documentos-tipo-doc.controller';
 export * from './contratos-pagos.controller';
+export * from './global.controller';

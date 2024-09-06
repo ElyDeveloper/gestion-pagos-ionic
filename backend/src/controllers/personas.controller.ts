@@ -167,7 +167,7 @@ export class PersonasController {
       'application/json': {
         schema: {
           type: 'array',
-          items: getModelSchemaRef(Personas, {includeRelations: true}),
+          items: {},
         },
       },
     },
@@ -177,7 +177,7 @@ export class PersonasController {
     currentUser: UserProfile,
     @param.query.number('skip') skip: number,
     @param.query.number('limit') limit: number,
-  ): Promise<Personas[]> {
+  ): Promise<any[]> {
     console.log('Usuario Logueado: ', currentUser);
     const userId = parseInt(currentUser[securityId], 10);
     console.log('Id de Usuario Logueado: ', userId);
@@ -224,13 +224,13 @@ export class PersonasController {
 
       //Encriptar id de clientes
       clients.forEach((c: any) => {
-        c.id = this.jwtService.encryptId(c.id || 0);
+        c.idEncrypted = this.jwtService.encryptId(c.id || 0);
       });
 
       return clients;
     }
 
-    const personas = await this.personasRepository.find({
+    let personas = await this.personasRepository.find({
       where: {
         estado: true,
       },
@@ -245,15 +245,15 @@ export class PersonasController {
       order: ['id DESC'],
     });
 
-    // clonar array
-    const copia: any = Array.from(personas);
+    let copiaSpread = personas.map(persona => ({
+      ...persona,
+      idEncrypted: this.jwtService.encryptId(persona.id || 0)
+    }));
+    
 
-    //encriptar id de prestamos con jwtService
-    copia.forEach((persona: any) => {
-      persona.id = this.jwtService.encryptId(persona.id || 0);
-    });
+    console.log('Personas encontradas: ', copiaSpread);
 
-    return copia;
+    return copiaSpread;
   }
 
   @get('/personas/clientes/paginated')
@@ -263,7 +263,7 @@ export class PersonasController {
       'application/json': {
         schema: {
           type: 'array',
-          items: getModelSchemaRef(Personas, {includeRelations: true}),
+          items: {},
         },
       },
     },
@@ -273,13 +273,13 @@ export class PersonasController {
     currentUser: UserProfile,
     @param.query.number('skip') skip: number,
     @param.query.number('limit') limit: number,
-  ): Promise<Personas[]> {
+  ): Promise<any[]> {
     console.log('Usuario Logueado: ', currentUser);
     const userId = parseInt(currentUser[securityId], 10);
     console.log('Id de Usuario Logueado: ', userId);
 
     console.log('Consulta paginada: ', skip);
-    const clientes = await this.personasRepository.find({
+    const personas = await this.personasRepository.find({
       where: {
         idTipoPersona: 1,
         estado: true,
@@ -295,15 +295,15 @@ export class PersonasController {
       order: ['id DESC'],
     });
 
-    // clonar array
-    const copia: any = Array.from(clientes);
+    let copiaSpread = personas.map(persona => ({
+      ...persona,
+      idEncrypted: this.jwtService.encryptId(persona.id || 0)
+    }));
+    
 
-    //encriptar id de prestamos con jwtService
-    copia.forEach((persona: any) => {
-      persona.id = this.jwtService.encryptId(persona.id || 0);
-    });
+    console.log('Personas encontradas: ', copiaSpread);
 
-    return copia;
+    return copiaSpread
   }
 
   @get('/personas/avales/paginated')
@@ -313,7 +313,7 @@ export class PersonasController {
       'application/json': {
         schema: {
           type: 'array',
-          items: getModelSchemaRef(Personas, {includeRelations: true}),
+          items: {},
         },
       },
     },
@@ -321,8 +321,8 @@ export class PersonasController {
   async dataPaginateAvales(
     @param.query.number('skip') skip: number,
     @param.query.number('limit') limit: number,
-  ): Promise<Personas[]> {
-    const avales = await this.personasRepository.find({
+  ): Promise<any[]> {
+    const personas = await this.personasRepository.find({
       where: {
         idTipoPersona: 2,
         estado: true,
@@ -338,15 +338,15 @@ export class PersonasController {
       order: ['id DESC'],
     });
 
-    // clonar array
-    const copia: any = Array.from(avales);
+    let copiaSpread = personas.map(persona => ({
+      ...persona,
+      idEncrypted: this.jwtService.encryptId(persona.id || 0)
+    }));
+    
 
-    //encriptar id de prestamos con jwtService
-    copia.forEach((persona: any) => {
-      persona.id = this.jwtService.encryptId(persona.id || 0);
-    });
+    console.log('Personas encontradas: ', copiaSpread);
 
-    return copia;
+    return copiaSpread
   }
 
   @patch('/personas')
@@ -394,12 +394,11 @@ export class PersonasController {
       },
     },
   })
-  async findByIdAsesor(@param.path.string('id') id: string): Promise<any> {
-    const idDecrypted = this.jwtService.decryptId(id);
-    console.log('Id de Cliente Desencriptado: ', idDecrypted);
+  async findByIdAsesor(@param.path.number('id') id: number): Promise<any> {
+    console.log('Id de Cliente Desencriptado: ', id);
     return this.usuarioClienteRepository.findOne({
       where: {
-        clienteId: idDecrypted,
+        clienteId: id,
       },
       include: ['usuario'],
     });
@@ -428,17 +427,13 @@ export class PersonasController {
     description: 'Personas PUT success',
   })
   async replaceById(
-    @param.path.string('id') id: string,
+    @param.path.number('id') id: number,
     @requestBody() personas: any,
   ): Promise<void> {
     console.log('personas', id, personas);
 
-    const decryptedId = this.jwtService.decryptId(id);
-
-    personas.id = decryptedId;
-
     try {
-      await this.personasRepository.replaceById(decryptedId, personas);
+      await this.personasRepository.replaceById(id, personas);
     } catch (error) {
       console.error('Error updating persona:', error);
       throw new HttpErrors.InternalServerError('Error updating persona');
@@ -450,19 +445,14 @@ export class PersonasController {
     description: 'UsuarioCliente PUT success',
   })
   async replaceByIdCliente(
-    @param.path.string('id') id: string,
+    @param.path.number('id') id: number,
     @requestBody() usuarioCliente: any,
   ): Promise<void> {
     // console.log('personas', id, usuarioCliente);
 
-    const decryptedId = this.jwtService.decryptId(id);
-    console.log('decryptedId', decryptedId);
-
-    usuarioCliente.clienteId = decryptedId;
-
     const userClient = await this.usuarioClienteRepository.findOne({
       where: {
-        clienteId: decryptedId,
+        clienteId: id,
       },
     });
 
@@ -484,11 +474,8 @@ export class PersonasController {
   @response(204, {
     description: 'Personas DELETE success',
   })
-  async deleteById(@param.path.string('id') id: string): Promise<void> {
-    //desencriptar id de prestamos con jwtService
-    const decryptedId = this.jwtService.decryptId(id.toString());
-    console.log('id de Persona a eliminar: ', decryptedId);
-    await this.personasRepository.updateById(decryptedId, {
+  async deleteById(@param.path.number('id') id: number): Promise<void> {
+    await this.personasRepository.updateById(id, {
       estado: false,
     });
   }
@@ -497,17 +484,21 @@ export class PersonasController {
   @response(204, {
     description: 'Personas DELETE success',
   })
-  async deleteByIdCliente(@param.path.string('id') id: string): Promise<void> {
-    //desencriptar id de prestamos con jwtService
-    const decryptedId = this.jwtService.decryptId(id.toString());
-    console.log('id de Persona a eliminar: ', decryptedId);
+  async deleteByIdCliente(@param.path.number('id') id: number): Promise<void> {
 
     const usuarioCliente = await this.usuarioClienteRepository.findOne({
       where: {
-        clienteId: decryptedId,
+        clienteId: id,
       },
     });
-    await this.usuarioClienteRepository.deleteById(usuarioCliente?.id);
+
+    try {
+      
+      await this.usuarioClienteRepository.deleteById(usuarioCliente?.id);
+    } catch {
+      console.error('Error deleting usuarioCliente');
+      throw new HttpErrors.InternalServerError('Error deleting usuarioCliente');
+    }
   }
 
   @get('/personas/todos/search')
@@ -520,7 +511,7 @@ export class PersonasController {
 
     console.log('search', search);
 
-    const PersonasSearch = await this.personasRepository.find({
+    const personas = await this.personasRepository.find({
       where: {
         estado: true,
         or: [
@@ -537,28 +528,25 @@ export class PersonasController {
       ],
     });
 
-    // clonar array
-    const copia: any = Array.from(PersonasSearch);
+    let copiaSpread = personas.map(persona => ({
+      ...persona,
+      idEncrypted: this.jwtService.encryptId(persona.id || 0)
+    }));
+    
 
-    //encriptar id de prestamos con jwtService
-    copia.forEach((persona: any) => {
-      persona.id = this.jwtService.encryptId(persona.id || 0);
-    });
+    console.log('Personas encontradas: ', copiaSpread);
 
-    return copia;
+    return copiaSpread
   }
 
   @get('/personas/clientes/search')
   async dataClientesSearch(
     @param.query.string('query') search: string,
   ): Promise<any> {
-    // let PersonasSearch = await this.getPersonasSearch(search);
-    // console.log('PersonasSearch', PersonasSearch);
-    // return PersonasSearch;
 
     console.log('search', search);
 
-    const PersonasSearch = await this.personasRepository.find({
+    const personas = await this.personasRepository.find({
       where: {
         and: [
           {idTipoPersona: 1},
@@ -579,15 +567,15 @@ export class PersonasController {
         'tipoPersona',
       ],
     });
-    // clonar array
-    const copia: any = Array.from(PersonasSearch);
+    let copiaSpread = personas.map(persona => ({
+      ...persona,
+      idEncrypted: this.jwtService.encryptId(persona.id || 0)
+    }));
+    
 
-    //encriptar id de prestamos con jwtService
-    copia.forEach((persona: any) => {
-      persona.id = this.jwtService.encryptId(persona.id || 0);
-    });
+    console.log('Personas encontradas: ', copiaSpread);
 
-    return copia;
+    return copiaSpread
   }
 
   @get('/personas/avales/search')
@@ -600,7 +588,7 @@ export class PersonasController {
 
     console.log('search', search);
 
-    const PersonasSearch = await this.personasRepository.find({
+    const personas = await this.personasRepository.find({
       where: {
         and: [
           {idTipoPersona: 2},
@@ -621,14 +609,14 @@ export class PersonasController {
         'tipoPersona',
       ],
     });
-    // clonar array
-    const copia: any = Array.from(PersonasSearch);
+    let copiaSpread = personas.map(persona => ({
+      ...persona,
+      idEncrypted: this.jwtService.encryptId(persona.id || 0)
+    }));
+    
 
-    //encriptar id de prestamos con jwtService
-    copia.forEach((persona: any) => {
-      persona.id = this.jwtService.encryptId(persona.id || 0);
-    });
+    console.log('Personas encontradas: ', copiaSpread);
 
-    return copia;
+    return copiaSpread
   }
 }

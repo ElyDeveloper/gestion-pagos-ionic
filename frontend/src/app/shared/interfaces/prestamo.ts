@@ -22,6 +22,7 @@ export interface Prestamos {
   idPeriodoCobro: number;
   idEstadoAprobacion: number;
   idAval: number;
+  idEncrypted?:string;
 
   // Optional properties for related entities
   cliente?: Personas;

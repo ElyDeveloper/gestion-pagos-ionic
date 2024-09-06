@@ -223,7 +223,7 @@ export class CheckPrestamosController {
           schema: {
             type: 'object',
             properties: {
-              idPrestamo: {type: 'string'},
+              idPrestamo: {type: 'number'},
               planId: {type: 'number'},
               estado: {type: 'boolean'},
               cuota: {type: 'number'},
@@ -237,7 +237,7 @@ export class CheckPrestamosController {
       },
     })
     datos: {
-      idPrestamo: string;
+      idPrestamo: number;
       planId: number;
       estado: boolean;
       monto: number;
@@ -259,7 +259,6 @@ export class CheckPrestamosController {
 
     await this.validateExistingPayments(planId);
 
-    const prestamoId = this.jwtService.decryptId(idPrestamo);
     const fechasPagos = this.generatePaymentDates(
       fechaInicio,
       periodoCobro,
@@ -271,7 +270,7 @@ export class CheckPrestamosController {
 
     await this.updatePlanAndLoan(
       planId,
-      prestamoId,
+      idPrestamo,
       fechaInicio,
       latestDate,
       idEstadoAprobacion,

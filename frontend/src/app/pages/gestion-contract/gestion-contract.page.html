@@ -1,5 +1,6 @@
 <ion-content [fullscreen]="true">
   <app-wrapper
+    [showBreadcrumb]="false"
     [textLoader]="textLoader"
     [toastMessage]="toastMessage"
     [toastColor]="toastColor"
@@ -189,23 +190,20 @@
 
   <div>
     <!-- <ion-card-content id="print-element" > -->
-    <div
-      id="contentToPrint"
-      #contentToPrint
-      class="d-flex justify-content-center">
+    <div id="print-contract" class="d-flex justify-content-center">
       <div [ngClass]="{'container': !isPrint, 'm-2':isPrint}">
         <div class="row">
-          <ion-item>
+          <ion-item lines="none">
             <img src="assets/logo.png" alt="" width="100" />
             <ion-badge slot="end" color="primary"
               >Contrato #: {{correlativo}}</ion-badge
             >
           </ion-item>
-          <h6 class="text-center mt-5 fw-bold">
+          <h4 class="text-center mt-5 fw-bold">
             PAGARÉ POR {{this.prestamoSeleccionado?.totalMonto| currency : "L" :
             "symbol"}}
-          </h6>
-
+          </h4>
+          <hr />
           <div class="col-12">
             @if(hasAval){
             <!-- Párrafo con aval -->
@@ -310,17 +308,16 @@
               {{formatDate(this.fechaAcuerdo)}} }@else {
               <strong style="color: red">Pendiente fecha acuerdo</strong>}.
             </p>
-            <div
-              class="row mt-5 diplay-flex justify-content-center align-content-center">
-              <div class="col-4 text-center m-5">
-                <div class="border-top pt-2">
-                  <p class="text-center">Firma</p>
+            <div class="signature-container">
+              <div class="signature-box">
+                <div class="signature-line">
+                  <p>Firma</p>
                 </div>
               </div>
               @if(hasAval){
-              <div class="col-4 text-center m-5">
-                <div class="border-top pt-2">
-                  <p class="text-center">Firma (Aval)</p>
+              <div class="signature-box">
+                <div class="signature-line text-center">
+                  <p>Firma (Aval)</p>
                 </div>
               </div>
               }
@@ -330,35 +327,4 @@
       </div>
     </div>
   </div>
-
-  <style>
-    @media print {
-      @page {
-        size: letter;
-        margin: 0;
-      }
-      body {
-        margin: 0;
-      }
-    }
-
-    .carta h1 {
-      font-size: 18pt;
-      margin-bottom: 20px;
-    }
-
-    .carta h2 {
-      font-size: 14pt;
-      margin-top: 20px;
-      margin-bottom: 10px;
-    }
-
-    .carta p {
-      margin-bottom: 10px;
-    }
-
-    .firma {
-      margin-top: 50px;
-    }
-  </style>
 </ion-content>

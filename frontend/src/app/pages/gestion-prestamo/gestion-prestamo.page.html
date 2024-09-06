@@ -30,16 +30,7 @@
             </strong>
           </p>
         </div>
-        <div>
-          <button class="btn btn-success" routerLink="/layout/prestamos">
-            Ver Prestamos
-            <ion-icon class="ms-2" name="open-outline"></ion-icon>
-          </button>
-          <!-- <ion-button routerLink="/layout/prestamos">
-            Ver Prestamos
-            <ion-icon class="ms-2" name="open-outline"></ion-icon>
-          </ion-button> -->
-        </div>
+        
       </div>
       <div
         class="alert"
@@ -75,11 +66,22 @@
           </li>
         </ul>
       </div>
+
+      <div class="">
+        <button class="btn btn-success" routerLink="/layout/prestamos">
+          Ver Prestamos
+          <ion-icon class="ms-2" name="open-outline"></ion-icon>
+        </button>
+        <!-- <ion-button routerLink="/layout/prestamos">
+          Ver Prestamos
+          <ion-icon class="ms-2" name="open-outline"></ion-icon>
+        </ion-button> -->
+      </div>
     </ion-card-content>
   </ion-card>
 
-  <div [ngSwitch]="currentStep">
-    <div *ngSwitchCase="0">
+  <div>
+    <div>
       <ion-card>
         <ion-card-header>
           <ion-title>Seleccionar Cliente/Aval</ion-title>
@@ -87,7 +89,7 @@
         <ion-card-content>
           <ion-grid>
             <ion-row>
-              <ion-col size-sm="12" size-md="6">
+              <ion-col sizeSm="12" sizeMd="6" sizeLg="4">
                 <!-- Buscador de cliente -->
                 <ion-searchbar
                   placeholder="Buscar Cliente..."
@@ -111,7 +113,7 @@
                   >Tiene Aval?</ion-toggle
                 >
               </ion-col>
-              <ion-col size-sm="12" size-md="6">
+              <ion-col sizeSm="12" sizeMd="6" sizeLg="4">
                 <!-- Buscador de Aval -->
                 <ion-searchbar
                   [disabled]="!hasAval"
@@ -135,7 +137,7 @@
         </ion-card-content>
       </ion-card>
     </div>
-    <div *ngSwitchCase="1">
+    <div>
       <ion-card>
         <ion-card-header>
           <ion-title> Plan de Pago </ion-title>
@@ -145,7 +147,7 @@
           <form [formGroup]="planesPagoForm" (ngSubmit)="onSubmit()">
             <ion-grid>
               <ion-row>
-                <ion-col size-xs="12" size-sm="6" size-md="6">
+                <ion-col sizeXs="12" sizeSm="4" sizeMd="3">
                   <ion-item>
                     <ion-label position="stacked" class="bold-label"
                       >Cuotas a Pagar:</ion-label
@@ -155,7 +157,7 @@
                       formControlName="cuotasPagar"></ion-input>
                   </ion-item>
                 </ion-col>
-                <ion-col size-xs="12" size-sm="6" size-md="6">
+                <ion-col sizeXs="12" sizeSm="4" sizeMd="3">
                   <ion-item>
                     <ion-label position="stacked" class="bold-label"
                       >Fecha de Inicio:</ion-label
@@ -165,7 +167,7 @@
                       formControlName="fechaInicio"></ion-input>
                   </ion-item>
                 </ion-col>
-                <ion-col size-xs="12" size-sm="6" size-md="6">
+                <ion-col sizeXs="12" sizeSm="4" sizeMd="3">
                   <ion-item>
                     <ion-label position="stacked" class="bold-label"
                       >Cuotas Pagadas:</ion-label
@@ -175,7 +177,7 @@
                       formControlName="cuotaPagadas"></ion-input>
                   </ion-item>
                 </ion-col>
-                <ion-col size-xs="12" size-md="6">
+                <ion-col sizeXs="12" sizeSm="4" sizeMd="3">
                   <ion-item lines="none">
                     <ion-label position="stacked" class="bold-label"
                       >Estado</ion-label
@@ -192,7 +194,7 @@
         </ion-card-content>
       </ion-card>
     </div>
-    <div *ngSwitchCase="2">
+    <div>
       <ion-card>
         <ion-card-header>
           <ion-title>Formulario de Préstamo</ion-title>
@@ -201,7 +203,7 @@
           <form [formGroup]="prestamoForm" (ngSubmit)="onSubmit()">
             <ion-grid>
               <ion-row>
-                <ion-col size-xs="12" size-sm="6" size-md="6">
+                <ion-col sizeXs="12" sizeSm="4" sizeMd="3">
                   <ion-item>
                     <ion-label position="stacked" class="bold-label"
                       >Monto:</ion-label
@@ -212,7 +214,7 @@
                       formControlName="monto"></ion-input>
                   </ion-item>
                 </ion-col>
-                <ion-col size-xs="12" size-sm="6" size-md="6">
+                <ion-col sizeXs="12" sizeSm="4" sizeMd="3">
                   <ion-item>
                     <ion-label position="stacked" class="bold-label"
                       >Tasa de Interés:</ion-label
@@ -223,7 +225,7 @@
                       formControlName="tasaInteres"></ion-input>
                   </ion-item>
                 </ion-col>
-                <ion-col size-xs="12" size-sm="6" size-md="6">
+                <ion-col sizeXs="12" sizeSm="4" sizeMd="3">
                   <ion-item>
                     <ion-label position="stacked" class="bold-label"
                       >Total Monto:</ion-label
@@ -234,7 +236,7 @@
                       formControlName="totalMonto"></ion-input>
                   </ion-item>
                 </ion-col>
-                <ion-col size-xs="12" size-sm="6" size-md="6">
+                <ion-col sizeXs="12" sizeSm="4" sizeMd="3">
                   <ion-item>
                     <ion-label position="stacked" class="bold-label"
                       >Fecha de Solicitud:</ion-label
@@ -244,7 +246,7 @@
                       formControlName="fechaSolicitud"></ion-input>
                   </ion-item>
                 </ion-col>
-                <ion-col size-xs="12" size-sm="6" size-md="6">
+                <ion-col sizeXs="12" sizeSm="4" sizeMd="3">
                   <ion-item>
                     <ion-label position="stacked" class="bold-label"
                       >Producto:</ion-label
@@ -260,7 +262,7 @@
                     </ion-select>
                   </ion-item>
                 </ion-col>
-                <ion-col size-xs="12" size-sm="6" size-md="6">
+                <ion-col sizeXs="12" sizeSm="4" sizeMd="3">
                   <ion-item>
                     <ion-label position="stacked" class="bold-label"
                       >Periodo de Cobro:</ion-label
@@ -276,7 +278,7 @@
                     </ion-select>
                   </ion-item>
                 </ion-col>
-                <ion-col size-xs="12" size-sm="6" size-md="6">
+                <ion-col sizeXs="12" sizeSm="4" sizeMd="3">
                   <ion-item>
                     <ion-label position="stacked" class="bold-label"
                       >Estado de Aprobación:</ion-label
@@ -293,7 +295,7 @@
                     </ion-select>
                   </ion-item>
                 </ion-col>
-                <ion-col size-xs="12" size-sm="6" size-md="6">
+                <ion-col sizeXs="12" sizeSm="4" sizeMd="3">
                   <ion-item>
                     <ion-label position="stacked" class="bold-label"
                       >Moneda:</ion-label
@@ -309,7 +311,7 @@
                     </ion-select>
                   </ion-item>
                 </ion-col>
-                <ion-col size-xs="12" size-md="6">
+                <ion-col sizeXs="12" sizeSm="4" sizeMd="3">
                   <ion-item lines="none">
                     <ion-label position="stacked" class="bold-label"
                       >Estado</ion-label
@@ -339,7 +341,7 @@
       </ion-card>
     </div>
 
-    <div class="navigation-buttons">
+    <!-- <div class="navigation-buttons">
       <ion-button [disabled]="currentStep === 0" (click)="previousStep()">
         <ion-icon class="me-2" name="arrow-back-outline"></ion-icon> Anterior
       </ion-button>
@@ -349,7 +351,7 @@
         Siguiente
         <ion-icon class="ms-2" name="arrow-forward-outline"></ion-icon>
       </ion-button>
-    </div>
+    </div> -->
   </div>
 
   <app-reusable-modal

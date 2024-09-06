@@ -95,6 +95,10 @@ export class GlobalService {
   PutId(endPoint: string, Id: number, body: any) {
     return this._http.put(`${API_URL}${endPoint}/${Id}`, body);
   }
+
+  PutIdString(endPoint: string, Id: string, body: any) {
+    return this._http.put(`${API_URL}${endPoint}/${Id}`, body);
+  }
   Delete(endPoint: string, Id: number) {
     return this._http.delete(`${API_URL}${endPoint}/${Id}`);
   }

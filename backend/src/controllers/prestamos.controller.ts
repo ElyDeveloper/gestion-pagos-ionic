@@ -61,12 +61,6 @@ export class PrestamosController {
     })
     prestamos: any,
   ): Promise<Prestamos> {
-    if (typeof prestamos.idCliente === 'string') {
-      prestamos.idCliente = this.jwtService.decryptId(prestamos.idCliente);
-    }
-    if (typeof prestamos.idAval === 'string') {
-      prestamos.idAval = this.jwtService.decryptId(prestamos.idAval);
-    }
     return this.prestamosRepository.create(prestamos);
   }
 
@@ -146,10 +140,7 @@ export class PrestamosController {
     description: 'List of Prestamos model',
     content: {
       'application/json': {
-        schema: {
-          type: 'array',
-          items: getModelSchemaRef(Prestamos, {includeRelations: true}),
-        },
+        schema: {},
       },
     },
   })
@@ -158,7 +149,7 @@ export class PrestamosController {
     currentUser: UserProfile,
     @param.query.number('skip') skip: number,
     @param.query.number('limit') limit: number,
-  ): Promise<Prestamos[]> {
+  ): Promise<any[]> {
     console.log('Usuario Logueado: ', currentUser);
     const userId = parseInt(currentUser[securityId], 10);
     console.log('Id de Usuario Logueado: ', userId);
@@ -226,15 +217,14 @@ export class PrestamosController {
         order: ['id DESC'],
       });
 
-      // clonar array
-      const copia: any = Array.from(prestamos);
+      let copiaSpread = prestamos.map(prestamo => ({
+        ...prestamo,
+        idEncrypted: this.jwtService.encryptId(prestamo.id || 0),
+      }));
 
-      //encriptar id de prestamos con jwtService
-      copia.forEach((prestamo: any) => {
-        prestamo.id = this.jwtService.encryptId(prestamo.id || 0);
-      });
+      console.log('Personas encontradas: ', copiaSpread);
 
-      return copia;
+      return copiaSpread;
     }
 
     const prestamos = await this.prestamosRepository.find({
@@ -255,15 +245,14 @@ export class PrestamosController {
       order: ['id DESC'],
     });
 
-    // clonar array
-    const copia: any = Array.from(prestamos);
+    let copiaSpread = prestamos.map(prestamo => ({
+      ...prestamo,
+      idEncrypted: this.jwtService.encryptId(prestamo.id || 0),
+    }));
 
-    //encriptar id de prestamos con jwtService
-    copia.forEach((prestamo: any) => {
-      prestamo.id = this.jwtService.encryptId(prestamo.id || 0);
-    });
+    console.log('Personas encontradas: ', copiaSpread);
 
-    return copia;
+    return copiaSpread;
   }
 
   @patch('/prestamos')
@@ -294,9 +283,8 @@ export class PrestamosController {
       },
     },
   })
-  async findById(@param.path.string('id') id: string): Promise<Prestamos> {
-    const idDecrypted = this.jwtService.decryptId(id);
-    return this.prestamosRepository.findById(idDecrypted, {
+  async findById(@param.path.number('id') id: number): Promise<Prestamos> {
+    return this.prestamosRepository.findById(id, {
       include: [
         {
           relation: 'cliente',
@@ -345,14 +333,6 @@ export class PrestamosController {
     @param.path.number('id') id: number,
     @requestBody() prestamos: any,
   ): Promise<void> {
-    //verificar si prestamos.idCliente es numero entero
-    if (typeof prestamos.idCliente === 'string') {
-      prestamos.idCliente = this.jwtService.decryptId(prestamos.idCliente);
-    }
-    if (typeof prestamos.idAval === 'string') {
-      prestamos.idAval = this.jwtService.decryptId(prestamos.idAval);
-    }
-
     await this.prestamosRepository.replaceById(id, prestamos);
   }
 
@@ -360,9 +340,8 @@ export class PrestamosController {
   @response(204, {
     description: 'Prestamos DELETE success',
   })
-  async deleteById(@param.path.string('id') id: string): Promise<void> {
-    const decryptedId = await this.jwtService.decryptId(id);
-    await this.prestamosRepository.updateById(decryptedId, {
+  async deleteById(@param.path.number('id') id: number): Promise<void> {
+    await this.prestamosRepository.updateById(id, {
       estado: false,
     });
   }
@@ -372,7 +351,7 @@ export class PrestamosController {
     @inject(SecurityBindings.USER)
     currentUser: UserProfile,
     @param.query.string('query') search: string,
-  ): Promise<Prestamos[]> {
+  ): Promise<any[]> {
     const userId = parseInt(currentUser[securityId], 10);
     const user = await this.usuarioRepository.findById(userId);
     if (!user) {
@@ -430,14 +409,13 @@ export class PrestamosController {
       ],
     });
 
-    // clonar array
-    const copia: any = Array.from(prestamos);
+    let copiaSpread = prestamos.map(prestamo => ({
+      ...prestamo,
+      idEncrypted: this.jwtService.encryptId(prestamo.id || 0),
+    }));
 
-    //encriptar id de prestamos con jwtService
-    copia.forEach((prestamo: any) => {
-      prestamo.id = this.jwtService.encryptId(prestamo.id || 0);
-    });
+    console.log('Personas encontradas: ', copiaSpread);
 
-    return copia;
+    return copiaSpread;
   }
 }

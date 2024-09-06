@@ -11,12 +11,12 @@ import { FormBuilder, FormGroup } from "@angular/forms";
 import { ActivatedRoute } from "@angular/router";
 import { FileUploader } from "ng2-file-upload";
 import { NgxPrintService, PrintOptions } from "ngx-print";
-import { Subscription } from "rxjs";
-import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
+import { catchError, firstValueFrom, Subscription, tap } from "rxjs";
 import { UploaderComponent } from "src/app/shared/components/uploader/uploader.component";
 import { FechasPagos } from "src/app/shared/interfaces/fecha-pago";
 import { Column } from "src/app/shared/interfaces/table";
 import { GlobalService } from "src/app/shared/services/global.service";
+import { LoaderService } from "src/app/shared/services/loader.service";
 import { FormModels } from "src/app/shared/utils/forms-models";
 import { environment } from "src/environments/environment";
 
@@ -29,8 +29,6 @@ const MILLISECONDS_PER_DAY = 1000 * 3600 * 24;
   styleUrls: ["./gestion-pago.page.scss"],
 })
 export class GestionPagoPage implements OnInit {
-  @ViewChild(LoaderComponent) private loaderComponent!: LoaderComponent;
-
   @ViewChild(UploaderComponent) uploaderComponent:
     | UploaderComponent
     | undefined;
@@ -71,9 +69,10 @@ export class GestionPagoPage implements OnInit {
 
   uploader!: FileUploader;
 
-  private globalService = inject(GlobalService);
-  private route = inject(ActivatedRoute);
-  private printService = inject(NgxPrintService);
+  private _globalService = inject(GlobalService);
+  private _route = inject(ActivatedRoute);
+  private _printService = inject(NgxPrintService);
+  private _loaderService = inject(LoaderService);
 
   constructor(private fb: FormBuilder) {
     this.formModels = new FormModels(this.fb);
@@ -85,13 +84,13 @@ export class GestionPagoPage implements OnInit {
   printSection() {
     this.isPrint = true;
     this.textLoader = "Imprimiendo...";
-    this.loaderComponent.show();
+    this._loaderService.show();
     const customPrintOptions: PrintOptions = new PrintOptions({
       printSectionId: "print-section",
 
       // Add any other print options as needed
     });
-    this.printService.styleSheetFile = "assets/css/print.css";
+    this._printService.styleSheetFile = "assets/css/print.css";
 
     //eliminar elemento         key: "actions", del objeto columnsData
     const indexActions = this.columnsData.findIndex(
@@ -103,7 +102,7 @@ export class GestionPagoPage implements OnInit {
 
     //esperar 1 segundo para que se muestre el loader
     setTimeout(() => {
-      this.printService.print(customPrintOptions);
+      this._printService.print(customPrintOptions);
 
       //Volver a colocar la columna actions
       this.columnsData.splice(indexActions, 0, {
@@ -121,7 +120,7 @@ export class GestionPagoPage implements OnInit {
       });
 
       this.isPrint = false;
-      this.loaderComponent.hide();
+      this._loaderService.hide();
     }, 1000);
   }
 
@@ -131,7 +130,7 @@ export class GestionPagoPage implements OnInit {
 
   verifyExistContract() {
     this.suscriptions.push(
-      this.globalService
+      this._globalService
         .Get(`contratos-pagos/verify/${this.prestamoSeleccionado.id}`)
         .subscribe({
           next: (data: any) => {
@@ -153,7 +152,7 @@ export class GestionPagoPage implements OnInit {
   }
 
   ionViewDidEnter() {
-    this.getIdByUrl();
+    this.getPrestamo();
     this.buildColumns();
   }
   ionViewDidLeave() {
@@ -161,7 +160,7 @@ export class GestionPagoPage implements OnInit {
   }
 
   getFileIfExist(idPago: number) {
-    this.globalService.GetId("documentos/by-fecha-pago", idPago).subscribe({
+    this._globalService.GetId("documentos/by-fecha-pago", idPago).subscribe({
       next: (response: any) => {
         console.log("Respuesta del Servidor: ", response);
         if (response?.urlDocumento) {
@@ -210,7 +209,7 @@ export class GestionPagoPage implements OnInit {
     data.idPrestamo = this.prestamoSeleccionado.id;
     data.mora = this.mora;
 
-    this.globalService.PostWithFile("pagos/saveFile", data, file).subscribe({
+    this._globalService.PostWithFile("pagos/saveFile", data, file).subscribe({
       next: (response) => {
         console.log("Respuesta del Servidor: ", response);
         this.getFechasPago(this.prestamoSeleccionado);
@@ -252,7 +251,10 @@ export class GestionPagoPage implements OnInit {
       );
 
       fechasPagos.forEach((fecha: any) => {
-        const diffDaysOld = this.getDiffDays(this.pagoSeleccionado.fechaPago, fecha);
+        const diffDaysOld = this.getDiffDays(
+          this.pagoSeleccionado.fechaPago,
+          fecha
+        );
         if (diffDaysOld < 0) {
           oldDaysLate += Math.abs(diffDaysOld);
         }
@@ -284,40 +286,64 @@ export class GestionPagoPage implements OnInit {
     );
   }
 
-  private getIdByUrl(): void {
-    this.suscriptions.push(
-      this.route.paramMap.subscribe((params) => {
-        const id = params.get("id");
-        this.idPrestamoUrl = id || "";
-        if (id) {
-          this.fetchPrestamo(id);
-        } else {
-          this.prestamoSeleccionado = null;
-        }
-      })
+  async getPrestamo() {
+    try {
+      const params = await firstValueFrom(this._route.paramMap);
+      const id = params.get("id");
+
+      if (!id) {
+        this.resetPrestamoState();
+        return;
+      }
+
+      const idDecrypted = await this.getDecryptedId(id);
+      if (!idDecrypted) return;
+
+      const prestamo = await this.fetchPrestamo(idDecrypted);
+      this.updatePrestamoState(prestamo);
+    } catch (error) {
+      console.error("Error fetching prestamo:", error);
+      // Consider adding user-friendly error handling here
+    }
+  }
+
+  private getDecryptedId(id: string): Promise<number | any> {
+    return firstValueFrom(
+      this._globalService.GetByIdEncrypted("convert-id", id).pipe(
+        catchError((error: any) => {
+          console.error("Error decrypting ID:", error);
+          return error;
+        })
+      )
     );
   }
 
-  private fetchPrestamo(id: string): void {
-    this.globalService.GetByIdEncrypted("prestamos", id).subscribe({
-      next: (prestamo: any) => {
-        if (prestamo) {
-          this.processPrestamo(prestamo);
-        }
-      },
-      error: (error) => console.error(error),
-    });
+  private fetchPrestamo(idDecrypted: number): Promise<any> {
+    return firstValueFrom(
+      this._globalService.GetId("prestamos", idDecrypted).pipe(
+        tap((prestamo: any) => {
+          prestamo = this._globalService.parseObjectDates(prestamo);
+          console.log("Prestamo:", prestamo);
+          console.log("Plan de Pago:", prestamo.planPago);
+        }),
+        catchError((error) => {
+          console.error("Error fetching prestamo:", error);
+          throw error;
+        })
+      )
+    );
   }
 
-  private processPrestamo(prestamo: any): void {
-    prestamo = this.globalService.parseObjectDates(prestamo);
-    console.log("Prestamo: ", prestamo);
+  private updatePrestamoState(prestamo: any): void {
     this.prestamoSeleccionado = prestamo;
     this.clienteSeleccionado = prestamo.cliente;
     this.avalSeleccionado = prestamo.aval;
     this.hasAval = !!prestamo.idAval;
-
     this.verifyExistContract();
+  }
+
+  private resetPrestamoState(): void {
+    this.prestamoSeleccionado = null;
   }
 
   private buildColumns(): void {
@@ -397,12 +423,12 @@ export class GestionPagoPage implements OnInit {
 
   onDeleteButtonClicked(data: any) {
     console.log("Elemento eliminado:", data);
-    this.globalService.Delete("pagos", data.id).subscribe({
+    this._globalService.Delete("pagos", data.id).subscribe({
       next: () => {
         this.toastColor = "success";
         this.toastMessage = "Pago eliminado exitosamente.";
         this.isToastOpen = true;
-        this.fetchPrestamo(this.idPrestamoUrl);
+        this.fetchPrestamo(this.prestamoSeleccionado.id);
       },
       error: (error: any) => {
         this.toastColor = "danger";
@@ -436,11 +462,11 @@ export class GestionPagoPage implements OnInit {
   }
 
   private getFormattedPaymentDate(): string {
-    return this.globalService.formatDateForInput(new Date().toISOString());
+    return this._globalService.formatDateForInput(new Date().toISOString());
   }
 
   getMora(id: number): void {
-    this.globalService.GetId("moras/fecha-pago", id).subscribe({
+    this._globalService.GetId("moras/fecha-pago", id).subscribe({
       next: (response: any) => {
         console.log("Mora:", response);
         const mora = this.calculateTotalMora(response);
@@ -477,7 +503,7 @@ export class GestionPagoPage implements OnInit {
 
   private getFechasPago(data: any): void {
     console.log("Información del prestamo:", data);
-    this.globalService.Get(`fechas-pagos/plan/${data.planPago.id}`).subscribe({
+    this._globalService.Get(`fechas-pagos/plan/${data.planPago.id}`).subscribe({
       next: (response: any) => {
         console.log("Plan de pago:", response);
         this.elements = this.processFechasPago(response);

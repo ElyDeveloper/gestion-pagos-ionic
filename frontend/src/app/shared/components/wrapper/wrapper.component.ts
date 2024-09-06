@@ -11,7 +11,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
     [color]="toastColor"
     (didDismiss)="setOpenedToast(false)"></ion-toast>
 
-  <app-breadcrumb></app-breadcrumb>
+  <app-breadcrumb *ngIf="showBreadcrumb"></app-breadcrumb>
   `
 })
 export class WrapperComponent implements OnInit {
@@ -19,6 +19,7 @@ export class WrapperComponent implements OnInit {
   @Input() toastMessage: string = 'Operacion realizada con éxito!';
   @Input() toastColor: string = 'primary';
   @Input() isToastOpen: boolean = false;
+  @Input() showBreadcrumb: boolean = true;
 
   @Output() isToastOpenChange: EventEmitter<boolean> = new EventEmitter<boolean>();
 

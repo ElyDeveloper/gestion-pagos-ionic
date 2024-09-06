@@ -33,7 +33,7 @@ import { FormModels } from "src/app/shared/utils/forms-models";
 export class GestionPrestamoPage implements OnInit {
   @ViewChild("modalPlanPago", { static: true })
   modalPlanPago!: TemplateRef<any>;
-  
+
   steps = [1, 2, 3];
   currentStep = 0;
 
@@ -144,8 +144,22 @@ export class GestionPrestamoPage implements OnInit {
   }
 
   extractNumber(input: string): number {
-    const numberString = input.replace(/\D/g, "");
-    return parseInt(numberString, 10) || 0;
+    // console.log("Input: ", input);
+    if (input) {
+      //Verificar si es string
+      if (typeof input === "string") {
+        //Remover textos y simbolos, solo dejar numeros
+        const numberString = input.replace(/\D/g, "");
+        return parseInt(numberString, 10) || 0;
+      }
+
+      // verificar si es numero
+      if (typeof input === "number") {
+        return input;
+      }
+    }
+
+    return 0;
   }
 
   nextStep() {
@@ -355,6 +369,10 @@ export class GestionPrestamoPage implements OnInit {
       } else {
         this.savePrestamo(planPago);
       }
+    } else {
+      this.toastMessage = "Todos los campos son obligatorios";
+      this.toastColor = "warning";
+      this.isToastOpen = true;
     }
   }
 

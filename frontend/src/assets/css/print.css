@@ -79,4 +79,31 @@
   @page {
     margin: 2cm;
   }
+
+  p{
+    text-align: justify;
+  }
+
+  .signature-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 3rem;
+  }
+  
+  .signature-box {
+    width: 33.33%;
+    text-align: center;
+    margin: 3rem;
+  }
+  
+  .signature-line {
+    border-top: 1px solid #000;
+    padding-top: 0.5rem;
+  }
+  
+  .signature-line p {
+    text-align: center !important;
+    margin: 0;
+  }
 }

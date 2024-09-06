@@ -28,7 +28,6 @@
 @import "~@ng-select/ng-select/themes/default.theme.css";
 @import "bootstrap/scss/bootstrap";
 
-
 /**
  * Ionic Dark Mode
  * -----------------------------------------------------
@@ -79,6 +78,29 @@ ion-avatar {
 ion-item {
   //Transparente
   --ion-item-background: transparent !important;
+}
+
+.signature-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 3rem;
+}
+
+.signature-box {
+  width: 33.33%;
+  text-align: center;
+  margin: 3rem;
+}
+
+.signature-line {
+  border-top: 1px solid #000;
+  padding-top: 0.5rem;
+}
+
+.signature-line p {
+  text-align: center !important;
+  margin: 0;
 }
 
 .custom-table {
@@ -148,7 +170,7 @@ ion-item {
 }
 
 .flag-image {
-  width: 30px;  /* o el tamaño que prefieras */
+  width: 30px; /* o el tamaño que prefieras */
   height: auto;
   object-fit: contain;
 }
@@ -156,58 +178,127 @@ ion-item {
 .stepper-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: var(--ion-card-background);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
 .step-indicator {
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background-color: #ccc;
+  background-color: var(--step-bg-color);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: bold;
+  color: var(--step-text-color);
+  position: relative;
 }
+
+.step-indicator::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  width: calc(100% - 40px);
+  height: 2px;
+  background-color: var(--step-bg-color);
+  transform: translateY(-50%);
+}
+
+.step-indicator:last-child::after {
+  display: none;
+}
+
 .step-indicator.active {
-  background-color: var(--ion-color-primary);
-  color: white;
+  background-color: var(--step-active-bg-color);
+  transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(var(--ion-color-primary-rgb), 0.5);
 }
+
 .step-indicator.completed {
-  background-color: var(--ion-color-success);
-  color: white;
+  background-color: var(--step-completed-bg-color);
 }
+
 .navigation-buttons {
   display: flex;
-  justify-content: space-around;
-  margin-top: 20px;
+  justify-content: space-between;
+  margin-top: 2rem;
 }
 
 .task-list {
   list-style-type: none;
   padding: 0;
+  // margin: 1rem 0;
 }
 
 .task-list li {
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
+  padding: 0.5rem;
+  transition: all 0.3s ease;
 }
 
 .task-list li span {
   flex-grow: 1;
-  margin-right: 10px;
+  margin-right: 1rem;
+  font-size: 1rem;
+}
+
+.task-list li.completed {
+  opacity: 0.7;
 }
 
 .task-list li.completed span {
   text-decoration: line-through;
-  color: #888;
+  color: var(--task-completed-color);
 }
 
 .task-list ion-icon {
-  font-size: 1.2em;
+  font-size: 1.4em;
 }
 
 .bold-label {
   font-weight: bold;
-  font-size: 20px !important;
+  font-size: 1.2rem !important;
+  margin-bottom: 0.5rem;
+  color: var(--ion-text-color);
+}
+
+ion-item {
+  --border-color: transparent;
+  --background: transparent;
+  --padding-start: 10px;
+  --background-hover: transparent;
+  --inner-padding-end: 10px;
+}
+
+ion-input,
+ion-select,
+ion-searchbar {
+  --padding-start: 16px !important;
+  --padding-end: 16px !important;
+  --background: var(--ion-color-light-tint) !important;
+  --color: var(--ion-color-light-contrast) !important;
+  --border-radius: 8px !important;
+  --inner-padding-end: 10px;
+
+  --margin-bottom: 5px !important;
+  margin-bottom: 16px;
+  margin-top: 16px;
+
+  &.has-focus {
+    --background: var(--ion-color-light-shade) !important;
+  }
+
+  input,
+  .select-text,
+  .searchbar-input {
+    caret-color: var(--ion-color-primary);
+  }
 }
