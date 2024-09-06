@@ -28,7 +28,6 @@ import {keys} from '../env/interfaces/Servicekeys.interface';
 import * as fs from 'fs';
 import * as path from 'path';
 
-
 // Configuración de multer para la carga de archivos
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -104,8 +103,7 @@ export class CheckPrestamosController {
 
         try {
           const dataSend = JSON.parse(req.body.data);
-          const {estado, fechaPago, idFechaPago, monto, mora, idPrestamo} =
-            dataSend;
+          const {fechaPago, idFechaPago, monto, mora, idPrestamo} = dataSend;
           const file = req.file;
 
           // Buscar el IdDocumento usando el IDPrestamo
@@ -175,6 +173,19 @@ export class CheckPrestamosController {
                 estado: true,
               });
             }
+
+            //INFO CONTAR CUOTAS PAGADAS EN FECHAS PAGOS
+            const countCuotasPagadas = await this.fechasPagosRepository.count({
+              planId: prestamo.idPlan,
+              estado: true,
+            });
+
+            console.log('Cuotas pagadas:', countCuotasPagadas.count);
+
+            //INFO ACTUALIZAR PLAN DE PAGO
+            await this.planesPagoRepository.updateById(prestamo.idPlan, {
+              cuotaPagadas: countCuotasPagadas.count,
+            });
           }
 
           // Crear el registro en documentosTipoDoc
@@ -539,10 +550,8 @@ export class CheckPrestamosController {
         return 'application/pdf';
       case '.txt':
         return 'text/plain';
-        default:
+      default:
         return 'application/octet-stream';
     }
   }
-
-
 }

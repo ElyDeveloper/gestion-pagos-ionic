@@ -2,7 +2,7 @@ import { Component, ViewChild, TemplateRef, inject } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { NavController } from "@ionic/angular";
-import { Subscription } from "rxjs";
+import { catchError, forkJoin, of, Subscription } from "rxjs";
 import { AuthService } from "src/app/shared/services/auth.service";
 import { GlobalService } from "src/app/shared/services/global.service";
 
@@ -68,13 +68,11 @@ export class HomePage {
   private _router = inject(Router);
   constructor() {}
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   ionViewDidEnter() {
     console.log("Llamado a obtencion de usuario");
     this.getUserLoggedIn();
-
   }
 
   ionViewWillLeave() {
@@ -99,59 +97,33 @@ export class HomePage {
   }
 
   async updateFolderCounts() {
-    this.suscriptions.push(
-      this._globalService.Get("usuarios/count").subscribe({
-        next: (data: any) => {
-          this.folders[0].count = data.count;
-        },
-        error: (error) => {
-          console.error("Error al obtener la cantidad de usuarios", error);
-        },
-      })
-    );
-    this.suscriptions.push(
-      this._globalService.Get("personas/count").subscribe({
-        next: (data: any) => {
-          this.folders[1].count = data.count;
-        },
-        error: (error) => {
-          console.error("Error al obtener la cantidad de clientes", error);
-        },
-      })
-    );
+    const requests = [
+      this._globalService.Get("usuarios/count"),
+      this._globalService.Get("personas/count"),
+      this._globalService.Get("personas/clientes/count"),
+      this._globalService.Get("contratos-pagos/count"),
+      this._globalService.Get("prestamos/count"),
+      this._globalService.Get("pagos/count"),
+    ];
 
     this.suscriptions.push(
-      this._globalService.Get("personas/clientes/count").subscribe({
-        next: (data: any) => {
-          this.folders[2].count = data.count;
+      forkJoin(
+        requests.map((request) =>
+          request.pipe(
+            catchError((error) => {
+              console.error("Error al obtener la cantidad:", error);
+              return of({ count: 0 });
+            })
+          )
+        )
+      ).subscribe({
+        next: (results: any[]) => {
+          results.forEach((result, index) => {
+            this.folders[index].count = result.count;
+          });
         },
         error: (error) => {
-          console.error("Error al obtener la cantidad de clientes", error);
-        },
-      })
-    );
-
-    this.suscriptions.push(
-      this._globalService.Get("contratos-pagos/count").subscribe({
-        next: (data: any) => {
-          this.folders[3].count = data.count;
-        },
-        error: (error) => {
-          console.error(
-            "Error al obtener la cantidad de contratos de pago",
-            error
-          );
-        },
-      })
-    );
-
-    this.suscriptions.push(
-      this._globalService.Get("prestamos/count").subscribe({
-        next: (data: any) => {
-          this.folders[4].count = data.count;
-        },
-        error: (error) => {
-          console.error("Error al obtener la cantidad de prestamos", error);
+          console.error("Error al actualizar los conteos de carpetas:", error);
         },
       })
     );

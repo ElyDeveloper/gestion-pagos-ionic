@@ -3,6 +3,7 @@ import {
   CountSchema,
   Filter,
   FilterExcludingWhere,
+  relation,
   repository,
   Where,
 } from '@loopback/repository';
@@ -29,6 +30,7 @@ import {
   FechasPagosRepository,
   MorasRepository,
   PagosRepository,
+  PlanesPagoRepository,
 } from '../repositories';
 
 @authenticate('jwt')
@@ -38,6 +40,8 @@ export class PagosController {
     public pagosRepository: PagosRepository,
     @repository(MorasRepository)
     public morasRepository: MorasRepository,
+    @repository(PlanesPagoRepository)
+    public planesPagoRepository: PlanesPagoRepository,
     @repository(FechasPagosRepository)
     public fechasPagosRepository: FechasPagosRepository,
     @repository(DocumentosRepository)
@@ -92,7 +96,7 @@ export class PagosController {
   })
   async find(): Promise<Pagos[]> {
     return this.pagosRepository.find({
-      include: [{relation: 'prestamos'}],
+      include: [{relation: 'cuota'}],
     });
   }
 
@@ -112,8 +116,35 @@ export class PagosController {
     @param.query.number('skip') skip: number,
     @param.query.number('limit') limit: number,
   ): Promise<Pagos[]> {
+    console.log('skip', skip);
+    console.log('limit', limit);
     return this.pagosRepository.find({
-      include: [{relation: 'prestamos'}],
+      include: [
+        {
+          relation: 'cuota',
+          scope: {
+            include: [
+              {
+                relation: 'planPago',
+                scope: {
+                  include: [
+                    {
+                      relation: 'prestamos',
+                      scope: {
+                        include: [
+                          {
+                            relation: 'cliente',
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      ],
       skip,
       limit,
     });
@@ -230,13 +261,12 @@ export class PagosController {
     });
 
     if (documentoTipoDoc) {
-      
       const documento = await this.documentosRepository.findOne({
         where: {
           idDocTipDoc: documentoTipoDoc.id,
         },
       });
-      
+
       if (documento) {
         await this.documentosRepository.deleteById(documento.id);
       }
@@ -244,20 +274,68 @@ export class PagosController {
       await this.documentosTipoDocRepository.deleteById(documentoTipoDoc.id);
     }
 
+    //INFO ELIMINAR PRESTAMO POR ID
     await this.pagosRepository.deleteById(id);
+
+    //INFO OBTENER FECHAS PAGOS CON PAGO
+    const fechaPago = await this.fechasPagosRepository.findById(
+      pago.idFechaPago,
+    );
+    if (fechaPago) {
+      //INFO CONTAR CUOTAS PAGADAS EN FECHAS PAGOS
+      const countCuotasPagadas = await this.fechasPagosRepository.count({
+        planId: fechaPago.planId,
+        estado: true,
+      });
+
+      console.log('Cuotas pagadas:', countCuotasPagadas.count);
+
+      //INFO ACTUALIZAR PLAN DE PAGO
+      await this.planesPagoRepository.updateById(fechaPago.planId, {
+        cuotaPagadas: countCuotasPagadas.count,
+      });
+    }
   }
 
   @get('/pagos/search')
   async dataPagosSearch(
     @param.query.string('search') search: string,
-  ): Promise<any> {
-    let PagosSearch = await this.getPagosSearch(search);
-    return PagosSearch;
-  }
+  ): Promise<Pagos[]> {
+    const pagos = await this.pagosRepository.find({
+      include: [
+        {
+          relation: 'cuota',
+          scope: {
+            include: [
+              {
+                relation: 'planPago',
+                scope: {
+                  include: [
+                    {
+                      relation: 'prestamos',
+                      scope: {
+                        include: [
+                          {
+                            relation: 'cliente',
+                            scope: {
+                              where: {
+                                nombres: {like: `%${search}%`},
+                                apellidos: {like: `%${search}%`},
+                              },
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      ],
+    });
 
-  async getPagosSearch(search: string) {
-    return await this.pagosRepository.dataSource.execute(
-      `${viewOf.getViewPagos} Where ClienteNombre like '%${search}%' or ClienteApellidos like '%${search}%' or TipoPrestamoNombre like '%${search}%'  or Monto like '%${search}%'  or FechaPago like '%${search}%' or FechaInicial like '%${search}%' or FechaFinal like '%${search}%'`,
-    );
+    return pagos;
   }
 }

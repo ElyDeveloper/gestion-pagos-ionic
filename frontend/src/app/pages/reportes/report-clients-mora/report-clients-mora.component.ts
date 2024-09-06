@@ -73,25 +73,10 @@ export class ReportClientsMoraComponent implements OnInit {
     this.getPrestamosWithMora();
   }
 
-  getPrestamosWithMora() { }
-  
+  getPrestamosWithMora() {}
+
   ionViewDidLeave() {
     this.suscriptions.forEach((sub) => sub.unsubscribe());
-  }
-
-  calculateMora(monto: number, daysLate: number): number {
-    const moraForDay = Number(((PERCENTAGE / 30) * monto).toFixed(2));
-    console.log("Mora por dia: ", moraForDay);
-    return Number((daysLate * moraForDay).toFixed(2));
-  }
-
-  private getDiffDays(fechaPagar: string, fechaRealizaPago: string): number {
-    const currentDate = new Date(fechaRealizaPago);
-    const fechaPago = new Date(fechaPagar);
-
-    return Math.ceil(
-      (fechaPago.getTime() - currentDate.getTime()) / MILLISECONDS_PER_DAY
-    );
   }
 
   scrollToElement(section: string): void {
