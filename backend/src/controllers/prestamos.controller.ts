@@ -440,4 +440,14 @@ export class PrestamosController {
 
     return copia;
   }
+
+  //endpoint para ejecutar el procedimiento almacenado de reporte de mora
+  @get('/prestamos/reporte-mora')
+  async reporteMora(): Promise<any> {
+    return this.prestamosRepository.dataSource.execute(
+      'SP_ReporteMora',
+      [],
+    );
+  }
+
 }
