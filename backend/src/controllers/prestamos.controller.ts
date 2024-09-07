@@ -450,4 +450,26 @@ export class PrestamosController {
     );
   }
 
+  //endpoint para ejecutar el procedimiento almacenado de reporte de prestamos
+  @get('/prestamos/reporte-recordCrediticio')
+  async reportePrestamos(
+    @param.query.number('idCliente') idCliente: number,
+  ): Promise<any> {
+
+    const encabezados = await this.prestamosRepository.dataSource.execute(
+      `SP_encabezadosRecordCrediticio ${idCliente}`,
+      [],
+    );
+
+    const cuerpo = await this.prestamosRepository.dataSource.execute(
+      `SP_cuerpoRecordCrediticio ${idCliente}`,
+      [],
+    );
+    
+    return {
+      encabezados,
+      cuerpo
+    };
+  }
+
 }
