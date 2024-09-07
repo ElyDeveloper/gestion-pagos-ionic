@@ -324,7 +324,7 @@ export class PrestamosPage implements OnInit {
   }
 
   onEditButtonClicked(data: any) {
-    this._router.navigate(["/layout/gestion-prestamo/" + data.id]);
+    this._router.navigate(["/layout/gestion-prestamo/" + data.idEncrypted]);
   }
 
   onContractButtonClicked(data: any) {

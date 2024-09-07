@@ -8,80 +8,64 @@
   </app-wrapper>
   <ion-card>
     <ion-card-content>
-      <div
-        class="alert alert-info d-flex justify-content-between py-1"
-        role="alert">
-        <div
-          class="row d-flex align-content-center align-items-center justify-content-center">
-          <p>
-            <ion-icon name="person-outline"></ion-icon> Cliente Seleccionado:
-            <strong>
-              @if (clienteSeleccionado?.id) { {{clienteSeleccionado.nombres}}
-              {{clienteSeleccionado.apellidos}} - {{clienteSeleccionado.dni}}
-              }@else { No Aún }
-            </strong>
-          </p>
-          <p *ngIf="hasAval">
-            <ion-icon name="person-outline"></ion-icon> Aval Seleccionado:
-            <strong>
-              @if (avalSeleccionado?.id) { {{avalSeleccionado.nombres}}
-              {{avalSeleccionado.apellidos}} - {{avalSeleccionado.dni}} }@else {
-              No Aún }
-            </strong>
-          </p>
-        </div>
-        
-      </div>
-      <div
-        class="alert"
-        [ngClass]="{
-          'alert-warning': isWarningState(),
-          'alert-success': isSuccessState()
-        }"
-        role="alert">
-        <ul class="task-list">
-          <li [class.completed]="clienteSeleccionado?.id">
-            <span>* Selecciona un cliente</span>
-            @if (clienteSeleccionado?.id) {
-            <ion-icon name="checkmark-done-outline" color="success"></ion-icon>
-            } @else {
-            <ion-icon name="close-outline" color="danger"></ion-icon>
-            }
-          </li>
-          <li [class.completed]="planesPagoForm.valid">
-            <span>* Selecciona un plan de pago</span>
-            @if (planesPagoForm.valid) {
-            <ion-icon name="checkmark-done-outline" color="success"></ion-icon>
-            } @else {
-            <ion-icon name="close-outline" color="danger"></ion-icon>
-            }
-          </li>
-          <li [class.completed]="prestamoForm.valid">
-            <span>* Llena los datos de préstamo</span>
-            @if (prestamoForm.valid) {
-            <ion-icon name="checkmark-done-outline" color="success"></ion-icon>
-            } @else {
-            <ion-icon name="close-outline" color="danger"></ion-icon>
-            }
-          </li>
-        </ul>
-      </div>
+      <ion-grid>
+        <ion-row class="ion-align-items-center">
+          <ion-col size="12" size-md="6">
+            <ion-item lines="none">
+              <ion-icon name="person-outline" slot="start"></ion-icon>
+              <ion-label>
+                <h2>Cliente Seleccionado:</h2>
+                <p><strong>Deysi Manueles Lopez - 1319198700207</strong></p>
+              </ion-label>
+            </ion-item>
+          </ion-col>
+          <ion-col size="12" size-md="6">
+            <ion-list>
+              <ion-item lines="none">
+                <ion-icon
+                  [name]="clienteSeleccionado ? 'checkmark-circle' : 'close-circle'"
+                  [color]="clienteSeleccionado ? 'success' : 'danger'"
+                  slot="start"></ion-icon>
+                <ion-label [color]="clienteSeleccionado ? 'success' : 'danger'"
+                  >Selecciona un cliente</ion-label
+                >
+              </ion-item>
+              <ion-item lines="none">
+                <ion-icon
+                  [name]="!planesPagoForm.invalid ? 'checkmark-circle' : 'close-circle'"
+                  [color]="!planesPagoForm.invalid ? 'success' : 'danger'"
+                  slot="start"></ion-icon>
+                <ion-label
+                  [color]="!planesPagoForm.invalid ? 'success' : 'danger'"
+                  >Selecciona un plan de pago</ion-label
+                >
+              </ion-item>
+              <ion-item lines="none">
+                <ion-icon
+                  [name]="!prestamoForm.invalid ? 'checkmark-circle' : 'close-circle'"
+                  [color]="!prestamoForm.invalid ? 'success' : 'danger'"
+                  slot="start"></ion-icon>
+                <ion-label
+                  [color]="!prestamoForm.invalid ? 'success' : 'danger'"
+                  >Llena los datos de préstamo</ion-label
+                >
+              </ion-item>
+            </ion-list>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
 
-      <div class="">
-        <button class="btn btn-success" routerLink="/layout/prestamos">
-          Ver Prestamos
-          <ion-icon class="ms-2" name="open-outline"></ion-icon>
-        </button>
-        <!-- <ion-button routerLink="/layout/prestamos">
-          Ver Prestamos
-          <ion-icon class="ms-2" name="open-outline"></ion-icon>
-        </ion-button> -->
+      <div class="ion-text-end ion-margin-top">
+        <ion-button color="success" routerLink="/layout/prestamos">
+          VER PRESTAMOS
+          <ion-icon name="open-outline" slot="end"></ion-icon>
+        </ion-button>
       </div>
     </ion-card-content>
   </ion-card>
 
-  <div>
-    <div>
+  <div class="row">
+    <div class="col-sm-12 col-md-6">
       <ion-card>
         <ion-card-header>
           <ion-title>Seleccionar Cliente/Aval</ion-title>
@@ -89,7 +73,7 @@
         <ion-card-content>
           <ion-grid>
             <ion-row>
-              <ion-col sizeSm="12" sizeMd="6" sizeLg="4">
+              <ion-col sizeXs="12" sizeSm="12">
                 <!-- Buscador de cliente -->
                 <ion-searchbar
                   placeholder="Buscar Cliente..."
@@ -113,7 +97,7 @@
                   >Tiene Aval?</ion-toggle
                 >
               </ion-col>
-              <ion-col sizeSm="12" sizeMd="6" sizeLg="4">
+              <ion-col sizeXs="12" sizeSm="12">
                 <!-- Buscador de Aval -->
                 <ion-searchbar
                   [disabled]="!hasAval"
@@ -136,8 +120,6 @@
           </ion-grid>
         </ion-card-content>
       </ion-card>
-    </div>
-    <div>
       <ion-card>
         <ion-card-header>
           <ion-title> Plan de Pago </ion-title>
@@ -147,7 +129,7 @@
           <form [formGroup]="planesPagoForm" (ngSubmit)="onSubmit()">
             <ion-grid>
               <ion-row>
-                <ion-col sizeXs="12" sizeSm="4" sizeMd="3">
+                <ion-col sizeXs="12" sizeSm="6">
                   <ion-item>
                     <ion-label position="stacked" class="bold-label"
                       >Cuotas a Pagar:</ion-label
@@ -157,7 +139,7 @@
                       formControlName="cuotasPagar"></ion-input>
                   </ion-item>
                 </ion-col>
-                <ion-col sizeXs="12" sizeSm="4" sizeMd="3">
+                <ion-col sizeXs="12" sizeSm="6">
                   <ion-item>
                     <ion-label position="stacked" class="bold-label"
                       >Fecha de Inicio:</ion-label
@@ -167,7 +149,7 @@
                       formControlName="fechaInicio"></ion-input>
                   </ion-item>
                 </ion-col>
-                <ion-col sizeXs="12" sizeSm="4" sizeMd="3">
+                <ion-col sizeXs="12" sizeSm="6">
                   <ion-item>
                     <ion-label position="stacked" class="bold-label"
                       >Cuotas Pagadas:</ion-label
@@ -177,7 +159,7 @@
                       formControlName="cuotaPagadas"></ion-input>
                   </ion-item>
                 </ion-col>
-                <ion-col sizeXs="12" sizeSm="4" sizeMd="3">
+                <ion-col sizeXs="12" sizeSm="6">
                   <ion-item lines="none">
                     <ion-label position="stacked" class="bold-label"
                       >Estado</ion-label
@@ -194,7 +176,7 @@
         </ion-card-content>
       </ion-card>
     </div>
-    <div>
+    <div class="col-sm-12 col-md-6">
       <ion-card>
         <ion-card-header>
           <ion-title>Formulario de Préstamo</ion-title>
@@ -203,7 +185,7 @@
           <form [formGroup]="prestamoForm" (ngSubmit)="onSubmit()">
             <ion-grid>
               <ion-row>
-                <ion-col sizeXs="12" sizeSm="4" sizeMd="3">
+                <ion-col sizeXs="12" sizeSm="6">
                   <ion-item>
                     <ion-label position="stacked" class="bold-label"
                       >Monto:</ion-label
@@ -214,7 +196,7 @@
                       formControlName="monto"></ion-input>
                   </ion-item>
                 </ion-col>
-                <ion-col sizeXs="12" sizeSm="4" sizeMd="3">
+                <ion-col sizeXs="12" sizeSm="6">
                   <ion-item>
                     <ion-label position="stacked" class="bold-label"
                       >Tasa de Interés:</ion-label
@@ -225,7 +207,7 @@
                       formControlName="tasaInteres"></ion-input>
                   </ion-item>
                 </ion-col>
-                <ion-col sizeXs="12" sizeSm="4" sizeMd="3">
+                <ion-col sizeXs="12" sizeSm="6">
                   <ion-item>
                     <ion-label position="stacked" class="bold-label"
                       >Total Monto:</ion-label
@@ -236,7 +218,7 @@
                       formControlName="totalMonto"></ion-input>
                   </ion-item>
                 </ion-col>
-                <ion-col sizeXs="12" sizeSm="4" sizeMd="3">
+                <ion-col sizeXs="12" sizeSm="6">
                   <ion-item>
                     <ion-label position="stacked" class="bold-label"
                       >Fecha de Solicitud:</ion-label
@@ -246,7 +228,7 @@
                       formControlName="fechaSolicitud"></ion-input>
                   </ion-item>
                 </ion-col>
-                <ion-col sizeXs="12" sizeSm="4" sizeMd="3">
+                <ion-col sizeXs="12" sizeSm="6">
                   <ion-item>
                     <ion-label position="stacked" class="bold-label"
                       >Producto:</ion-label
@@ -262,7 +244,7 @@
                     </ion-select>
                   </ion-item>
                 </ion-col>
-                <ion-col sizeXs="12" sizeSm="4" sizeMd="3">
+                <ion-col sizeXs="12" sizeSm="6">
                   <ion-item>
                     <ion-label position="stacked" class="bold-label"
                       >Periodo de Cobro:</ion-label
@@ -278,7 +260,7 @@
                     </ion-select>
                   </ion-item>
                 </ion-col>
-                <ion-col sizeXs="12" sizeSm="4" sizeMd="3">
+                <ion-col sizeXs="12" sizeSm="6">
                   <ion-item>
                     <ion-label position="stacked" class="bold-label"
                       >Estado de Aprobación:</ion-label
@@ -295,7 +277,7 @@
                     </ion-select>
                   </ion-item>
                 </ion-col>
-                <ion-col sizeXs="12" sizeSm="4" sizeMd="3">
+                <ion-col sizeXs="12" sizeSm="6">
                   <ion-item>
                     <ion-label position="stacked" class="bold-label"
                       >Moneda:</ion-label
@@ -311,7 +293,7 @@
                     </ion-select>
                   </ion-item>
                 </ion-col>
-                <ion-col sizeXs="12" sizeSm="4" sizeMd="3">
+                <ion-col sizeXs="12" sizeSm="6">
                   <ion-item lines="none">
                     <ion-label position="stacked" class="bold-label"
                       >Estado</ion-label
@@ -340,18 +322,6 @@
         </ion-card-content>
       </ion-card>
     </div>
-
-    <!-- <div class="navigation-buttons">
-      <ion-button [disabled]="currentStep === 0" (click)="previousStep()">
-        <ion-icon class="me-2" name="arrow-back-outline"></ion-icon> Anterior
-      </ion-button>
-      <ion-button
-        [disabled]="currentStep === steps.length - 1"
-        (click)="nextStep()">
-        Siguiente
-        <ion-icon class="ms-2" name="arrow-forward-outline"></ion-icon>
-      </ion-button>
-    </div> -->
   </div>
 
   <app-reusable-modal

@@ -9,9 +9,9 @@
   }
 
   /* Ocultar elementos innecesarios para impresión */
-  .no-print, 
-  ion-button, 
-  ion-searchbar, 
+  .no-print,
+  ion-button,
+  ion-searchbar,
   ion-icon {
     display: none !important;
   }
@@ -47,9 +47,15 @@
   .status-cell {
     font-weight: bold;
   }
-  .status-cell.pending { color: #666 !important; }
-  .status-cell.paid { color: #000 !important; }
-  .status-cell.overdue { color: #333 !important; }
+  .status-cell.pending {
+    color: #666 !important;
+  }
+  .status-cell.paid {
+    color: #000 !important;
+  }
+  .status-cell.overdue {
+    color: #333 !important;
+  }
 
   /* Ajustes para imágenes */
   img {
@@ -62,7 +68,10 @@
   }
 
   /* Evitar cortes de página dentro de elementos */
-  tr, td, th, p {
+  tr,
+  td,
+  th,
+  p {
     page-break-inside: avoid;
   }
 
@@ -71,7 +80,7 @@
     display: table-header-group;
   }
 
-  h2{
+  h2 {
     font-size: 16 !important;
   }
 
@@ -80,7 +89,7 @@
     margin: 2cm;
   }
 
-  p{
+  p {
     text-align: justify;
   }
 
@@ -90,20 +99,58 @@
     align-items: center;
     margin-top: 3rem;
   }
-  
+
   .signature-box {
     width: 33.33%;
     text-align: center;
     margin: 3rem;
   }
-  
+
   .signature-line {
     border-top: 1px solid #000;
     padding-top: 0.5rem;
   }
-  
+
   .signature-line p {
     text-align: center !important;
     margin: 0;
   }
+}
+
+/* VISTA DE PAGOS */
+
+.payment-details-header {
+  padding: 20px;
+  border-radius: 8px;
+}
+.header-title {
+  text-align: center;
+  margin: 0 0 20px 0;
+  font-size: 24px;
+  color: #333;
+}
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.client-info {
+  flex-grow: 1;
+}
+.client-info p {
+  margin: 5px 0;
+  font-size: 16px;
+  color: #555;
+}
+.client-info strong {
+  color: #333;
+  margin-right: 5px;
+}
+.logo-container {
+  flex-shrink: 0;
+  margin-left: 20px;
+}
+.logo {
+  width: 100px;
+  height: auto;
 }

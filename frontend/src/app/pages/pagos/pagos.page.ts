@@ -6,10 +6,13 @@ import {
   ViewChild,
 } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { Router } from "@angular/router";
 import { Subscription } from "rxjs";
 import { Pagos } from "src/app/shared/interfaces/pago";
 import { Column } from "src/app/shared/interfaces/table";
 import { GlobalService } from "src/app/shared/services/global.service";
+import { ModalConfig } from "src/app/shared/utils/extra";
+import { FormModels } from "src/app/shared/utils/forms-models";
 
 @Component({
   selector: "app-pagos",
@@ -24,8 +27,35 @@ import { GlobalService } from "src/app/shared/services/global.service";
           [currentPage]="currentPage"
           [totalPages]="totalPages"
           [title]="'Pagos'"
-          [context]="'Pago'">
+          [context]="'Pago'"
+          (openButtonClicked)="onOpenButtonClicked($event)"
+          (uploadButtonClicked)="onUploadButtonClicked($event)">
         </app-view-data>
+
+        <app-reusable-modal
+          [(isOpen)]="isModalOpen"
+          [modalConfig]="modalConfig"
+          [content]="modalSelected"
+          (saveData)="handleSave($event)">
+        </app-reusable-modal>
+
+        <ng-template #modalUpload let-close="close" let-save="save">
+          <ion-header>
+            <ion-toolbar>
+              <ion-title>Subir Comprobante</ion-title>
+              <ion-buttons slot="end">
+                <ion-button (click)="close()">Cerrar</ion-button>
+              </ion-buttons>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content>
+            <ion-card>
+              <ion-card-content>
+                <app-uploader></app-uploader>
+              </ion-card-content>
+            </ion-card>
+          </ion-content>
+        </ng-template>
       </section>
     </ion-content>
   `,
@@ -39,8 +69,21 @@ export class PagosPage implements OnInit {
   totalPages = 0;
   columnsData: Column[] = []; // Aquí deberías recibir los datos a mostrar en la tabla (cabeceras)
 
+  modalConfig: ModalConfig = {
+    fieldAliases: {},
+  };
+
+  isModalOpen: boolean = false;
+  modalSelected: TemplateRef<any>;
+
+  @ViewChild("modalUpload")
+  modalUpload!: TemplateRef<any>;
+
   private _globalService = inject(GlobalService);
-  constructor() {}
+  private _router = inject(Router);
+  constructor() {
+    this.modalSelected = this.modalUpload;
+  }
 
   handleSave(data: any) {
     console.log("Datos guardados:", data);
@@ -52,6 +95,21 @@ export class PagosPage implements OnInit {
   ionViewWillEnter() {
     this.buildColumns();
     this.getCountElements();
+  }
+
+  onUploadButtonClicked(event: any) {
+    console.log("Archivo subido:", event);
+    // Aquí puedes procesar el archivo como necesites
+    this.modalSelected = this.modalUpload;
+    this.isModalOpen = true;
+  }
+
+  onOpenButtonClicked(event: any) {
+    console.log("Abrir botón:", event);
+    // Aquí puedes abrir un modal o acción relacionada con el elemento seleccionado
+
+    // redirigir a view-file
+    this._router.navigate(["/layout/view-file/" + event.id]);
   }
 
   buildColumns() {
@@ -114,7 +172,7 @@ export class PagosPage implements OnInit {
           },
           {
             alias: "Abrir Adjunto - ",
-            action: "info",
+            action: "open",
             icon: "open",
             color: "secondary",
             rolesAuthorized: [1, 2],

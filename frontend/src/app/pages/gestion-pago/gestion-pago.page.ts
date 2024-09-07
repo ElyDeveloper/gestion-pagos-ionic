@@ -45,6 +45,7 @@ export class GestionPagoPage implements OnInit {
   hasMora = false;
   existContrato = false;
   isPrint = false;
+  isPagado = false;
 
   isToastOpen = false;
   toastMessage: string = "cliente guardado correctamente";
@@ -349,6 +350,7 @@ export class GestionPagoPage implements OnInit {
   private buildColumns(): void {
     this.columnsData = [
       { key: "numero", alias: "No. Cuota" },
+      { key: "id", alias: "Código" },
       { key: "fechaPago", alias: "Fecha de Pago", type: "date" },
       { key: "monto", alias: "Monto Cuota", type: "currency" },
       { key: "mora", alias: "Monto Mora", type: "currency" },
@@ -424,11 +426,13 @@ export class GestionPagoPage implements OnInit {
   onDeleteButtonClicked(data: any) {
     console.log("Elemento eliminado:", data);
     this._globalService.Delete("pagos", data.id).subscribe({
-      next: () => {
+      next: async () => {
         this.toastColor = "success";
         this.toastMessage = "Pago eliminado exitosamente.";
         this.isToastOpen = true;
-        this.fetchPrestamo(this.prestamoSeleccionado.id);
+
+        const prestamo = await this.fetchPrestamo(this.prestamoSeleccionado.id);
+        this.updatePrestamoState(prestamo);
       },
       error: (error: any) => {
         this.toastColor = "danger";
@@ -517,8 +521,11 @@ export class GestionPagoPage implements OnInit {
   }
 
   private processFechasPago(fechasPago: any[]): any[] {
+    const qtyCuotas = fechasPago.length;
     return fechasPago.map((cuota: any, index: number) => {
+      // si es ultima cuota retorna con estado pagado
       cuota.numero = index + 1;
+
       cuota.idFechaPago = cuota.id;
 
       if (!cuota.estado) {
@@ -554,7 +561,13 @@ export class GestionPagoPage implements OnInit {
   }
 
   private selectPago(index: number): void {
-    const pagoSelect = this.elements[index];
-    this.onselectButtonClicked(pagoSelect);
+    //Verificar antes si el index es mayor que la cantidad de cuotas
+    if (index >= 0 && index < this.elements.length) {
+      const pagoSelect = this.elements[index];
+      this.onselectButtonClicked(pagoSelect);
+      this.isPagado = false;
+    } else {
+      this.isPagado = true;
+    }
   }
 }

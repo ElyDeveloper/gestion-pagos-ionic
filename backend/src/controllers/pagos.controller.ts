@@ -144,6 +144,12 @@ export class PagosController {
             ],
           },
         },
+        {
+          relation: 'documentosTipoDoc',
+          scope: {
+            include: [{relation: 'documentos'}],
+          },
+        },
       ],
       skip,
       limit,
@@ -302,6 +308,9 @@ export class PagosController {
     @param.query.string('search') search: string,
   ): Promise<Pagos[]> {
     const pagos = await this.pagosRepository.find({
+      where: {
+        id: {like: `%${search}%`},
+      },
       include: [
         {
           relation: 'cuota',
@@ -317,12 +326,12 @@ export class PagosController {
                         include: [
                           {
                             relation: 'cliente',
-                            scope: {
-                              where: {
-                                nombres: {like: `%${search}%`},
-                                apellidos: {like: `%${search}%`},
-                              },
-                            },
+                            // scope: {
+                            //   where: {
+                            //     nombres: {like: `%${search}%`},
+                            //     apellidos: {like: `%${search}%`},
+                            //   },
+                            // },
                           },
                         ],
                       },
@@ -331,6 +340,12 @@ export class PagosController {
                 },
               },
             ],
+          },
+        },
+        {
+          relation: 'documentosTipoDoc',
+          scope: {
+            include: [{relation: 'documentos'}],
           },
         },
       ],

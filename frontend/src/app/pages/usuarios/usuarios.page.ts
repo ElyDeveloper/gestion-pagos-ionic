@@ -35,7 +35,6 @@ import { FormModels } from "src/app/shared/utils/forms-models";
   styleUrls: ["./usuarios.page.scss"],
 })
 export class UsuariosPage implements OnInit {
-
   elements: Usuario[] = [];
   element: Usuario = {
     nombre: "",
@@ -190,10 +189,7 @@ export class UsuariosPage implements OnInit {
           text: "Eliminar",
           handler: () => {
             this._globalService
-              .Delete(
-                "usuario-clientes/by-cliente",
-                clientRemove.id ||0
-              )
+              .Delete("usuario-clientes/by-cliente", clientRemove.id || 0)
               .subscribe({
                 next: () => {
                   console.log("Cliente eliminado correctamente");
@@ -468,6 +464,7 @@ export class UsuariosPage implements OnInit {
     } else if (this.isResetPswd) {
       this.handleUserOperation("resetPswd", data);
     } else if (this.isElement) {
+      data = this.prepareData(data);
       if (this.isEdit) {
         this.handleUserOperation("edit", data);
       } else {
@@ -475,6 +472,13 @@ export class UsuariosPage implements OnInit {
         this.handleUserOperation("create", data);
       }
     }
+  }
+
+  private prepareData(data: any) {
+    data.correo = data.email || "no-email@example.com";
+    data.telefono = data.cel.replace(/-/g, "");
+
+    return data;
   }
 
   handleUserOperation(

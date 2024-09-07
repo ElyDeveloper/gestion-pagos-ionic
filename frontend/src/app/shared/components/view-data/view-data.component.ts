@@ -39,6 +39,8 @@ export class ViewDataComponent implements OnInit {
   @Output() selectClientClicked = new EventEmitter<any>();
   @Output() checkButtonClicked = new EventEmitter<any>();
   @Output() selectButtonClicked = new EventEmitter<any>();
+  @Output() openButtonClicked = new EventEmitter<any>();
+  @Output() uploadButtonClicked = new EventEmitter<any>();
   @Output() goButtonClicked = new EventEmitter<any>();
   @Output() contractButtonClicked = new EventEmitter<any>();
   @Output() pagoButtonClicked = new EventEmitter<any>();
@@ -51,7 +53,6 @@ export class ViewDataComponent implements OnInit {
   searchTerm$ = new Subject<string>();
 
   userLogged: any = {};
-
 
   private _alertController = inject(AlertController);
   private _authService = inject(AuthService);
@@ -155,8 +156,6 @@ export class ViewDataComponent implements OnInit {
 
     return primaryValue;
   }
-
-
 
   getCellValue(row: any, column: Column): any {
     let primaryValue = this.getNestedValue(row, column.key);
@@ -264,6 +263,12 @@ export class ViewDataComponent implements OnInit {
       case "plan":
         this.onInfoPlan(row);
         break;
+      case "upload":
+        this.onUpload(row);
+        break;
+      case "open":
+        this.onOpen(row);
+        break;
       case "asignClients":
         this.onSelectClients(row);
         break;
@@ -335,6 +340,15 @@ export class ViewDataComponent implements OnInit {
   onInfoPlan(data: any) {
     console.log("Se click en plan");
     this.planButtonClicked.emit(data);
+  }
+  onUpload(data: any) {
+    console.log("Se click en upload");
+    this.uploadButtonClicked.emit(data);
+  }
+
+  onOpen(data: any) {
+    console.log("Se click en abrir");
+    this.openButtonClicked.emit(data);
   }
 
   onSelectClients(data: any) {

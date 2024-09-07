@@ -411,7 +411,7 @@ export class PersonasPage implements OnInit {
 
   async handleUserOperation(operation: "edit" | "create", data: any) {
     try {
-      this.prepareData(data);
+      data = this.prepareData(data);
       const operationText = operation === "edit" ? "Editado" : "Guardado";
       await this.showLoader(`${operationText} cliente`);
 
@@ -442,6 +442,8 @@ export class PersonasPage implements OnInit {
     data.cel = data.cel.replace(/-/g, "");
     data.idNacionalidad = this.selectedNacionalidad.id;
     console.log("Datos del cliente antes de guardar:", data);
+
+    return data;
   }
 
   private async performApiCall(operation: string, data: any): Promise<any> {

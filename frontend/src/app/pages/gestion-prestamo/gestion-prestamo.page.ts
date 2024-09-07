@@ -13,7 +13,9 @@ import {
   distinctUntilChanged,
   forkJoin,
   map,
+  of,
   Subject,
+  switchMap,
 } from "rxjs";
 import { EstadosAprobacion } from "src/app/shared/interfaces/estado-aprobacion";
 import { Monedas } from "src/app/shared/interfaces/moneda";
@@ -92,35 +94,50 @@ export class GestionPrestamoPage implements OnInit {
   }
 
   getPrestamo() {
-    //Obtener id de la url
-    this._route.paramMap.subscribe((params) => {
-      const id = params.get("id");
-      if (id) {
-        this._globalService.GetByIdEncrypted("prestamos", id).subscribe({
-          next: (prestamo: any) => {
-            if (prestamo) {
-              prestamo = this._globalService.parseObjectDates(prestamo);
-              console.log("Prestamo: ", prestamo);
-              this.prestamoSeleccionado = prestamo;
-              this.clienteSeleccionado = prestamo.cliente;
-              this.avalSeleccionado = prestamo.aval;
-              if (prestamo.idAval) {
-                this.hasAval = true;
-              }
-              console.log("Plan de Pago: ", prestamo.planPago);
-              this.prestamoForm.patchValue(prestamo);
-              this.planesPagoForm.patchValue(prestamo.planPago);
-              this.isEdit = true;
-            }
-          },
-          error: (error) => console.error(error),
-        });
-      } else {
-        this.prestamoSeleccionado = null;
-        this.isEdit = false;
-        this.initValuesForm();
-      }
+    this._route.paramMap
+      .pipe(
+        map((params) => params.get("id")),
+        switchMap((id) =>
+          id ? this._globalService.GetIdString("convert-id", id) : of(null)
+        )
+      )
+      .subscribe({
+        next: (convertedId: any) => {
+          if (convertedId) {
+            this.fetchAndSetPrestamo(convertedId);
+          } else {
+            this.resetPrestamoState();
+          }
+        },
+        error: (error) => console.error("Error getting prestamo:", error),
+      });
+  }
+
+  private fetchAndSetPrestamo(id: number) {
+    this._globalService.GetId("prestamos", id).subscribe({
+      next: (prestamo: any) => {
+        prestamo = this._globalService.parseObjectDates(prestamo);
+        this.setPrestamo(prestamo);
+      },
+      error: (error) =>
+        console.error("Error fetching prestamo details:", error),
     });
+  }
+
+  private setPrestamo(prestamo: any) {
+    this.prestamoSeleccionado = prestamo;
+    this.clienteSeleccionado = prestamo.cliente;
+    this.avalSeleccionado = prestamo.aval;
+    this.hasAval = !!prestamo.idAval;
+    this.prestamoForm.patchValue(prestamo);
+    this.planesPagoForm.patchValue(prestamo.planPago);
+    this.isEdit = true;
+  }
+
+  private resetPrestamoState() {
+    this.prestamoSeleccionado = null;
+    this.isEdit = false;
+    this.initValuesForm();
   }
 
   calculateTotalMonto() {
@@ -446,7 +463,9 @@ export class GestionPrestamoPage implements OnInit {
 
   private handlePrestamoSuccess(response: any) {
     console.log("Operación de préstamo exitosa:", response);
-    this.isModalOpen = false;
+    this.toastMessage = "Operación de préstamo exitosa";
+    this.toastColor = "success";
+    this.isModalOpen = true;
     this.isEdit = false;
     this.cleanForms();
     this.clienteSeleccionado = null;
@@ -460,7 +479,10 @@ export class GestionPrestamoPage implements OnInit {
   private handlePrestamoError(error: any) {
     console.error("Error en la operación de préstamo:", error);
     // TODO: Mostrar mensaje de error al usuario
-    this.isModalOpen = false;
+    this.toastMessage = "Error en la operación de préstamo";
+    this.toastColor = "danger";
+    this.isToastOpen = true;
+    this.isModalOpen = true;
     this.isEdit = false;
     this.initValuesForm();
     this.currentStep = 0;

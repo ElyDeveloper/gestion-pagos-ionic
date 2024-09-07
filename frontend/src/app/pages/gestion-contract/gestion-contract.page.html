@@ -8,26 +8,23 @@
     (isToastOpenChange)="setOpenedToast($event)">
   </app-wrapper>
 
-  <div
-    class="alert alert-danger sticky-top"
-    role="alert"
-    *ngIf="!isPrint && existContrato">
+  <div class="alert alert-danger sticky-top" role="alert" *ngIf="existContrato">
     Ya existe un contrato generado para este préstamo, por políticas de
     seguridad no se puede modificar el contenido de este documento.
   </div>
 
-  <ion-card *ngIf="!isPrint">
+  <ion-card>
     <ion-card-header>
       <ion-card-title>Datos Empresa/Bancarios</ion-card-title>
       <div class="d-flex justify-content-end">
-        <button class="btn btn-danger me-2" (click)="generateContract()">
+        <ion-button color="danger" (click)="generateContract()">
           Generar Contrato
-          <i class="fa-solid fa-file-signature"></i>
-        </button>
-        <button class="btn btn-success" routerLink="/layout/prestamos">
+          <ion-icon slot="end" name="document-text-outline"></ion-icon>
+        </ion-button>
+        <ion-button color="success" routerLink="/layout/prestamos">
           Ver Prestamos
-          <ion-icon class="ms-2" name="open-outline"></ion-icon>
-        </button>
+          <ion-icon slot="end" name="open-outline"></ion-icon>
+        </ion-button>
       </div>
     </ion-card-header>
     <ion-card-content>

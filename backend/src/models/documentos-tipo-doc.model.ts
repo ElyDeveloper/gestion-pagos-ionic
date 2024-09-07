@@ -1,4 +1,4 @@
-import {belongsTo, Entity, hasMany, model, property} from '@loopback/repository';
+import {belongsTo, Entity, hasMany, model, property, hasOne} from '@loopback/repository';
 import { TipoDocumentos } from './tipo-documentos.model';
 import { Documentos } from './documentos.model';
 import { Pagos } from './pagos.model';
@@ -22,11 +22,14 @@ export class DocumentosTipoDoc extends Entity {
   @belongsTo(() => TipoDocumentos, {name: 'tipoDocumentos'})
   idTipoDocumento: number;
 
+  @hasOne(() => Documentos, {keyTo: 'idDocTipDoc'})
+  documentos: Documentos;
+  
   @belongsTo(() => Pagos, {name: 'pagos'})
   idDocumento: number;
 
-  @hasMany(() => Documentos, {keyTo: 'idDocTipDoc'})
-  documentos: Documentos[];
+  // @hasMany(() => Documentos, {keyTo: 'idDocTipDoc'})
+  // documentos: Documentos[];
 
   // Indexer property to allow additional data
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
