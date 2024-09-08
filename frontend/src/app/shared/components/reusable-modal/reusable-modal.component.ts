@@ -4,9 +4,12 @@ import {
   Input,
   Output,
   TemplateRef,
+  ViewChild,
 } from "@angular/core";
 import { FormGroup } from "@angular/forms";
 import { ModalConfig } from "../../utils/extra";
+import { UploaderComponent } from "../uploader/uploader.component";
+import { FileUploader } from "ng2-file-upload";
 
 @Component({
   selector: "app-reusable-modal",
@@ -38,7 +41,6 @@ export class ReusableModalComponent {
 
   isToastOpen = false;
   toastMessage = "Guardado correctamente";
-  // toastColor = "primary";
 
   close = () => {
     this.isOpen = false;
@@ -46,7 +48,6 @@ export class ReusableModalComponent {
   };
 
   save = (data: any, isForm: boolean = true) => {
-    console.log("data", data);
     if (isForm) {
       if (this.formSave.invalid) {
         const invalidFields: string[] = [];
@@ -54,20 +55,23 @@ export class ReusableModalComponent {
         Object.keys(this.formSave.controls).forEach((key) => {
           const control = this.formSave.get(key);
           if (control && control.invalid) {
-            // Usar el alias del campo si está disponible, de lo contrario usar la clave
             const fieldName = this.modalConfig.fieldAliases[key] || key;
             invalidFields.push(fieldName);
           }
         });
 
-        console.log("Campos inválidos:", invalidFields);
-
-        // this.toastColor = "danger";
         this.toastMessage = `Por favor, complete correctamente los siguientes campos: ${invalidFields.join(
           ", "
         )}`;
         this.setOpenedToast(true);
         return;
+      }
+    } else {
+      if (data?.type === "file") {
+          this.saveData.emit();
+          this.close();
+          return;
+        
       }
     }
 
@@ -83,4 +87,5 @@ export class ReusableModalComponent {
   setOpenedToast(value: boolean) {
     this.isToastOpen = value;
   }
+
 }

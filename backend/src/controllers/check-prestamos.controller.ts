@@ -28,7 +28,6 @@ import {keys} from '../env/interfaces/Servicekeys.interface';
 import * as fs from 'fs';
 import * as path from 'path';
 
-
 // Configuración de multer para la carga de archivos
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -104,8 +103,7 @@ export class CheckPrestamosController {
 
         try {
           const dataSend = JSON.parse(req.body.data);
-          const {estado, fechaPago, idFechaPago, monto, mora, idPrestamo} =
-            dataSend;
+          const {fechaPago, idFechaPago, monto, mora, idPrestamo} = dataSend;
           const file = req.file;
 
           // Buscar el IdDocumento usando el IDPrestamo
@@ -175,6 +173,19 @@ export class CheckPrestamosController {
                 estado: true,
               });
             }
+
+            //INFO CONTAR CUOTAS PAGADAS EN FECHAS PAGOS
+            const countCuotasPagadas = await this.fechasPagosRepository.count({
+              planId: prestamo.idPlan,
+              estado: true,
+            });
+
+            console.log('Cuotas pagadas:', countCuotasPagadas.count);
+
+            //INFO ACTUALIZAR PLAN DE PAGO
+            await this.planesPagoRepository.updateById(prestamo.idPlan, {
+              cuotaPagadas: countCuotasPagadas.count,
+            });
           }
 
           // Crear el registro en documentosTipoDoc
@@ -212,7 +223,7 @@ export class CheckPrestamosController {
           schema: {
             type: 'object',
             properties: {
-              idPrestamo: {type: 'string'},
+              idPrestamo: {type: 'number'},
               planId: {type: 'number'},
               estado: {type: 'boolean'},
               cuota: {type: 'number'},
@@ -226,7 +237,7 @@ export class CheckPrestamosController {
       },
     })
     datos: {
-      idPrestamo: string;
+      idPrestamo: number;
       planId: number;
       estado: boolean;
       monto: number;
@@ -248,7 +259,6 @@ export class CheckPrestamosController {
 
     await this.validateExistingPayments(planId);
 
-    const prestamoId = this.jwtService.decryptId(idPrestamo);
     const fechasPagos = this.generatePaymentDates(
       fechaInicio,
       periodoCobro,
@@ -260,7 +270,7 @@ export class CheckPrestamosController {
 
     await this.updatePlanAndLoan(
       planId,
-      prestamoId,
+      idPrestamo,
       fechaInicio,
       latestDate,
       idEstadoAprobacion,
@@ -380,6 +390,8 @@ export class CheckPrestamosController {
   })
   async updatePagoFile(
     @requestBody({
+      description: 'Datos para actualizar documento',
+      required: false,
       content: {
         'multipart/form-data': {
           'x-parser': 'stream',
@@ -399,36 +411,20 @@ export class CheckPrestamosController {
     return new Promise((resolve, reject) => {
       upload.single('file')(req, res, async (err: any) => {
         if (err) {
+          console.log('Error al cargar el archivo:', err);
           return reject({error: 'Error al cargar el archivo.'});
         }
-
+        
         try {
           const dataSend = JSON.parse(req.body.data);
-          const {fechaPago, idFechaPago} = dataSend;
+          const {id} = dataSend;
           const file = req.file;
 
-          const pago = await this.pagosRepository.findOne({
-            where: {idFechaPago},
-          });
-
           console.log('Archivo cargado:', file);
-          console.log('Fecha de pago:', new Date(fechaPago));
-          console.log('Pago:', pago);
-
-          const documento = await this.documentosRepository.findOne({
-            where: {idDocumento: pago?.id},
-          });
-
-          //Actualizar la fechaPago de la tabla Pagos
-          if (fechaPago != undefined && pago?.id != undefined) {
-            await this.pagosRepository.updateById(pago?.id, {
-              fechaPago: new Date(fechaPago).toISOString(),
-            });
-          }
 
           //Actualizar el campo UrlDocumento en la tabla documentos si esta presente
           if (file !== undefined) {
-            await this.documentosRepository.updateById(documento?.id, {
+            await this.documentosRepository.updateById(id, {
               urlDocumento: file ? file?.path : undefined,
               fechaSubida: new Date().toISOString(),
             });
@@ -539,10 +535,8 @@ export class CheckPrestamosController {
         return 'application/pdf';
       case '.txt':
         return 'text/plain';
-        default:
+      default:
         return 'application/octet-stream';
     }
   }
-
-
 }

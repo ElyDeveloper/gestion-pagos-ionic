@@ -6,6 +6,7 @@ export interface ContratosPago {
   fechaGeneracion: string;
   contenido: string;
   idPrestamo: number;
+  idPrestamoEncrypted?: string;
 
   // Optional property for related entity
   prestamo?: Prestamos;

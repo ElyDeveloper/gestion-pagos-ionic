@@ -1,13 +1,5 @@
 <ion-content [fullscreen]="false">
-  <app-loader [textLoader]="textLoader"></app-loader>
-  <ion-toast
-    [isOpen]="isToastOpen"
-    message="{{toastMessage}}"
-    [duration]="5000"
-    [color]="toastColor"
-    (didDismiss)="setOpenedToast(false)"></ion-toast>
-
-  <app-breadcrumb></app-breadcrumb>
+  <app-wrapper [textLoader]="textLoader"></app-wrapper>
   <ion-grid>
     <ion-row
       class="d-flex justify-content-center"
@@ -38,8 +30,6 @@
   </ion-grid>
   <section>
     <app-view-data
-      [currentPage]="1"
-      [totalPages]="10"
       [title]="title"
       [context]="'cliente'"
       [data]="elements"

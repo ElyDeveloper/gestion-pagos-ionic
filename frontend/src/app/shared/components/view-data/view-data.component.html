@@ -10,71 +10,6 @@
         </ion-button>
       </div>
     </div>
-    <div class="row justify-content-center" *ngIf="showCalendar">
-      <form class="row row-cols-sm-auto">
-        <div class="col-12">
-          <div class="dp-hidden position-absolute">
-            <div class="input-group">
-              <input
-                name="datepicker"
-                class="form-control"
-                ngbDatepicker
-                #datepicker="ngbDatepicker"
-                [autoClose]="'outside'"
-                (dateSelect)="onDateSelection($event)"
-                [displayMonths]="2"
-                [dayTemplate]="t"
-                outsideDays="hidden"
-                [startDate]="fromDate!"
-                tabindex="-1" />
-              <ng-template #t let-date let-focused="focused">
-                <span
-                  class="custom-day"
-                  [class.focused]="focused"
-                  [class.range]="isRange(date)"
-                  [class.faded]="isHovered(date) || isInside(date)"
-                  (mouseenter)="hoveredDate = date"
-                  (mouseleave)="hoveredDate = null">
-                  {{ date.day }}
-                </span>
-              </ng-template>
-            </div>
-          </div>
-          <div class="input-group">
-            <input
-              #dpFromDate
-              class="form-control"
-              placeholder="yyyy-mm-dd"
-              name="dpFromDate"
-              [value]="formatter.format(fromDate)"
-              (input)="fromDate = validateInput(fromDate, dpFromDate.value)" />
-            <button
-              class="btn btn-outline-secondary bi bi-calendar3"
-              (click)="datepicker.toggle()"
-              type="button"></button>
-          </div>
-        </div>
-        <div class="col-12">
-          <div class="input-group">
-            <input
-              #dpToDate
-              class="form-control"
-              placeholder="yyyy-mm-dd"
-              name="dpToDate"
-              [value]="formatter.format(toDate)"
-              (input)="toDate = validateInput(toDate, dpToDate.value)" />
-            <button
-              class="btn btn-outline-secondary bi bi-calendar3"
-              (click)="datepicker.toggle()"
-              type="button"></button>
-          </div>
-        </div>
-      </form>
-
-      <hr />
-      <pre>From date model: {{ fromDate | json }}</pre>
-      <pre>To date model: {{ toDate | json }}</pre>
-    </div>
 
     <div class="row" *ngIf="showSearch">
       <ion-searchbar
@@ -82,14 +17,13 @@
         [(ngModel)]="search"
         (ngModelChange)="searchValueChanged($event)"></ion-searchbar>
     </div>
+    <ng-content select="[headerContent]"></ng-content>
   </ion-card-header>
 
   <ion-card-content>
     <ng-container>
-      <section>
-        <ng-content select="[headerContent]"></ng-content>
-      </section>
-      <div class="table-responsive d-none d-md-block">
+      <section></section>
+      <div class="table-responsive d-none d-md-block mt-3">
         <table class="custom-table">
           <thead>
             <tr>
@@ -130,14 +64,33 @@
                     </ng-container>
                     <ng-container *ngSwitchCase="'array'">
                       <ng-container
-                        *ngFor="let item of getValuesArray(row, column)">
+                        *ngFor="
+                          let item of getValuesArray(row, column);
+                          index as i
+                        ">
+                        @if(isPrint){
+                        <p>
+                          {{
+                            item[getCellPropsVisibles(column)[0]]
+                              | customDate : 6 : "dd/MM/yyyy"
+                          }}
+                          <br />
+                          <strong>{{
+                            item[getCellPropsVisibles(column)[1]]
+                              | currency : "L" : "symbol"
+                          }}</strong>
+                        </p>
+                        <hr *ngIf="i === 0" />
+                        }@else{
                         <ion-chip>
-                          <ion-label
-                            >{{
-                              item[getCellPropsVisibles(column)[0]]
-                                | customDate : 6 : "dd/MM/yyyy"
-                            }}
-
+                          <ion-label>
+                            <span>
+                              {{
+                                item[getCellPropsVisibles(column)[0]]
+                                  | customDate : 6 : "dd/MM/yyyy"
+                              }}
+                            </span>
+                            <br />
                             <strong>{{
                               item[getCellPropsVisibles(column)[1]]
                                 | currency : "L" : "symbol"
@@ -147,6 +100,7 @@
                             (click)="onDeleteButtonClick(item)"
                             name="close-circle"></ion-icon>
                         </ion-chip>
+                        }
                       </ng-container>
                     </ng-container>
 
@@ -230,72 +184,128 @@
 <!-- Sección de vista móvil -->
 <section class="d-md-none">
   <ion-list>
-    @for (row of data; track row.id) {
-    <ion-item>
-      <ion-thumbnail slot="start">
-        <img
-          alt="Usuario"
-          src="https://ionicframework.com/docs/demos/api/avatar/avatar.svg" />
-      </ion-thumbnail>
+    <ion-item *ngFor="let row of data">
       <ion-label>
-        <!-- Título dinámico -->
-        <h2>
-          {{ getCellValue(row, columnsData[0]) }}
-          {{
-            columnsData[0].type == "concat"
-              ? ""
-              : getCellValue(row, columnsData[1])
-          }}
-        </h2>
-
-        <ng-container [ngSwitch]="columnsData[2].type">
-          <ng-container *ngSwitchCase="'dni'">
-            <p>{{ getCellValue(row, columnsData[2]) | formatDni }}</p>
-          </ng-container>
-          <ng-container *ngSwitchCase="'currency'">
-            <p>
-              {{
-                getCellValue(row, columnsData[2]) | currency : "L" : "symbol"
-              }}
-            </p>
-          </ng-container>
-          <ng-container *ngSwitchDefault>
-            <p>{{ getCellValue(row, columnsData[2]) }}</p>
-          </ng-container>
-        </ng-container>
-
-        <!-- Acciones -->
-        <div class="d-flex justify-content-between align-items-center">
-          @if (getEstadoColumn()) {
-          <ion-badge
-            [color]="
-              getCellValue(row, getEstadoColumn()) === 'true'
-                ? 'success'
-                : 'tertiary'
-            ">
-            {{
-              getCellValue(row, getEstadoColumn()) === "true"
-                ? "Activo"
-                : "Inactivo"
-            }}
-          </ion-badge>
-          }
-          <ion-buttons>
-            @for (action of getActionsColumn()?.lstActions || []; track
-            action.action) {
-            <ion-button
-              shape="round"
-              [color]="action.color"
-              (click)="onActionClick(row, action.action)">
-              <ion-icon [name]="action.icon" size="medium"></ion-icon>
-            </ion-button>
-            }
-          </ion-buttons>
-        </div>
+        <h2>{{ getCellValue(row, columnsData[0]) }}</h2>
+        <p>{{ getCellValue(row, columnsData[1]) }}</p>
       </ion-label>
+      <!-- <ion-button slot="end" (click)="showDetails(row)"> -->
+      <ion-button slot="end">
+        <ion-icon name="information-circle-outline"></ion-icon>
+      </ion-button>
     </ion-item>
-    }
   </ion-list>
+
+  <!-- <ion-modal #modal>
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Detalles</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="modal.dismiss()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <ion-list>
+          <ion-item *ngFor="let column of columnsData">
+            <ion-label>
+              <h2>{{ column.alias }}</h2>
+              <p [ngSwitch]="column.type">
+                <ng-container *ngSwitchCase="'boolean'">
+                  <ion-badge
+                    [color]="
+                      getCellValue(selectedRow, column) === 'true'
+                        ? 'success'
+                        : 'medium'
+                    ">
+                    {{
+                      getCellValue(selectedRow, column) === "true"
+                        ? getCellOptions(column)[0]
+                        : getCellOptions(column)[1]
+                    }}
+                  </ion-badge>
+                </ng-container>
+                <ng-container *ngSwitchCase="'options'">
+                  <ion-badge [color]="getClassForOption(column, selectedRow)">
+                    {{ getCellOptionValue(selectedRow, column) }}
+                  </ion-badge>
+                </ng-container>
+                <ng-container *ngSwitchCase="'array'">
+                  <ion-chip
+                    *ngFor="let item of getValuesArray(selectedRow, column)">
+                    <ion-label>
+                      {{
+                        item[getCellPropsVisibles(column)[0]]
+                          | customDate : 6 : "dd/MM/yyyy"
+                      }}
+                      <strong>{{
+                        item[getCellPropsVisibles(column)[1]]
+                          | currency : "L" : "symbol"
+                      }}</strong>
+                    </ion-label>
+                  </ion-chip>
+                </ng-container>
+                <ng-container *ngSwitchCase="'date'">
+                  {{
+                    getCellValue(selectedRow, column)
+                      | customDate : 6 : "dd/MM/yyyy"
+                  }}
+                </ng-container>
+                <ng-container *ngSwitchCase="'percentage'">
+                  {{ getCellValue(selectedRow, column) | number : "1.2-2" }}%
+                </ng-container>
+                <ng-container *ngSwitchCase="'currency'">
+                  {{
+                    getCellValue(selectedRow, column)
+                      | currency : "L" : "symbol"
+                  }}
+                </ng-container>
+                <ng-container *ngSwitchCase="'dni'">
+                  {{ getCellValue(selectedRow, column) | formatDni }}
+                </ng-container>
+                <ng-container *ngSwitchCase="'xml'">
+                  <ion-text
+                    *ngFor="
+                      let item of getCellValue(selectedRow, column) | xmlToList
+                    ">
+                    {{ item }}
+                  </ion-text>
+                </ng-container>
+                <ng-container *ngSwitchCase="'image'">
+                  <ion-img
+                    [src]="'assets/flags/' + getImageUrl(selectedRow, column)"
+                    [alt]="getCellValue(selectedRow, column)"></ion-img>
+                </ng-container>
+                <ng-container *ngSwitchDefault>
+                  {{ getCellValue(selectedRow, column) }}
+                </ng-container>
+              </p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+        <ion-grid *ngIf="columnsData.find(col => col.key === 'actions')">
+          <ion-row>
+            <ion-col
+              *ngFor="let action of columnsData.find(col => col.key === 'actions').lstActions">
+              <ion-button
+                *ngIf="
+                  !action.rolesAuthorized ||
+                  (userLogged.rolid &&
+                    action.rolesAuthorized.includes(userLogged.rolid))
+                "
+                [color]="action.color"
+                (click)="onActionClick(selectedRow, action.action)"
+                expand="block">
+                <ion-icon [name]="action.icon" slot="start"></ion-icon>
+                {{ action.alias }}
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-content>
+    </ng-template>
+  </ion-modal> -->
 </section>
 
 <!-- Seccion de paginacion -->

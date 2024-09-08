@@ -7,13 +7,13 @@ import {
 } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
-import { Observable } from "rxjs";
-import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
+import { Observable, Subscription } from "rxjs";
 import { Prestamos } from "src/app/shared/interfaces/prestamo";
 import { Column } from "src/app/shared/interfaces/table";
 import { Usuario } from "src/app/shared/interfaces/usuario";
 import { AuthService } from "src/app/shared/services/auth.service";
 import { GlobalService } from "src/app/shared/services/global.service";
+import { LoaderService } from "src/app/shared/services/loader.service";
 import { FormModels } from "src/app/shared/utils/forms-models";
 
 @Component({
@@ -22,8 +22,6 @@ import { FormModels } from "src/app/shared/utils/forms-models";
   styleUrls: ["./prestamos.page.scss"],
 })
 export class PrestamosPage implements OnInit {
-  @ViewChild(LoaderComponent) loaderComponent!: LoaderComponent;
-
   elements: Prestamos[] = [];
 
   element: Prestamos = {
@@ -55,6 +53,8 @@ export class PrestamosPage implements OnInit {
   isToastOpen = false;
   isEdit = false;
 
+  suscripciones: Subscription[] = [];
+
   textLoader: string = "Cargando...";
   toastMessage: string = "cliente guardado correctamente";
   toastColor: string = "primary";
@@ -74,6 +74,7 @@ export class PrestamosPage implements OnInit {
   private _globalService = inject(GlobalService);
   private _router = inject(Router);
   private _authService = inject(AuthService);
+  private _loaderService = inject(LoaderService);
 
   //TODO ESPECIFICO
   @ViewChild("modalAprobar", { static: true })
@@ -86,7 +87,6 @@ export class PrestamosPage implements OnInit {
   estadosAprobacion: any[] = [];
   columnsDataPlan: Column[] = []; // Aquí deberías recibir los datos a mostrar en la tabla (cabeceras)
   formAprobar: FormGroup;
-
 
   constructor(private fb: FormBuilder) {
     this.formModels = new FormModels(this.fb);
@@ -324,17 +324,17 @@ export class PrestamosPage implements OnInit {
   }
 
   onEditButtonClicked(data: any) {
-    this._router.navigate(["/layout/gestion-prestamo/" + data.id]);
+    this._router.navigate(["/layout/gestion-prestamo/" + data.idEncrypted]);
   }
 
   onContractButtonClicked(data: any) {
     console.log("Contrato del cliente:", data);
-    this._router.navigate(["/gestion-contrato/" + data.id]);
+    this._router.navigate(["/gestion-contrato/" + data.idEncrypted]);
   }
 
   onPagoButtonClicked(data: any) {
     console.log("Contrato del cliente:", data);
-    this._router.navigate(["/layout/gestion-pago/" + data.id]);
+    this._router.navigate(["/layout/gestion-pago/" + data.idEncrypted]);
   }
 
   onInfoButtonClicked(data: any) {
@@ -359,7 +359,7 @@ export class PrestamosPage implements OnInit {
       },
       error: (error: any) => {
         console.error("Error al obtener el plan de pago:", error);
-        this.loaderComponent.hide();
+        this._loaderService.hide();
         this.toastMessage = "Error al obtener el plan de pago";
         this.setOpenedToast(true);
       },
@@ -373,18 +373,18 @@ export class PrestamosPage implements OnInit {
   onDeleteButtonClicked(data: any) {
     console.log("Eliminar cliente Obtenido:", data);
     this.textLoader = "Eliminando cliente";
-    this.loaderComponent.show();
+    this._loaderService.show();
     this._globalService.Delete("prestamos", data.id).subscribe({
       next: (response: any) => {
         console.log("cliente eliminado:", response);
         this.getCountElements();
-        this.loaderComponent.hide();
+        this._loaderService.hide();
         this.toastMessage = "cliente eliminado correctamente";
         this.setOpenedToast(true);
       },
       error: (error: any) => {
         console.error("Error al eliminar el cliente:", error);
-        this.loaderComponent.hide();
+        this._loaderService.hide();
         this.toastMessage = "Error al eliminar el cliente";
         this.setOpenedToast(true);
       },
@@ -419,7 +419,7 @@ export class PrestamosPage implements OnInit {
     );
 
     this.textLoader = `${operationText} ${this.elementType}`;
-    this.loaderComponent.show();
+    this._loaderService.show();
 
     //TODO COMENTAR
     console.log(`Datos del ${this.elementType}: `, data);
@@ -438,7 +438,7 @@ export class PrestamosPage implements OnInit {
     );
 
     this.textLoader = `${operationText} ${this.elementType}`;
-    // this.loaderComponent.show();
+    // this._loaderService.show();
 
     //TODO COMENTAR
     // console.log(`Datos del ${this.elementType}: `, data);
@@ -508,7 +508,7 @@ export class PrestamosPage implements OnInit {
     //TODO: COMENTAR
     console.log(`cliente ${operationText.toLowerCase()}:`, response);
     this.isModalOpen = false;
-    this.loaderComponent.hide();
+    this._loaderService.hide();
     this.toastColor = "success";
     this.toastMessage = `${
       this.elementType
@@ -523,7 +523,7 @@ export class PrestamosPage implements OnInit {
       `Error al ${operationText.toLowerCase()} el ${this.elementType}:`,
       error.error.error.message
     );
-    this.loaderComponent.hide();
+    this._loaderService.hide();
     this.toastColor = "danger";
     this.toastMessage = `Error ${operationText.toLowerCase()} el ${
       this.elementType
@@ -531,14 +531,11 @@ export class PrestamosPage implements OnInit {
     this.setOpenedToast(true);
   }
 
-
-
   onPageChange(event: any) {
     console.log("Evento de cambio de página:", event);
     this.currentPage = event;
     this.getElementsPag();
   }
-  
 
   onSearchData(event: any) {
     console.log("Evento de búsqueda:", event);
@@ -562,31 +559,36 @@ export class PrestamosPage implements OnInit {
     const skip = this.currentPage * this.currentPageSize - this.currentPageSize;
     const limit = this.currentPageSize;
 
-    this._globalService
-      .Get(`prestamos/paginated?skip=${skip}&limit=${limit}`)
-      .subscribe({
-        next: (response: any) => {
-          this.elements = response;
-          console.log("Elementos obtenidos:", response);
-        },
-        error: (error) => {
-          console.error("Error al obtener los elementos:", error);
-        },
-      });
+    this.suscripciones.push(
+      this._globalService
+        .Get(`prestamos/paginated?skip=${skip}&limit=${limit}`)
+        .subscribe({
+          next: (response: any) => {
+            this.elements = response;
+            console.log("Elementos obtenidos:", response);
+          },
+          error: (error) => {
+            console.error("Error al obtener los elementos:", error);
+          },
+        })
+    );
   }
 
   getCountElements() {
-    this._globalService.Get("prestamos/count").subscribe({
-      next: (response: any) => {
-        console.log("Cantidad de elementos:", response.count);
-        const totalElements = response.count;
-        this.totalPages = Math.ceil(totalElements / this.currentPageSize);
-        console.log("Total de páginas:", this.totalPages);
-        this.getElementsPag();
-      },
-      error: (error) => {
-        console.error("Error al obtener la cantidad de elementos:", error);
-      },
-    });
+    this.suscripciones.forEach((s) => s.unsubscribe());
+    this.suscripciones.push(
+      this._globalService.Get("prestamos/count").subscribe({
+        next: (response: any) => {
+          console.log("Cantidad de elementos:", response.count);
+          const totalElements = response.count;
+          this.totalPages = Math.ceil(totalElements / this.currentPageSize);
+          console.log("Total de páginas:", this.totalPages);
+          this.getElementsPag();
+        },
+        error: (error) => {
+          console.error("Error al obtener la cantidad de elementos:", error);
+        },
+      })
+    );
   }
 }

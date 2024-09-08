@@ -1,17 +1,13 @@
 <ion-content [fullscreen]="false">
-  <app-loader [textLoader]="textLoader"></app-loader>
-  <ion-toast
-    [isOpen]="isToastOpen"
-    message="{{toastMessage}}"
-    [duration]="5000"
-    [color]="toastColor"
-    (didDismiss)="setOpenedToast(false)"></ion-toast>
-
-  <app-breadcrumb></app-breadcrumb>
+  <app-wrapper
+    [textLoader]="textLoader"
+    [toastMessage]="toastMessage"
+    [toastColor]="toastColor"
+    [isToastOpen]="isToastOpen"
+    (isToastOpenChange)="setOpenedToast($event)">
+  </app-wrapper>
   <section>
     <app-view-data
-      [currentPage]="1"
-      [totalPages]="10"
       [title]="'Usuarios'"
       [context]="'usuario'"
       [data]="elements"
@@ -98,6 +94,7 @@
                     >Teléfono:</ion-label
                   >
                   <ion-input
+                    [appInputMask]="'####-####'"
                     type="tel"
                     formControlName="telefono"
                     placeholder="Ej: 0000-0000"></ion-input>
@@ -235,23 +232,6 @@
           <ion-grid>
             <ion-row>
               <ion-col size-xs="12" size-sm="12" size-md="12">
-                <!-- <ion-searchbar
-                  [placeholder]="searchPlaceHolder"
-                  [(ngModel)]="search"
-                  (ionInput)="searchValueChanged($event)">
-                </ion-searchbar>
-                <ion-list *ngIf="filteredClients.length > 0">
-                  @for (client of filteredClients; track client.id) {
-                  <ion-item
-                    class="user-select-none"
-                    (click)="toggleSelection(client)">
-                    <ion-label
-                      >{{client.nombres}} {{client.apellidos}} -
-                      {{client.dni}}</ion-label
-                    >
-                  </ion-item>
-                  }
-                </ion-list> -->
                 <div *ngIf="selectedClients.length > 0">
                   <ion-list-header>
                     <ion-label

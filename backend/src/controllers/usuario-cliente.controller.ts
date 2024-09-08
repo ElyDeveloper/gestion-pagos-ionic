@@ -220,16 +220,11 @@ export class UsuarioClienteController {
       where: {
         usuarioId: id,
       },
-      include: [{relation: 'Cliente'}, {relation: 'Usuario'}],
+      include: [{relation: 'cliente'}, {relation: 'usuario'}],
     });
 
-    //Encriptar el id de los clientes
-
     if (userClients.length > 0) {
-      const clients = userClients.map(uc => {
-        uc.Cliente.id = this.jwtService.encryptId(uc.Cliente?.id);
-        return uc;
-      });
+      const clients = userClients.map(uc => uc.cliente);
 
       return clients;
     }
@@ -278,11 +273,10 @@ export class UsuarioClienteController {
   @response(204, {
     description: 'UsuarioCliente DELETE success',
   })
-  async deleteByIdCliente(@param.path.string('id') id: string): Promise<void> {
-    const idDecrypted = this.jwtService.decryptId(id);
+  async deleteByIdCliente(@param.path.number('id') id: number): Promise<void> {
     const usuarioCliente = await this.usuarioClienteRepository.findOne({
       where: {
-        clienteId: idDecrypted,
+        clienteId: id,
       },
     });
     await this.usuarioClienteRepository.deleteById(usuarioCliente?.id);

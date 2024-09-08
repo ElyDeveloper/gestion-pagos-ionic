@@ -67,7 +67,7 @@
           <td class="text-center">
             <div class="d-flex justify-content-center py-2">
               <button
-                (click)="item.remove()"
+                (click)="removeFile(item)"
                 type="button"
                 class="btn btn-danger btn-sm rounded-circle">
                 <i class="fa-solid fa-trash-can"></i>
@@ -77,15 +77,5 @@
         </tr>
       </tbody>
     </table>
-    <!-- 
-    <section id="uploader-buttons" class="mt-2">
-      <button
-        (click)="uploader.clearQueue()"
-        [disabled]="!uploader.queue.length"
-        type="button"
-        class="btn btn-danger rounded-pill">
-        Eliminar todo
-      </button>
-    </section> -->
   </section>
 </section>

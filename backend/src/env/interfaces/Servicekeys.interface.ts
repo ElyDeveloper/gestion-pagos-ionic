@@ -12,10 +12,9 @@ export namespace keys {
   export const GENERATE_NEW_VERIFY_CODE = require('codeid');
   export const TIME_OUT_NAME = 'timeout_event';
   export const VERIFICATION_CODE_NAME = 'code';
-  export const ROUTE_CLIENTS_IMAGE = '../../public/image/Actors/Clients';
-  export const ROUTE_PROVIDERS_IMAGE = '../../public/image/Actors/Providers';
   export const NAME_PROFILE_PHOTO = 'file';
   export const EXTENSIONS_IMAGE: string[] = ['.PNG', '.JPG', '.JPEG', '.SVG'];
   export const MAX_WIDTH_IMAGE = 1024 * 1024;
-  export const URL_FILE = 'C:\\Prestamos Files';
+  // export const URL_FILE = 'C:\\Prestamos Files';
+  export const URL_FILE = 'X:\\Docs';
 }

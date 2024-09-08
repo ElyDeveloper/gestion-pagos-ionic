@@ -63,13 +63,11 @@ export class PlanesPago extends Entity {
   })
   estado: boolean;
 
-  // Define well-known properties here
   @hasMany(() => Prestamos, {keyTo: 'idPlan'})
   prestamos: Prestamos[];
 
   @hasMany(() => FechasPagos, {keyTo: 'planId'})
   fechasPagos: FechasPagos[];
-
   // Indexer property to allow additional data
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [prop: string]: any;

@@ -12,11 +12,6 @@ import { AlertController } from "@ionic/angular";
 import { debounceTime, distinctUntilChanged, Subject } from "rxjs";
 import { AuthService } from "../../services/auth.service";
 import { Router } from "@angular/router";
-import {
-  NgbCalendar,
-  NgbDate,
-  NgbDateParserFormatter,
-} from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
   selector: "app-view-data",
@@ -28,9 +23,9 @@ export class ViewDataComponent implements OnInit {
   @Input() showPagination: boolean = true;
   @Input() showAdd: boolean = true;
   @Input() showSearch: boolean = true;
+  @Input() isPrint: boolean = false;
   @Input() context: string = "elemento";
   @Input() searchPlaceHolder: string = "Buscar...";
-  @Input() showCalendar: boolean = false;
   @Input() currentPage: number = 1;
   @Input() totalPages: number = 10; // Esto debería ser dinámico basado en tus datos
   @Input() visiblePages: number[] = [];
@@ -44,6 +39,8 @@ export class ViewDataComponent implements OnInit {
   @Output() selectClientClicked = new EventEmitter<any>();
   @Output() checkButtonClicked = new EventEmitter<any>();
   @Output() selectButtonClicked = new EventEmitter<any>();
+  @Output() openButtonClicked = new EventEmitter<any>();
+  @Output() uploadButtonClicked = new EventEmitter<any>();
   @Output() goButtonClicked = new EventEmitter<any>();
   @Output() contractButtonClicked = new EventEmitter<any>();
   @Output() pagoButtonClicked = new EventEmitter<any>();
@@ -57,17 +54,6 @@ export class ViewDataComponent implements OnInit {
 
   userLogged: any = {};
 
-  calendar = inject(NgbCalendar);
-  formatter = inject(NgbDateParserFormatter);
-
-  hoveredDate: NgbDate | null = null;
-  fromDate: NgbDate | null = this.calendar.getToday();
-  toDate: NgbDate | null = this.calendar.getNext(
-    this.calendar.getToday(),
-    "d",
-    10
-  );
-
   private _alertController = inject(AlertController);
   private _authService = inject(AuthService);
   private _router = inject(Router);
@@ -76,52 +62,6 @@ export class ViewDataComponent implements OnInit {
 
   ngOnInit() {
     this.getUserLoggedIn();
-  }
-
-  onDateSelection(date: any) {
-    if (!this.fromDate && !this.toDate) {
-      this.fromDate = date;
-    } else if (
-      this.fromDate &&
-      !this.toDate &&
-      date &&
-      date.after(this.fromDate)
-    ) {
-      this.toDate = date;
-    } else {
-      this.toDate = null;
-      this.fromDate = date;
-    }
-  }
-
-  isHovered(date: NgbDate) {
-    return (
-      this.fromDate &&
-      !this.toDate &&
-      this.hoveredDate &&
-      date.after(this.fromDate) &&
-      date.before(this.hoveredDate)
-    );
-  }
-
-  isInside(date: NgbDate) {
-    return this.toDate && date.after(this.fromDate) && date.before(this.toDate);
-  }
-
-  isRange(date: NgbDate) {
-    return (
-      date.equals(this.fromDate) ||
-      (this.toDate && date.equals(this.toDate)) ||
-      this.isInside(date) ||
-      this.isHovered(date)
-    );
-  }
-
-  validateInput(currentValue: NgbDate | null, input: string): NgbDate | null {
-    const parsed = this.formatter.parse(input);
-    return parsed && this.calendar.isValid(NgbDate.from(parsed))
-      ? NgbDate.from(parsed)
-      : currentValue;
   }
 
   getUserLoggedIn() {
@@ -216,8 +156,6 @@ export class ViewDataComponent implements OnInit {
 
     return primaryValue;
   }
-
-
 
   getCellValue(row: any, column: Column): any {
     let primaryValue = this.getNestedValue(row, column.key);
@@ -325,6 +263,12 @@ export class ViewDataComponent implements OnInit {
       case "plan":
         this.onInfoPlan(row);
         break;
+      case "upload":
+        this.onUpload(row);
+        break;
+      case "open":
+        this.onOpen(row);
+        break;
       case "asignClients":
         this.onSelectClients(row);
         break;
@@ -396,6 +340,15 @@ export class ViewDataComponent implements OnInit {
   onInfoPlan(data: any) {
     console.log("Se click en plan");
     this.planButtonClicked.emit(data);
+  }
+  onUpload(data: any) {
+    console.log("Se click en upload");
+    this.uploadButtonClicked.emit(data);
+  }
+
+  onOpen(data: any) {
+    console.log("Se click en abrir");
+    this.openButtonClicked.emit(data);
   }
 
   onSelectClients(data: any) {

@@ -20,12 +20,12 @@ import {
   takeUntil,
   tap,
 } from "rxjs";
-import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
 import { Personas } from "src/app/shared/interfaces/persona";
 import { Roles } from "src/app/shared/interfaces/rol";
 import { Column } from "src/app/shared/interfaces/table";
 import { Usuario } from "src/app/shared/interfaces/usuario";
 import { GlobalService } from "src/app/shared/services/global.service";
+import { LoaderService } from "src/app/shared/services/loader.service";
 import { FieldAliases, ModalConfig } from "src/app/shared/utils/extra";
 import { FormModels } from "src/app/shared/utils/forms-models";
 
@@ -35,8 +35,6 @@ import { FormModels } from "src/app/shared/utils/forms-models";
   styleUrls: ["./usuarios.page.scss"],
 })
 export class UsuariosPage implements OnInit {
-  @ViewChild(LoaderComponent) loaderComponent!: LoaderComponent;
-
   elements: Usuario[] = [];
   element: Usuario = {
     nombre: "",
@@ -80,6 +78,7 @@ export class UsuariosPage implements OnInit {
 
   private _globalService = inject(GlobalService);
   private _alertController = inject(AlertController);
+  private _loaderService = inject(LoaderService);
 
   // TODO: Atributos Especificos
   @ViewChild("modalResetPswd", { static: true })
@@ -190,10 +189,7 @@ export class UsuariosPage implements OnInit {
           text: "Eliminar",
           handler: () => {
             this._globalService
-              .DeleteString(
-                "usuario-clientes/by-cliente",
-                clientRemove?.id?.toString() || ""
-              )
+              .Delete("usuario-clientes/by-cliente", clientRemove.id || 0)
               .subscribe({
                 next: () => {
                   console.log("Cliente eliminado correctamente");
@@ -419,7 +415,7 @@ export class UsuariosPage implements OnInit {
             true,
             this.modalSelectClients
           );
-          this.selectedClients = response.map((uc: any) => uc.Cliente);
+          this.selectedClients = response;
         },
         error: (error: any) => {
           console.error("Error al obtener clientes del usuario:", error);
@@ -436,18 +432,18 @@ export class UsuariosPage implements OnInit {
   onDeleteButtonClicked(data: any) {
     console.log("Eliminar usuario Obtenido:", data);
     this.textLoader = "Eliminando Usuario";
-    this.loaderComponent.show();
+    this._loaderService.show();
     this._globalService.Delete("usuarios", data.id).subscribe({
       next: (response: any) => {
         console.log("Usuario eliminado:", response);
         this.getCountElements();
-        this.loaderComponent.hide();
+        this._loaderService.hide();
         this.toastMessage = "Usuario eliminado correctamente";
         this.setOpenedToast(true);
       },
       error: (error: any) => {
         console.error("Error al eliminar el usuario:", error);
-        this.loaderComponent.hide();
+        this._loaderService.hide();
         this.toastMessage = "Error al eliminar el usuario";
         this.setOpenedToast(true);
       },
@@ -468,6 +464,7 @@ export class UsuariosPage implements OnInit {
     } else if (this.isResetPswd) {
       this.handleUserOperation("resetPswd", data);
     } else if (this.isElement) {
+      data = this.prepareData(data);
       if (this.isEdit) {
         this.handleUserOperation("edit", data);
       } else {
@@ -475,6 +472,13 @@ export class UsuariosPage implements OnInit {
         this.handleUserOperation("create", data);
       }
     }
+  }
+
+  private prepareData(data: any) {
+    data.correo = data.email || "no-email@example.com";
+    data.telefono = data.cel.replace(/-/g, "");
+
+    return data;
   }
 
   handleUserOperation(
@@ -504,13 +508,13 @@ export class UsuariosPage implements OnInit {
     }
 
     this.textLoader = `${operationText} Usuario`;
-    this.loaderComponent.show();
+    this._loaderService.show();
 
     apiCall.subscribe({
       next: (response: any) => {
         console.log(`Usuario ${operationText.toLowerCase()}:`, response);
         this.isModalOpen = false;
-        this.loaderComponent.hide();
+        this._loaderService.hide();
         this.toastMessage = `Usuario ${operationText.toLowerCase()} correctamente`;
         this.setOpenedToast(true);
         this.cleanForm();
@@ -521,7 +525,7 @@ export class UsuariosPage implements OnInit {
           `Error al ${operationText.toLowerCase()} el usuario:`,
           error
         );
-        this.loaderComponent.hide();
+        this._loaderService.hide();
         this.toastMessage = `Error al ${operationText.toLowerCase()} el usuario`;
       },
     });

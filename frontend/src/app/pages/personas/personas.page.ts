@@ -7,13 +7,13 @@ import {
 } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
-import { Observable } from "rxjs";
-import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
+import { firstValueFrom, Observable, Subscription } from "rxjs";
 import { Personas } from "src/app/shared/interfaces/persona";
 import { Column } from "src/app/shared/interfaces/table";
 import { Usuario } from "src/app/shared/interfaces/usuario";
 import { AuthService } from "src/app/shared/services/auth.service";
 import { GlobalService } from "src/app/shared/services/global.service";
+import { LoaderService } from "src/app/shared/services/loader.service";
 import { FieldAliases, ModalConfig } from "src/app/shared/utils/extra";
 import { FormModels } from "src/app/shared/utils/forms-models";
 
@@ -23,8 +23,6 @@ import { FormModels } from "src/app/shared/utils/forms-models";
   styleUrls: ["./personas.page.scss"],
 })
 export class PersonasPage implements OnInit {
-  @ViewChild(LoaderComponent) loaderComponent!: LoaderComponent;
-
   elements: Personas[] = [];
   element: Personas = {
     dni: "",
@@ -54,7 +52,7 @@ export class PersonasPage implements OnInit {
   isModalOpen = false;
   isModalOpenX = false;
   isEdit = false;
-  
+
   textLoader: string = "Cargando...";
   isToastOpen = false;
   toastMessage: string = "cliente guardado correctamente";
@@ -78,9 +76,9 @@ export class PersonasPage implements OnInit {
   formSelected: FormGroup;
   formSelectedX: FormGroup;
 
-  private _router = inject(Router);
   private _globalService = inject(GlobalService);
   private _authService = inject(AuthService);
+  private _loaderService = inject(LoaderService);
 
   //TODO: ESPECIFICOS
   nacionalidades: any[] = [];
@@ -89,12 +87,15 @@ export class PersonasPage implements OnInit {
   estadosCiviles: any[] = [];
   tiposPersona: any[] = [];
 
+  suscripciones: Subscription[] = [];
+
   currentUser: Usuario | null = null;
 
   filteredNacionalidades = this.nacionalidades;
   selectedNacionalidad: any = null;
   filteredAsesores = this.asesores;
   selectedAsesor: any = null;
+  lastSelectedAsesor: any = null;
 
   constructor(private fb: FormBuilder) {
     this.formModels = new FormModels(this.fb);
@@ -131,7 +132,6 @@ export class PersonasPage implements OnInit {
   }
 
   filterNacionalidades(event: any) {
-    
     const searchTerm = event.target.value.toLowerCase();
     if (searchTerm === "") {
       this.filteredNacionalidades = [];
@@ -317,6 +317,9 @@ export class PersonasPage implements OnInit {
   }
 
   private setModalState(isEdit: boolean, modalTemplate: any, formData?: any) {
+    //TODO ESPEDIFICO
+    this.suscripciones.forEach((sub) => sub.unsubscribe());
+
     this.isEdit = isEdit;
 
     if (formData) {
@@ -334,15 +337,18 @@ export class PersonasPage implements OnInit {
       this.selectedNacionalidad = this.nacionalidades.find(
         (n) => n.id === formData.idNacionalidad
       );
-      this._globalService.GetId("personas/asesor", formData.id).subscribe({
-        next: (asesor: any) => {
-          this.selectedAsesor = asesor?.Usuario || null;
-          console.log("Asesor seleccionado: ", this.selectedAsesor);
-        },
-        error: (error: any) => {
-          console.error("Error al obtener información del asesor:", error);
-        },
-      });
+      this.suscripciones.push(
+        this._globalService.GetId("personas/asesor", formData.id).subscribe({
+          next: (asesor: any) => {
+            this.selectedAsesor = asesor?.Usuario || null;
+            this.lastSelectedAsesor = this.selectedAsesor;
+            console.log("Asesor seleccionado: ", this.selectedAsesor);
+          },
+          error: (error: any) => {
+            console.error("Error al obtener información del asesor:", error);
+          },
+        })
+      );
     } else if (!isEdit) {
       this.cleanForm();
     }
@@ -381,25 +387,16 @@ export class PersonasPage implements OnInit {
     this.isModalOpen = true;
   }
 
-  onDeleteButtonClicked(data: any) {
+  async onDeleteButtonClicked(data: any) {
     console.log("Eliminar cliente Obtenido:", data);
-    this.textLoader = "Eliminando cliente";
-    this.loaderComponent.show();
-    this._globalService.Delete("personas", data.id).subscribe({
-      next: (response: any) => {
-        console.log("cliente eliminado:", response);
-        this.getCountElements();
-        this.loaderComponent.hide();
-        this.toastMessage = "cliente eliminado correctamente";
-        this.setOpenedToast(true);
-      },
-      error: (error: any) => {
-        console.error("Error al eliminar el cliente:", error);
-        this.loaderComponent.hide();
-        this.toastMessage = "Error al eliminar el cliente";
-        this.setOpenedToast(true);
-      },
-    });
+    try {
+      await this.showLoader("Eliminando cliente");
+      await firstValueFrom(this._globalService.Delete("personas", data.id));
+      await this.getCountElements();
+      this.handleOperationSuccess("Cliente eliminado correctamente");
+    } catch (error) {
+      this.handleOperationError("Error al eliminar el cliente", error);
+    }
   }
 
   async handleSaveX(data: any) {
@@ -407,132 +404,106 @@ export class PersonasPage implements OnInit {
   }
 
   async handleSave(data: any) {
-    if (data.email === "" || data.email === null) {
-      data.email = "no-email@example.com";
-    }
+    const operation = this.isEdit ? "edit" : "create";
+    if (!this.isEdit) delete data.id;
+    await this.handleUserOperation(operation, data);
+  }
 
-    //Eliminar guiones de cadena de data.dni y data.cel
-    data.dni = data.dni.replace(/-/g, "");
-    data.cel = data.cel.replace(/-/g, "");
-    data.idNacionalidad = this.selectedNacionalidad.id;
+  async handleUserOperation(operation: "edit" | "create", data: any) {
+    try {
+      data = this.prepareData(data);
+      const operationText = operation === "edit" ? "Editado" : "Guardado";
+      await this.showLoader(`${operationText} cliente`);
 
-    console.log("Datos del cliente antes guardar:", data);
+      const response = await this.performApiCall(operation, data);
+      console.log(`Cliente ${operationText.toLowerCase()}:`, response);
 
-    if (this.isEdit) {
-      this.handleUserOperation("edit", data);
-      
-    } else if (!this.isEdit) {
-      delete data.id;
-      this.handleUserOperation("create", data);
+      if (operation === "create") {
+        await this.handleAsesorCreation(response.id);
+      } else {
+        await this.handleAsesorUpdate(data.id);
+      }
+
+      this.handleOperationSuccess(
+        `Cliente ${operationText.toLowerCase()} correctamente`
+      );
+    } catch (error) {
+      this.handleOperationError(
+        `Error al ${operation === "edit" ? "editar" : "guardar"} el cliente`,
+        error
+      );
     }
   }
 
-  handleUserOperation(operation: "edit" | "create", data: any) {
+  private prepareData(data: any) {
     data.fechaIngreso = new Date(data.fechaIngreso);
-    console.log("Datos del cliente:", data);
+    data.email = data.email || "no-email@example.com";
+    data.dni = data.dni.replace(/-/g, "");
+    data.cel = data.cel.replace(/-/g, "");
+    data.idNacionalidad = this.selectedNacionalidad.id;
+    console.log("Datos del cliente antes de guardar:", data);
 
-    // return;
-    let operationText: string;
-    let apiCall: Observable<any>;
+    return data;
+  }
 
-    switch (operation) {
-      case "edit":
-        operationText = "Editado";
-        apiCall = this._globalService.PutId("personas", data.id, data);
-        break;
-      case "create":
-        delete data.Id;
-        operationText = "Guardado";
-        apiCall = this._globalService.Post("personas", data);
-        break;
+  private async performApiCall(operation: string, data: any): Promise<any> {
+    return operation === "edit"
+      ? await firstValueFrom(
+          this._globalService.PutIdString("personas", data.id, data)
+        )
+      : await firstValueFrom(this._globalService.Post("personas", data));
+  }
+
+  private async handleAsesorCreation(clienteId: number) {
+    if (this.selectedAsesor) {
+      await firstValueFrom(
+        this._globalService.Post("personas/asesor", {
+          usuarioId: this.selectedAsesor.id,
+          clienteId: clienteId,
+        })
+      );
     }
+  }
 
-    this.textLoader = `${operationText} cliente`;
-    this.loaderComponent.show();
-
-    apiCall.subscribe({
-      next: (response: any) => {
-        console.log(`cliente ${operationText.toLowerCase()}:`, response);
-        if (this.selectedAsesor && operation==='create') {
-          this._globalService
-            .Post("personas/asesor", {
-              usuarioId: this.selectedAsesor.id,
-              clienteId: response.id,
-            })
-            .subscribe({
-              next: (response: any) => {
-                console.log("Asesor guardado:", response);
-                this.isModalOpen = false;
-                this.loaderComponent.hide();
-                this.toastColor = "success";
-                this.toastMessage = `cliente ${operationText.toLowerCase()} correctamente`;
-                this.setOpenedToast(true);
-                this.cleanForm();
-                this.getCountElements();
-              },
-              error: (error: any) => {
-                console.error("Error al guardar el asesor:", error);
-                this.toastColor = "danger";
-                this.toastMessage = `Error al guardar el asesor`;
-                this.setOpenedToast(true);
-              },
-            });
-        }
-
-        if (this.selectedAsesor && operation === 'edit') {
-          this._globalService.PutId('personas/asesor', data.id, {
-            usuarioId: this.selectedAsesor.id,
-            clienteId: data.id,
-          }).subscribe({
-            next: (response: any) => {
-              console.log("Asesor actualizado:", response);
-              this.isModalOpen = false;
-              this.loaderComponent.hide();
-              this.toastColor = "success";
-              this.toastMessage = `cliente ${operationText.toLowerCase()} correctamente`;
-              this.setOpenedToast(true);
-              this.cleanForm();
-              this.getCountElements();
-            },
-            error: (error: any) => {
-              console.error("Error al actualizar el asesor:", error);
-              this.loaderComponent.hide();
-              this.toastColor = "danger";
-              this.toastMessage = `Error al actualizar el asesor`;
-              this.setOpenedToast(true);
-            },
-          })
-        } else {
-          this._globalService.Delete("personas/asesor", data.id).subscribe({
-            next: (response: any) => {
-              console.log("Asesor eliminado:", response);
-              this.isModalOpen = false;
-              this.loaderComponent.hide();
-              this.toastColor = "success";
-              this.toastMessage = `cliente ${operationText.toLowerCase()} correctamente`;
-              this.setOpenedToast(true);
-              this.cleanForm();
-              this.getCountElements();
-            },
-            error: (error: any) => {
-              console.error("Error al eliminar el asesor:", error);
-              this.toastColor = "danger";
-              this.toastMessage = `Error al eliminar el asesor`;
-              this.setOpenedToast(true);
-            },
-          });
-        }
-
-      },
-      error: (error: any) => {
-        console.error(
-          `Error al ${operationText.toLowerCase()} el cliente:`,
-          error
+  private async handleAsesorUpdate(clienteId: number) {
+    if (this.selectedAsesor) {
+      console.log("Actualizando asesor del cliente:", this.selectedAsesor);
+      await firstValueFrom(
+        this._globalService.PutId("personas/asesor", clienteId, {
+          usuarioId: this.selectedAsesor.id,
+          clienteId: clienteId,
+        })
+      );
+    } else {
+      if (this.lastSelectedAsesor) {
+        await firstValueFrom(
+          this._globalService.Delete("personas/asesor", clienteId)
         );
-        this.loaderComponent.hide();
-        this.toastMessage = `Error al ${operationText.toLowerCase()} el cliente`;
-      },
-    });
+      }
+    }
+  }
+
+  private async showLoader(text: string) {
+    this.textLoader = text;
+    this._loaderService.show();
+  }
+
+  private handleOperationSuccess(message: string) {
+    this.isModalOpen = false;
+    this._loaderService.hide();
+    this.toastColor = "success";
+    this.toastMessage = message;
+    this.setOpenedToast(true);
+    this.cleanForm();
+    this.getCountElements();
+  }
+
+  private handleOperationError(message: string, error: any) {
+    console.error(message, error);
+    this._loaderService.hide();
+    this.toastColor = "danger";
+    this.toastMessage = message;
+    this.setOpenedToast(true);
   }
 
   onPageChange(event: any) {
@@ -569,8 +540,8 @@ export class PersonasPage implements OnInit {
       .Get(`personas/${this.action}/paginated?skip=${skip}&limit=${limit}`)
       .subscribe({
         next: (response: any) => {
-          this.elements = response;
           console.log("Elementos obtenidos:", response);
+          this.elements = response;
         },
         error: (error) => {
           console.error("Error al obtener los elementos:", error);
