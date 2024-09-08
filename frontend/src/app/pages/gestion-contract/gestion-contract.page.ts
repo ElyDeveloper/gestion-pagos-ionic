@@ -224,7 +224,10 @@ export class GestionContractPage implements OnInit {
         return;
       }
 
+      console.log("ID Encrypted:", id);
+
       const idDecrypted = await this.getDecryptedId(id);
+      console.log("Decrypted ID:", idDecrypted);
       if (!idDecrypted) return;
 
       const prestamo = await this.fetchPrestamo(idDecrypted);

@@ -5,11 +5,10 @@ import { ValidatorFn, AbstractControl } from "@angular/forms";
 import { GlobalService } from "src/app/shared/services/global.service";
 import { CookieService } from "ngx-cookie-service";
 import { key } from "src/app/libraries/key.library";
-import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
 import { AuthService } from "src/app/shared/services/auth.service";
-import { Usuario } from "src/app/shared/interfaces/usuario";
 import { AlertController } from "@ionic/angular";
 import { Subscription } from "rxjs";
+import { LoaderService } from "src/app/shared/services/loader.service";
 
 interface Login {
   identificator: string;
@@ -22,14 +21,15 @@ interface Login {
   styleUrls: ["./login.page.scss"],
 })
 export class LoginPage implements OnInit {
-  @ViewChild(LoaderComponent) loaderComponent!: LoaderComponent;
-  textLoader: string = "Cargando";
   user: Login = {
     identificator: "",
     password: "",
   };
+
+  textLoader: string = "Cargando";
   isToastOpen: boolean = false;
   toastMessage: string = "";
+  toastColor: string = "primary";
   formErrors: any = {
     email: "",
     password: "",
@@ -42,6 +42,7 @@ export class LoginPage implements OnInit {
   private _cookieService = inject(CookieService);
   private _authService = inject(AuthService);
   private _alertController = inject(AlertController);
+  private _loaderService = inject(LoaderService);
 
   constructor() {}
 
@@ -59,7 +60,7 @@ export class LoginPage implements OnInit {
   async login() {
     if (this.validateForm()) {
       this.textLoader = "Iniciando Sesión";
-      this.loaderComponent.show();
+      this._loaderService.show();
 
       this.suscriptions.push(
         this._globalService.Post("login", this.user).subscribe({
@@ -69,7 +70,7 @@ export class LoginPage implements OnInit {
             const { token, usuario } = result;
 
             if (usuario && usuario.changedPassword === false) {
-              this.loaderComponent.hide();
+              this._loaderService.hide();
               this.toastMessage = "Por favor, cambie su contraseña.";
               this.setOpenedToast(true);
 
@@ -91,21 +92,22 @@ export class LoginPage implements OnInit {
               // Usar el AuthService para almacenar la información del usuario
               this._authService.setUserInfo(result.usuario);
 
+              this.toastColor = "success";
               this.toastMessage = "Bienvenido " + this.user.identificator;
               this.setOpenedToast(true);
               setTimeout(() => {
-                this.loaderComponent.hide();
+                this._loaderService.hide();
                 this._router.navigate(["/layout"]);
               }, 2000);
             } else {
-              this.loaderComponent.hide();
+              this._loaderService.hide();
               this.toastMessage = "Usuario o contraseña incorrectos.";
               this.setOpenedToast(true);
             }
           },
           error: (error: any) => {
             console.error(error);
-            this.loaderComponent.hide();
+            this._loaderService.hide();
             this.toastMessage = "Error al iniciar sesión";
             this.setOpenedToast(true);
           },

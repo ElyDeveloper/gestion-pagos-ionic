@@ -390,6 +390,8 @@ export class CheckPrestamosController {
   })
   async updatePagoFile(
     @requestBody({
+      description: 'Datos para actualizar documento',
+      required: false,
       content: {
         'multipart/form-data': {
           'x-parser': 'stream',
@@ -409,36 +411,20 @@ export class CheckPrestamosController {
     return new Promise((resolve, reject) => {
       upload.single('file')(req, res, async (err: any) => {
         if (err) {
+          console.log('Error al cargar el archivo:', err);
           return reject({error: 'Error al cargar el archivo.'});
         }
-
+        
         try {
           const dataSend = JSON.parse(req.body.data);
-          const {fechaPago, idFechaPago} = dataSend;
+          const {id} = dataSend;
           const file = req.file;
 
-          const pago = await this.pagosRepository.findOne({
-            where: {idFechaPago},
-          });
-
           console.log('Archivo cargado:', file);
-          console.log('Fecha de pago:', new Date(fechaPago));
-          console.log('Pago:', pago);
-
-          const documento = await this.documentosRepository.findOne({
-            where: {idDocumento: pago?.id},
-          });
-
-          //Actualizar la fechaPago de la tabla Pagos
-          if (fechaPago != undefined && pago?.id != undefined) {
-            await this.pagosRepository.updateById(pago?.id, {
-              fechaPago: new Date(fechaPago).toISOString(),
-            });
-          }
 
           //Actualizar el campo UrlDocumento en la tabla documentos si esta presente
           if (file !== undefined) {
-            await this.documentosRepository.updateById(documento?.id, {
+            await this.documentosRepository.updateById(id, {
               urlDocumento: file ? file?.path : undefined,
               fechaSubida: new Date().toISOString(),
             });

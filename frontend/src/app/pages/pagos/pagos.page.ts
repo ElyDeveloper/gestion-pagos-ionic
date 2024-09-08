@@ -7,6 +7,7 @@ import {
 } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
+import { FileUploader } from "ng2-file-upload";
 import { Subscription } from "rxjs";
 import { Pagos } from "src/app/shared/interfaces/pago";
 import { Column } from "src/app/shared/interfaces/table";
@@ -18,7 +19,13 @@ import { FormModels } from "src/app/shared/utils/forms-models";
   selector: "app-pagos",
   template: `
     <ion-content [fullscreen]="false">
-      <app-wrapper> </app-wrapper>
+      <app-wrapper
+        [textLoader]="textLoader"
+        [toastMessage]="toastMessage"
+        [toastColor]="toastColor"
+        [isToastOpen]="isToastOpen"
+        (isToastOpenChange)="setOpenedToast($event)">
+      </app-wrapper>
       <section class="container">
         <app-view-data
           [showAdd]="false"
@@ -33,10 +40,10 @@ import { FormModels } from "src/app/shared/utils/forms-models";
         </app-view-data>
 
         <app-reusable-modal
-          [(isOpen)]="isModalOpen"
-          [modalConfig]="modalConfig"
-          [content]="modalSelected"
-          (saveData)="handleSave($event)">
+          [isOpen]="isModalOpen"
+          [content]="modalUpload"
+          (isOpenChange)="onModalOpenChange($event)"
+          (saveData)="onSaveData()">
         </app-reusable-modal>
 
         <ng-template #modalUpload let-close="close" let-save="save">
@@ -49,11 +56,20 @@ import { FormModels } from "src/app/shared/utils/forms-models";
             </ion-toolbar>
           </ion-header>
           <ion-content>
-            <ion-card>
-              <ion-card-content>
-                <app-uploader></app-uploader>
-              </ion-card-content>
-            </ion-card>
+            <div class="container">
+              <app-uploader
+                (uploaderChange)="onUploaderChange($event)"
+                (fileSelected)="onFileSelected($event)"></app-uploader>
+              <div class="d-flex justify-content-center">
+                <ion-button
+                  [color]="'success'"
+                  (click)="save({ type: 'file' }, false)"
+                  [disabled]="!uploadedFile"
+                  >Subir
+                  <ion-icon class="ms-2" name="cloud-upload-outline"></ion-icon>
+                </ion-button>
+              </div>
+            </div>
           </ion-content>
         </ng-template>
       </section>
@@ -64,14 +80,23 @@ export class PagosPage implements OnInit {
   elements: Pagos[] = []; // Aquí puedes almacenar los elementos obtenidos
   suscriptions: Subscription[] = [];
 
+  textLoader = "primary";
+  toastColor = "primary";
+  toastMessage = "Elemento guardado correctamente";
+  isToastOpen = false;
+
   currentPage = 1;
   currentPageSize = 10;
   totalPages = 0;
   columnsData: Column[] = []; // Aquí deberías recibir los datos a mostrar en la tabla (cabeceras)
 
+  pagoSeleccionado: any = null;
+
   modalConfig: ModalConfig = {
     fieldAliases: {},
   };
+
+  uploadedFile: File | null = null;
 
   isModalOpen: boolean = false;
   modalSelected: TemplateRef<any>;
@@ -85,12 +110,47 @@ export class PagosPage implements OnInit {
     this.modalSelected = this.modalUpload;
   }
 
-  handleSave(data: any) {
-    console.log("Datos guardados:", data);
+  ngOnInit() {}
+
+  onSaveData() {
+    console.log("Se guardara el archivo:", this.uploadedFile);
+
+    this._globalService.PatchWithFile('pagos/updateFile', this.pagoSeleccionado, this.uploadedFile).subscribe({
+      next: () => {
+        this.getCountElements();
+        this.toastMessage = "Archivo subido correctamente";
+        this.toastColor = "success";
+        this.isToastOpen = true;
+        this.uploadedFile = null;
+        this.isModalOpen = false;
+      },
+      error: (error) => {
+        this.toastMessage = "Error al subir el archivo";
+        this.toastColor = "danger";
+        this.isToastOpen = true;
+      },
+    })
+
     // Aquí puedes procesar los datos como necesites
   }
 
-  ngOnInit() {}
+  setOpenedToast(isOpen: boolean) {
+    this.isToastOpen = isOpen;
+  }
+
+  onModalOpenChange(event: any) {
+    console.log("Modal abierto:", event);
+    this.isModalOpen = event;
+  }
+
+  onUploaderChange(event: any) {
+    console.log("Cambio en el uploader:", event);
+  }
+
+  onFileSelected(event: any) {
+    console.log("Archivo seleccionado:", event);
+    this.uploadedFile = event;
+  }
 
   ionViewWillEnter() {
     this.buildColumns();
@@ -98,8 +158,9 @@ export class PagosPage implements OnInit {
   }
 
   onUploadButtonClicked(event: any) {
-    console.log("Archivo subido:", event);
     // Aquí puedes procesar el archivo como necesites
+    this.pagoSeleccionado = event?.documentosTipoDoc?.documentos || null;
+    console.log("Pago seleccionado:", this.pagoSeleccionado);
     this.modalSelected = this.modalUpload;
     this.isModalOpen = true;
   }
@@ -108,8 +169,17 @@ export class PagosPage implements OnInit {
     console.log("Abrir botón:", event);
     // Aquí puedes abrir un modal o acción relacionada con el elemento seleccionado
 
+    if (event?.documentosTipoDoc?.documentos?.urlDocumento) {
+      this._router.navigate([
+        "/layout/view-file/" + event.documentosTipoDoc.documentos.urlDocumento,
+      ]);
+    } else {
+      console.error("No se encuentra el documento del pago.");
+      this.toastColor = "danger";
+      this.toastMessage = "No se encuentra el documento del pago.";
+      this.isToastOpen = true;
+    }
     // redirigir a view-file
-    this._router.navigate(["/layout/view-file/" + event.id]);
   }
 
   buildColumns() {
@@ -167,7 +237,7 @@ export class PagosPage implements OnInit {
             alias: "Cargar Archivo - ",
             action: "upload",
             icon: "cloud-upload",
-            color: "primary",
+            color: "success",
             rolesAuthorized: [1, 2, 3],
           },
           {

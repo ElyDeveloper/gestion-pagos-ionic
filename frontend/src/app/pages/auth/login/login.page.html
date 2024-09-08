@@ -1,6 +1,12 @@
 <ion-content [fullscreen]="true">
-  <!-- <app-wrapper [textLoader]="textLoader"> </app-wrapper> -->
-  <app-loader [textLoader]="textLoader"></app-loader>
+  <app-wrapper
+    [showBreadcrumb]="false"
+    [textLoader]="textLoader"
+    [toastMessage]="toastMessage"
+    [toastColor]="toastColor"
+    [isToastOpen]="isToastOpen"
+    (isToastOpenChange)="setOpenedToast($event)">
+  </app-wrapper>
   <!-- Crear login -->
   <div
     class="h-100 d-flex justify-content-center align-items-center align-content-center">
@@ -59,10 +65,4 @@
       </ion-card-content>
     </ion-card>
   </div>
-
-  <ion-toast
-    [isOpen]="isToastOpen"
-    message="{{toastMessage}}"
-    [duration]="5000"
-    (didDismiss)="setOpenedToast(false)"></ion-toast>
 </ion-content>

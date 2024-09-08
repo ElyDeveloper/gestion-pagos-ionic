@@ -171,9 +171,11 @@ export class ContratosPagoPage implements OnInit {
     this.isModalOpen = true;
   }
   onGoButtonClicked(data: any) {
-    console.log("Ir al detalle del cliente:", data);
+    console.log("Ir al detalle del cliente:", data.idPrestamoEncrypted);
     //Redirigir al detalle del cliente
-    this._router.navigate(["/gestion-contrato", data.prestamo.id]);
+
+    // return;
+    this._router.navigate(["/gestion-contrato", data.idPrestamoEncrypted]);
   }
 
   onDeleteButtonClicked(data: any) {

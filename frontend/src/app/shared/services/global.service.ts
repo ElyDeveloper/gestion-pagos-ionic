@@ -79,7 +79,7 @@ export class GlobalService {
     return this._http.post(`${API_URL}${endPoint}`, formData);
   }
 
-  PutWithFile(endPoint: string, dataSend: any, selectedFile?: File) {
+  PatchWithFile(endPoint: string, dataSend: any, selectedFile: File | null) {
     const formData = new FormData();
     formData.append("data", JSON.stringify(dataSend));
     // Añadir el archivo si existe
