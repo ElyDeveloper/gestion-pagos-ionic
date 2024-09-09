@@ -1,13 +1,77 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>view-files</ion-title>
+    <ion-buttons slot="start">
+      <ion-button color="primary" (click)="goBack()">
+        <ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Visor de Archivos</ion-title>
   </ion-toolbar>
 </ion-header>
-
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">view-files</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <app-wrapper [showBreadcrumb]="false"></app-wrapper>
+  <ion-card>
+    <ion-card-content>
+      <div *ngIf="fileUrl">
+        <div *ngIf="isImage" class="image-viewer">
+          <img
+            class="mt-3"
+            style="height: 80vh"
+            #imageElement
+            [src]="fileUrl"
+            [style.transform]="'scale(' + scale + ') rotate(' + rotation + 'deg)'"
+            (load)="onImageLoad()" />
+          <ion-grid class="controls ion-padding">
+            <ion-row class="ion-justify-content-center ion-align-items-center">
+              <ion-col size="12" size-sm="6" size-md="3">
+                <ion-button expand="block" (click)="zoomIn()">
+                  <ion-icon name="add-outline" slot="start"></ion-icon>
+                  Acercar
+                </ion-button>
+              </ion-col>
+              <ion-col size="12" size-sm="6" size-md="3">
+                <ion-button expand="block" (click)="zoomOut()">
+                  <ion-icon name="remove-outline" slot="start"></ion-icon>
+                  Alejar
+                </ion-button>
+              </ion-col>
+              <ion-col size="12" size-sm="6" size-md="3">
+                <ion-button expand="block" (click)="rotateClockwise()">
+                  <ion-icon name="refresh-outline" slot="start"></ion-icon>
+                  Girar
+                </ion-button>
+              </ion-col>
+              <ion-col size="12" size-sm="6" size-md="3">
+                <ion-button expand="block" (click)="rotateCounterClockwise()">
+                  <ion-icon
+                    name="refresh-outline"
+                    class="flip-horizontal"
+                    slot="start"></ion-icon>
+                  Girar
+                </ion-button>
+              </ion-col>
+            </ion-row>
+            <ion-row class="ion-justify-content-center">
+              <ion-col size="12" size-sm="6" size-md="6">
+                <ion-button expand="block" (click)="resetImage()">
+                  <ion-icon
+                    name="refresh-circle-outline"
+                    slot="start"></ion-icon>
+                  Restablecer
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </div>
+        <pdf-viewer
+          *ngIf="isPdf"
+          [src]="fileUrl"
+          [render-text]="true"
+          class="pdf-viewer"></pdf-viewer>
+      </div>
+      <ion-text color="danger" *ngIf="error">
+        <p><ion-icon name="alert-circle-outline"></ion-icon> {{ error }}</p>
+      </ion-text>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

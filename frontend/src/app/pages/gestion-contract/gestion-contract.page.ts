@@ -240,7 +240,7 @@ export class GestionContractPage implements OnInit {
 
   private getDecryptedId(id: string): Promise<number | any> {
     return firstValueFrom(
-      this._globalService.GetByIdEncrypted("convert-id", id).pipe(
+      this._globalService.GetIdDecrypted("decrypted-id", id).pipe(
         catchError((error: any) => {
           console.error("Error decrypting ID:", error);
           return error;

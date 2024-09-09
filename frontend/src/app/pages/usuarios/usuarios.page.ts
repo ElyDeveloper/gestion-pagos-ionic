@@ -451,6 +451,7 @@ export class UsuariosPage implements OnInit {
   }
 
   async handleSave(data: any) {
+
     if (this.isSelectClients) {
       console.log("Data de clientes seleccionados: ", data);
       const clientsIds = data.map((client: Personas) => client.id);

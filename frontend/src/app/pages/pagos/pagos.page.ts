@@ -12,6 +12,7 @@ import { Subscription } from "rxjs";
 import { Pagos } from "src/app/shared/interfaces/pago";
 import { Column } from "src/app/shared/interfaces/table";
 import { GlobalService } from "src/app/shared/services/global.service";
+import { PreventAbuseService } from "src/app/shared/services/prevent-abuse.service";
 import { ModalConfig } from "src/app/shared/utils/extra";
 import { FormModels } from "src/app/shared/utils/forms-models";
 
@@ -106,32 +107,40 @@ export class PagosPage implements OnInit {
 
   private _globalService = inject(GlobalService);
   private _router = inject(Router);
+  private _preventAbuseService = inject(PreventAbuseService);
+
   constructor() {
     this.modalSelected = this.modalUpload;
   }
 
   ngOnInit() {}
 
-  onSaveData() {
-    console.log("Se guardara el archivo:", this.uploadedFile);
-
-    this._globalService.PatchWithFile('pagos/updateFile', this.pagoSeleccionado, this.uploadedFile).subscribe({
-      next: () => {
-        this.getCountElements();
-        this.toastMessage = "Archivo subido correctamente";
-        this.toastColor = "success";
-        this.isToastOpen = true;
-        this.uploadedFile = null;
-        this.isModalOpen = false;
-      },
-      error: (error) => {
-        this.toastMessage = "Error al subir el archivo";
-        this.toastColor = "danger";
-        this.isToastOpen = true;
-      },
-    })
-
-    // Aquí puedes procesar los datos como necesites
+  async onSaveData() {
+    if (await this._preventAbuseService.registerClick()) {
+      console.log("Se guardara el archivo:", this.uploadedFile);
+      
+      this._globalService
+        .PatchWithFile(
+          "pagos/updateFile",
+          this.pagoSeleccionado,
+          this.uploadedFile
+        )
+        .subscribe({
+          next: () => {
+            this.getCountElements();
+            this.toastMessage = "Archivo subido correctamente";
+            this.toastColor = "success";
+            this.isToastOpen = true;
+            this.uploadedFile = null;
+            this.isModalOpen = false;
+          },
+          error: (error) => {
+            this.toastMessage = "Error al subir el archivo";
+            this.toastColor = "danger";
+            this.isToastOpen = true;
+          },
+        });
+    }
   }
 
   setOpenedToast(isOpen: boolean) {
@@ -169,16 +178,26 @@ export class PagosPage implements OnInit {
     console.log("Abrir botón:", event);
     // Aquí puedes abrir un modal o acción relacionada con el elemento seleccionado
 
-    if (event?.documentosTipoDoc?.documentos?.urlDocumento) {
-      this._router.navigate([
-        "/layout/view-file/" + event.documentosTipoDoc.documentos.urlDocumento,
-      ]);
-    } else {
-      console.error("No se encuentra el documento del pago.");
-      this.toastColor = "danger";
-      this.toastMessage = "No se encuentra el documento del pago.";
-      this.isToastOpen = true;
-    }
+    const idDecrypted = event?.documentosTipoDoc?.documentos?.id || 0;
+    this._globalService
+      .GetIdEncrypted("encrypted-id", Number(idDecrypted))
+      .subscribe({
+        next: (data: any) => {
+          console.log("ID encriptado:", data.idEncrypted);
+          if (data) {
+            this._router.navigate([`/view-file/${data.idEncrypted}`]);
+          } else {
+            console.error("No se encuentra el documento del pago.");
+            this.toastColor = "danger";
+            this.toastMessage = "No se encuentra el documento del pago.";
+            this.isToastOpen = true;
+          }
+        },
+        error: (error) => {
+          console.error("Error al obtener la ID encriptada:", error);
+        },
+      });
+
     // redirigir a view-file
   }
 

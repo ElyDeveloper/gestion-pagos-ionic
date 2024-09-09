@@ -404,6 +404,7 @@ export class PersonasPage implements OnInit {
   }
 
   async handleSave(data: any) {
+    
     const operation = this.isEdit ? "edit" : "create";
     if (!this.isEdit) delete data.id;
     await this.handleUserOperation(operation, data);

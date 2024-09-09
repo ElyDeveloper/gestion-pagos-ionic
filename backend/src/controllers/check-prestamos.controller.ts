@@ -27,6 +27,7 @@ import {Request as ExpressRequest, Response as ExpressResponse} from 'express';
 import {keys} from '../env/interfaces/Servicekeys.interface';
 import * as fs from 'fs';
 import * as path from 'path';
+import mime from 'mime-types';
 
 // Configuración de multer para la carga de archivos
 const storage = multer.diskStorage({
@@ -414,7 +415,7 @@ export class CheckPrestamosController {
           console.log('Error al cargar el archivo:', err);
           return reject({error: 'Error al cargar el archivo.'});
         }
-        
+
         try {
           const dataSend = JSON.parse(req.body.data);
           const {id} = dataSend;
@@ -485,7 +486,8 @@ export class CheckPrestamosController {
   }
 
   // Método para obtener un archivo
-  @get('/getFile', {
+
+  @get('/getFile/{id}', {
     responses: {
       '200': {
         description: 'Return the requested file',
@@ -494,49 +496,52 @@ export class CheckPrestamosController {
     },
   })
   async getFile(
-    @param.query.string('filepath') filepath: string, // Recibe el parámetro filepath desde la query string
-    @inject(RestBindings.Http.RESPONSE) response: Response, // Inyecta la respuesta HTTP
+    @param.path.number('id') id: number,
+    @inject(RestBindings.Http.RESPONSE) response: Response,
   ): Promise<any> {
+    console.log('Descargando archivo:', id);
     try {
-      // Construye la ruta completa del archivo
-      const fullPath = path.resolve(filepath);
+      const documento = await this.documentosRepository.findById(id);
 
-      // Verifica si el archivo existe
+      console.log('Archivo encontrado:', documento);
+
+      if (!documento) {
+        response.status(404).send('Document not found');
+        return;
+      }
+
+      if (documento.urlDocumento === null) {
+        response.status(404).send('No document uploaded');
+        return;
+      }
+
+      const filePath = documento.urlDocumento || '';
+      const fullPath = path.resolve(filePath);
+
       if (!fs.existsSync(fullPath)) {
         response.status(404).send('File not found');
         return;
       }
 
-      // Obtén la extensión del archivo para determinar el tipo MIME
       const mimeType = this.getMimeType(fullPath);
+      console.log('Tipo MIME:', mimeType);
 
-      // Establece los encabezados para la respuesta, incluyendo el tipo MIME adecuado
+      const stats = fs.statSync(fullPath);
       response.setHeader('Content-Type', mimeType);
+      response.setHeader('Content-Length', stats.size);
+      response.setHeader(
+        'Content-Disposition',
+        `inline; filename="${path.basename(fullPath)}"`,
+      );
 
-      // Devuelve el archivo como respuesta
       return fs.createReadStream(fullPath).pipe(response);
     } catch (error) {
+      console.error('Error al obtener el archivo:', error);
       response.status(500).send(`Error fetching file: ${error.message}`);
     }
   }
 
-  // Método para obtener el tipo MIME basado en la extensión del archivo
   getMimeType(filePath: string): string {
-    const ext = path.extname(filePath).toLowerCase();
-    switch (ext) {
-      case '.jpg':
-      case '.jpeg':
-        return 'image/jpeg';
-      case '.png':
-        return 'image/png';
-      case '.gif':
-        return 'image/gif';
-      case '.pdf':
-        return 'application/pdf';
-      case '.txt':
-        return 'text/plain';
-      default:
-        return 'application/octet-stream';
-    }
+    return mime.lookup(filePath) || 'application/octet-stream';
   }
 }

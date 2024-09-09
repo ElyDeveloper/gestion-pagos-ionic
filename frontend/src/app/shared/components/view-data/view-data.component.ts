@@ -12,6 +12,7 @@ import { AlertController } from "@ionic/angular";
 import { debounceTime, distinctUntilChanged, Subject } from "rxjs";
 import { AuthService } from "../../services/auth.service";
 import { Router } from "@angular/router";
+import { PreventAbuseService } from "../../services/prevent-abuse.service";
 
 @Component({
   selector: "app-view-data",
@@ -57,6 +58,7 @@ export class ViewDataComponent implements OnInit {
   private _alertController = inject(AlertController);
   private _authService = inject(AuthService);
   private _router = inject(Router);
+  private _preventAbuseService = inject(PreventAbuseService);
 
   constructor() {}
 
@@ -279,81 +281,113 @@ export class ViewDataComponent implements OnInit {
     }
   }
 
-  onAddButtonClick() {
-    this.addButtonClicked.emit();
+  async onAddButtonClick() {
+    if (await this._preventAbuseService.registerClick()) {
+      this.addButtonClicked.emit();
+    }
   }
 
-  onEditButtonClick(data: any) {
-    this.editButtonClicked.emit(data);
+  async onEditButtonClick(data: any) {
+    if (await this._preventAbuseService.registerClick()) {
+      this.editButtonClicked.emit(data);
+    }
   }
 
-  onInfoButtonClick(data: any) {
-    this.infoButtonClicked.emit(data);
+  async onInfoButtonClick(data: any) {
+    if (await this._preventAbuseService.registerClick()) {
+      this.infoButtonClicked.emit(data);
+    }
   }
 
-  onCheckButtonClick(data: any) {
-    this.checkButtonClicked.emit(data);
-  }
-  onSelectButtonClick(data: any) {
-    this.selectButtonClicked.emit(data);
-  }
-  onGoButtonClicked(data: any) {
-    this.goButtonClicked.emit(data);
+  async onCheckButtonClick(data: any) {
+    if (await this._preventAbuseService.registerClick()) {
+      this.checkButtonClicked.emit(data);
+    }
   }
 
-  onContractButtonClick(data: any) {
-    this.contractButtonClicked.emit(data);
+  async onSelectButtonClick(data: any) {
+    if (await this._preventAbuseService.registerClick()) {
+      this.selectButtonClicked.emit(data);
+    }
   }
-  onPagoButtonClick(data: any) {
-    this.pagoButtonClicked.emit(data);
+
+  async onGoButtonClicked(data: any) {
+    if (await this._preventAbuseService.registerClick()) {
+      this.goButtonClicked.emit(data);
+    }
+  }
+
+  async onContractButtonClick(data: any) {
+    if (await this._preventAbuseService.registerClick()) {
+      this.contractButtonClicked.emit(data);
+    }
+  }
+
+  async onPagoButtonClick(data: any) {
+    if (await this._preventAbuseService.registerClick()) {
+      this.pagoButtonClicked.emit(data);
+    }
   }
 
   async onDeleteButtonClick(data: any) {
-    const alert = await this._alertController.create({
-      header: "Eliminar elemento",
-      message: "¿Realmente deseas eliminar este elemento?",
-      buttons: [
-        {
-          text: "Cancelar",
-          role: "cancel",
-          cssClass: "secondary",
-          handler: () => {
-            console.log("Eliminación cancelada");
+    if (await this._preventAbuseService.registerClick()) {
+      const alert = await this._alertController.create({
+        header: "Eliminar elemento",
+        message: "¿Realmente deseas eliminar este elemento?",
+        buttons: [
+          {
+            text: "Cancelar",
+            role: "cancel",
+            cssClass: "secondary",
+            handler: () => {
+              console.log("Eliminación cancelada");
+            },
           },
-        },
-        {
-          text: "Eliminar",
-          handler: () => {
-            this.deleteButtonClicked.emit(data);
+          {
+            text: "Eliminar",
+            handler: () => {
+              this.deleteButtonClicked.emit(data);
+            },
           },
-        },
-      ],
-    });
+        ],
+      });
 
-    await alert.present();
+      await alert.present();
+    }
   }
 
-  onResetPassword(data: any) {
-    this.resetPasswordButtonClicked.emit(data);
+  async onResetPassword(data: any) {
+    if (await this._preventAbuseService.registerClick()) {
+      this.resetPasswordButtonClicked.emit(data);
+    }
   }
 
-  onInfoPlan(data: any) {
-    console.log("Se click en plan");
-    this.planButtonClicked.emit(data);
-  }
-  onUpload(data: any) {
-    console.log("Se click en upload");
-    this.uploadButtonClicked.emit(data);
+  async onInfoPlan(data: any) {
+    if (await this._preventAbuseService.registerClick()) {
+      console.log("Se click en plan");
+      this.planButtonClicked.emit(data);
+    }
   }
 
-  onOpen(data: any) {
-    console.log("Se click en abrir");
-    this.openButtonClicked.emit(data);
+  async onUpload(data: any) {
+    if (await this._preventAbuseService.registerClick()) {
+      console.log("Se click en upload");
+      this.uploadButtonClicked.emit(data);
+    }
   }
 
-  onSelectClients(data: any) {
-    console.log("Se click en seleccionar clientes");
-    this.selectClientClicked.emit(data);
+  async onOpen(data: any) {
+    if (await this._preventAbuseService.registerClick()) {
+      console.log("Se click en abrir");
+      this.openButtonClicked.emit(data);
+    }
+  }
+
+  async onSelectClients(data: any) {
+    if (await this._preventAbuseService.registerClick()) {
+      console.log("Se click en seleccionar clientes");
+      this.selectClientClicked.emit(data);
+    }
   }
 
   updateVisiblePages() {

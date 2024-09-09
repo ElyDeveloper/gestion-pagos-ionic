@@ -1,6 +1,7 @@
 import {
   Component,
   EventEmitter,
+  inject,
   Input,
   Output,
   TemplateRef,
@@ -10,6 +11,7 @@ import { FormGroup } from "@angular/forms";
 import { ModalConfig } from "../../utils/extra";
 import { UploaderComponent } from "../uploader/uploader.component";
 import { FileUploader } from "ng2-file-upload";
+import { PreventAbuseService } from "../../services/prevent-abuse.service";
 
 @Component({
   selector: "app-reusable-modal",
@@ -42,41 +44,44 @@ export class ReusableModalComponent {
   isToastOpen = false;
   toastMessage = "Guardado correctamente";
 
+  private _preventAbuseService = inject(PreventAbuseService);
+
   close = () => {
     this.isOpen = false;
     this.isOpenChange.emit(false);
   };
 
-  save = (data: any, isForm: boolean = true) => {
-    if (isForm) {
-      if (this.formSave.invalid) {
-        const invalidFields: string[] = [];
+  save = async (data: any, isForm: boolean = true) => {
+    if (await this._preventAbuseService.registerClick()) {
+      if (isForm) {
+        if (this.formSave.invalid) {
+          const invalidFields: string[] = [];
 
-        Object.keys(this.formSave.controls).forEach((key) => {
-          const control = this.formSave.get(key);
-          if (control && control.invalid) {
-            const fieldName = this.modalConfig.fieldAliases[key] || key;
-            invalidFields.push(fieldName);
-          }
-        });
+          Object.keys(this.formSave.controls).forEach((key) => {
+            const control = this.formSave.get(key);
+            if (control && control.invalid) {
+              const fieldName = this.modalConfig.fieldAliases[key] || key;
+              invalidFields.push(fieldName);
+            }
+          });
 
-        this.toastMessage = `Por favor, complete correctamente los siguientes campos: ${invalidFields.join(
-          ", "
-        )}`;
-        this.setOpenedToast(true);
-        return;
-      }
-    } else {
-      if (data?.type === "file") {
+          this.toastMessage = `Por favor, complete correctamente los siguientes campos: ${invalidFields.join(
+            ", "
+          )}`;
+          this.setOpenedToast(true);
+          return;
+        }
+      } else {
+        if (data?.type === "file") {
           this.saveData.emit();
           this.close();
           return;
-        
+        }
       }
-    }
 
-    this.saveData.emit(data);
-    this.close();
+      this.saveData.emit(data);
+      this.close();
+    }
   };
 
   onDidDismiss() {
@@ -87,5 +92,4 @@ export class ReusableModalComponent {
   setOpenedToast(value: boolean) {
     this.isToastOpen = value;
   }
-
 }
