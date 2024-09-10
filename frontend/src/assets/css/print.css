@@ -1,0 +1,156 @@
+@media print {
+  /* Estilos generales para impresión */
+  body {
+    font-family: Arial, sans-serif;
+    font-size: 12pt;
+    line-height: 1.3;
+    background: none;
+    color: #000;
+  }
+
+  /* Ocultar elementos innecesarios para impresión */
+  .no-print,
+  ion-button,
+  ion-searchbar,
+  ion-icon {
+    display: none !important;
+  }
+
+  /* Estilos para la tabla */
+  .custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1cm;
+  }
+
+  .custom-table th,
+  .custom-table td {
+    border: 1px solid #000;
+    padding: 0.2cm;
+    text-align: center;
+  }
+
+  .custom-table th {
+    background-color: #f2f2f2 !important;
+    color: #000;
+    font-weight: bold;
+  }
+
+  /* Asegurar que los fondos se impriman */
+  .custom-table tr:nth-child(even) {
+    background-color: #f9f9f9 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Estilos para celdas de estado */
+  .status-cell {
+    font-weight: bold;
+  }
+  .status-cell.pending {
+    color: #666 !important;
+  }
+  .status-cell.paid {
+    color: #000 !important;
+  }
+  .status-cell.overdue {
+    color: #333 !important;
+  }
+
+  /* Ajustes para imágenes */
+  img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+
+    /*Alinear a la derecha*/
+    float: right;
+    margin-left: 10px;
+  }
+
+  /* Evitar cortes de página dentro de elementos */
+  tr,
+  td,
+  th,
+  p {
+    page-break-inside: avoid;
+  }
+
+  /* Asegurar que los encabezados de tabla se repitan en cada página */
+  thead {
+    display: table-header-group;
+  }
+
+  h2 {
+    font-size: 16 !important;
+  }
+
+  /* Ajustes para el diseño de página */
+  @page {
+    margin: 2cm;
+  }
+
+  p {
+    text-align: justify;
+  }
+
+  .signature-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 3rem;
+  }
+
+  .signature-box {
+    width: 33.33%;
+    text-align: center;
+    margin: 3rem;
+  }
+
+  .signature-line {
+    border-top: 1px solid #000;
+    padding-top: 0.5rem;
+  }
+
+  .signature-line p {
+    text-align: center !important;
+    margin: 0;
+  }
+}
+
+/* VISTA DE PAGOS */
+
+.payment-details-header {
+  padding: 20px;
+  border-radius: 8px;
+}
+.header-title {
+  text-align: center;
+  margin: 0 0 20px 0;
+  font-size: 24px;
+  color: #333;
+}
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.client-info {
+  flex-grow: 1;
+}
+.client-info p {
+  margin: 5px 0;
+  font-size: 16px;
+  color: #555;
+}
+.client-info strong {
+  color: #333;
+  margin-right: 5px;
+}
+.logo-container {
+  flex-shrink: 0;
+  margin-left: 20px;
+}
+.logo {
+  width: 100px;
+  height: auto;
+}

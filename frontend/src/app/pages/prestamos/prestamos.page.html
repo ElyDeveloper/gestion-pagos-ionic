@@ -1,17 +1,13 @@
 <ion-content [fullscreen]="false">
-  <app-loader [textLoader]="textLoader"></app-loader>
-  <ion-toast
-    [isOpen]="isToastOpen"
-    message="{{toastMessage}}"
-    [color]="toastColor"
-    [duration]="5000"
-    (didDismiss)="setOpenedToast(false)"></ion-toast>
-
-  <app-breadcrumb></app-breadcrumb>
+  <app-wrapper
+    [textLoader]="textLoader"
+    [toastMessage]="toastMessage"
+    [toastColor]="toastColor"
+    [isToastOpen]="isToastOpen"
+    (isToastOpenChange)="setOpenedToast($event)">
+  </app-wrapper>
   <section>
     <app-view-data
-      [currentPage]="1"
-      [totalPages]="10"
       [title]="'Prestamos'"
       [context]="'prestamo'"
       [data]="elements"

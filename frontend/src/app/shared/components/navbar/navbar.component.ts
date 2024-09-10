@@ -8,8 +8,40 @@ import { CookieService } from "ngx-cookie-service";
 
 @Component({
   selector: "app-navbar",
-  templateUrl: "./navbar.component.html",
-  styleUrls: ["./navbar.component.scss"],
+  template: `
+    <ion-header [translucent]="true">
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <ion-title size="large" class="ion-hide-md-down"
+          >{{ appName }}
+        </ion-title>
+        <!-- Título para móviles -->
+        <ion-title size="medium" class="ion-hide-md-up">FICRE</ion-title>
+        <!-- Visualizar foto de usuario -->
+        <ion-avatar slot="end">
+          <img
+            src="https://ionicframework.com/docs/demos/api/avatar/avatar.svg" />
+        </ion-avatar>
+        <!-- Desplegable para cerrar sesión -->
+        <ion-buttons slot="end">
+          <ion-button (click)="setOpen(true)">
+            <span class="ion-hide-md-down"
+              >{{ user.nombre }} {{ user.apellido }}
+            </span>
+            <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-action-sheet
+      [isOpen]="isActionSheetOpen"
+      header="Opciones"
+      [buttons]="actionSheetButtons"
+      (didDismiss)="setOpen(false)"></ion-action-sheet>
+  `,
 })
 export class NavbarComponent implements OnInit {
   selectionProfile: any;
@@ -84,7 +116,7 @@ export class NavbarComponent implements OnInit {
   logout() {
     console.log("logout");
     //Eliminar las cookies
-    this._cookieService.delete('tokensession');
+    this._cookieService.delete("tokensession");
     this.router.navigate(["/login"]);
   }
 }

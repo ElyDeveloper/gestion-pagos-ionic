@@ -1,0 +1,106 @@
+<ion-content [fullscreen]="true">
+  <app-wrapper></app-wrapper>
+
+  <ion-grid>
+    <ion-row>
+      <ion-col size-xs="12" size-md="6" size-lg="4">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Reportes</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list>
+              <ion-item button (click)="seleccionarReporte('clientes-mora')">
+                <ion-icon name="people-outline" slot="start"></ion-icon>
+                <ion-label>Clientes en Mora</ion-label>
+              </ion-item>
+              <ion-item button (click)="seleccionarReporte('estado-cuenta')">
+                <ion-icon name="document-text-outline" slot="start"></ion-icon>
+                <ion-label>Estado de Cuenta</ion-label>
+              </ion-item>
+              <ion-item
+                button
+                (click)="seleccionarReporte('record-crediticio')">
+                <ion-icon name="time-outline" slot="start"></ion-icon>
+                <ion-label>Record Crediticio</ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <ion-col size-xs="12" size-md="6" size-lg="8">
+        <ion-card style="min-height: 100vh">
+          <ion-card-content>
+            <ng-container *ngIf="reporteSeleccionado === null">
+              <nz-result nzStatus="info"> </nz-result>
+              <h1 class="text-center">Selecciona un reporte para visualizar</h1>
+              <nz-list
+                [nzDataSource]="listData"
+                [nzRenderItem]="item"
+                [nzItemLayout]="'vertical'">
+                <ng-template #item let-item>
+                  <nz-list-item
+                    [nzContent]="loading ? ' ' : item.content"
+                    [nzActions]="loading ? [] : [starAction, likeAction, msgAction]"
+                    [nzExtra]="loading ? null : extra">
+                    <nz-skeleton
+                      [nzLoading]="loading"
+                      [nzActive]="true"
+                      [nzAvatar]="false">
+                      <ng-template #starAction>
+                        <span
+                          nz-icon
+                          nzType="star-o"
+                          style="margin-right: 8px"></span>
+                        156
+                      </ng-template>
+                      <ng-template #likeAction>
+                        <span
+                          nz-icon
+                          nzType="like-o"
+                          style="margin-right: 8px"></span>
+                        156
+                      </ng-template>
+                      <ng-template #msgAction>
+                        <span
+                          nz-icon
+                          nzType="message"
+                          style="margin-right: 8px"></span>
+                        2
+                      </ng-template>
+                      <nz-list-item-meta
+                        [nzAvatar]="item.avatar"
+                        [nzTitle]="nzTitle"
+                        [nzDescription]="item.description">
+                        <ng-template #nzTitle>
+                          <a href="{{ item.href }}">{{ item.title }}</a>
+                        </ng-template>
+                      </nz-list-item-meta>
+                      <ng-template #extra>
+                        <img
+                          width="272"
+                          alt="logo"
+                          src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png" />
+                      </ng-template>
+                    </nz-skeleton>
+                  </nz-list-item>
+                </ng-template>
+              </nz-list>
+            </ng-container>
+
+            <app-report-estado-cuenta
+              [company]="company"
+              *ngIf="reporteSeleccionado === 'estado-cuenta'"></app-report-estado-cuenta>
+            <app-report-clients-mora
+              [company]="company"
+              *ngIf="reporteSeleccionado === 'clientes-mora'"></app-report-clients-mora>
+            <app-report-record-crediticio
+              [company]="company"
+              *ngIf="reporteSeleccionado ==='record-crediticio'"></app-report-record-crediticio>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

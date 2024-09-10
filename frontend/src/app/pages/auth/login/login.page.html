@@ -1,9 +1,16 @@
 <ion-content [fullscreen]="true">
-  <app-loader [textLoader]="textLoader"></app-loader>
+  <app-wrapper
+    [showBreadcrumb]="false"
+    [textLoader]="textLoader"
+    [toastMessage]="toastMessage"
+    [toastColor]="toastColor"
+    [isToastOpen]="isToastOpen"
+    (isToastOpenChange)="setOpenedToast($event)">
+  </app-wrapper>
   <!-- Crear login -->
   <div
     class="h-100 d-flex justify-content-center align-items-center align-content-center">
-    <ion-card style="max-width: 350px; width: 100%; min-height: 500px;">
+    <ion-card style="max-width: 350px; width: 100%; min-height: 500px">
       <ion-card-header>
         <ion-card-title>Iniciar Sesión</ion-card-title>
       </ion-card-header>
@@ -21,7 +28,7 @@
           </div>
         </div>
         <ion-item>
-          <ion-label position="floating">Email</ion-label>
+          <ion-label position="stacked" class="bold-label">Email</ion-label>
           <ion-input
             type="email"
             [(ngModel)]="user.identificator"
@@ -33,7 +40,7 @@
         </ion-text>
 
         <ion-item>
-          <ion-label position="floating">Password</ion-label>
+          <ion-label position="stacked" class="bold-label">Password</ion-label>
           <ion-input
             type="password"
             [(ngModel)]="user.password"
@@ -58,10 +65,4 @@
       </ion-card-content>
     </ion-card>
   </div>
-
-  <ion-toast
-    [isOpen]="isToastOpen"
-    message="{{toastMessage}}"
-    [duration]="5000"
-    (didDismiss)="setOpenedToast(false)"></ion-toast>
 </ion-content>

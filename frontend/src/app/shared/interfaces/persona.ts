@@ -5,7 +5,7 @@ import { TipoPersonas } from "./tipo-persona";
 
 
 export interface Personas {
-  id?: number | string;
+  id?: number;
   dni?: string;
   nombres: string;
   apellidos: string;
@@ -20,6 +20,8 @@ export interface Personas {
   idRecordCrediticio: number;
   idEstadoCivil: number;
   idTipoPersona: number;
+  idEncrypted?:string;
+
 
   // Optional properties for related entities
   nacionalidad?: Nacionalidades;

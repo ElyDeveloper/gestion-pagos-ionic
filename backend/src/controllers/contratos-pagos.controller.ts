@@ -29,7 +29,7 @@ export class ContratosPagosController {
     @service(GlobalService)
     private globalService: GlobalService,
     @service(JWTService)
-    private jWTService: JWTService,
+    private jwtService: JWTService,
   ) {}
 
   @post('/contratos-pagos')
@@ -116,7 +116,7 @@ export class ContratosPagosController {
   async dataPaginate(
     @param.query.number('skip') skip: number,
     @param.query.number('limit') limit: number,
-  ): Promise<ContratosPago[]> {
+  ): Promise<any[]> {
     console.log('Llamada de paginacion');
     const contratos = await this.contratosPagoRepository.find({
       include: [
@@ -126,12 +126,14 @@ export class ContratosPagosController {
       limit,
     });
 
-    //Encriptar el id de prestamo:
-    contratos.forEach((c) => {
-      c.prestamo.id = this.jWTService.encryptId(c.prestamo.id);
-    });
+    let copiaSpread = contratos.map(contrato => ({
+      ...contrato,
+      idPrestamoEncrypted: this.jwtService.encryptId(contrato.idPrestamo|| 0),
+    }));
 
-    return contratos;
+    console.log('Contratos encontrados: ', copiaSpread);
+
+    return copiaSpread;
   }
 
   @get('/contratos-pagos/verify/{id}')

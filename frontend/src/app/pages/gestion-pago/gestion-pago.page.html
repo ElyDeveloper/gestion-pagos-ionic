@@ -1,332 +1,289 @@
 <ion-content [fullscreen]="true">
-  <app-loader [textLoader]="textLoader"></app-loader>
-
-  <ion-toast
-    [isOpen]="isToastOpen"
-    message="{{toastMessage}}"
-    [duration]="5000"
-    [color]="toastColor"
-    (didDismiss)="setOpenedToast(false)"></ion-toast>
-  <ng-container *ngIf="!isPrint">
-    <app-breadcrumb></app-breadcrumb>
-
-    <ion-card id="pago-form">
+  <ng-container>
+    <app-wrapper
+      [textLoader]="textLoader"
+      [toastMessage]="toastMessage"
+      [toastColor]="toastColor"
+      [isToastOpen]="isToastOpen"
+      (isToastOpenChange)="setOpenedToast($event)">
+    </app-wrapper>
+    <ion-card>
       <ion-card-content>
-        <div
-          class="alert alert-info d-flex justify-content-between py-1"
-          role="alert">
-          <div
-            class="row d-flex align-content-center align-items-center justify-content-center">
-            <p>
-              <ion-icon name="person-outline"></ion-icon> Cliente Seleccionado:
-              <strong>
-                @if (clienteSeleccionado?.id) { {{clienteSeleccionado.nombres}}
-                {{clienteSeleccionado.apellidos}} - {{clienteSeleccionado.dni}}
-                }@else { No Aún }
-              </strong>
-            </p>
-            <p *ngIf="hasAval">
-              <ion-icon name="person-outline"></ion-icon> Aval Seleccionado:
-              <strong>
-                @if (avalSeleccionado?.id) { {{avalSeleccionado.nombres}}
-                {{avalSeleccionado.apellidos}} - {{avalSeleccionado.dni}} }@else
-                { No Aún }
-              </strong>
-            </p>
-          </div>
-        </div>
+        <ion-grid>
+          <ion-row class="ion-align-items-center">
+            <ion-col size="12" size-md="6">
+              <ion-item lines="none">
+                <ion-icon name="person-outline" slot="start"></ion-icon>
+                <ion-label>
+                  <h2>Cliente Seleccionado:</h2>
+                  <p>
+                    <strong>
+                      @if (clienteSeleccionado?.id) {
+                      {{clienteSeleccionado.nombres}}
+                      {{clienteSeleccionado.apellidos}} -
+                      {{clienteSeleccionado.dni}} } @else { No Aún }
+                    </strong>
+                  </p>
+                </ion-label>
+              </ion-item>
+              <ion-item lines="none" *ngIf="hasAval">
+                <ion-icon name="person-outline" slot="start"></ion-icon>
+                <ion-label>
+                  <h2>Aval Seleccionado:</h2>
+                  <p>
+                    <strong>
+                      @if (avalSeleccionado?.id) { {{avalSeleccionado.nombres}}
+                      {{avalSeleccionado.apellidos}} - {{avalSeleccionado.dni}}
+                      } @else { No Aún }
+                    </strong>
+                  </p>
+                </ion-label>
+              </ion-item>
+            </ion-col>
+            <ion-col size="12" size-md="6">
+              <div class="ion-text-end ion-margin-top">
+                <ion-button color="success" routerLink="/layout/prestamos">
+                  Ver Préstamos
+                  <ion-icon name="open-outline" slot="end"></ion-icon>
+                </ion-button>
+                <ion-button
+                  color="danger"
+                  (click)="printSection()"
+                  class="ion-margin-start">
+                  Imprimir Detalle de Pagos
+                  <ion-icon name="print-outline" slot="end"></ion-icon>
+                </ion-button>
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
 
-        <div
+        <ion-item
           *ngIf="!existContrato"
-          class="alert alert-danger d-flex justify-content-between py-1"
-          role="alert">
-          <p>
-            No existe contrato registrado para este prestamo, debe generar uno
+          lines="none"
+          color="danger"
+          class="ion-margin-top">
+          <ion-icon name="alert-circle-outline" slot="start"></ion-icon>
+          <ion-label>
+            No existe contrato registrado para este préstamo, debe generar uno
             primero.
-          </p>
-        </div>
-        <div class="d-flex justify-content-end">
-          <button class="btn btn-success" routerLink="/layout/prestamos">
-            Ver Prestamos
-            <ion-icon class="ms-2" name="open-outline"></ion-icon>
-          </button>
-          <!-- <button class=" ms-2 btn btn-danger" (click)="printSection()">
-            Imprimir Estado de Cuenta
-            <ion-icon name="print-outline"></ion-icon>
-          </button> -->
-        </div>
+          </ion-label>
+        </ion-item>
       </ion-card-content>
     </ion-card>
-    <ion-card *ngIf="existContrato">
-      <ion-card-content>
-        <section>
-          <div class="container p-0">
-            <div class="row">
-              <div class="col-md-4 col-sm-12">
-                <ion-card>
-                  <ion-card-header>
-                    <ion-card-title>Detalles del Pago</ion-card-title>
-                  </ion-card-header>
-                  <ion-card-content>
-                    <ion-list>
-                      <ion-item>
-                        <ion-label>
-                          <h2>Fecha de pago seleccionado</h2>
-                          <ion-text color="success">
-                            {{pagoSeleccionado?.fechaPago | customDate : 6 :
-                            "dd/MM/yyyy"}}
-                          </ion-text>
-                        </ion-label>
-                      </ion-item>
-
-                      <ion-item>
-                        <ion-label>
-                          <h2>Cuota #</h2>
-                          <ion-text color="success">
-                            {{pagoSeleccionado?.numero}}
-                          </ion-text>
-                        </ion-label>
-                      </ion-item>
-
-                      <ion-item>
-                        <ion-label>
-                          <h2>Adeudo Cancelado</h2>
-                          <ion-text color="success">
-                            {{montoPagado | currency : "L" : "symbol"}}
-                          </ion-text>
-                        </ion-label>
-                      </ion-item>
-
-                      <ion-item>
-                        <ion-label>
-                          <h2>Monto Cuota</h2>
-                          <ion-text color="danger">
-                            {{pagoSeleccionado.monto | currency : "L" :
-                            "symbol"}}
-                          </ion-text>
-                        </ion-label>
-                      </ion-item>
-
-                      <ion-item>
-                        <ion-label>
-                          <h2>Mora</h2>
-                          <ion-text color="danger">
-                            {{mora | currency : "L" : "symbol"}}
-                          </ion-text>
-                        </ion-label>
-                      </ion-item>
-
-                      <ion-item>
-                        <ion-label>
-                          <h2>Saldo Cuota Pendiente</h2>
-                          <ion-text color="danger">
-                            {{adeudoCuota | currency : "L" : "symbol"}}
-                          </ion-text>
-                        </ion-label>
-                      </ion-item>
-
-                      <ion-item>
-                        <ion-label>
-                          <h2>Saldo Mora Pendiente</h2>
-                          <ion-text color="danger">
-                            {{adeudoMora | currency : "L" : "symbol"}}
-                          </ion-text>
-                        </ion-label>
-                      </ion-item>
-
-                      <ion-item>
-                        <ion-label>
-                          <h2>Adeudo Total</h2>
-                          <ion-text color="danger">
-                            {{adeudoTotal | currency : "L" : "symbol"}}
-                          </ion-text>
-                        </ion-label>
-                      </ion-item>
-
-                      <ion-item>
-                        <ion-label>
-                          <h2>Días de retraso</h2>
-                          <ion-text color="danger"> {{ daysLate }} </ion-text>
-                        </ion-label>
-                      </ion-item>
-                      @if(fileUrl !== '') {
-                      <ion-item>
-                        <ion-label>
-                          <h2>Archivo adjunto</h2>
-                          <ion-text color="success">
-                            <ion-router-link
-                              routerLink="/layout/view-file/{{fileUrl}}">
-                              {{fileUrl.substring(fileUrl.lastIndexOf('/') +
-                              1)}}
-                            </ion-router-link>
-                          </ion-text>
-                        </ion-label>
-                      </ion-item>
-                      }
-                    </ion-list>
-                  </ion-card-content>
-                </ion-card>
-              </div>
-              <div class="col-md-8 col-sm-12">
-                <app-view-data
-                  [showAdd]="false"
-                  [showTitle]="false"
-                  [showPagination]="false"
-                  [showSearch]="false"
-                  [currentPage]="1"
-                  [totalPages]="10"
-                  [context]="'fecha de pago'"
-                  [data]="elements"
-                  [columnsData]="columnsData"
-                  (selectButtonClicked)="onselectButtonClicked($event)"
-                  (deleteButtonClicked)="onDeleteButtonClicked($event)">
-                  <div headerContent>
-                    <div class="row">
-                      <div class="col-sm-12 col-md-8">
-                        <h2>
-                          <span class="fw-bold">Estado de Cuenta</span>: @if
-                          (clienteSeleccionado?.id) {
-                          {{clienteSeleccionado.nombres}}
-                          {{clienteSeleccionado.apellidos}} }@else { No Aún }
-                        </h2>
-                        <h2>
-                          <span class="fw-bold">Identitad #</span>: @if
-                          (clienteSeleccionado?.id) { {{clienteSeleccionado.dni
-                          | formatDni}} }@else { No Aún }
-                        </h2>
-                        <h2>
-                          <span class="fw-bold"> Prestamo: </span>
-                          {{prestamoSeleccionado.totalMonto | currency : "L" :
-                          "symbol" }}
-                        </h2>
-                      </div>
-                      <div
-                        class="col-sm-12 col-md-4 d-flex justify-content-end">
-                        <img src="assets/logo.png" width="100" alt="" />
-                      </div>
-                    </div>
-                  </div>
-                </app-view-data>
-              </div>
-
-              <div
-                class="col-sm-12"
-                *ngIf="!pagoSeleccionado.estado
-            ">
-                <ion-card>
-                  <div class="row">
-                    <div class="col-6">
-                      <form [formGroup]="pagoForm">
-                        <ion-grid>
-                          <ion-row>
-                            <ion-col size="12">
-                              <ion-item>
-                                <ion-label position="stacked" class="bold-label"
-                                  >Fecha registro de pago:</ion-label
-                                >
-                                <ion-input
-                                  (keyup)="changeDate()"
-                                  type="date"
-                                  formControlName="fechaPago"
-                                  placeholder="YYYY-MM-DD"></ion-input>
-                              </ion-item>
-                            </ion-col>
-
-                            <ion-col size="12">
-                              <ion-item>
-                                <ion-label position="stacked" class="bold-label"
-                                  >Monto Cuota:</ion-label
-                                >
-                                <ion-input
-                                  type="number"
-                                  formControlName="monto"
-                                  placeholder="Ingrese el monto"></ion-input>
-                              </ion-item>
-                            </ion-col>
-
-                            @if(hasMora){
-                            <ion-col size="12">
-                              <ion-item>
-                                <ion-label position="stacked" class="bold-label"
-                                  >Mora:</ion-label
-                                >
-                                <ion-input
-                                  [readonly]="true"
-                                  type="number"
-                                  formControlName="mora"
-                                  placeholder="Ingrese el monto"></ion-input>
-                              </ion-item>
-                            </ion-col>
-                            }
-                          </ion-row>
-                        </ion-grid>
-                      </form>
-                    </div>
-                    <div class="col-6">
-                      <app-uploader></app-uploader>
-                    </div>
-                  </div>
-
-                  <ion-grid>
-                    <ion-row class="ion-justify-content-center">
-                      <ion-col size-xs="12" size-sm="8" size-md="6" size-lg="4">
-                        <ion-button
-                          [disabled]="pagoSeleccionado.estado"
-                          expand="block"
-                          (click)="save(pagoForm.value)"
-                          class="ion-margin-top">
-                          Guardar
-                        </ion-button>
-                      </ion-col>
-                    </ion-row>
-                  </ion-grid>
-                </ion-card>
-              </div>
-            </div>
-          </div>
-        </section>
-      </ion-card-content>
-    </ion-card></ng-container
-  >
-
-  <ng-container *ngIf="isPrint">
-    <app-view-data
-      id="contentToPrint"
-      #contentToPrint
-      [showAdd]="false"
-      [showTitle]="false"
-      [showPagination]="false"
-      [showSearch]="false"
-      [currentPage]="1"
-      [totalPages]="10"
-      [context]="'fecha de pago'"
-      [data]="elements"
-      [columnsData]="columnsData"
-      (selectButtonClicked)="onselectButtonClicked($event)"
-      (deleteButtonClicked)="onDeleteButtonClicked($event)">
-      <div headerContent>
+    <section *ngIf="existContrato">
+      <div class="container p-0">
         <div class="row">
-          <div class="col-sm-12 col-md-8">
-            <h2>
-              <span class="fw-bold">Estado de Cuenta</span>: @if
-              (clienteSeleccionado?.id) { {{clienteSeleccionado.nombres}}
-              {{clienteSeleccionado.apellidos}} }@else { No Aún }
-            </h2>
-            <h2>
-              <span class="fw-bold">Identitad #</span>: @if
-              (clienteSeleccionado?.id) { {{clienteSeleccionado.dni |
-              formatDni}} }@else { No Aún }
-            </h2>
-            <h2>
-              <span class="fw-bold"> Prestamo: </span>
-              {{prestamoSeleccionado.totalMonto | currency : "L" : "symbol" }}
-            </h2>
+          <div class="col-md-4 col-sm-12">
+            <ion-card>
+              <ion-card-header>
+                <h5 class="fw-bold">Detalles del Pago</h5>
+              </ion-card-header>
+              <ion-card-content>
+                <ion-list>
+                  <ion-item>
+                    <ion-label>
+                      <h5>Fecha de pago seleccionado</h5>
+                      <ion-text color="success">
+                        {{pagoSeleccionado?.fechaPago | customDate : 6 :
+                        "dd/MM/yyyy"}}
+                      </ion-text>
+                    </ion-label>
+                  </ion-item>
+
+                  <ion-item>
+                    <ion-label>
+                      <h5>Cuota #</h5>
+                      <ion-text color="success">
+                        {{pagoSeleccionado?.numero}}
+                      </ion-text>
+                    </ion-label>
+                  </ion-item>
+
+                  <ion-item>
+                    <ion-label>
+                      <h5>Adeudo Cancelado</h5>
+                      <ion-text color="success">
+                        {{montoPagado | currency : "L" : "symbol"}}
+                      </ion-text>
+                    </ion-label>
+                  </ion-item>
+
+                  <ion-item>
+                    <ion-label>
+                      <h5>Monto Cuota</h5>
+                      <ion-text color="danger">
+                        {{pagoSeleccionado.monto | currency : "L" : "symbol"}}
+                      </ion-text>
+                    </ion-label>
+                  </ion-item>
+
+                  <ion-item>
+                    <ion-label>
+                      <h5>Mora</h5>
+                      <ion-text color="danger">
+                        {{mora | currency : "L" : "symbol"}}
+                      </ion-text>
+                    </ion-label>
+                  </ion-item>
+
+                  <ion-item>
+                    <ion-label>
+                      <h5>Saldo Cuota Pendiente</h5>
+                      <ion-text color="danger">
+                        {{adeudoCuota | currency : "L" : "symbol"}}
+                      </ion-text>
+                    </ion-label>
+                  </ion-item>
+
+                  <ion-item>
+                    <ion-label>
+                      <h5>Saldo Mora Pendiente</h5>
+                      <ion-text color="danger">
+                        {{adeudoMora | currency : "L" : "symbol"}}
+                      </ion-text>
+                    </ion-label>
+                  </ion-item>
+
+                  <ion-item>
+                    <ion-label>
+                      <h5>Adeudo Total</h5>
+                      <ion-text color="danger">
+                        {{adeudoTotal | currency : "L" : "symbol"}}
+                      </ion-text>
+                    </ion-label>
+                  </ion-item>
+
+                  <ion-item>
+                    <ion-label>
+                      <h5>Días de retraso</h5>
+                      <ion-text color="danger"> {{ daysLate }} </ion-text>
+                    </ion-label>
+                  </ion-item>
+                  @if(fileUrl !== '') {
+                  <ion-item>
+                    <ion-label>
+                      <h5>Archivo adjunto</h5>
+                      <ion-text color="success">
+                        <ion-router-link
+                          routerLink="/layout/view-file/{{fileUrl}}">
+                          {{fileUrl.substring(fileUrl.lastIndexOf('/') + 1)}}
+                        </ion-router-link>
+                      </ion-text>
+                    </ion-label>
+                  </ion-item>
+                  }
+                </ion-list>
+              </ion-card-content>
+            </ion-card>
           </div>
-          <div class="col-sm-12 col-md-4 d-flex justify-content-end">
-            <img src="assets/logo.png" width="100" alt="" />
+          <div class="col-md-8 col-sm-12" id="print-section">
+            <app-view-data
+              [showAdd]="false"
+              [showTitle]="false"
+              [showPagination]="false"
+              [showSearch]="false"
+              [isPrint]="isPrint"
+              [currentPage]="1"
+              [totalPages]="10"
+              [context]="'fecha de pago'"
+              [data]="elements"
+              [columnsData]="columnsData"
+              (selectButtonClicked)="onselectButtonClicked($event)"
+              (deleteButtonClicked)="onDeleteButtonClicked($event)">
+              <div class="payment-details-header" headerContent>
+                <h1 class="header-title">Detalle de Pagos</h1>
+                <div class="header-content">
+                  <div class="client-info">
+                    <p>
+                      <strong>Cliente:</strong> Nelman Rolando Jimenez Hernandez
+                    </p>
+                    <p><strong>Identidad #:</strong> 1301-1979-00703</p>
+                    <p><strong>Préstamo:</strong> L7,380.00</p>
+                  </div>
+                  <div class="logo-container">
+                    <img src="assets/logo.png" alt="FICRE Logo" class="logo" />
+                  </div>
+                </div>
+              </div>
+            </app-view-data>
+          </div>
+
+          <div
+            class="col-sm-12"
+            *ngIf="!pagoSeleccionado.estado
+        ">
+            <ion-card>
+              <div class="row">
+                <div class="col-sm-12 col-md-6">
+                  <form [formGroup]="pagoForm">
+                    <ion-grid>
+                      <ion-row>
+                        <ion-col size="12">
+                          <ion-item>
+                            <ion-label position="stacked" class="bold-label"
+                              >Fecha registro de pago:</ion-label
+                            >
+                            <ion-input
+                              (keyup)="changeDate()"
+                              type="date"
+                              formControlName="fechaPago"
+                              placeholder="YYYY-MM-DD"></ion-input>
+                          </ion-item>
+                        </ion-col>
+
+                        <ion-col size="12">
+                          <ion-item>
+                            <ion-label position="stacked" class="bold-label"
+                              >Monto Pago:</ion-label
+                            >
+                            <ion-input
+                              type="number"
+                              formControlName="monto"
+                              placeholder="Ingrese el monto"></ion-input>
+                          </ion-item>
+                        </ion-col>
+
+                        @if(hasMora){
+                        <ion-col size="12">
+                          <ion-item>
+                            <ion-label position="stacked" class="bold-label"
+                              >Mora:</ion-label
+                            >
+                            <ion-input
+                              [readonly]="true"
+                              type="number"
+                              formControlName="mora"
+                              placeholder="Ingrese el monto"></ion-input>
+                          </ion-item>
+                        </ion-col>
+                        }
+                      </ion-row>
+                    </ion-grid>
+                  </form>
+                </div>
+                <div class="col-sm-12 col-md-6">
+                  <app-uploader></app-uploader>
+                </div>
+              </div>
+
+              <ion-grid>
+                <ion-row class="ion-justify-content-center">
+                  <ion-col size-xs="12" size-sm="8" size-md="6" size-lg="4">
+                    <ion-button
+                      [disabled]="pagoSeleccionado.estado || isPagado"
+                      expand="block"
+                      (click)="save(pagoForm.value)"
+                      class="ion-margin-top">
+                      Guardar
+                    </ion-button>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </ion-card>
           </div>
         </div>
       </div>
-    </app-view-data>
-  </ng-container>
+    </section></ng-container
+  >
 </ion-content>

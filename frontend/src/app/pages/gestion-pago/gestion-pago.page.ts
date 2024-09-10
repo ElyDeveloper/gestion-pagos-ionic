@@ -10,12 +10,13 @@ import {
 import { FormBuilder, FormGroup } from "@angular/forms";
 import { ActivatedRoute } from "@angular/router";
 import { FileUploader } from "ng2-file-upload";
-import { Subscription } from "rxjs";
-import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
+import { NgxPrintService, PrintOptions } from "ngx-print";
+import { catchError, firstValueFrom, Subscription, tap } from "rxjs";
 import { UploaderComponent } from "src/app/shared/components/uploader/uploader.component";
 import { FechasPagos } from "src/app/shared/interfaces/fecha-pago";
 import { Column } from "src/app/shared/interfaces/table";
 import { GlobalService } from "src/app/shared/services/global.service";
+import { LoaderService } from "src/app/shared/services/loader.service";
 import { FormModels } from "src/app/shared/utils/forms-models";
 import { environment } from "src/environments/environment";
 
@@ -28,13 +29,9 @@ const MILLISECONDS_PER_DAY = 1000 * 3600 * 24;
   styleUrls: ["./gestion-pago.page.scss"],
 })
 export class GestionPagoPage implements OnInit {
-  @ViewChild(LoaderComponent) private loaderComponent!: LoaderComponent;
-
   @ViewChild(UploaderComponent) uploaderComponent:
     | UploaderComponent
     | undefined;
-
-  @Output() changeView: EventEmitter<void> = new EventEmitter();
 
   elements: FechasPagos[] = [];
   columnsData: Column[] = [];
@@ -46,9 +43,9 @@ export class GestionPagoPage implements OnInit {
 
   hasAval = false;
   hasMora = false;
-  isEditar = false;
   existContrato = false;
   isPrint = false;
+  isPagado = false;
 
   isToastOpen = false;
   toastMessage: string = "cliente guardado correctamente";
@@ -73,8 +70,10 @@ export class GestionPagoPage implements OnInit {
 
   uploader!: FileUploader;
 
-  private globalService = inject(GlobalService);
-  private route = inject(ActivatedRoute);
+  private _globalService = inject(GlobalService);
+  private _route = inject(ActivatedRoute);
+  private _printService = inject(NgxPrintService);
+  private _loaderService = inject(LoaderService);
 
   constructor(private fb: FormBuilder) {
     this.formModels = new FormModels(this.fb);
@@ -84,62 +83,46 @@ export class GestionPagoPage implements OnInit {
   ngOnInit(): void {}
 
   printSection() {
-    this.textLoader = "Importando...";
     this.isPrint = true;
-    this.changeViewState();
-    this.loaderComponent.show();
-    //Esperar 1 segundo para que se muestre el loader
+    this.textLoader = "Imprimiendo...";
+    this._loaderService.show();
+    const customPrintOptions: PrintOptions = new PrintOptions({
+      printSectionId: "print-section",
+
+      // Add any other print options as needed
+    });
+    this._printService.styleSheetFile = "assets/css/print.css";
+
+    //eliminar elemento         key: "actions", del objeto columnsData
+    const indexActions = this.columnsData.findIndex(
+      (column) => column.key === "actions"
+    );
+    if (indexActions !== -1) {
+      this.columnsData.splice(indexActions, 1);
+    }
+
+    //esperar 1 segundo para que se muestre el loader
     setTimeout(() => {
-      this.loaderComponent.hide();
+      this._printService.print(customPrintOptions);
 
-      var contentToPrint = document.getElementById(
-        "contentToPrint"
-      ) as HTMLElement;
+      //Volver a colocar la columna actions
+      this.columnsData.splice(indexActions, 0, {
+        key: "actions",
+        alias: "Acciones",
+        lstActions: [
+          {
+            alias: "Seleccionar",
+            action: "select",
+            icon: "open",
+            color: "primary",
+            rolesAuthorized: [1, 2],
+          },
+        ],
+      });
 
-      //Verificar si hay contenido para imprimir
-      if (!contentToPrint) {
-        this.isPrint = false;
-        this.changeViewState();
-        return;
-      }
-
-      // Ocultar la URL del documento durante la impresión
-      const style = document.createElement("style");
-      style.innerHTML = `
-      @page {
-        size: A4 portrait;
-        margin: 0;
-      }
-  
-      @media print {
-        @page { margin-bottom: 0; margin-top: 0; }
-        body::after { content: none !important;
-      }
-    `;
-
-      // contentToPrint.innerHTML = contentToPrint.innerHTML;
-      contentToPrint.appendChild(style);
-
-      // var contentToPrint = document.getElementById('contentToPrint').innerHTML;
-      // document.body.innerHTML = contentToPrint.innerHTML;
-
-      //Esperar a que se cargue la imagen
-      setTimeout(() => {
-        // Imprimir el contenido
-        window.print();
-        //Eliminar los estilos
-        contentToPrint.removeChild(style);
-        this.isPrint = false;
-        console.log("Valor isPrint desde RangePicker: ", this.isPrint);
-        this.changeViewState();
-        console.log("Se ha restablecido el componente...");
-        // window.location.reload();
-      }, 3000);
+      this.isPrint = false;
+      this._loaderService.hide();
     }, 1000);
-  }
-
-  changeViewState() {
-    this.changeView.emit();
   }
 
   setOpenedToast(value: boolean) {
@@ -148,7 +131,7 @@ export class GestionPagoPage implements OnInit {
 
   verifyExistContract() {
     this.suscriptions.push(
-      this.globalService
+      this._globalService
         .Get(`contratos-pagos/verify/${this.prestamoSeleccionado.id}`)
         .subscribe({
           next: (data: any) => {
@@ -170,7 +153,7 @@ export class GestionPagoPage implements OnInit {
   }
 
   ionViewDidEnter() {
-    this.getIdByUrl();
+    this.getPrestamo();
     this.buildColumns();
   }
   ionViewDidLeave() {
@@ -178,7 +161,7 @@ export class GestionPagoPage implements OnInit {
   }
 
   getFileIfExist(idPago: number) {
-    this.globalService.GetId("documentos/by-fecha-pago", idPago).subscribe({
+    this._globalService.GetId("documentos/by-fecha-pago", idPago).subscribe({
       next: (response: any) => {
         console.log("Respuesta del Servidor: ", response);
         if (response?.urlDocumento) {
@@ -200,10 +183,8 @@ export class GestionPagoPage implements OnInit {
     }
     if (data.estado === true) {
       console.log("Modo Edicion");
-      this.isEditar = true;
     } else {
       console.log("Modo Creación");
-      this.isEditar = false;
     }
 
     if (data.fechaPago === "" || data.fechaPago === null) {
@@ -229,62 +210,64 @@ export class GestionPagoPage implements OnInit {
     data.idPrestamo = this.prestamoSeleccionado.id;
     data.mora = this.mora;
 
-    if (!this.isEditar) {
-      this.globalService.PostWithFile("pagos/saveFile", data, file).subscribe({
-        next: (response) => {
-          console.log("Respuesta del Servidor: ", response);
-          this.getFechasPago(this.prestamoSeleccionado);
-          this.uploaderComponent?.uploader?.clearQueue();
+    this._globalService.PostWithFile("pagos/saveFile", data, file).subscribe({
+      next: (response) => {
+        console.log("Respuesta del Servidor: ", response);
+        this.getFechasPago(this.prestamoSeleccionado);
+        this.uploaderComponent?.uploader?.clearQueue();
 
-          // TODO: Mostrar mensaje de éxito
-          this.toastColor = "success";
-          this.toastMessage = "Pago guardado correctamente";
-          this.isToastOpen = true;
-        },
-        error: (error) => {
-          console.error("Error en el Servidor: ", error);
-          // TODO: Mostrar mensaje de error
-          this.toastColor = "danger";
-          this.toastMessage = "Error al guardar el pago";
-          this.isToastOpen = true;
-        },
-      });
-    }
-    {
-      this.globalService.PutWithFile("pagos/updateFile", data, file).subscribe({
-        next: (response) => {
-          console.log("Respuesta del Servidor: ", response);
-          this.getFechasPago(this.prestamoSeleccionado);
-          this.uploaderComponent?.uploader?.clearQueue();
-
-          // TODO: Mostrar mensaje de éxito
-          this.toastColor = "success";
-          this.toastMessage = "Pago modificado correctamente";
-          this.isToastOpen = true;
-        },
-        error: (error) => {
-          console.error("Error en el Servidor: ", error);
-
-          // TODO: Mostrar mensaje de error
-          this.toastColor = "danger";
-          this.toastMessage = "Error al modificar el pago";
-          this.isToastOpen = true;
-        },
-      });
-    }
+        // TODO: Mostrar mensaje de éxito
+        this.toastColor = "success";
+        this.toastMessage = "Pago guardado correctamente";
+        this.isToastOpen = true;
+      },
+      error: (error) => {
+        console.error("Error en el Servidor: ", error);
+        // TODO: Mostrar mensaje de error
+        this.toastColor = "danger";
+        this.toastMessage = "Error al guardar el pago";
+        this.isToastOpen = true;
+      },
+    });
   }
 
   changeDate(): void {
     const date = this.pagoForm.get("fechaPago")?.value;
-    const diffDays = this.getDiffDays(this.pagoSeleccionado.fechaPago, date);
+    let diffDays = this.getDiffDays(this.pagoSeleccionado.fechaPago, date);
     let mora = 0;
+    this.daysLate = 0;
+
     if (diffDays < 0) {
       this.daysLate = Math.abs(diffDays);
-      mora = this.calculateMora(this.pagoSeleccionado.monto, this.daysLate);
-      this.mora = mora;
-      this.calculateTotales();
     }
 
+    let oldDaysLate = 0;
+    if (this.pagoSeleccionado?.pagos) {
+      const fechasPagos = this.pagoSeleccionado.pagos.reduce(
+        (acc: any, pago: any) => {
+          acc.push(pago.fechaPago);
+          return acc;
+        },
+        []
+      );
+
+      fechasPagos.forEach((fecha: any) => {
+        const diffDaysOld = this.getDiffDays(
+          this.pagoSeleccionado.fechaPago,
+          fecha
+        );
+        if (diffDaysOld < 0) {
+          oldDaysLate += Math.abs(diffDaysOld);
+        }
+      });
+
+      console.log("Fechas de pagos: ", fechasPagos);
+    }
+    this.daysLate += oldDaysLate;
+    console.log("Días de atraso: ", this.daysLate);
+    mora = this.calculateMora(this.pagoSeleccionado.monto, this.daysLate);
+    this.mora = mora;
+    this.calculateTotales();
     this.hasMora = mora > 0;
     this.pagoForm.get("mora")?.setValue(mora);
   }
@@ -304,66 +287,84 @@ export class GestionPagoPage implements OnInit {
     );
   }
 
-  isSuccessState(): boolean {
-    return !!this.clienteSeleccionado?.id && this.pagoForm.valid;
+  async getPrestamo() {
+    try {
+      const params = await firstValueFrom(this._route.paramMap);
+      const id = params.get("id");
+
+      if (!id) {
+        this.resetPrestamoState();
+        return;
+      }
+
+      const idDecrypted = await this.getDecryptedId(id);
+      if (!idDecrypted) return;
+
+      const prestamo = await this.fetchPrestamo(idDecrypted);
+      this.updatePrestamoState(prestamo);
+    } catch (error) {
+      console.error("Error fetching prestamo:", error);
+      // Consider adding user-friendly error handling here
+    }
   }
 
-  isWarningState(): boolean {
-    return !this.clienteSeleccionado?.id || !this.pagoForm.valid;
-  }
-
-  private getIdByUrl(): void {
-    this.suscriptions.push(
-      this.route.paramMap.subscribe((params) => {
-        const id = params.get("id");
-        this.idPrestamoUrl = id || "";
-        if (id) {
-          this.fetchPrestamo(id);
-        } else {
-          this.prestamoSeleccionado = null;
-        }
-      })
+  private getDecryptedId(id: string): Promise<number | any> {
+    return firstValueFrom(
+      this._globalService.GetByIdEncrypted("convert-id", id).pipe(
+        catchError((error: any) => {
+          console.error("Error decrypting ID:", error);
+          return error;
+        })
+      )
     );
   }
 
-  private fetchPrestamo(id: string): void {
-    this.globalService.GetByIdEncrypted("prestamos", id).subscribe({
-      next: (prestamo: any) => {
-        if (prestamo) {
-          this.processPrestamo(prestamo);
-        }
-      },
-      error: (error) => console.error(error),
-    });
+  private fetchPrestamo(idDecrypted: number): Promise<any> {
+    return firstValueFrom(
+      this._globalService.GetId("prestamos", idDecrypted).pipe(
+        tap((prestamo: any) => {
+          prestamo = this._globalService.parseObjectDates(prestamo);
+          console.log("Prestamo:", prestamo);
+          console.log("Plan de Pago:", prestamo.planPago);
+        }),
+        catchError((error) => {
+          console.error("Error fetching prestamo:", error);
+          throw error;
+        })
+      )
+    );
   }
 
-  private processPrestamo(prestamo: any): void {
-    prestamo = this.globalService.parseObjectDates(prestamo);
-    console.log("Prestamo: ", prestamo);
+  private updatePrestamoState(prestamo: any): void {
     this.prestamoSeleccionado = prestamo;
     this.clienteSeleccionado = prestamo.cliente;
     this.avalSeleccionado = prestamo.aval;
     this.hasAval = !!prestamo.idAval;
-
     this.verifyExistContract();
+  }
+
+  private resetPrestamoState(): void {
+    this.prestamoSeleccionado = null;
   }
 
   private buildColumns(): void {
     this.columnsData = [
       { key: "numero", alias: "No. Cuota" },
+      { key: "id", alias: "Código" },
       { key: "fechaPago", alias: "Fecha de Pago", type: "date" },
       { key: "monto", alias: "Monto Cuota", type: "currency" },
-      {
-        key: "estado",
-        alias: "Estado",
-        type: "boolean",
-        options: ["Pagado", "No Pagado"],
-      },
+      { key: "mora", alias: "Monto Mora", type: "currency" },
       {
         key: "pagos",
         alias: "Pagos Realizados",
         type: "array",
         propsVisibles: ["fechaPago", "monto"],
+      },
+      {
+        key: "estado",
+        alias: "Estado",
+        type: "boolean",
+        options: ["Pagado", "No Pagado"],
       },
       {
         key: "verificacion",
@@ -424,12 +425,14 @@ export class GestionPagoPage implements OnInit {
 
   onDeleteButtonClicked(data: any) {
     console.log("Elemento eliminado:", data);
-    this.globalService.Delete("pagos", data.id).subscribe({
-      next: () => {
+    this._globalService.Delete("pagos", data.id).subscribe({
+      next: async () => {
         this.toastColor = "success";
         this.toastMessage = "Pago eliminado exitosamente.";
         this.isToastOpen = true;
-        this.fetchPrestamo(this.idPrestamoUrl);
+
+        const prestamo = await this.fetchPrestamo(this.prestamoSeleccionado.id);
+        this.updatePrestamoState(prestamo);
       },
       error: (error: any) => {
         this.toastColor = "danger";
@@ -463,14 +466,17 @@ export class GestionPagoPage implements OnInit {
   }
 
   private getFormattedPaymentDate(): string {
-    return this.globalService.formatDateForInput(new Date().toISOString());
+    return this._globalService.formatDateForInput(new Date().toISOString());
   }
 
   getMora(id: number): void {
-    this.globalService.GetId("moras/fecha-pago", id).subscribe({
+    this._globalService.GetId("moras/fecha-pago", id).subscribe({
       next: (response: any) => {
-        // console.log("Mora:", response);
-        this.mora = this.calculateTotalMora(response);
+        console.log("Mora:", response);
+        const mora = this.calculateTotalMora(response);
+        if (mora > 0) {
+          this.mora = this.calculateTotalMora(response);
+        }
         this.calculateTotales();
       },
       error: (error: any) => console.error("Error al obtener la mora:", error),
@@ -501,7 +507,7 @@ export class GestionPagoPage implements OnInit {
 
   private getFechasPago(data: any): void {
     console.log("Información del prestamo:", data);
-    this.globalService.Get(`fechas-pagos/plan/${data.planPago.id}`).subscribe({
+    this._globalService.Get(`fechas-pagos/plan/${data.planPago.id}`).subscribe({
       next: (response: any) => {
         console.log("Plan de pago:", response);
         this.elements = this.processFechasPago(response);
@@ -515,8 +521,11 @@ export class GestionPagoPage implements OnInit {
   }
 
   private processFechasPago(fechasPago: any[]): any[] {
+    const qtyCuotas = fechasPago.length;
     return fechasPago.map((cuota: any, index: number) => {
+      // si es ultima cuota retorna con estado pagado
       cuota.numero = index + 1;
+
       cuota.idFechaPago = cuota.id;
 
       if (!cuota.estado) {
@@ -542,12 +551,23 @@ export class GestionPagoPage implements OnInit {
         cuota.mora = 0;
       }
 
+      if (cuota?.moras) {
+        cuota.mora = cuota.moras.mora;
+        console.log("Mora en DB:", cuota.mora);
+      }
+
       return cuota;
     });
   }
 
   private selectPago(index: number): void {
-    const pagoSelect = this.elements[index];
-    this.onselectButtonClicked(pagoSelect);
+    //Verificar antes si el index es mayor que la cantidad de cuotas
+    if (index >= 0 && index < this.elements.length) {
+      const pagoSelect = this.elements[index];
+      this.onselectButtonClicked(pagoSelect);
+      this.isPagado = false;
+    } else {
+      this.isPagado = true;
+    }
   }
 }

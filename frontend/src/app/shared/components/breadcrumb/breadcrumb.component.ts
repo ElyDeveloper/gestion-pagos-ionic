@@ -1,11 +1,25 @@
 import { Component, inject, OnInit } from "@angular/core";
-import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
-import { filter, Subscription } from "rxjs";
+import { ActivatedRoute, Router } from "@angular/router";
 
 @Component({
   selector: "app-breadcrumb",
-  templateUrl: "./breadcrumb.component.html",
-  styleUrls: ["./breadcrumb.component.scss"],
+  template: `
+    <ion-breadcrumbs class="mt-5 pt-3 ">
+      <ion-breadcrumb (click)="goTo('/home')" class="breadcrumb-clickable">
+        <ion-icon slot="start" name="home"></ion-icon>
+        Inicio
+      </ion-breadcrumb>
+      <ion-breadcrumb
+        *ngFor="let segment of segments"
+        (click)="goTo(segment)"
+        class="breadcrumb-clickable">
+        {{ segment }}
+      </ion-breadcrumb>
+    </ion-breadcrumbs>
+  `,
+  styles: [
+    ".breadcrumb-clickable { cursor: pointer; transition: transform 0.2s ease; &:hover {transform: scale(1.05);}}",
+  ],
 })
 export class BreadcrumbComponent implements OnInit {
   segments: any[] = [];
