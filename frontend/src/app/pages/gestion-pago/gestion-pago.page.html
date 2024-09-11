@@ -160,19 +160,6 @@
                       <ion-text color="danger"> {{ daysLate }} </ion-text>
                     </ion-label>
                   </ion-item>
-                  @if(fileUrl !== '') {
-                  <ion-item>
-                    <ion-label>
-                      <h5>Archivo adjunto</h5>
-                      <ion-text color="success">
-                        <ion-router-link
-                          routerLink="/layout/view-file/{{fileUrl}}">
-                          {{fileUrl.substring(fileUrl.lastIndexOf('/') + 1)}}
-                        </ion-router-link>
-                      </ion-text>
-                    </ion-label>
-                  </ion-item>
-                  }
                 </ion-list>
               </ion-card-content>
             </ion-card>

@@ -15,7 +15,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
   `
 })
 export class WrapperComponent implements OnInit {
-  @Input() textLoader: string = 'Cargando...';
+  @Input() textLoader: string = 'Cargando';
   @Input() toastMessage: string = 'Operacion realizada con éxito!';
   @Input() toastColor: string = 'primary';
   @Input() isToastOpen: boolean = false;

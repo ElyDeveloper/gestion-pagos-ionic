@@ -1,20 +1,17 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { NgModule } from "@angular/core";
 
-import { IonicModule } from '@ionic/angular';
+import { ViewFilesPageRoutingModule } from "./view-files-routing.module";
 
-import { ViewFilesPageRoutingModule } from './view-files-routing.module';
-
-import { ViewFilesPage } from './view-files.page';
+import { ViewFilesPage } from "./view-files.page";
+import { SharedModule } from "src/app/shared/shared.module";
+import { PdfViewerModule } from "ng2-pdf-viewer";
 
 @NgModule({
   imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    ViewFilesPageRoutingModule
+    SharedModule,
+    ViewFilesPageRoutingModule,
+    PdfViewerModule,
   ],
-  declarations: [ViewFilesPage]
+  declarations: [ViewFilesPage],
 })
 export class ViewFilesPageModule {}

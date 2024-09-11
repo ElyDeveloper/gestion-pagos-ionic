@@ -46,10 +46,10 @@ const routes: Routes = [
       import("./pages/layout.module").then((m) => m.LayoutPageModule),
   },
   {
-    path: "gestion-contrato/:id",
+    path: "view-file/:id",
     loadChildren: () =>
-      import("./pages/gestion-contract/gestion-contract.module").then(
-        (m) => m.GestionContractPageModule
+      import("./pages/view-files/view-files.module").then(
+        (m) => m.ViewFilesPageModule
       ),
   },
 ];

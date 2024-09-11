@@ -15,7 +15,7 @@ describe('GestionPagoPage', () => {
   let activatedRouteMock: any;
 
   beforeEach(() => {
-    globalServiceMock = jasmine.createSpyObj('GlobalService', ['GetByIdEncrypted', 'Get', 'parseObjectDates', 'formatDateForInput']);
+    globalServiceMock = jasmine.createSpyObj('GlobalService', ['GetIdDecrypted', 'Get', 'parseObjectDates', 'formatDateForInput']);
     activatedRouteMock = {
       paramMap: of({ get: () => '1' })
     };

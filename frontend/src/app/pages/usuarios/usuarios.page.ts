@@ -65,7 +65,7 @@ export class UsuariosPage implements OnInit {
   isToastOpen = false;
   isEdit = false;
 
-  textLoader: string = "Cargando...";
+  textLoader: string = "Cargando";
   toastMessage: string = "Usuario guardado correctamente";
   toastColor: string = "primary";
 
@@ -451,6 +451,9 @@ export class UsuariosPage implements OnInit {
   }
 
   async handleSave(data: any) {
+
+    console.log('Data a Guardar: ', data)
+
     if (this.isSelectClients) {
       console.log("Data de clientes seleccionados: ", data);
       const clientsIds = data.map((client: Personas) => client.id);
@@ -476,7 +479,7 @@ export class UsuariosPage implements OnInit {
 
   private prepareData(data: any) {
     data.correo = data.email || "no-email@example.com";
-    data.telefono = data.cel.replace(/-/g, "");
+    data.telefono = data.telefono.replace(/-/g, "");
 
     return data;
   }

@@ -17,6 +17,7 @@ import { FechasPagos } from "src/app/shared/interfaces/fecha-pago";
 import { Column } from "src/app/shared/interfaces/table";
 import { GlobalService } from "src/app/shared/services/global.service";
 import { LoaderService } from "src/app/shared/services/loader.service";
+import { PreventAbuseService } from "src/app/shared/services/prevent-abuse.service";
 import { FormModels } from "src/app/shared/utils/forms-models";
 import { environment } from "src/environments/environment";
 
@@ -54,8 +55,6 @@ export class GestionPagoPage implements OnInit {
 
   idPrestamoUrl: string = "primary";
 
-  fileUrl: string = "";
-
   mora: number = 0;
   montoPagado: number = 0;
   adeudoCuota: number = 0;
@@ -74,6 +73,7 @@ export class GestionPagoPage implements OnInit {
   private _route = inject(ActivatedRoute);
   private _printService = inject(NgxPrintService);
   private _loaderService = inject(LoaderService);
+  private _preventAbuseService = inject(PreventAbuseService);
 
   constructor(private fb: FormBuilder) {
     this.formModels = new FormModels(this.fb);
@@ -160,75 +160,65 @@ export class GestionPagoPage implements OnInit {
     this.suscriptions.forEach((sub) => sub.unsubscribe());
   }
 
-  getFileIfExist(idPago: number) {
-    this._globalService.GetId("documentos/by-fecha-pago", idPago).subscribe({
-      next: (response: any) => {
-        console.log("Respuesta del Servidor: ", response);
-        if (response?.urlDocumento) {
-          this.fileUrl = response.urlDocumento;
-        }
-      },
-      error: (error) => {
-        console.error("Error en el Servidor: ", error);
-      },
-    });
-  }
+  async save(data: any) {
+    if (await this._preventAbuseService.registerClick()) {
 
-  save(data: any): void {
-    if (data.monto > this.adeudoTotal) {
-      this.toastColor = "danger";
-      this.toastMessage = "El monto no puede ser mayor al adeudo total";
-      this.isToastOpen = true;
-      return;
-    }
-    if (data.estado === true) {
-      console.log("Modo Edicion");
-    } else {
-      console.log("Modo Creación");
-    }
-
-    if (data.fechaPago === "" || data.fechaPago === null) {
-      this.toastColor = "danger";
-      this.toastMessage = "Debe seleccionar una fecha de pago";
-      this.isToastOpen = true;
-      return;
-    }
-
-    if (data.monto === null || data.monto <= 0) {
-      this.toastColor = "danger";
-      this.toastMessage = "Debe ingresar un monto válido";
-      this.isToastOpen = true;
-      return;
-    }
-
-    console.log("Formulario de Registro de Pago: ", data);
-
-    const file = this.uploaderComponent?.uploader?.queue[0]?._file;
-
-    console.log("Archivo subido: ", file);
-
-    data.idPrestamo = this.prestamoSeleccionado.id;
-    data.mora = this.mora;
-
-    this._globalService.PostWithFile("pagos/saveFile", data, file).subscribe({
-      next: (response) => {
-        console.log("Respuesta del Servidor: ", response);
-        this.getFechasPago(this.prestamoSeleccionado);
-        this.uploaderComponent?.uploader?.clearQueue();
-
-        // TODO: Mostrar mensaje de éxito
-        this.toastColor = "success";
-        this.toastMessage = "Pago guardado correctamente";
-        this.isToastOpen = true;
-      },
-      error: (error) => {
-        console.error("Error en el Servidor: ", error);
-        // TODO: Mostrar mensaje de error
+      // return;
+      if (data.monto > this.adeudoTotal) {
         this.toastColor = "danger";
-        this.toastMessage = "Error al guardar el pago";
+        this.toastMessage = "El monto no puede ser mayor al adeudo total";
         this.isToastOpen = true;
-      },
-    });
+        return;
+      }
+      if (data.estado === true) {
+        console.log("Modo Edicion");
+      } else {
+        console.log("Modo Creación");
+      }
+
+      if (data.fechaPago === "" || data.fechaPago === null) {
+        this.toastColor = "danger";
+        this.toastMessage = "Debe seleccionar una fecha de pago";
+        this.isToastOpen = true;
+        return;
+      }
+
+      if (data.monto === null || data.monto <= 0) {
+        this.toastColor = "danger";
+        this.toastMessage = "Debe ingresar un monto válido";
+        this.isToastOpen = true;
+        return;
+      }
+
+      console.log("Formulario de Registro de Pago: ", data);
+
+      const file = this.uploaderComponent?.uploader?.queue[0]?._file;
+
+      console.log("Archivo subido: ", file);
+
+      data.idPrestamo = this.prestamoSeleccionado.id;
+      data.mora = this.mora;
+
+      this._globalService.PostWithFile("pagos/saveFile", data, file).subscribe({
+        next: (response) => {
+          console.log("Respuesta del Servidor: ", response);
+          this.getFechasPago(this.prestamoSeleccionado);
+          this.uploaderComponent?.uploader?.clearQueue();
+
+          // TODO: Mostrar mensaje de éxito
+          this.toastColor = "success";
+          this.toastMessage = "Pago guardado correctamente";
+          this.isToastOpen = true;
+        },
+        error: (error) => {
+          console.error("Error en el Servidor: ", error);
+          // TODO: Mostrar mensaje de error
+          this.toastColor = "danger";
+          this.toastMessage = "Error al guardar el pago";
+          this.isToastOpen = true;
+        },
+      });
+    }
   }
 
   changeDate(): void {
@@ -310,7 +300,7 @@ export class GestionPagoPage implements OnInit {
 
   private getDecryptedId(id: string): Promise<number | any> {
     return firstValueFrom(
-      this._globalService.GetByIdEncrypted("convert-id", id).pipe(
+      this._globalService.GetIdDecrypted("decrypted-id", id).pipe(
         catchError((error: any) => {
           console.error("Error decrypting ID:", error);
           return error;
@@ -384,13 +374,6 @@ export class GestionPagoPage implements OnInit {
             color: "primary",
             rolesAuthorized: [1, 2],
           },
-          // {
-          //   alias: "Pagos - ",
-          //   action: "info",
-          //   icon: "information",
-          //   color: "primary",
-          //   rolesAuthorized: [1, 2, 3],
-          // },
         ],
       },
     ];
@@ -409,7 +392,6 @@ export class GestionPagoPage implements OnInit {
     this.pagoSeleccionado = data;
 
     this.calculatePaymentDetails(data);
-    this.getFileIfExist(data.id);
 
     this.hasMora = data.mora > 0;
     this.mora = data.mora;
@@ -521,7 +503,6 @@ export class GestionPagoPage implements OnInit {
   }
 
   private processFechasPago(fechasPago: any[]): any[] {
-    const qtyCuotas = fechasPago.length;
     return fechasPago.map((cuota: any, index: number) => {
       // si es ultima cuota retorna con estado pagado
       cuota.numero = index + 1;

@@ -21,11 +21,11 @@ import { FileUploadModule } from "ng2-file-upload";
 import { NgSelectModule } from "@ng-select/ng-select";
 import { InputMaskDirective } from "./directives/input-mask.directive";
 import { NgxPrintModule } from "ngx-print";
-import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
-import { NzResultModule } from 'ng-zorro-antd/result';
-import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
-import { NzListModule } from 'ng-zorro-antd/list';
-
+import { NzDatePickerModule } from "ng-zorro-antd/date-picker";
+import { NzResultModule } from "ng-zorro-antd/result";
+import { NzSkeletonModule } from "ng-zorro-antd/skeleton";
+import { NzListModule } from "ng-zorro-antd/list";
+import { PreventAbuseService } from "./services/prevent-abuse.service";
 
 @NgModule({
   declarations: [
@@ -45,11 +45,10 @@ import { NzListModule } from 'ng-zorro-antd/list';
     FileUploadModule,
     NgSelectModule,
     NgxPrintModule,
-    NzDatePickerModule,  // IMPORTANT: for Ant Design DatePicker
-    NzResultModule,  // IMPORTANT: for Ant Design Result Module
-    NzSkeletonModule,  // IMPORTANT: for Ant Design Skeleton Module
-    NzListModule,  // IMPORTANT: for Ant Design List Module
-    
+    NzDatePickerModule, // IMPORTANT: for Ant Design DatePicker
+    NzResultModule, // IMPORTANT: for Ant Design Result Module
+    NzSkeletonModule, // IMPORTANT: for Ant Design Skeleton Module
+    NzListModule, // IMPORTANT: for Ant Design List Module
   ],
   exports: [
     AuthModule,
@@ -66,11 +65,11 @@ import { NzListModule } from 'ng-zorro-antd/list';
     XmlToListPipe,
     InputMaskDirective,
     NgxPrintModule,
-    NzDatePickerModule,  // IMPORTANT: for Ant Design DatePicker
-    NzResultModule,  // IMPORTANT: for Ant Design Result Module
-    NzSkeletonModule,  // IMPORTANT: for Ant Design Skeleton Module
-    NzListModule,  // IMPORTANT: for Ant Design List Module
+    NzDatePickerModule, // IMPORTANT: for Ant Design DatePicker
+    NzResultModule, // IMPORTANT: for Ant Design Result Module
+    NzSkeletonModule, // IMPORTANT: for Ant Design Skeleton Module
+    NzListModule, // IMPORTANT: for Ant Design List Module
   ],
-  providers: [DatePipe],
+  providers: [DatePipe, PreventAbuseService],
 })
 export class SharedModule {}

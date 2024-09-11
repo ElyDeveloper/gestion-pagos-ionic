@@ -25,6 +25,7 @@ import { PlanesPago } from "src/app/shared/interfaces/plan-pago";
 import { Prestamos } from "src/app/shared/interfaces/prestamo";
 import { Productos } from "src/app/shared/interfaces/producto";
 import { GlobalService } from "src/app/shared/services/global.service";
+import { PreventAbuseService } from "src/app/shared/services/prevent-abuse.service";
 import { FormModels } from "src/app/shared/utils/forms-models";
 
 @Component({
@@ -74,6 +75,7 @@ export class GestionPrestamoPage implements OnInit {
   private _globalService = inject(GlobalService);
   private _route = inject(ActivatedRoute);
   private _router = inject(Router);
+  private _preventAbuseService = inject(PreventAbuseService);
 
   constructor(private fb: FormBuilder) {
     this.formModels = new FormModels(this.fb);
@@ -98,7 +100,7 @@ export class GestionPrestamoPage implements OnInit {
       .pipe(
         map((params) => params.get("id")),
         switchMap((id) =>
-          id ? this._globalService.GetIdString("convert-id", id) : of(null)
+          id ? this._globalService.GetIdString("decrypted-id", id) : of(null)
         )
       )
       .subscribe({
@@ -328,11 +330,13 @@ export class GestionPrestamoPage implements OnInit {
   }
 
   async handleSave(data: any) {
-    if (this.isEdit) {
-      // this.handleUserOperation("edit", data);
-    } else if (!this.isEdit) {
-      delete data.id;
-      // this.handleUserOperation("create", data);
+    if (await this._preventAbuseService.registerClick()) {
+      if (this.isEdit) {
+        // this.handleUserOperation("edit", data);
+      } else if (!this.isEdit) {
+        delete data.id;
+        // this.handleUserOperation("create", data);
+      }
     }
   }
 
