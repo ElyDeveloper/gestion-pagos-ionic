@@ -3,7 +3,7 @@
     <ion-card-title class="d-none d-md-block" *ngIf="showTitle">{{
       title
     }}</ion-card-title>
-    <div class="row d-flex justify-content-end" *ngIf="showAdd">
+    <div class="row d-flex justify-content-end" *ngIf="showAdd && userLogged.rolid!==3">
       <div style="width: 150px">
         <ion-button color="primary" (click)="onAddButtonClick()">
           Agregar <ion-icon name="add-outline"></ion-icon>

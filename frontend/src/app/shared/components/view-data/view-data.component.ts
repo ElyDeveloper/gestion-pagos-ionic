@@ -364,14 +364,12 @@ export class ViewDataComponent implements OnInit {
 
   async onInfoPlan(data: any) {
     if (await this._preventAbuseService.registerClick()) {
-      console.log("Se click en plan");
       this.planButtonClicked.emit(data);
     }
   }
 
   async onUpload(data: any) {
     if (await this._preventAbuseService.registerClick()) {
-      console.log("Se click en upload");
       this.uploadButtonClicked.emit(data);
     }
   }

@@ -116,31 +116,29 @@ export class PagosPage implements OnInit {
   ngOnInit() {}
 
   async onSaveData() {
-    if (await this._preventAbuseService.registerClick()) {
-      console.log("Se guardara el archivo:", this.uploadedFile);
-      
-      this._globalService
-        .PatchWithFile(
-          "pagos/updateFile",
-          this.pagoSeleccionado,
-          this.uploadedFile
-        )
-        .subscribe({
-          next: () => {
-            this.getCountElements();
-            this.toastMessage = "Archivo subido correctamente";
-            this.toastColor = "success";
-            this.isToastOpen = true;
-            this.uploadedFile = null;
-            this.isModalOpen = false;
-          },
-          error: (error) => {
-            this.toastMessage = "Error al subir el archivo";
-            this.toastColor = "danger";
-            this.isToastOpen = true;
-          },
-        });
-    }
+    console.log("Se guardara el archivo:", this.uploadedFile);
+
+    this._globalService
+      .PatchWithFile(
+        "pagos/updateFile",
+        this.pagoSeleccionado,
+        this.uploadedFile
+      )
+      .subscribe({
+        next: () => {
+          this.getCountElements();
+          this.toastMessage = "Archivo subido correctamente";
+          this.toastColor = "success";
+          this.isToastOpen = true;
+          this.uploadedFile = null;
+          this.isModalOpen = false;
+        },
+        error: (error) => {
+          this.toastMessage = "Error al subir el archivo";
+          this.toastColor = "danger";
+          this.isToastOpen = true;
+        },
+      });
   }
 
   setOpenedToast(isOpen: boolean) {

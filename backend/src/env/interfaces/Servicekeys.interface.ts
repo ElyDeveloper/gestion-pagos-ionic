@@ -1,3 +1,7 @@
+//Importar dotenv
+
+require('dotenv').config();
+
 export namespace keys {
   export const JWT_SECRET_KEY = 'jwtSecret@Key*2021';
   export const SECRET_KEY = 'keyAcces2024';
@@ -16,5 +20,5 @@ export namespace keys {
   export const EXTENSIONS_IMAGE: string[] = ['.PNG', '.JPG', '.JPEG', '.SVG'];
   export const MAX_WIDTH_IMAGE = 1024 * 1024;
   // export const URL_FILE = 'C:\\Prestamos Files';
-  export const URL_FILE = 'X:\\Docs';
+  export const URL_FILE = process.env.PATH_SAVE || 'C:\\Prestamos Files';
 }

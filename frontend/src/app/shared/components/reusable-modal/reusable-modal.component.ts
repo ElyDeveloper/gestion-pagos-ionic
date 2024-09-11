@@ -47,6 +47,7 @@ export class ReusableModalComponent {
   private _preventAbuseService = inject(PreventAbuseService);
 
   close = () => {
+    this.setOpenedToast(false);
     this.isOpen = false;
     this.isOpenChange.emit(false);
   };
@@ -54,6 +55,7 @@ export class ReusableModalComponent {
   save = async (data: any, isForm: boolean = true) => {
     if (await this._preventAbuseService.registerClick()) {
       if (isForm) {
+        console.log("Es formulario");
         if (this.formSave.invalid) {
           const invalidFields: string[] = [];
 
@@ -69,18 +71,16 @@ export class ReusableModalComponent {
             ", "
           )}`;
           this.setOpenedToast(true);
-          return;
         }
+
+        this.saveData.emit(data);
       } else {
         if (data?.type === "file") {
+          console.log("No es formulario");
+
           this.saveData.emit();
-          this.close();
-          return;
         }
       }
-
-      this.saveData.emit(data);
-      this.close();
     }
   };
 

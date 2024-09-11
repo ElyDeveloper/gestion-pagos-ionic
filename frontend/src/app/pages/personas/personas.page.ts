@@ -340,7 +340,7 @@ export class PersonasPage implements OnInit {
       this.suscripciones.push(
         this._globalService.GetId("personas/asesor", formData.id).subscribe({
           next: (asesor: any) => {
-            this.selectedAsesor = asesor?.Usuario || null;
+            this.selectedAsesor = asesor?.usuario || null;
             this.lastSelectedAsesor = this.selectedAsesor;
             console.log("Asesor seleccionado: ", this.selectedAsesor);
           },
@@ -417,7 +417,7 @@ export class PersonasPage implements OnInit {
       await this.showLoader(`${operationText} cliente`);
 
       const response = await this.performApiCall(operation, data);
-      console.log(`Cliente ${operationText.toLowerCase()}:`, response);
+      console.log(`Cliente ${operationText.toLowerCase()}:`, data);
 
       if (operation === "create") {
         await this.handleAsesorCreation(response.id);
@@ -448,9 +448,10 @@ export class PersonasPage implements OnInit {
   }
 
   private async performApiCall(operation: string, data: any): Promise<any> {
+    console.log('Data a guardar performApicall: ', data)
     return operation === "edit"
       ? await firstValueFrom(
-          this._globalService.PutIdString("personas", data.id, data)
+          this._globalService.PutId("personas", data.id, data)
         )
       : await firstValueFrom(this._globalService.Post("personas", data));
   }
