@@ -175,7 +175,7 @@ export class ContratosPagoPage implements OnInit {
     //Redirigir al detalle del cliente
 
     // return;
-    this._router.navigate(["/gestion-contrato", data.idPrestamoEncrypted]);
+    this._router.navigate(["/layout/gestion-contrato", data.idPrestamoEncrypted]);
   }
 
   onDeleteButtonClicked(data: any) {
