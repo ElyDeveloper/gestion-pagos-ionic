@@ -15,7 +15,11 @@
               <ion-icon name="person-outline" slot="start"></ion-icon>
               <ion-label>
                 <h2>Cliente Seleccionado:</h2>
-                <p><strong>Deysi Manueles Lopez - 1319198700207</strong></p>
+                @if(clienteSeleccionado){
+                  <p><strong>{{clienteSeleccionado.nombres}} {{clienteSeleccionado.apellidos}} - {{clienteSeleccionado.dni}} </strong></p>
+                }@else {
+                  <p>No Aún</p>
+                }
               </ion-label>
             </ion-item>
           </ion-col>
