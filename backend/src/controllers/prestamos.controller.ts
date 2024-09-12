@@ -450,4 +450,15 @@ export class PrestamosController {
     };
   }
 
+  //endpoint para ejecutar el procedimiento almacenado de reporte de cartera asesor
+  @get('/prestamos/reporte-cartera-asesor')
+  async reporteCarteraAsesor(
+    @param.query.number('idUsuario') idUsuario: number,
+  ): Promise<any> {
+    return this.prestamosRepository.dataSource.execute(
+      `SP_ReporteCarteraAsesor ${idUsuario}`,
+      [],
+    );
+  }
+
 }
