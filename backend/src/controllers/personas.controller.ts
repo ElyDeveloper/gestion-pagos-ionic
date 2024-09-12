@@ -86,12 +86,42 @@ export class PersonasController {
     return this.usuarioClienteRepository.create(usuarioCliente);
   }
 
+  // @get('/personas/count')
+  // @response(200, {
+  //   description: 'Personas model count',
+  //   content: {'application/json': {schema: CountSchema}},
+  // })
+  // async count(@param.where(Personas) where?: Where<Personas>): Promise<Count> {
+  //   return this.personasRepository.count({
+  //     estado: true,
+  //   });
+  // }
+
   @get('/personas/count')
   @response(200, {
     description: 'Personas model count',
     content: {'application/json': {schema: CountSchema}},
   })
-  async count(@param.where(Personas) where?: Where<Personas>): Promise<Count> {
+  async countPersonas(
+    @inject(SecurityBindings.USER)
+    currentUser: UserProfile,
+    @param.where(Personas) where?: Where<Personas>,
+  ): Promise<Count> {
+    console.log('Usuario Logueado: ', currentUser);
+    const userId = parseInt(currentUser[securityId], 10);
+    console.log('Id de Usuario Logueado en Clientes: ', userId);
+
+    const user = await this.usuarioRepository.findById(userId);
+    if (!user) {
+      throw new HttpErrors.Unauthorized('Usuario no encontrado');
+    }
+    console.log('Usuario encontrado: ', user);
+
+    if (user.rolid === 3) {
+      return this.usuarioClienteRepository.count({
+        usuarioId: userId,
+      });
+    }
     return this.personasRepository.count({
       estado: true,
     });
