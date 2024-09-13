@@ -5,16 +5,13 @@ import {
   TemplateRef,
   ViewChild,
 } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
-import { FileUploader } from "ng2-file-upload";
 import { Subscription } from "rxjs";
 import { Pagos } from "src/app/shared/interfaces/pago";
 import { Column } from "src/app/shared/interfaces/table";
 import { GlobalService } from "src/app/shared/services/global.service";
 import { PreventAbuseService } from "src/app/shared/services/prevent-abuse.service";
 import { ModalConfig } from "src/app/shared/utils/extra";
-import { FormModels } from "src/app/shared/utils/forms-models";
 
 @Component({
   selector: "app-pagos",
@@ -108,7 +105,6 @@ export class PagosPage implements OnInit {
 
   private _globalService = inject(GlobalService);
   private _router = inject(Router);
-  private _preventAbuseService = inject(PreventAbuseService);
 
   constructor() {
     this.modalSelected = this.modalUpload;
@@ -135,6 +131,7 @@ export class PagosPage implements OnInit {
           this.isModalOpen = false;
         },
         error: (error) => {
+          console.log("Error al subir el archivo:", error);
           this.toastMessage = "Error al subir el archivo";
           this.toastColor = "danger";
           this.isToastOpen = true;
