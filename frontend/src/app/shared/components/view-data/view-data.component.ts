@@ -162,6 +162,10 @@ export class ViewDataComponent implements OnInit {
   getCellValue(row: any, column: Column): any {
     let primaryValue = this.getNestedValue(row, column.key);
 
+    if (!primaryValue) { 
+      return "N/A";
+    }
+
     if (column.combineWith) {
       const secondaryValue = this.getNestedValue(row, column.combineWith);
       if (column.combineFormat) {
