@@ -24,6 +24,10 @@
                 <ion-icon name="time-outline" slot="start"></ion-icon>
                 <ion-label>Record Crediticio</ion-label>
               </ion-item>
+              <ion-item button (click)="seleccionarReporte('cartera-asesor')">
+                <ion-icon name="briefcase-outline" slot="start"></ion-icon>
+                <ion-label>Cartera Asesor</ion-label>
+              </ion-item>
             </ion-list>
           </ion-card-content>
         </ion-card>
@@ -98,6 +102,9 @@
             <app-report-record-crediticio
               [company]="company"
               *ngIf="reporteSeleccionado ==='record-crediticio'"></app-report-record-crediticio>
+
+            <app-report-cartera-asesores
+              *ngIf="reporteSeleccionado ==='cartera-asesor'"></app-report-cartera-asesores>
           </ion-card-content>
         </ion-card>
       </ion-col>
