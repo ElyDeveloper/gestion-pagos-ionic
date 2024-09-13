@@ -36,6 +36,7 @@ import { FormModels } from "src/app/shared/utils/forms-models";
           [totalPages]="totalPages"
           [title]="'Pagos'"
           [context]="'Pago'"
+          (currentPageOut)="onPageChange($event)"
           (openButtonClicked)="onOpenButtonClicked($event)"
           (uploadButtonClicked)="onUploadButtonClicked($event)">
         </app-view-data>
@@ -281,6 +282,12 @@ export class PagosPage implements OnInit {
         console.error("Error al obtener la cantidad de elementos:", error);
       },
     });
+  }
+
+  onPageChange(event: any) {
+    console.log("Evento de cambio de página:", event);
+    this.currentPage = event;
+    this.getElementsPag();
   }
 
   getElementsPag() {
