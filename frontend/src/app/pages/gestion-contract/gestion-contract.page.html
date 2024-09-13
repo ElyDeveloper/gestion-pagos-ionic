@@ -8,12 +8,8 @@
     (isToastOpenChange)="setOpenedToast($event)">
   </app-wrapper>
 
-  <div class="alert alert-danger sticky-top" role="alert" *ngIf="existContrato">
-    Ya existe un contrato generado para este préstamo, por políticas de
-    seguridad no se puede modificar el contenido de este documento.
-  </div>
-
-  <ion-card>
+  <br>
+  <ion-card class="mt-5">
     <ion-card-header>
       <ion-card-title>Datos Empresa/Bancarios</ion-card-title>
       <div class="d-flex justify-content-end">
@@ -182,6 +178,10 @@
           </ion-col>
         </ion-row>
       </ion-grid>
+      <div class="alert alert-danger" role="alert" *ngIf="existContrato">
+        Ya existe un contrato generado para este préstamo, por políticas de
+        seguridad no se puede modificar el contenido de este documento.
+      </div>
     </ion-card-content>
   </ion-card>
 
@@ -243,7 +243,7 @@
             }
             <p><strong>DECLARO Y HAGO CONSTAR:</strong></p>
             <p>
-              <strong>PRIMERO:</strong> Que estoy en adeudarle a
+              <strong>PRIMERO:</strong> Que adeudo a
               @if(nombreEmpresa===''){
               <strong style="color: red">Pendiente Empresa</strong>
               }@else { {{nombreEmpresa}}} quien es representada legalmente por
@@ -282,8 +282,7 @@
               ({{this.prestamoSeleccionado?.totalMonto| currency : "L" :
               "symbol"}}), por concepto de préstamo. En caso de incurrir en mora
               por incumplimiento de las obligaciones de pago pactadas, se
-              aplicará un recargo del {{percentage}}% sobre el monto de la cuota
-              vencida por cada día de retraso.
+              aplicará un recargo de intereses moratorios del {{percentage}}% mensual.
             </p>
             <p>
               <strong>TERCERO:</strong> En caso de incumplimiento en el pago de

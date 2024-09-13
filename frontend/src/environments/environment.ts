@@ -6,8 +6,8 @@ export const environment = {
   production: false,
   // apiURL: 'http://localhost:3005/',
   apiURL: 'http://localhost:3001/',
-  company: 'Sociedad Financiamiento de Crédito Efectivo (FICRE) S. de R. L.',
-  percentage: 0.3,
+  company: 'Financiamiento de Crédito Efectivo (FICRE) S. de R. L.',
+  percentage: 0.03,
   appName: "LAP - Loan Administration Platform",
 
 };

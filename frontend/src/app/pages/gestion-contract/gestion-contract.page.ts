@@ -15,7 +15,7 @@ import { ContratosPago } from "src/app/shared/interfaces/contrato";
 import { LoaderService } from "src/app/shared/services/loader.service";
 import { NgxPrintService, PrintOptions } from "ngx-print";
 const COMPANY = environment.company || "No Aún";
-const PERCENTAGE = (environment.percentage /30) * 100;
+const PERCENTAGE = (environment.percentage) * 100;
 @Component({
   selector: "app-gestion-contract",
   templateUrl: "./gestion-contract.page.html",
