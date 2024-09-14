@@ -1,6 +1,6 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpResponse } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
-import { interval } from "rxjs";
+import { interval, Observable } from "rxjs";
 import { environment } from "src/environments/environment";
 
 const API_URL = environment.apiURL;
@@ -53,7 +53,17 @@ export class GlobalService {
     return this._http.get(`${API_URL}${endPoint}/${Id}`);
   }
 
-  GetByIdEncrypted(endPoint: string, Id: string) {
+  downloadFile(endPoint: string, Id: number): Observable<HttpResponse<Blob>> {
+    return this._http.get(`${API_URL}${endPoint}/${Id}`, {
+      responseType: 'blob',
+      observe: 'response'
+    });
+  }
+
+  GetIdDecrypted(endPoint: string, Id: string) {
+    return this._http.get(`${API_URL}${endPoint}/${Id}`);
+  }
+  GetIdEncrypted(endPoint: string, Id: number) {
     return this._http.get(`${API_URL}${endPoint}/${Id}`);
   }
   GetManyById(endPoint: string, Id: number) {

@@ -1,2 +1,10 @@
 2024-09-01 15:50:02 - Starting C:\Program Files\nodejs\node.exe  --harmony X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\node_modules\node-windows\lib\wrapper.js --file X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\server.js --scriptoptions= --log "MiAppAngularService wrapper" --grow 0.25 --wait 1 --maxrestarts 3 --abortonerror n --stopparentfirst undefined
 2024-09-01 15:50:02 - Started 20500
+2024-09-12 23:02:09 - Starting C:\Program Files\nodejs\node.exe  --harmony X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\node_modules\node-windows\lib\wrapper.js --file X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\server.js --scriptoptions= --log "MiAppAngularService wrapper" --grow 0.25 --wait 1 --maxrestarts 3 --abortonerror n --stopparentfirst undefined
+2024-09-12 23:02:09 - Started 6356
+2024-09-13 06:46:13 - Starting C:\Program Files\nodejs\node.exe  --harmony X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\node_modules\node-windows\lib\wrapper.js --file X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\server.js --scriptoptions= --log "MiAppAngularService wrapper" --grow 0.25 --wait 1 --maxrestarts 3 --abortonerror n --stopparentfirst undefined
+2024-09-13 06:46:13 - Started 5748
+2024-09-13 20:05:35 - Starting C:\Program Files\nodejs\node.exe  --harmony X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\node_modules\node-windows\lib\wrapper.js --file X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\server.js --scriptoptions= --log "MiAppAngularService wrapper" --grow 0.25 --wait 1 --maxrestarts 3 --abortonerror n --stopparentfirst undefined
+2024-09-13 20:05:35 - Started 8860
+2024-09-13 20:23:59 - Starting C:\Program Files\nodejs\node.exe  --harmony X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\node_modules\node-windows\lib\wrapper.js --file X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\server.js --scriptoptions= --log "MiAppAngularService wrapper" --grow 0.25 --wait 1 --maxrestarts 3 --abortonerror n --stopparentfirst undefined
+2024-09-13 20:23:59 - Started 7844

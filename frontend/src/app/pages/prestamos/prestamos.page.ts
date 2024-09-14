@@ -160,7 +160,12 @@ export class PrestamosPage implements OnInit {
   }
 
   buildColumns() {
+    
     this.columnsData = [
+      {
+        key: "id",
+        alias: "Código",
+      },
       {
         key: "cliente.nombres",
         alias: "Cliente",
@@ -329,7 +334,7 @@ export class PrestamosPage implements OnInit {
 
   onContractButtonClicked(data: any) {
     console.log("Contrato del cliente:", data);
-    this._router.navigate(["/gestion-contrato/" + data.idEncrypted]);
+    this._router.navigate(["/layout/gestion-contrato/" + data.idEncrypted]);
   }
 
   onPagoButtonClicked(data: any) {
@@ -371,21 +376,21 @@ export class PrestamosPage implements OnInit {
   }
 
   onDeleteButtonClicked(data: any) {
-    console.log("Eliminar cliente Obtenido:", data);
-    this.textLoader = "Eliminando cliente";
+    console.log("Eliminar presta,mo Obtenido:", data);
+    this.textLoader = "Eliminando prestamo";
     this._loaderService.show();
     this._globalService.Delete("prestamos", data.id).subscribe({
       next: (response: any) => {
         console.log("cliente eliminado:", response);
         this.getCountElements();
         this._loaderService.hide();
-        this.toastMessage = "cliente eliminado correctamente";
+        this.toastMessage = "prestamo eliminado correctamente";
         this.setOpenedToast(true);
       },
       error: (error: any) => {
-        console.error("Error al eliminar el cliente:", error);
+        console.error("Error al eliminar el prestamo:", error);
         this._loaderService.hide();
-        this.toastMessage = "Error al eliminar el cliente";
+        this.toastMessage = "Error al eliminar el prestamo";
         this.setOpenedToast(true);
       },
     });

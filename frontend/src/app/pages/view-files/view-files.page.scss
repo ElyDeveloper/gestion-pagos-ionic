@@ -1,0 +1,30 @@
+.image-viewer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.image-viewer img {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 1rem;
+}
+
+.controls ion-button {
+  margin: 0.5rem 0;
+}
+
+.flip-horizontal {
+  transform: scaleX(-1);
+}
+
+.pdf-viewer {
+  width: 100%;
+  height: 600px;
+}
+
+@media (min-width: 768px) {
+  .controls ion-button {
+    margin: 0;
+  }
+}

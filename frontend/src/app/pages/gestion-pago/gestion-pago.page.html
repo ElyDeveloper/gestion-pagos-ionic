@@ -160,19 +160,6 @@
                       <ion-text color="danger"> {{ daysLate }} </ion-text>
                     </ion-label>
                   </ion-item>
-                  @if(fileUrl !== '') {
-                  <ion-item>
-                    <ion-label>
-                      <h5>Archivo adjunto</h5>
-                      <ion-text color="success">
-                        <ion-router-link
-                          routerLink="/layout/view-file/{{fileUrl}}">
-                          {{fileUrl.substring(fileUrl.lastIndexOf('/') + 1)}}
-                        </ion-router-link>
-                      </ion-text>
-                    </ion-label>
-                  </ion-item>
-                  }
                 </ion-list>
               </ion-card-content>
             </ion-card>
@@ -196,10 +183,17 @@
                 <div class="header-content">
                   <div class="client-info">
                     <p>
-                      <strong>Cliente:</strong> Nelman Rolando Jimenez Hernandez
+                      <strong>Cliente:</strong> {{clienteSeleccionado.nombres}}
+                      {{clienteSeleccionado.apellidos}}
                     </p>
-                    <p><strong>Identidad #:</strong> 1301-1979-00703</p>
-                    <p><strong>Préstamo:</strong> L7,380.00</p>
+                    <p>
+                      <strong>Identidad #:</strong> {{clienteSeleccionado.dni|formatDni}}
+                    </p>
+                    <p>
+                      <strong>Préstamo:</strong>
+                      {{prestamoSeleccionado.totalMonto | currency : "L" :
+                      "symbol" }}
+                    </p>
                   </div>
                   <div class="logo-container">
                     <img src="assets/logo.png" alt="FICRE Logo" class="logo" />

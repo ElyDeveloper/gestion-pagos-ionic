@@ -15,6 +15,7 @@ import { ContratosPago } from "src/app/shared/interfaces/contrato";
 import { LoaderService } from "src/app/shared/services/loader.service";
 import { NgxPrintService, PrintOptions } from "ngx-print";
 const COMPANY = environment.company || "No Aún";
+const PERCENTAGE = (environment.percentage) * 100;
 @Component({
   selector: "app-gestion-contract",
   templateUrl: "./gestion-contract.page.html",
@@ -50,6 +51,7 @@ export class GestionContractPage implements OnInit {
   editarLugarAcuerdo: boolean = false;
 
   nombreEmpresa: string = COMPANY;
+  percentage: string = PERCENTAGE.toString();;
   bancoDepositar: string = "";
   ciudadBanco: string = "";
   cuentaBancaria: string = "";
@@ -240,7 +242,7 @@ export class GestionContractPage implements OnInit {
 
   private getDecryptedId(id: string): Promise<number | any> {
     return firstValueFrom(
-      this._globalService.GetByIdEncrypted("convert-id", id).pipe(
+      this._globalService.GetIdDecrypted("decrypted-id", id).pipe(
         catchError((error: any) => {
           console.error("Error decrypting ID:", error);
           return error;

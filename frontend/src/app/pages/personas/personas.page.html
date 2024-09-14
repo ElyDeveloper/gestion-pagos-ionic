@@ -1,5 +1,11 @@
 <ion-content [fullscreen]="false">
-  <app-wrapper [textLoader]="textLoader"></app-wrapper>
+  <app-wrapper
+    [textLoader]="textLoader"
+    [toastMessage]="toastMessage"
+    [toastColor]="toastColor"
+    [isToastOpen]="isToastOpen"
+    (isToastOpenChange)="setOpenedToast($event)">
+  </app-wrapper>
   <ion-grid>
     <ion-row
       class="d-flex justify-content-center"
@@ -299,9 +305,7 @@
               <p>{{ asesor.correo }}</p>
             </ion-label>
           </ion-item>
-          <ion-item
-            class="user-select-none"
-            (click)="selectAsesor(null)">
+          <ion-item class="user-select-none" (click)="selectAsesor(null)">
             <ion-label>
               <h2>Sin Selección</h2>
               <p>N/D</p>

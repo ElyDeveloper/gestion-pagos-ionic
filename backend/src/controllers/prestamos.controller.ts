@@ -178,8 +178,6 @@ export class PrestamosController {
             },
           },
         ],
-        skip,
-        limit,
         order: ['id DESC'],
       });
 

@@ -15,9 +15,39 @@
               <ion-icon name="person-outline" slot="start"></ion-icon>
               <ion-label>
                 <h2>Cliente Seleccionado:</h2>
-                <p><strong>Deysi Manueles Lopez - 1319198700207</strong></p>
+                @if(clienteSeleccionado){
+                <p>
+                  <strong
+                    >{{clienteSeleccionado.nombres}}
+                    {{clienteSeleccionado.apellidos}} -
+                    {{clienteSeleccionado.dni}}
+                  </strong>
+                </p>
+                }@else {
+                <p>No Aún</p>
+                }
               </ion-label>
             </ion-item>
+
+            @if(avalSeleccionado){
+            <ion-item lines="none">
+              <ion-icon name="person-outline" slot="start"></ion-icon>
+              <ion-label>
+                <h2>Aval Seleccionado:</h2>
+                @if(avalSeleccionado){
+                <p>
+                  <strong
+                    >{{avalSeleccionado.nombres}}
+                    {{avalSeleccionado.apellidos}} -
+                    {{avalSeleccionado.dni}}
+                  </strong>
+                </p>
+                }@else {
+                <p>No Aún</p>
+                }
+              </ion-label>
+            </ion-item>
+            }
           </ion-col>
           <ion-col size="12" size-md="6">
             <ion-list>

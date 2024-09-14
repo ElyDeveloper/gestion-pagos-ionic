@@ -86,12 +86,42 @@ export class PersonasController {
     return this.usuarioClienteRepository.create(usuarioCliente);
   }
 
+  // @get('/personas/count')
+  // @response(200, {
+  //   description: 'Personas model count',
+  //   content: {'application/json': {schema: CountSchema}},
+  // })
+  // async count(@param.where(Personas) where?: Where<Personas>): Promise<Count> {
+  //   return this.personasRepository.count({
+  //     estado: true,
+  //   });
+  // }
+
   @get('/personas/count')
   @response(200, {
     description: 'Personas model count',
     content: {'application/json': {schema: CountSchema}},
   })
-  async count(@param.where(Personas) where?: Where<Personas>): Promise<Count> {
+  async countPersonas(
+    @inject(SecurityBindings.USER)
+    currentUser: UserProfile,
+    @param.where(Personas) where?: Where<Personas>,
+  ): Promise<Count> {
+    console.log('Usuario Logueado: ', currentUser);
+    const userId = parseInt(currentUser[securityId], 10);
+    console.log('Id de Usuario Logueado en Clientes: ', userId);
+
+    const user = await this.usuarioRepository.findById(userId);
+    if (!user) {
+      throw new HttpErrors.Unauthorized('Usuario no encontrado');
+    }
+    console.log('Usuario encontrado: ', user);
+
+    if (user.rolid === 3) {
+      return this.usuarioClienteRepository.count({
+        usuarioId: userId,
+      });
+    }
     return this.personasRepository.count({
       estado: true,
     });
@@ -247,9 +277,8 @@ export class PersonasController {
 
     let copiaSpread = personas.map(persona => ({
       ...persona,
-      idEncrypted: this.jwtService.encryptId(persona.id || 0)
+      idEncrypted: this.jwtService.encryptId(persona.id || 0),
     }));
-    
 
     console.log('Personas encontradas: ', copiaSpread);
 
@@ -297,13 +326,12 @@ export class PersonasController {
 
     let copiaSpread = personas.map(persona => ({
       ...persona,
-      idEncrypted: this.jwtService.encryptId(persona.id || 0)
+      idEncrypted: this.jwtService.encryptId(persona.id || 0),
     }));
-    
 
     console.log('Personas encontradas: ', copiaSpread);
 
-    return copiaSpread
+    return copiaSpread;
   }
 
   @get('/personas/avales/paginated')
@@ -340,13 +368,12 @@ export class PersonasController {
 
     let copiaSpread = personas.map(persona => ({
       ...persona,
-      idEncrypted: this.jwtService.encryptId(persona.id || 0)
+      idEncrypted: this.jwtService.encryptId(persona.id || 0),
     }));
-    
 
     console.log('Personas encontradas: ', copiaSpread);
 
-    return copiaSpread
+    return copiaSpread;
   }
 
   @patch('/personas')
@@ -460,10 +487,17 @@ export class PersonasController {
     console.log('User Client', userClient);
 
     try {
-      await this.usuarioClienteRepository.replaceById(
-        userClient?.id,
-        usuarioCliente,
-      );
+      if (userClient) {
+        await this.usuarioClienteRepository.replaceById(
+          userClient?.id,
+          usuarioCliente,
+        );
+      } else {
+        await this.usuarioClienteRepository.create({
+          usuarioId: usuarioCliente.usuarioId,
+          clienteId: usuarioCliente.clienteId,
+        });
+      }
     } catch (error) {
       console.error('Error updating persona:', error);
       throw new HttpErrors.InternalServerError('Error updating persona');
@@ -485,7 +519,6 @@ export class PersonasController {
     description: 'Personas DELETE success',
   })
   async deleteByIdCliente(@param.path.number('id') id: number): Promise<void> {
-
     const usuarioCliente = await this.usuarioClienteRepository.findOne({
       where: {
         clienteId: id,
@@ -493,7 +526,6 @@ export class PersonasController {
     });
 
     try {
-      
       await this.usuarioClienteRepository.deleteById(usuarioCliente?.id);
     } catch {
       console.error('Error deleting usuarioCliente');
@@ -530,20 +562,18 @@ export class PersonasController {
 
     let copiaSpread = personas.map(persona => ({
       ...persona,
-      idEncrypted: this.jwtService.encryptId(persona.id || 0)
+      idEncrypted: this.jwtService.encryptId(persona.id || 0),
     }));
-    
 
     console.log('Personas encontradas: ', copiaSpread);
 
-    return copiaSpread
+    return copiaSpread;
   }
 
   @get('/personas/clientes/search')
   async dataClientesSearch(
     @param.query.string('query') search: string,
   ): Promise<any> {
-
     console.log('search', search);
 
     const personas = await this.personasRepository.find({
@@ -569,13 +599,12 @@ export class PersonasController {
     });
     let copiaSpread = personas.map(persona => ({
       ...persona,
-      idEncrypted: this.jwtService.encryptId(persona.id || 0)
+      idEncrypted: this.jwtService.encryptId(persona.id || 0),
     }));
-    
 
     console.log('Personas encontradas: ', copiaSpread);
 
-    return copiaSpread
+    return copiaSpread;
   }
 
   @get('/personas/avales/search')
@@ -611,12 +640,11 @@ export class PersonasController {
     });
     let copiaSpread = personas.map(persona => ({
       ...persona,
-      idEncrypted: this.jwtService.encryptId(persona.id || 0)
+      idEncrypted: this.jwtService.encryptId(persona.id || 0),
     }));
-    
 
     console.log('Personas encontradas: ', copiaSpread);
 
-    return copiaSpread
+    return copiaSpread;
   }
 }

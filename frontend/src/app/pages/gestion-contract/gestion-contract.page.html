@@ -8,12 +8,8 @@
     (isToastOpenChange)="setOpenedToast($event)">
   </app-wrapper>
 
-  <div class="alert alert-danger sticky-top" role="alert" *ngIf="existContrato">
-    Ya existe un contrato generado para este préstamo, por políticas de
-    seguridad no se puede modificar el contenido de este documento.
-  </div>
-
-  <ion-card>
+  <br>
+  <ion-card class="mt-5">
     <ion-card-header>
       <ion-card-title>Datos Empresa/Bancarios</ion-card-title>
       <div class="d-flex justify-content-end">
@@ -182,6 +178,10 @@
           </ion-col>
         </ion-row>
       </ion-grid>
+      <div class="alert alert-danger" role="alert" *ngIf="existContrato">
+        Ya existe un contrato generado para este préstamo, por políticas de
+        seguridad no se puede modificar el contenido de este documento.
+      </div>
     </ion-card-content>
   </ion-card>
 
@@ -241,11 +241,9 @@
               documento:
             </p>
             }
-
-            <h6 class="mt-4 mb-3 fw-bold">DECLARO Y HAGO CONSTAR</h6>
-
+            <p><strong>DECLARO Y HAGO CONSTAR:</strong></p>
             <p>
-              <strong>PRIMERO:</strong> Que estoy en adeudarle a
+              <strong>PRIMERO:</strong> Que adeudo a
               @if(nombreEmpresa===''){
               <strong style="color: red">Pendiente Empresa</strong>
               }@else { {{nombreEmpresa}}} quien es representada legalmente por
@@ -259,7 +257,6 @@
               ({{this.prestamoSeleccionado?.totalMonto| currency : "L" :
               "symbol"}}).
             </p>
-            <br />
             <p>
               <strong>SEGUNDO:</strong> Los cuales me comprometo a pagarlos, sin
               retraso alguno, en un lapso de tiempo de
@@ -283,18 +280,31 @@
               {{this.prestamoSeleccionado?.totalMonto |
               numberToWords:'lempiras'}}
               ({{this.prestamoSeleccionado?.totalMonto| currency : "L" :
-              "symbol"}}), por concepto de préstamo.
+              "symbol"}}), por concepto de préstamo. En caso de incurrir en mora
+              por incumplimiento de las obligaciones de pago pactadas, se
+              aplicará un recargo de intereses moratorios del {{percentage}}% mensual.
             </p>
-            <br />
             <p>
+              <strong>TERCERO:</strong> En caso de incumplimiento en el pago de
+              la obligación pactada, el Acreedor tendrá derecho a proceder por
+              vía judicial, <strong>SIN PROTESTO</strong>, ante el Juzgado o
+              Tribunal que la empresa prestataria designe. El Acreedor podrá
+              reclamar el total de la obligación adeudada, así como todos los
+              gastos incurridos en el proceso y los honorarios de los
+              profesionales del Derecho involucrados en la ejecución judicial.
+              Todos estos costos serán responsabilidad del Deudor. Este
+              documento tendrá carácter de <strong>TÍTULO EJECUTIVO</strong>,
+              con fuerza ejecutiva inmediata.
+            </p>
+            <!-- <p>
               <strong>TERCERO:</strong> El incumplimiento de pago de la
               obligación pactada, dará derecho al Acreedor a proceder por vía
-              Judicial, SIN PROTESTO, reclamando el total de la obligación,
+              Judicial, SIN PROTESTO, al Juzgado o Tribunal la empresa prestataria designe, reclamando el total de la obligación,
               todos los gastos y honorarios de profesionales del Derecho, para
               el cumplimiento Judicial de lo adeudado, serán de cuenta del
               Deudor. Sirviendo este Documento, como TITULO EJECUTIVO, con
               aparejada Ejecución.
-            </p>
+            </p> -->
 
             <p class="mt-4">
               En fe de lo cual y para los fines legales correspondientes, firmo

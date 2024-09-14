@@ -39,19 +39,19 @@ const routes: Routes = [
         loadChildren: () =>
           import("./pagos/pagos.module").then((m) => m.PagosPageModule),
       },
-      {
-        path: "view-file/:url",
-        loadChildren: () =>
-          import("./view-files/view-files.module").then(
-            (m) => m.ViewFilesPageModule
-          ),
-      },
 
       {
         path: "usuarios",
         loadChildren: () =>
           import("./usuarios/usuarios.module").then(
             (m) => m.UsuariosPageModule
+          ),
+      },
+      {
+        path: "gestion-contrato/:id",
+        loadChildren: () =>
+          import("./gestion-contract/gestion-contract.module").then(
+            (m) => m.GestionContractPageModule
           ),
       },
       {
