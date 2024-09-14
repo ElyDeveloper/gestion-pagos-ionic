@@ -8,7 +8,6 @@ import {
 } from "@angular/core";
 import { FileUploader } from "ng2-file-upload";
 import { Subscription } from "rxjs";
-import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
 import { GlobalService } from "src/app/shared/services/global.service";
 import { environment } from "src/environments/environment";
 
@@ -30,23 +29,11 @@ export class ReportClientsMoraComponent implements OnInit {
   totalMora = 0;
 
   isPrint = false;
-  isModalOpen = false;
-
-  asesores: any[] = [];
-  filteredAsesores = this.asesores;
-  selectedAsesor: any = null;
-
-  private suscriptions: Subscription[] = [];
-
-  @ViewChild("modalAsesorSelector")
-  modalAsesorSelector!: TemplateRef<any>;
-
-  modalSelected: TemplateRef<any> = this.modalAsesorSelector;
 
   uploader!: FileUploader;
 
-  private globalService = inject(GlobalService);
-
+  private suscriptions: Subscription[] = [];
+  private _globalService = inject(GlobalService);
   constructor() {
     this.dateNow = this.subtractHours(this.dateNow, 6);
   }
@@ -55,41 +42,17 @@ export class ReportClientsMoraComponent implements OnInit {
     this.getPrestamosWithMora();
   }
 
-  handleSave(event: any) {
-    console.log("Event:", event);
-  }
-
   subtractHours(date: Date, hours: number): Date {
     const newDate = new Date(date);
     newDate.setHours(newDate.getHours() - hours);
     return newDate;
   }
 
-  filterAsesores(event: any) {
-    const searchTerm = event.target.value.toLowerCase();
-    if (searchTerm === "") {
-      this.filteredAsesores = [];
-      return;
-    }
-    this.filteredAsesores = this.asesores.filter(
-      (asesor) =>
-        asesor.nombre.toLowerCase().includes(searchTerm) ||
-        asesor.apellido.toLowerCase().includes(searchTerm) ||
-        asesor.correo.toLowerCase().includes(searchTerm)
-    );
-  }
-
-  selectAsesor(asesor: any) {
-    this.selectedAsesor = asesor;
-    console.log("Asesor seleccionada: ", this.selectedAsesor);
-    this.isModalOpen = false;
-  }
-
   getPrestamosWithMora() {
     this.totalClients = 0;
     this.totalMora = 0;
     this.suscriptions.push(
-      this.globalService.Get("prestamos/reporte-mora").subscribe({
+      this._globalService.Get("prestamos/reporte-mora").subscribe({
         next: (data: any) => {
           console.log("Prestamos con mora:", data);
           this.elements = data;
@@ -103,22 +66,10 @@ export class ReportClientsMoraComponent implements OnInit {
         },
       })
     );
-
-    this.suscriptions.push(
-      this.globalService.GetId("usuarios/roles", 3).subscribe((data: any) => {
-        this.asesores = data;
-        console.log("Asesores: ", this.asesores);
-      })
-    );
   }
 
   ionViewDidLeave() {
     this.suscriptions.forEach((sub) => sub.unsubscribe());
-  }
-
-  showOpenModal(value: boolean) {
-    this.modalSelected = this.modalAsesorSelector
-    this.isModalOpen = value;
   }
 
   scrollToElement(section: string): void {
