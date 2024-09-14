@@ -31,11 +31,30 @@
             </ion-list>
           </ion-card-content>
         </ion-card>
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Acciones</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <section class="mt-2 d-flex justify-content-around">
+              <!-- Boton de Imprimir -->
+              <ion-button color="danger" (click)="printSection()">
+                <ion-icon name="print"></ion-icon>
+                Imprimir
+              </ion-button>
+              <!-- Boton de Descargar -->
+              <ion-button color="success">
+                <ion-icon name="download"></ion-icon>
+                Descargar
+              </ion-button>
+            </section>
+          </ion-card-content>
+        </ion-card>
       </ion-col>
 
       <ion-col size-xs="12" size-md="6" size-lg="8">
         <ion-card style="min-height: 100vh">
-          <ion-card-content>
+          <ion-card-content id="report-mora">
             <ng-container *ngIf="reporteSeleccionado === null">
               <nz-result nzStatus="info"> </nz-result>
               <h1 class="text-center">Selecciona un reporte para visualizar</h1>
