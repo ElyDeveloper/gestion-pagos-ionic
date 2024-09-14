@@ -5,29 +5,37 @@ import { DatePipe } from "@angular/common";
 @Component({
   selector: "card-view-info",
   template: `
-    <ion-card>
-      <ion-card-content>
-        <ion-list lines="none">
-          @for (column of columnsData; track column.key) { @if (column.key !==
-          'actions') {
-          <ion-item>
-            <ion-label>{{ column.alias }}</ion-label>
+    <ion-grid>
+      <ion-row>
+        @for (column of columnsData; track column.key) { @if (column.key !==
+        'actions') {
+        <ion-col size="4">
+          <ion-item lines="none">
+            <ion-label
+              ><strong>{{ column.alias }}:</strong></ion-label
+            >
+          </ion-item>
+        </ion-col>
+        <ion-col size="8">
+          <ion-item lines="none">
             <ng-container [ngSwitch]="column.type">
               <ion-badge
                 *ngSwitchCase="'boolean'"
-                slot="end"
                 [color]="getCellValue(element, column) ? 'success' : 'medium'">
                 {{ getCellValue(element, column) ? "Activo" : "Inactivo" }}
               </ion-badge>
-              <ion-note *ngSwitchCase="'object'" slot="end">{{
+              <ion-text *ngSwitchCase="'object'">{{
                 getCellValue(element, column)
-              }}</ion-note>
-              <ion-note *ngSwitchCase="'date'" slot="end">{{
+              }}</ion-text>
+              <ion-text *ngSwitchCase="'date'">{{
                 getCellValue(element, column) | customDate : 6 : "dd/MM/yyyy"
-              }}</ion-note>
-              <ion-note *ngSwitchCase="'dni'" slot="end">{{
+              }}</ion-text>
+              <ion-text *ngSwitchCase="'dni'">{{
                 getCellValue(element, column) | formatDni
-              }}</ion-note>
+              }}</ion-text>
+              <ion-text *ngSwitchCase="'currency'">{{
+                getCellValue(element, column) | currency : "L" : "symbol"
+              }}</ion-text>
               <ng-container *ngSwitchCase="'xml'">
                 <ion-list>
                   @for (item of getCellValue(element, column) | xmlToList; track
@@ -44,35 +52,29 @@ import { DatePipe } from "@angular/common";
                   }
                 </ion-list>
               </ng-container>
-              <ion-note *ngSwitchDefault slot="end">{{
+              <ion-text *ngSwitchDefault>{{
                 getCellValue(element, column)
-              }}</ion-note>
+              }}</ion-text>
             </ng-container>
           </ion-item>
-          } }
-        </ion-list>
-      </ion-card-content>
-    </ion-card>
+        </ion-col>
+        } }
+      </ion-row>
+    </ion-grid>
   `,
   styles: [
     `
-      ion-card {
-        margin: 16px;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+      ion-grid {
+        border: 1px solid #ddd;
       }
-      ion-item {
-        --padding-start: 0;
-        --inner-padding-end: 0;
+
+      ion-row {
+        border-bottom: 1px solid #ddd;
       }
-      ion-label {
-        font-weight: 500;
-      }
-      ion-note {
-        font-size: 14px;
-      }
-      ion-badge {
-        --padding-start: 8px;
-        --padding-end: 8px;
+
+      ion-col {
+        border: 1px solid #ddd;
+        padding: 10px;
       }
     `,
   ],
@@ -91,6 +93,8 @@ export class CardViewInfoComponent implements OnInit {
 
   getCellValue(row: any, column: Column): any {
     const primaryValue = this.getNestedValue(row, column.key);
+
+    if (!primaryValue) return "N/A";
 
     if (column.combineWith) {
       const secondaryValue = this.getNestedValue(row, column.combineWith);

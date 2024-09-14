@@ -23,6 +23,14 @@
     margin-bottom: 1cm;
   }
 
+  .date-emision p{
+    text-align: right !important;
+  }
+
+  .text-center{
+    text-align: center;
+  }
+
   .custom-table th,
   .custom-table td {
     border: 1px solid #000;

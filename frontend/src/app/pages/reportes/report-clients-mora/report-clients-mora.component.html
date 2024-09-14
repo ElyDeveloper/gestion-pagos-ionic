@@ -1,59 +1,52 @@
+
 <div class="header">
-  <h2> {{company}} </h2>
-  <h3>Reporte de Clientes en Mora</h3>
+  <h3 class="text-center">{{ company }}</h3>
+  <h3 class="text-center">Reporte de Clientes en Mora</h3>
 </div>
 
-<div style="text-align: right">
-  <p>13/09/2024 2:34 p.m.</p>
+<div style="text-align: right" class="date-emision">
+  <p>{{ dateNow | customDate }}</p>
 </div>
 
-<table>
-  <tr>
-    <th>Cod. Cliente</th>
-    <th>Nombre</th>
-    <th>Cod. Préstamo</th>
-    <th>Monto Préstamo</th>
-    <th>Saldo Ptmo.</th>
-    <th>Días Mora</th>
-    <th>Monto en Mora</th>
-  </tr>
-  <tr>
-    <td>2920480130</td>
-    <td>Jose Carlos Rivera Lopez</td>
-    <td>290155500411:51</td>
-    <td>12,000.00</td>
-    <td>4,344.56</td>
-    <td>15</td>
-    <td>1,293.26</td>
-  </tr>
-  <tr>
-    <td>2920480131</td>
-    <td>María González Hernández</td>
-    <td>290155500412:52</td>
-    <td>8,000.00</td>
-    <td>3,200.00</td>
-    <td>30</td>
-    <td>800.00</td>
-  </tr>
-  <tr>
-    <td>2920480132</td>
-    <td>Juan Pérez Sánchez</td>
-    <td>290155500413:53</td>
-    <td>15,000.00</td>
-    <td>7,500.00</td>
-    <td>45</td>
-    <td>2,250.00</td>
-  </tr>
-</table>
+<div class="table-responsive mt-3">
+  <table class="custom-table">
+    <thead>
+      <tr>
+        <th>Cod. Cliente</th>
+        <th>Nombre</th>
+        <th>Cod. Préstamo</th>
+        <th>Monto Préstamo</th>
+        <th>Saldo Ptmo.</th>
+        <th>Días Mora</th>
+        <th>Monto en Mora</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of elements; track $index) {
+      <tr>
+        <td class="text-center">{{ item.codCliente }}</td>
+        <td>{{ item.nombre }}</td>
+        <td class="text-center">{{ item.codPrestamo }}</td>
+        <td>{{ item.montoPrestamo | currency : "L" : "symbol" }}</td>
+        <td>{{ item.saldPtmo | currency : "L" : "symbol" }}</td>
+        <td class="text-center">{{ item.diasMora }}</td>
+        <td>{{ item.montoMora | currency : "L" : "symbol" }}</td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</div>
 
-<div class="section">Resumen</div>
-<table>
+<div class="section">Resumen:</div>
+<table class="custom-table">
   <tr>
     <th>Total Clientes en Mora</th>
     <th>Total Monto en Mora</th>
   </tr>
   <tr>
-    <td>3</td>
-    <td>4,343.26</td>
+    <td class="text-center">{{ totalClients }}</td>
+    <td class="text-center">{{ totalMora | currency : "L" : "symbol" }}</td>
   </tr>
 </table>
+
+
