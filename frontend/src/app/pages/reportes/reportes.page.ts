@@ -58,7 +58,7 @@ export class ReportesPage implements OnInit {
 
   ngOnInit() {
     this.company = environment.company;
-    this.getAsesores();
+    // this.getAsesores();
   }
 
   ionViewDidLeave() {

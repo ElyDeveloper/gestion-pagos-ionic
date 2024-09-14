@@ -1,6 +1,35 @@
 <ion-content [fullscreen]="true">
   <app-wrapper></app-wrapper>
-
+  <ion-card
+    ><ion-card-header>
+      <ion-card-title>Cinta de Opciones</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            <ion-item>
+              <ion-toggle>Filtrar por Asesor</ion-toggle>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+      <ion-button
+        color="danger"
+        (click)="printSection()"
+        [disabled]="!reporteSeleccionado">
+        <ion-icon name="print-outline" slot="start"></ion-icon>
+        Imprimir
+      </ion-button>
+      <ion-button
+        color="success"
+        (click)="showOpenModal(true)"
+        [disabled]="!reporteSeleccionado">
+        <ion-icon name="person-add-outline" slot="start"></ion-icon>
+        Seleccionar Asesor
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
   <ion-grid>
     <ion-row>
       <ion-col size-xs="12" size-md="6" size-lg="4">
@@ -33,26 +62,9 @@
         </ion-card>
         <ion-card>
           <ion-card-header>
-            <ion-card-title>Acciones</ion-card-title>
+            <ion-card-title>Panel Administrativo</ion-card-title>
           </ion-card-header>
           <ion-card-content class="p-4">
-            <ion-grid>
-              <ion-row class="ion-justify-content-between ion-align-items-center">
-                <ion-col size="auto">
-                  <ion-button color="danger" (click)="printSection()" [disabled]="!reporteSeleccionado">
-                    <ion-icon name="print-outline" slot="start"></ion-icon>
-                    Imprimir
-                  </ion-button>
-                </ion-col>
-                <ion-col size="auto">
-                  <ion-button color="success" (click)="showOpenModal(true)" [disabled]="!reporteSeleccionado">
-                    <ion-icon name="person-add-outline" slot="start"></ion-icon>
-                    Seleccionar Asesor
-                  </ion-button>
-                </ion-col>
-              </ion-row>
-            </ion-grid>
-          
             <ion-item lines="none" class="ion-margin-top">
               <ion-label>
                 <h2 class="ion-text-wrap">Asesor Seleccionado</h2>
@@ -63,7 +75,12 @@
                   <p>No se ha seleccionado un asesor</p>
                 </ng-template>
               </ion-label>
-              <ion-button slot="end" color="primary" (click)="obtenerReporte()" shape="round" [disabled]="!selectedAsesor">
+              <ion-button
+                slot="end"
+                color="primary"
+                (click)="obtenerReporte()"
+                shape="round"
+                [disabled]="!selectedAsesor">
                 <ion-icon name="search-outline" slot="icon-only"></ion-icon>
               </ion-button>
             </ion-item>
