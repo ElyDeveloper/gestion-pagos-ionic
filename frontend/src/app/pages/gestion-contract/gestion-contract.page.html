@@ -8,7 +8,7 @@
     (isToastOpenChange)="setOpenedToast($event)">
   </app-wrapper>
 
-  <br>
+  <br />
   <ion-card class="mt-5">
     <ion-card-header>
       <ion-card-title>Datos Empresa/Bancarios</ion-card-title>
@@ -190,16 +190,19 @@
     <div id="print-contract" class="d-flex justify-content-center">
       <div [ngClass]="{'container': !isPrint, 'm-2':isPrint}">
         <div class="row">
-          <ion-item lines="none">
-            <img src="assets/logo.png" alt="" width="100" />
+          <div class="col-6">
             <ion-badge slot="end" color="primary"
               >Contrato #: {{correlativo}}</ion-badge
             >
-          </ion-item>
-          <h4 class="text-center mt-5 fw-bold">
-            PAGARÉ POR {{this.prestamoSeleccionado?.totalMonto| currency : "L" :
-            "symbol"}}
-          </h4>
+            <h4 class="text-center fw-bold">
+              PAGARÉ POR {{this.prestamoSeleccionado?.totalMonto| currency : "L"
+              : "symbol"}}
+            </h4>
+          </div>
+
+          <div class="col-6">
+            <img src="assets/logo.png" alt="" width="100" />
+          </div>
           <hr />
           <div class="col-12">
             @if(hasAval){
@@ -243,8 +246,7 @@
             }
             <p><strong>DECLARO Y HAGO CONSTAR:</strong></p>
             <p>
-              <strong>PRIMERO:</strong> Que adeudo a
-              @if(nombreEmpresa===''){
+              <strong>PRIMERO:</strong> Que adeudo a @if(nombreEmpresa===''){
               <strong style="color: red">Pendiente Empresa</strong>
               }@else { {{nombreEmpresa}}} quien es representada legalmente por
               ____________________________________ con documento nacional
@@ -282,7 +284,8 @@
               ({{this.prestamoSeleccionado?.totalMonto| currency : "L" :
               "symbol"}}), por concepto de préstamo. En caso de incurrir en mora
               por incumplimiento de las obligaciones de pago pactadas, se
-              aplicará un recargo de intereses moratorios del {{percentage}}% mensual.
+              aplicará un recargo de intereses moratorios del {{percentage}}%
+              mensual.
             </p>
             <p>
               <strong>TERCERO:</strong> En caso de incumplimiento en el pago de
