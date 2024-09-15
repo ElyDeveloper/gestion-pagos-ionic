@@ -1,5 +1,5 @@
 @media print {
-  /* Estilos generales para impresión */
+  /* General print styles */
   body {
     font-family: Arial, sans-serif;
     font-size: 12pt;
@@ -8,7 +8,7 @@
     color: #000;
   }
 
-  /* Ocultar elementos innecesarios para impresión */
+  /* Hide unnecessary elements for printing */
   .no-print,
   ion-button,
   ion-searchbar,
@@ -16,18 +16,18 @@
     display: none !important;
   }
 
-  /* Estilos para la tabla */
+  /* Table styles */
   .custom-table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 1cm;
   }
 
-  .date-emision p{
+  .date-emision p {
     text-align: right !important;
   }
 
-  .text-center{
+  .text-center {
     text-align: center;
   }
 
@@ -44,14 +44,14 @@
     font-weight: bold;
   }
 
-  /* Asegurar que los fondos se impriman */
+  /* Ensure backgrounds are printed */
   .custom-table tr:nth-child(even) {
     background-color: #f9f9f9 !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
 
-  /* Estilos para celdas de estado */
+  /* Status cell styles */
   .status-cell {
     font-weight: bold;
   }
@@ -65,17 +65,15 @@
     color: #333 !important;
   }
 
-  /* Ajustes para imágenes */
+  /* Image adjustments */
   img {
     max-width: 100% !important;
     page-break-inside: avoid;
-
-    /*Alinear a la derecha*/
     float: right;
     margin-left: 10px;
   }
 
-  /* Evitar cortes de página dentro de elementos */
+  /* Prevent page breaks within elements */
   tr,
   td,
   th,
@@ -83,16 +81,16 @@
     page-break-inside: avoid;
   }
 
-  /* Asegurar que los encabezados de tabla se repitan en cada página */
+  /* Ensure table headers repeat on each page */
   thead {
     display: table-header-group;
   }
 
   h2 {
-    font-size: 16 !important;
+    font-size: 16pt !important;
   }
 
-  /* Ajustes para el diseño de página */
+  /* Page layout adjustments */
   @page {
     margin: 2cm;
   }
@@ -101,6 +99,7 @@
     text-align: justify;
   }
 
+  /* Signature styles */
   .signature-container {
     display: flex;
     justify-content: center;
@@ -123,10 +122,71 @@
     text-align: center !important;
     margin: 0;
   }
+
+  /* General table styles */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  th,
+  td {
+    border: 1px solid #ddd;
+    padding: 4px;
+    text-align: left;
+  }
+  th {
+    background-color: #f2f2f2;
+    text-align: center;
+  }
+
+  .especial-right {
+    text-align: right !important;
+  }
+
+  /* Header and section styles */
+  .header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .section {
+    margin-top: 15px;
+    font-weight: bold;
+  }
+
+  /* Client info styles */
+  .cliente-info {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+  }
+  .info-item {
+    margin-bottom: 10px;
+    padding-right: 10px;
+    border-right: 1px solid #ccc;
+  }
+  .info-label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+  }
+  .info-value {
+    display: block;
+  }
+  .info-item:last-child,
+  .info-item:nth-child(3n) {
+    border-right: none;
+  }
 }
 
-/* VISTA DE PAGOS */
-
+/* Payment view styles */
 .payment-details-header {
   padding: 20px;
   border-radius: 8px;
@@ -161,4 +221,18 @@
 .logo {
   width: 100px;
   height: auto;
+}
+
+/* Mobile view adjustments */
+@media (max-width: 600px) {
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+  .info-item {
+    border-right: none;
+    border-bottom: 1px solid #ccc;
+  }
+  .info-item:last-child {
+    border-bottom: none;
+  }
 }
