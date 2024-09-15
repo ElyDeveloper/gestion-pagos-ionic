@@ -9,13 +9,13 @@ import {
 import { ActivatedRoute } from "@angular/router";
 import { GlobalService } from "src/app/shared/services/global.service";
 import { environment } from "src/environments/environment";
-import { catchError, firstValueFrom, tap } from "rxjs";
+import { catchError, firstValueFrom, Subscription, tap } from "rxjs";
 import { Title } from "@angular/platform-browser";
 import { ContratosPago } from "src/app/shared/interfaces/contrato";
 import { LoaderService } from "src/app/shared/services/loader.service";
 import { NgxPrintService, PrintOptions } from "ngx-print";
 const COMPANY = environment.company || "No Aún";
-const PERCENTAGE = (environment.percentage) * 100;
+const PERCENTAGE = environment.percentage * 100;
 @Component({
   selector: "app-gestion-contract",
   templateUrl: "./gestion-contract.page.html",
@@ -51,7 +51,7 @@ export class GestionContractPage implements OnInit {
   editarLugarAcuerdo: boolean = false;
 
   nombreEmpresa: string = COMPANY;
-  percentage: string = PERCENTAGE.toString();;
+  percentage: string = PERCENTAGE.toString();
   bancoDepositar: string = "";
   ciudadBanco: string = "";
   cuentaBancaria: string = "";
@@ -71,18 +71,28 @@ export class GestionContractPage implements OnInit {
   avalSeleccionado: any = null;
   prestamoSeleccionado: any = {};
 
+  suscripciones: Subscription[] = [];
+
   private _globalService = inject(GlobalService);
   private _route = inject(ActivatedRoute);
   private _loaderService = inject(LoaderService);
   private _titleService = inject(Title);
   private _printService = inject(NgxPrintService);
 
-
   constructor() {}
 
   ngOnInit() {
+    
+  }
+
+  ionViewDidEnter() {
     this.getPrestamo();
     this.getCorrelativo();
+  }
+
+  ionViewWillLeave() {
+    this._titleService.setTitle("Gestión Pagos");
+
   }
 
   verifyExist() {
@@ -139,9 +149,6 @@ export class GestionContractPage implements OnInit {
     );
   }
 
-  ionViewWillLeave() {
-    this._titleService.setTitle("Gestión Pagos");
-  }
 
   generateContract() {
     //Validar que todos los campos estén llenos
@@ -202,6 +209,7 @@ export class GestionContractPage implements OnInit {
     this._loaderService.show();
     const customPrintOptions: PrintOptions = new PrintOptions({
       printSectionId: "print-contract",
+      openNewTab:true
 
       // Add any other print options as needed
     });

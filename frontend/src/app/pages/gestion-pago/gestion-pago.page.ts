@@ -80,7 +80,7 @@ export class GestionPagoPage implements OnInit {
     this.pagoForm = this.formModels.pagoForm();
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   printSection() {
     this.isPrint = true;
