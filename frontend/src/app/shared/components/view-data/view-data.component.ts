@@ -162,7 +162,7 @@ export class ViewDataComponent implements OnInit {
   getCellValue(row: any, column: Column): any {
     let primaryValue = this.getNestedValue(row, column.key);
 
-    if (!primaryValue) { 
+    if (!primaryValue && column.type !== "currency") { 
       return "N/A";
     }
 

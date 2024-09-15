@@ -164,7 +164,7 @@
               </ion-card-content>
             </ion-card>
           </div>
-          <div class="col-md-8 col-sm-12" id="print-section">
+          <div class="col-md-8 col-sm-12" id="print-fechas-pagos">
             <app-view-data
               [showAdd]="false"
               [showTitle]="false"
@@ -187,7 +187,8 @@
                       {{clienteSeleccionado.apellidos}}
                     </p>
                     <p>
-                      <strong>Identidad #:</strong> {{clienteSeleccionado.dni|formatDni}}
+                      <strong>Identidad #:</strong>
+                      {{clienteSeleccionado.dni|formatDni}}
                     </p>
                     <p>
                       <strong>Préstamo:</strong>

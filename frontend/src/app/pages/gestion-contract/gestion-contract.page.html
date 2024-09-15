@@ -187,23 +187,27 @@
 
   <div>
     <!-- <ion-card-content id="print-element" > -->
-    <div id="print-contract" class="d-flex justify-content-center">
+    <div id="print-contract" class="d-flex justify-content-center mt-5">
       <div [ngClass]="{'container': !isPrint, 'm-2':isPrint}">
+        <div class="pagare-header">
+          <div class="pagare-header__left">
+            <ion-badge class="pagare-header__badge" slot="end" color="primary">
+              Contrato #: {{correlativo}}
+            </ion-badge>
+            <p class="pagare-header__title">
+              PAGARÉ POR {{prestamoSeleccionado?.totalMonto | currency : "L" :
+              "symbol"}}
+            </p>
+          </div>
+          <div class="pagare-header__right">
+            <img
+              class="pagare-header__logo"
+              src="assets/logo.png"
+              alt="FICRE logo" />
+          </div>
+        </div>
+        <hr />
         <div class="row">
-          <div class="col-6">
-            <ion-badge slot="end" color="primary"
-              >Contrato #: {{correlativo}}</ion-badge
-            >
-            <h4 class="text-center fw-bold">
-              PAGARÉ POR {{this.prestamoSeleccionado?.totalMonto| currency : "L"
-              : "symbol"}}
-            </h4>
-          </div>
-
-          <div class="col-6">
-            <img src="assets/logo.png" alt="" width="100" />
-          </div>
-          <hr />
           <div class="col-12">
             @if(hasAval){
             <!-- Párrafo con aval -->
@@ -299,15 +303,6 @@
               documento tendrá carácter de <strong>TÍTULO EJECUTIVO</strong>,
               con fuerza ejecutiva inmediata.
             </p>
-            <!-- <p>
-              <strong>TERCERO:</strong> El incumplimiento de pago de la
-              obligación pactada, dará derecho al Acreedor a proceder por vía
-              Judicial, SIN PROTESTO, al Juzgado o Tribunal la empresa prestataria designe, reclamando el total de la obligación,
-              todos los gastos y honorarios de profesionales del Derecho, para
-              el cumplimiento Judicial de lo adeudado, serán de cuenta del
-              Deudor. Sirviendo este Documento, como TITULO EJECUTIVO, con
-              aparejada Ejecución.
-            </p> -->
 
             <p class="mt-4">
               En fe de lo cual y para los fines legales correspondientes, firmo

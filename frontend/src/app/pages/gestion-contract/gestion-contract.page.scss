@@ -3,6 +3,29 @@ p{
   text-align: justify;
 }
 
+.signature-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 3rem;
+}
+
+.signature-box {
+  width: 33.33%;
+  text-align: center;
+  margin: 3rem;
+}
+
+.signature-line {
+  border-top: 1px solid #000;
+  padding-top: 0.5rem;
+}
+
+.signature-line p {
+  text-align: center !important;
+  margin: 0;
+}
+
 .border-top{
   border-top: 1px solid #000 !important;
 }
@@ -10,4 +33,37 @@ p{
 .carta{
   background-color: white;
   color: #000;
+}
+
+.pagare-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pagare-header__left {
+  display: flex;
+  flex-direction: column;
+}
+
+.pagare-header__badge {
+  text-align: center;
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+}
+
+.pagare-header__title {
+  font-weight: bold;
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.pagare-header__right {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.pagare-header__logo {
+  width: 100px;
+  height: auto;
 }

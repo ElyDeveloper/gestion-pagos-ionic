@@ -236,6 +236,10 @@ export class UsuariosPage implements OnInit {
   buildColumns() {
     this.columnsData = [
       {
+        key: "id",
+        alias: "Código",
+      },
+      {
         key: "nombre",
         alias: "Nombre",
       },
