@@ -1,14 +1,46 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit } from "@angular/core";
+import { catchError, firstValueFrom, tap } from "rxjs";
+import { Cartera } from "src/app/shared/interfaces/cartera";
+import { GlobalService } from "src/app/shared/services/global.service";
 
 @Component({
-  selector: 'app-report-cartera-asesores',
-  templateUrl: './report-cartera-asesores.component.html',
+  selector: "app-report-cartera-asesores",
+  templateUrl: "./report-cartera-asesores.component.html",
   styleUrls: [],
 })
-export class ReportCarteraAsesoresComponent  implements OnInit {
+export class ReportCarteraAsesoresComponent implements OnInit {
+  @Input() idAsesor: number = 0;
 
-  constructor() { }
+  carteraAsesor: Cartera[] = [];
 
-  ngOnInit() {}
+  private _globalService = inject(GlobalService);
+  constructor() {}
 
+  ngOnInit(): void {
+    this.getCarteraAsesor();
+  }
+
+  async getCarteraAsesor() {
+    // prestamos/reporte-cartera-asesor?idUsuario=4
+
+    if(this.idAsesor === 0) return;
+    await this.fetchCartera();
+  }
+
+  private fetchCartera(): Promise<any> {
+    return firstValueFrom(
+      this._globalService
+        .Get(`prestamos/reporte-cartera-asesor?idUsuario=${this.idAsesor}`)
+        .pipe(
+          tap((cartera: any) => {
+            console.log("Cartera asesor:", cartera);
+            this.carteraAsesor = cartera;
+          }),
+          catchError((error) => {
+            console.error("Error fetching prestamo:", error);
+            throw error;
+          })
+        )
+    );
+  }
 }

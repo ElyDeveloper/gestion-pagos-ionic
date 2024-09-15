@@ -210,7 +210,7 @@
                 [company]="company"
                 *ngIf="reporteSeleccionado ==='record-crediticio'"></app-report-record-crediticio>
 
-              <app-report-cartera-asesores
+              <app-report-cartera-asesores [idAsesor]="selectedAsesor?.id || 0"
                 *ngIf="reporteSeleccionado ==='cartera-asesor'"></app-report-cartera-asesores>
             </section>
           </ion-card-content>

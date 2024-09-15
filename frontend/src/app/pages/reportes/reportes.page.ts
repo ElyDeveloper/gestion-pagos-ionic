@@ -11,6 +11,7 @@ import { AuthService } from "src/app/shared/services/auth.service";
 import { GlobalService } from "src/app/shared/services/global.service";
 import { LoaderService } from "src/app/shared/services/loader.service";
 import { environment } from "src/environments/environment";
+import { ReportCarteraAsesoresComponent } from "./report-cartera-asesores/report-cartera-asesores.component";
 
 @Component({
   selector: "app-reportes",
@@ -48,6 +49,9 @@ export class ReportesPage implements OnInit {
 
   @ViewChild("modalAsesorSelector")
   modalAsesorSelector!: TemplateRef<any>;
+
+  @ViewChild(ReportCarteraAsesoresComponent)
+  reportCarteraAsesor!: ReportCarteraAsesoresComponent;
 
   @ViewChild("modalClienteSelector")
   modalClienteSelector!: TemplateRef<any>;
@@ -101,7 +105,11 @@ export class ReportesPage implements OnInit {
     this.isFilterAsesor = event.detail.checked;
   }
 
-  obtenerReporte() {}
+  obtenerReporte() {
+    if (this.enableFilterAsesor) {
+      this.reportCarteraAsesor.getCarteraAsesor();
+    }
+  }
   handleSave(event: any) {
     console.log("Event:", event);
   }
