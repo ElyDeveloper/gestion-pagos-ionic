@@ -448,4 +448,42 @@ export class PrestamosController {
     };
   }
 
+  //endpoint para ejecutar el procedimiento almacenado de reporte de cartera asesor
+  @get('/prestamos/reporte-cartera-asesor')
+  async reporteCarteraAsesor(
+    @param.query.number('idUsuario') idUsuario: number,
+  ): Promise<any> {
+    return this.prestamosRepository.dataSource.execute(
+      `SP_ReporteCarteraAsesor ${idUsuario}`,
+      [],
+    );
+  }
+
+  //endpoint para ejecutar el procedimiento almacenado de reporte de informacion de pagos
+  @get('/prestamos/reporte-informacion-pagos')
+  async reporteInformacionPagos(
+    @param.query.number('idPrestamo') idPrestamo: number,
+  ): Promise<any> {
+    const encabezados = await this.prestamosRepository.dataSource.execute(
+      `SP_RTextosSaldosTotales ${idPrestamo}`,
+      [],
+    );
+
+    const saldoVigente = await this.prestamosRepository.dataSource.execute(
+      `SP_RSaldosVigentes ${idPrestamo}`,
+      [],
+    );
+
+    const pagosEfectuados = await this.prestamosRepository.dataSource.execute(
+      `SP_RDetallePagosEfectuados ${idPrestamo}`,
+      [],
+    );
+
+    return {
+      encabezados,
+      saldoVigente,
+      pagosEfectuados
+    };
+  }
+
 }
