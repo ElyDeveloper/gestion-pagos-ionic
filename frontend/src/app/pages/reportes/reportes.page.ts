@@ -25,6 +25,8 @@ export class ReportesPage implements OnInit {
   loading = true;
   isFilterAsesor = false;
   isFilterCliente = false;
+  enableFilterAsesor = false;
+  enableFilterCliente = false;
 
   toastMessage: string = "cliente guardado correctamente";
   toastColor: string = "primary";
@@ -125,6 +127,24 @@ export class ReportesPage implements OnInit {
 
   seleccionarReporte(tipo: string) {
     this.reporteSeleccionado = tipo;
+
+    this.enableFilterAsesor = false;
+    this.enableFilterCliente = false;
+
+    switch (tipo) {
+      case "clientes-mora":
+        this.enableFilterAsesor = true;
+        break;
+      case "estado-cuenta":
+        this.enableFilterCliente = true;
+        break;
+      case "record-crediticio":
+        this.enableFilterCliente = true;
+        break;
+      case "cartera-asesor":
+        this.enableFilterAsesor = true;
+        break;
+    }
   }
 
   getAsesores() {
