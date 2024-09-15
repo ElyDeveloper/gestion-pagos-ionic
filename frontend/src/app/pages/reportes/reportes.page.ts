@@ -7,6 +7,7 @@ import {
 } from "@angular/core";
 import { NgxPrintService, PrintOptions } from "ngx-print";
 import { Subscription } from "rxjs";
+import { AuthService } from "src/app/shared/services/auth.service";
 import { GlobalService } from "src/app/shared/services/global.service";
 import { LoaderService } from "src/app/shared/services/loader.service";
 import { environment } from "src/environments/environment";
@@ -18,15 +19,20 @@ import { environment } from "src/environments/environment";
 })
 export class ReportesPage implements OnInit {
   company: string = "Company N/D";
-  isPrint = false;
 
+  isPrint = false;
   isToastOpen = false;
+  loading = true;
+  isFilterAsesor = false;
+  isFilterCliente = false;
+  enableFilterAsesor = false;
+  enableFilterCliente = false;
+
   toastMessage: string = "cliente guardado correctamente";
   toastColor: string = "primary";
   textLoader: string = "primary";
 
   reporteSeleccionado: string | null = null;
-  loading = true;
   isModalOpen = false;
 
   listData = new Array(3).fill({}).map((_i, index) => ({
@@ -43,40 +49,102 @@ export class ReportesPage implements OnInit {
   @ViewChild("modalAsesorSelector")
   modalAsesorSelector!: TemplateRef<any>;
 
+  @ViewChild("modalClienteSelector")
+  modalClienteSelector!: TemplateRef<any>;
+
   modalSelected: TemplateRef<any> = this.modalAsesorSelector;
 
   asesores: any[] = [];
+  clientes: any[] = [];
   filteredAsesores = this.asesores;
+  filteredClientes = this.asesores;
   selectedAsesor: any = null;
+  selectedCliente: any = null;
+  currentUser: any = null;
 
   private suscriptions: Subscription[] = [];
 
   private _globalService = inject(GlobalService);
   private _printService = inject(NgxPrintService);
+  private _authService = inject(AuthService);
   private _loaderService = inject(LoaderService);
   constructor() {}
 
   ngOnInit() {
     this.company = environment.company;
-    // this.getAsesores();
+    this.getAsesores();
   }
 
   ionViewDidLeave() {
     this.suscriptions.forEach((sub) => sub.unsubscribe());
   }
 
-  obtenerReporte(){}
+  getCurrentUser() {
+    this.suscriptions.push(
+      this._authService.getUserInfo().subscribe((user) => {
+        this.currentUser = user;
+      })
+    );
+  }
+
+  filterAsesor(event: any) {
+    console.log("Event: ", event.detail.checked);
+    this.isFilterAsesor = event.detail.checked;
+  }
+  filterCliente(event: any) {
+    console.log("Event: ", event.detail.checked);
+    this.isFilterCliente = event.detail.checked;
+  }
+
+  filterClient(event: any) {
+    console.log("Event: ", event.detail.checked);
+    this.isFilterAsesor = event.detail.checked;
+  }
+
+  obtenerReporte() {}
   handleSave(event: any) {
     console.log("Event:", event);
   }
 
-  showOpenModal(value: boolean) {
-    this.modalSelected = this.modalAsesorSelector
+  showOpenModal(value: boolean, type: string) {
+    switch (type) {
+      case "asesor":
+        this.selectedAsesor = null;
+        this.selectedCliente = null;
+        this.modalSelected = this.modalAsesorSelector;
+        break;
+      case "cliente":
+        this.selectedAsesor = null;
+        this.selectedCliente = null;
+        this.modalSelected = this.modalClienteSelector;
+        break;
+      default:
+        break;
+    }
+
     this.isModalOpen = value;
   }
 
   seleccionarReporte(tipo: string) {
     this.reporteSeleccionado = tipo;
+
+    this.enableFilterAsesor = false;
+    this.enableFilterCliente = false;
+
+    switch (tipo) {
+      case "clientes-mora":
+        this.enableFilterAsesor = true;
+        break;
+      case "estado-cuenta":
+        this.enableFilterCliente = true;
+        break;
+      case "record-crediticio":
+        this.enableFilterCliente = true;
+        break;
+      case "cartera-asesor":
+        this.enableFilterAsesor = true;
+        break;
+    }
   }
 
   getAsesores() {
@@ -101,10 +169,36 @@ export class ReportesPage implements OnInit {
         asesor.correo.toLowerCase().includes(searchTerm)
     );
   }
+  filterClientes(event: any) {
+    const searchTerm = event.target.value.toLowerCase();
+    if (searchTerm === "") {
+      this.filteredClientes = [];
+      return;
+    }
+
+    this.suscriptions.push(
+      this._globalService
+        .Get(`personas/clientes/search?query=${event}`)
+        .subscribe({
+          next: (response: any) => {
+            this.filteredClientes = response;
+            console.log("Elementos obtenidos:", response);
+          },
+          error: (error) => {
+            console.error("Error al obtener los elementos:", error);
+          },
+        })
+    );
+  }
 
   selectAsesor(asesor: any) {
     this.selectedAsesor = asesor;
     console.log("Asesor seleccionada: ", this.selectedAsesor);
+    this.isModalOpen = false;
+  }
+  selectCliente(cliente: any) {
+    this.selectedCliente = cliente;
+    console.log("Cliente seleccionada: ", this.selectedCliente);
     this.isModalOpen = false;
   }
 
