@@ -419,9 +419,11 @@ export class PrestamosController {
 
   //endpoint para ejecutar el procedimiento almacenado de reporte de mora
   @get('/prestamos/reporte-mora')
-  async reporteMora(): Promise<any> {
+  async reporteMora(
+    @param.query.number('idUsuario') idUsuario: number,
+  ): Promise<any> {
     return this.prestamosRepository.dataSource.execute(
-      'SP_ReporteMora',
+      `SP_ReporteMora ${idUsuario}`,
       [],
     );
   }
@@ -441,10 +443,15 @@ export class PrestamosController {
       `SP_cuerpoRecordCrediticio ${idCliente}`,
       [],
     );
+
+    const pie = await this.prestamosRepository.dataSource.execute(
+      `SP_pieRecordCrediticio ${idCliente}`
+    )
     
     return {
       encabezados,
-      cuerpo
+      cuerpo,
+      pie
     };
   }
 
