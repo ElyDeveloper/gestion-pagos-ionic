@@ -50,14 +50,14 @@
               <ion-row>
                 <ion-col size="auto">
                   <ion-item>
-                    <ion-toggle (ionChange)="filterAsesor($event)"
+                    <ion-toggle [disabled]="!enableFilterAsesor" (ionChange)="filterAsesor($event)"
                       >Filtrar por Asesor</ion-toggle
                     >
                   </ion-item>
                 </ion-col>
                 <ion-col size="auto">
                   <ion-item>
-                    <ion-toggle (ionChange)="filterCliente($event)"
+                    <ion-toggle [disabled]="!enableFilterCliente" (ionChange)="filterCliente($event)"
                       >Filtrar por Cliente</ion-toggle
                     >
                   </ion-item>
