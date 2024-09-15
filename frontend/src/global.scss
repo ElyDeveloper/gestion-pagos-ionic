@@ -80,29 +80,6 @@ ion-item {
   --ion-item-background: transparent !important;
 }
 
-.signature-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 3rem;
-}
-
-.signature-box {
-  width: 33.33%;
-  text-align: center;
-  margin: 3rem;
-}
-
-.signature-line {
-  border-top: 1px solid #000;
-  padding-top: 0.5rem;
-}
-
-.signature-line p {
-  text-align: center !important;
-  margin: 0;
-}
-
 .custom-table {
   // Estilos completos para una tabla
   width: 100%;
@@ -278,7 +255,7 @@ ion-item {
   --inner-padding-end: 10px;
 }
 
-ion-list{
+ion-list {
   --background: transparent;
   --border-radius: 0;
   --padding-top: 0;
@@ -311,13 +288,12 @@ ion-searchbar {
   }
 }
 
-
 ion-card {
   border-radius: 16px;
   overflow: hidden;
 
   ion-card-header {
-    background:  var(--ion-color-light-shade) !important;
+    background: var(--ion-color-light-shade) !important;
     // color: var(--ion-color-primary) !important;
     padding: 16px;
 
@@ -326,7 +302,6 @@ ion-card {
       font-weight: bold;
       margin-bottom: 8px;
       color: var(--ion-color-tertiary) !important;
-
     }
 
     ion-card-subtitle {

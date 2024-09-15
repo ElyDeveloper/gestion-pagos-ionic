@@ -87,7 +87,7 @@ export class GestionPagoPage implements OnInit {
     this.textLoader = "Imprimiendo...";
     this._loaderService.show();
     const customPrintOptions: PrintOptions = new PrintOptions({
-      printSectionId: "print-section",
+      printSectionId: "print-fechas-pagos",
 
       // Add any other print options as needed
     });

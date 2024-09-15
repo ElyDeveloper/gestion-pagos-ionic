@@ -205,7 +205,7 @@ export class GestionContractPage implements OnInit {
 
       // Add any other print options as needed
     });
-    this._printService.styleSheetFile = "assets/css/print.css";
+    this._printService.styleSheetFile = "assets/css/print-contract.css";
 
     //esperar 1 segundo para que se muestre el loader
     setTimeout(() => {
