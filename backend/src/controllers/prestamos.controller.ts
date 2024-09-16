@@ -466,23 +466,23 @@ export class PrestamosController {
     );
   }
 
-  //endpoint para ejecutar el procedimiento almacenado de reporte de informacion de pagos
-  @get('/prestamos/reporte-informacion-pagos')
+  //endpoint para ejecutar el procedimiento almacenado de reporte de informacion de saldo de cuenta
+  @get('/prestamos/reporte-estado-cuenta')
   async reporteInformacionPagos(
-    @param.query.number('idPrestamo') idPrestamo: number,
+    @param.query.number('idCliente') idCliente: number,
   ): Promise<any> {
     const encabezados = await this.prestamosRepository.dataSource.execute(
-      `SP_RTextosSaldosTotales ${idPrestamo}`,
+      `SP_RTextosSaldosTotales ${idCliente}`,
       [],
     );
 
     const saldoVigente = await this.prestamosRepository.dataSource.execute(
-      `SP_RSaldosVigentes ${idPrestamo}`,
+      `SP_RSaldosVigentes ${idCliente}`,
       [],
     );
 
     const pagosEfectuados = await this.prestamosRepository.dataSource.execute(
-      `SP_RDetallePagosEfectuados ${idPrestamo}`,
+      `SP_RDetallePagosEfectuados ${idCliente}`,
       [],
     );
 
