@@ -605,6 +605,7 @@ export class PersonasController {
         and: [
           {
             or: [
+              {id: {like: `%${search}%`}},
               {dni: {like: `%${search}%`}},
               {nombres: {like: `%${search}%`}},
               {apellidos: {like: `%${search}%`}},
@@ -689,6 +690,7 @@ export class PersonasController {
           {estado: true},
           {
             or: [
+              {id: {like: `%${search}%`}},
               {dni: {like: `%${search}%`}},
               {nombres: {like: `%${search}%`}},
               {apellidos: {like: `%${search}%`}},
@@ -737,6 +739,7 @@ export class PersonasController {
           {estado: true},
           {
             or: [
+              {id: {like: `%${search}%`}},
               {dni: {like: `%${search}%`}},
               {nombres: {like: `%${search}%`}},
               {apellidos: {like: `%${search}%`}},

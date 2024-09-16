@@ -393,13 +393,18 @@ export class PrestamosController {
 
     const prestamos = await this.prestamosRepository.find({
       where: {
-        and: [
+        or: [
+          {id: {like: `%${search}%`}},
           {
-            idCliente: {
-              inq: idsClientes,
-            },
+            and: [
+              {
+                idCliente: {
+                  inq: idsClientes,
+                },
+              },
+              {estado: true},
+            ],
           },
-          {estado: true},
         ],
       },
       include: [

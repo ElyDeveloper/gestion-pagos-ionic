@@ -59,8 +59,8 @@ export class ReportClientsMoraComponent implements OnInit {
     return newDate;
   }
   getForAsesor(asesor: any) {
+    this.asesorSelected = asesor;
     if (asesor) {
-      this.asesorSelected = asesor;
       this.idUser = asesor.id;
     } else {
       this.idUser = this.currentUser.id;

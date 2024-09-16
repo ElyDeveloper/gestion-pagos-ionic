@@ -169,7 +169,7 @@ export class PrestamosPage implements OnInit {
     this.columnsData = [
       {
         key: "id",
-        alias: "Código",
+        alias: "Código Prestamo",
       },
       {
         key: "cliente.nombres",

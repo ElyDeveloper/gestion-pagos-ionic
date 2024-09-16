@@ -23,6 +23,12 @@
               Imprimir
             </ion-button>
           </ion-col>
+          <ion-col size="auto">
+            <ion-button color="success" routerLink="/layout/prestamos">
+              Ver Prestamos
+              <ion-icon slot="end" name="open-outline"></ion-icon>
+            </ion-button>
+          </ion-col>
         </ion-row>
       </ion-grid>
     </ion-card-content>
@@ -39,32 +45,6 @@
             }
           </ion-card-header>
           <ion-card-content class="p-4">
-            <!-- <ion-grid>
-              <ion-row>
-                @if(currentUser.rolid!==3){
-                <ion-col size="auto">
-                  <ion-item>
-                    <ion-toggle
-                      [(ngModel)]="isFilterAsesor"
-                      [disabled]="!enableFilterAsesor"
-                      (ionChange)="filterAsesor($event)"
-                      >Filtrar por Asesor</ion-toggle
-                    >
-                  </ion-item>
-                </ion-col>
-                }
-                <ion-col size="auto">
-                  <ion-item>
-                    <ion-toggle
-                      [(ngModel)]="isFilterCliente"
-                      [disabled]="!enableFilterCliente"
-                      (ionChange)="filterCliente($event)"
-                      >Filtrar por Cliente</ion-toggle
-                    >
-                  </ion-item>
-                </ion-col>
-              </ion-row>
-            </ion-grid> -->
             @if(currentUser.rolid!==3){
             <ion-item lines="none" class="ion-margin-top">
               <ion-label>
