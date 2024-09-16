@@ -6,10 +6,11 @@ import { GlobalService } from "src/app/shared/services/global.service";
 @Component({
   selector: "app-report-cartera-asesores",
   templateUrl: "./report-cartera-asesores.component.html",
-  styleUrls: [],
+  styleUrls: ["../reportes.page.scss"],
 })
 export class ReportCarteraAsesoresComponent implements OnInit {
-  @Input() idAsesor: number = 0;
+  @Input() company: string = "";
+  @Input() selectedAsesor: any = null;
 
   carteraAsesor: Cartera[] = [];
 
@@ -23,14 +24,16 @@ export class ReportCarteraAsesoresComponent implements OnInit {
   async getCarteraAsesor() {
     // prestamos/reporte-cartera-asesor?idUsuario=4
 
-    if(this.idAsesor === 0) return;
+    if (!this.selectedAsesor) return;
     await this.fetchCartera();
   }
 
   private fetchCartera(): Promise<any> {
     return firstValueFrom(
       this._globalService
-        .Get(`prestamos/reporte-cartera-asesor?idUsuario=${this.idAsesor}`)
+        .Get(
+          `prestamos/reporte-cartera-asesor?idUsuario=${this.selectedAsesor.id}`
+        )
         .pipe(
           tap((cartera: any) => {
             console.log("Cartera asesor:", cartera);

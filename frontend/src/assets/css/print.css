@@ -23,8 +23,9 @@
     margin-bottom: 1cm;
   }
 
-  .date-emision p {
-    text-align: right !important;
+  .date-emision {
+    display: flex;
+    justify-content: space-between;
   }
 
   .text-center {
@@ -93,6 +94,8 @@
   /* Page layout adjustments */
   @page {
     margin: 2cm;
+    size: landscape;
+
   }
 
   p {

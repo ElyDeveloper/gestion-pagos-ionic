@@ -72,7 +72,6 @@ export class PrestamosController {
   async count(
     @inject(SecurityBindings.USER)
     currentUser: UserProfile,
-    @param.where(Prestamos) where?: Where<Prestamos>,
   ): Promise<Count> {
     const userId = parseInt(currentUser[securityId], 10);
 
@@ -81,10 +80,10 @@ export class PrestamosController {
       throw new HttpErrors.Unauthorized('Usuario no encontrado');
     }
 
-    console.log('Usuario Logueado en prestamos: ', user);
+    // console.log('Usuario Logueado en prestamos: ', user);
 
     if (user.rolid === 3) {
-      console.log('Consultando prestamos de todos los clientes');
+      // console.log('Consultando prestamos de todos los clientes');
       const usuariosClientes = await this.usuarioClienteRepository.find({
         where: {
           usuarioId: userId,
@@ -92,9 +91,9 @@ export class PrestamosController {
         include: ['cliente'],
       });
 
-      console.log('Clientes del Usuario Logueado: ', usuariosClientes);
+      // console.log('Clientes del Usuario Logueado: ', usuariosClientes);
       const idsClientes = usuariosClientes.map(u => u.clienteId);
-      console.log('Ids de Clientes del Usuario Logueado: ', idsClientes);
+      // console.log('Ids de Clientes del Usuario Logueado: ', idsClientes);
       return this.prestamosRepository.count({
         idCliente: {inq: idsClientes},
         estado: true,
@@ -150,16 +149,16 @@ export class PrestamosController {
     @param.query.number('skip') skip: number,
     @param.query.number('limit') limit: number,
   ): Promise<any[]> {
-    console.log('Usuario Logueado: ', currentUser);
+    // console.log('Usuario Logueado: ', currentUser);
     const userId = parseInt(currentUser[securityId], 10);
-    console.log('Id de Usuario Logueado: ', userId);
-    console.log('Llamada de paginacion');
+    // console.log('Id de Usuario Logueado: ', userId);
+    // console.log('Llamada de paginacion');
 
     const user = await this.usuarioRepository.findById(userId);
     if (!user) {
       throw new HttpErrors.Unauthorized('Usuario no encontrado');
     }
-    console.log('Usuario encontrado: ', user);
+    // console.log('Usuario encontrado: ', user);
 
     if (user.rolid === 3) {
       const usuariosCliente = await this.usuarioClienteRepository.find({
@@ -220,7 +219,7 @@ export class PrestamosController {
         idEncrypted: this.jwtService.encryptId(prestamo.id || 0),
       }));
 
-      console.log('Personas encontradas: ', copiaSpread);
+      // console.log('Personas encontradas: ', copiaSpread);
 
       return copiaSpread;
     }
@@ -248,7 +247,7 @@ export class PrestamosController {
       idEncrypted: this.jwtService.encryptId(prestamo.id || 0),
     }));
 
-    console.log('Personas encontradas: ', copiaSpread);
+    // console.log('Personas encontradas: ', copiaSpread);
 
     return copiaSpread;
   }
@@ -356,44 +355,56 @@ export class PrestamosController {
       throw new HttpErrors.Unauthorized('Usuario no encontrado');
     }
 
-    let idsClientes: number[];
+    let idsClientes: number[] = [];
+    const clientes = await this.personasRepository.find({
+      where: {
+        and: [
+          {idTipoPersona: 1},
+          {
+            or: [
+              {nombres: {like: `%${search}%`}},
+              {apellidos: {like: `%${search}%`}},
+              {dni: {like: `%${search}%`}},
+            ],
+          },
+        ],
+      },
+    });
+
+    console.log('Clientes encontrados: ', clientes.length);
+
     if (user.rolid === 3) {
-      const clientes = await this.personasRepository.find({
+      const usuariosCliente = await this.usuarioClienteRepository.find({
         where: {
-          or: [
-            {nombres: {like: `%${search}%`}},
-            {apellidos: {like: `%${search}%`}},
+          and: [
+            {usuarioId: userId},
+            {estado: true},
+            {clienteId: {inq: clientes.map(c => c.id)}},
           ],
         },
       });
-      idsClientes = clientes.map(u => u.clienteId);
+
+      idsClientes = usuariosCliente.map(uc => uc.clienteId);
     } else {
-      const clientes = await this.personasRepository.find({
-        where: {
-          idTipoPersona: 1,
-          or: [
-            {nombres: {like: `%${search}%`}},
-            {apellidos: {like: `%${search}%`}},
-            {dni: {like: `%${search}%`}},
-          ],
-        },
-      });
-      idsClientes = clientes
-        .map(u => u.id!)
-        .filter((id): id is number => id !== undefined);
+      idsClientes = clientes.map(c => c.id || 0);
     }
 
     console.log('Ids de Clientes: ', idsClientes);
 
     const prestamos = await this.prestamosRepository.find({
       where: {
-        and: [
+        or: [
+          {id: {like: `%${search}%`}},
           {
-            idCliente: {
-              inq: idsClientes,
-            },
+            and: [
+              {
+                idCliente: {
+                  inq: idsClientes,
+                },
+              },
+              {estado: true},
+            ],
           },
-          {estado: true},
         ],
       },
       include: [
@@ -412,7 +423,7 @@ export class PrestamosController {
       idEncrypted: this.jwtService.encryptId(prestamo.id || 0),
     }));
 
-    console.log('Personas encontradas: ', copiaSpread);
+    // console.log('Personas encontradas: ', copiaSpread);
 
     return copiaSpread;
   }
@@ -433,7 +444,6 @@ export class PrestamosController {
   async reportePrestamos(
     @param.query.number('idCliente') idCliente: number,
   ): Promise<any> {
-
     const encabezados = await this.prestamosRepository.dataSource.execute(
       `SP_encabezadosRecordCrediticio ${idCliente}`,
       [],
@@ -445,13 +455,13 @@ export class PrestamosController {
     );
 
     const pie = await this.prestamosRepository.dataSource.execute(
-      `SP_pieRecordCrediticio ${idCliente}`
-    )
-    
+      `SP_pieRecordCrediticio ${idCliente}`,
+    );
+
     return {
       encabezados,
       cuerpo,
-      pie
+      pie,
     };
   }
 
@@ -489,8 +499,7 @@ export class PrestamosController {
     return {
       encabezados,
       saldoVigente,
-      pagosEfectuados
+      pagosEfectuados,
     };
   }
-
 }

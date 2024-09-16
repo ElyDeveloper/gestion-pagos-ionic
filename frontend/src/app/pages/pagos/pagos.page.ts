@@ -10,7 +10,6 @@ import { Subscription } from "rxjs";
 import { Pagos } from "src/app/shared/interfaces/pago";
 import { Column } from "src/app/shared/interfaces/table";
 import { GlobalService } from "src/app/shared/services/global.service";
-import { PreventAbuseService } from "src/app/shared/services/prevent-abuse.service";
 import { ModalConfig } from "src/app/shared/utils/extra";
 
 @Component({

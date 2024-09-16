@@ -1,12 +1,14 @@
-
 <div class="header">
   <h3 class="text-center">{{ company }}</h3>
   <h3 class="text-center">Reporte de Clientes en Mora</h3>
 </div>
 
-<div style="text-align: right" class="date-emision">
-  <p><strong>Asesor:</strong> Todos</p>
-  <p>{{ dateNow | customDate }}</p>
+<div class="date-emision">
+  <p>
+    <strong>Asesor:</strong> {{ asesorSelected?.nombre || "Todos" }}
+    {{ asesorSelected?.apellido }}
+  </p>
+  <p>{{ subtractHours(dateNow, 6) | customDate }}</p>
 </div>
 
 <div class="table-responsive mt-3">
@@ -49,5 +51,3 @@
     <td class="text-center">{{ totalMora | currency : "L" : "symbol" }}</td>
   </tr>
 </table>
-
-

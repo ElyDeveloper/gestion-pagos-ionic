@@ -7,7 +7,13 @@ import {
 } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
-import { Observable, Subscription } from "rxjs";
+import {
+  catchError,
+  firstValueFrom,
+  Observable,
+  Subscription,
+  tap,
+} from "rxjs";
 import { Prestamos } from "src/app/shared/interfaces/prestamo";
 import { Column } from "src/app/shared/interfaces/table";
 import { Usuario } from "src/app/shared/interfaces/usuario";
@@ -160,11 +166,10 @@ export class PrestamosPage implements OnInit {
   }
 
   buildColumns() {
-    
     this.columnsData = [
       {
         key: "id",
-        alias: "Código",
+        alias: "Código Prestamo",
       },
       {
         key: "cliente.nombres",
@@ -542,58 +547,79 @@ export class PrestamosPage implements OnInit {
     this.getElementsPag();
   }
 
-  onSearchData(event: any) {
+  async onSearchData(event: any): Promise<void> {
     console.log("Evento de búsqueda:", event);
-    if (event === "") {
-      this.getCountElements();
-    } else {
-      this._globalService.Get(`prestamos/search?query=${event}`).subscribe({
-        next: (response: any) => {
-          this.elements = response;
-          console.log("Elementos obtenidos:", response);
-        },
-        error: (error) => {
-          console.error("Error al obtener los elementos:", error);
-        },
-      });
+    try {
+      if (event === "") {
+        await this.getCountElements();
+      } else {
+        await firstValueFrom(
+          this._globalService.Get(`prestamos/search?query=${event}`).pipe(
+            tap((res: any) => {
+              this.elements = res;
+              console.log("Elementos obtenidos:", res);
+            }),
+            catchError((error) => {
+              console.error("Error al obtener los elementos:", error);
+              throw error;
+            })
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error en onSearchData:", error);
+      // Aquí puedes manejar el error, por ejemplo, mostrando un mensaje al usuario
     }
   }
 
-  getElementsPag() {
+  private async getElementsPag(): Promise<void> {
     this.elements = [];
     const skip = this.currentPage * this.currentPageSize - this.currentPageSize;
     const limit = this.currentPageSize;
 
-    this.suscripciones.push(
-      this._globalService
-        .Get(`prestamos/paginated?skip=${skip}&limit=${limit}`)
-        .subscribe({
-          next: (response: any) => {
-            this.elements = response;
-            console.log("Elementos obtenidos:", response);
-          },
-          error: (error) => {
-            console.error("Error al obtener los elementos:", error);
-          },
-        })
-    );
+    try {
+      await firstValueFrom(
+        this._globalService
+          .Get(`prestamos/paginated?skip=${skip}&limit=${limit}`)
+          .pipe(
+            tap((res: any) => {
+              this.elements = res;
+              console.log("Elementos obtenidos:", res);
+            }),
+            catchError((error) => {
+              console.error("Error al obtener los elementos:", error);
+              throw error;
+            })
+          )
+      );
+    } catch (error) {
+      console.error("Error en getElementsPag:", error);
+      // Aquí puedes manejar el error, por ejemplo, mostrando un mensaje al usuario
+    }
   }
 
-  getCountElements() {
-    this.suscripciones.forEach((s) => s.unsubscribe());
-    this.suscripciones.push(
-      this._globalService.Get("prestamos/count").subscribe({
-        next: (response: any) => {
-          console.log("Cantidad de elementos:", response.count);
-          const totalElements = response.count;
-          this.totalPages = Math.ceil(totalElements / this.currentPageSize);
-          console.log("Total de páginas:", this.totalPages);
-          this.getElementsPag();
-        },
-        error: (error) => {
-          console.error("Error al obtener la cantidad de elementos:", error);
-        },
-      })
-    );
+  private async getCountElements(): Promise<void> {
+    try {
+      await firstValueFrom(
+        this._globalService.Get("prestamos/count").pipe(
+          tap((res: any) => {
+            console.log("Cantidad de elementos:", res.count);
+            const totalElements = res.count;
+            this.totalPages = Math.ceil(totalElements / this.currentPageSize);
+            console.log("Total de páginas:", this.totalPages);
+          }),
+          catchError((error) => {
+            console.error("Error al obtener la cantidad de elementos:", error);
+            throw error;
+          })
+        )
+      );
+
+      // Llamar a getElementsPag después de obtener el conteo
+      await this.getElementsPag();
+    } catch (error) {
+      console.error("Error en getCountElements:", error);
+      // Aquí puedes manejar el error, por ejemplo, mostrando un mensaje al usuario
+    }
   }
 }

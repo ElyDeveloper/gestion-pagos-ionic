@@ -12,6 +12,8 @@ import { GlobalService } from "src/app/shared/services/global.service";
 import { LoaderService } from "src/app/shared/services/loader.service";
 import { environment } from "src/environments/environment";
 import { ReportCarteraAsesoresComponent } from "./report-cartera-asesores/report-cartera-asesores.component";
+import { ReportClientsMoraComponent } from "./report-clients-mora/report-clients-mora.component";
+import { ReportRecordCrediticioComponent } from "./report-record-crediticio/report-record-crediticio.component";
 
 @Component({
   selector: "app-reportes",
@@ -24,8 +26,6 @@ export class ReportesPage implements OnInit {
   isPrint = false;
   isToastOpen = false;
   loading = true;
-  isFilterAsesor = false;
-  isFilterCliente = false;
   enableFilterAsesor = false;
   enableFilterCliente = false;
 
@@ -36,22 +36,17 @@ export class ReportesPage implements OnInit {
   reporteSeleccionado: string | null = null;
   isModalOpen = false;
 
-  listData = new Array(3).fill({}).map((_i, index) => ({
-    href: "http://ng.ant.design",
-    title: `ant design part ${index}`,
-    // avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-    description:
-      "Ant Design, a design language for background applications, is refined by Ant UED Team.",
-    content:
-      "We supply a series of design principles, practical patterns and high quality design resources " +
-      "(Sketch and Axure), to help people create their product prototypes beautifully and efficiently.",
-  }));
-
   @ViewChild("modalAsesorSelector")
   modalAsesorSelector!: TemplateRef<any>;
 
   @ViewChild(ReportCarteraAsesoresComponent)
   reportCarteraAsesor!: ReportCarteraAsesoresComponent;
+
+  @ViewChild(ReportClientsMoraComponent)
+  reportClientsMoraComponent!: ReportClientsMoraComponent;
+
+  @ViewChild(ReportRecordCrediticioComponent)
+  reportRecordCrediticioComponent!: ReportRecordCrediticioComponent;
 
   @ViewChild("modalClienteSelector")
   modalClienteSelector!: TemplateRef<any>;
@@ -61,7 +56,7 @@ export class ReportesPage implements OnInit {
   asesores: any[] = [];
   clientes: any[] = [];
   filteredAsesores = this.asesores;
-  filteredClientes = this.asesores;
+  filteredClientes = this.clientes;
   selectedAsesor: any = null;
   selectedCliente: any = null;
   currentUser: any = null;
@@ -76,6 +71,7 @@ export class ReportesPage implements OnInit {
 
   ngOnInit() {
     this.company = environment.company;
+    this.getCurrentUser();
     this.getAsesores();
   }
 
@@ -91,23 +87,33 @@ export class ReportesPage implements OnInit {
     );
   }
 
-  filterAsesor(event: any) {
-    console.log("Event: ", event.detail.checked);
-    this.isFilterAsesor = event.detail.checked;
-  }
-  filterCliente(event: any) {
-    console.log("Event: ", event.detail.checked);
-    this.isFilterCliente = event.detail.checked;
-  }
+  clearFilters() {
+    this.filteredAsesores = [];
+    this.filteredClientes = [];
+    this.selectedAsesor = null;
+    this.selectedCliente = null;
 
-  filterClient(event: any) {
-    console.log("Event: ", event.detail.checked);
-    this.isFilterAsesor = event.detail.checked;
+    this.obtenerReporte();
   }
 
   obtenerReporte() {
-    if (this.enableFilterAsesor) {
-      this.reportCarteraAsesor.getCarteraAsesor();
+    switch (this.reporteSeleccionado) {
+      case "clientes-mora":
+        this.reportClientsMoraComponent.getForAsesor(this.selectedAsesor);
+        break;
+      case "estado-cuenta":
+        // this.reportClientsMoraComponent.getEstadosCuentas();
+        break;
+      case "record-crediticio":
+        this.reportRecordCrediticioComponent.getForCliente(
+          this.selectedCliente
+        );
+        break;
+      case "cartera-asesor":
+        this.reportCarteraAsesor.getCarteraAsesor();
+        break;
+      default:
+        break;
     }
   }
   handleSave(event: any) {
@@ -178,6 +184,7 @@ export class ReportesPage implements OnInit {
     );
   }
   filterClientes(event: any) {
+    console.log("Event: ", event);
     const searchTerm = event.target.value.toLowerCase();
     if (searchTerm === "") {
       this.filteredClientes = [];
@@ -203,11 +210,15 @@ export class ReportesPage implements OnInit {
     this.selectedAsesor = asesor;
     console.log("Asesor seleccionada: ", this.selectedAsesor);
     this.isModalOpen = false;
+
+    this.obtenerReporte();
   }
   selectCliente(cliente: any) {
     this.selectedCliente = cliente;
     console.log("Cliente seleccionada: ", this.selectedCliente);
     this.isModalOpen = false;
+
+    this.obtenerReporte();
   }
 
   printSection() {
