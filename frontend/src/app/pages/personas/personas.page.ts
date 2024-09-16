@@ -7,7 +7,13 @@ import {
 } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
-import { firstValueFrom, Observable, Subscription } from "rxjs";
+import {
+  catchError,
+  firstValueFrom,
+  Observable,
+  Subscription,
+  tap,
+} from "rxjs";
 import { Personas } from "src/app/shared/interfaces/persona";
 import { Column } from "src/app/shared/interfaces/table";
 import { Usuario } from "src/app/shared/interfaces/usuario";
@@ -188,6 +194,8 @@ export class PersonasPage implements OnInit {
   //TODO: ESPECIFICO
   goAction(action: string) {
     // console.log("Accion capturada: ", action);
+    this.currentPage = 1;
+    this.currentPageSize = 10;
     this.title = action;
     this.action = action.toLowerCase();
     this.getCountElements();
@@ -408,7 +416,6 @@ export class PersonasPage implements OnInit {
   }
 
   async handleSave(data: any) {
-    
     const operation = this.isEdit ? "edit" : "create";
     if (!this.isEdit) delete data.id;
     await this.handleUserOperation(operation, data);
@@ -452,7 +459,7 @@ export class PersonasPage implements OnInit {
   }
 
   private async performApiCall(operation: string, data: any): Promise<any> {
-    console.log('Data a guardar performApicall: ', data)
+    console.log("Data a guardar performApicall: ", data);
     return operation === "edit"
       ? await firstValueFrom(
           this._globalService.PutId("personas", data.id, data)
@@ -512,61 +519,74 @@ export class PersonasPage implements OnInit {
     this.setOpenedToast(true);
   }
 
-  onPageChange(event: any) {
+  async onPageChange(event: any) {
     console.log("Evento de cambio de página:", event);
     this.currentPage = event;
-    this.getElementsPag();
+    await this.getElementsPag();
   }
 
-  onSearchData(event: any) {
+  async onSearchData(event: any): Promise<void> {
     console.log("Evento de búsqueda:", event);
-    if (event === "") {
-      this.getCountElements();
-    } else {
-      this._globalService
-        .Get(`personas/${this.action}/search?query=${event}`)
-        .subscribe({
-          next: (response: any) => {
-            this.elements = response;
-            console.log("Elementos obtenidos:", response);
-          },
-          error: (error) => {
-            console.error("Error al obtener los elementos:", error);
-          },
-        });
+    try {
+      if (event === "") {
+        await this.getCountElements();
+      } else {
+        await firstValueFrom(
+          this._globalService
+            .Get(`personas/${this.action}/search?query=${event}`)
+            .pipe(
+              tap((res: any) => {
+                this.elements = res;
+                console.log("Elementos obtenidos:", res);
+              }),
+              catchError((error) => {
+                console.error("Error al obtener los elementos:", error);
+                throw error;
+              })
+            )
+        );
+      }
+    } catch (error) {
+      console.error("Error en onSearchData:", error);
+      // Aquí puedes manejar el error, por ejemplo, mostrando un mensaje al usuario
     }
   }
 
-  getElementsPag() {
+  private getElementsPag(): Promise<any> {
     this.elements = [];
     const skip = this.currentPage * this.currentPageSize - this.currentPageSize;
     const limit = this.currentPageSize;
 
-    this._globalService
-      .Get(`personas/${this.action}/paginated?skip=${skip}&limit=${limit}`)
-      .subscribe({
-        next: (response: any) => {
-          console.log("Elementos obtenidos:", response);
-          this.elements = response;
-        },
-        error: (error) => {
-          console.error("Error al obtener los elementos:", error);
-        },
-      });
+    return firstValueFrom(
+      this._globalService
+        .Get(`personas/${this.action}/paginated?skip=${skip}&limit=${limit}`)
+        .pipe(
+          tap((response: any) => {
+            console.log("Elementos obtenidos:", response);
+            this.elements = response; // Asumiendo que la respuesta tiene una propiedad 'data'
+          }),
+          catchError((error) => {
+            console.error("Error al obtener los elementos:", error);
+            throw error;
+          })
+        )
+    );
   }
 
-  getCountElements() {
-    this._globalService.Get("personas/count").subscribe({
-      next: (response: any) => {
-        console.log("Cantidad de elementos:", response.count);
-        const totalElements = response.count;
-        this.totalPages = Math.ceil(totalElements / this.currentPageSize);
-        console.log("Total de páginas:", this.totalPages);
-        this.getElementsPag();
-      },
-      error: (error) => {
-        console.error("Error al obtener la cantidad de elementos:", error);
-      },
-    });
+  private getCountElements(): Promise<void> {
+    return firstValueFrom(
+      this._globalService.Get("personas/count").pipe(
+        tap((response: any) => {
+          console.log("Cantidad de elementos:", response.count);
+          const totalElements = response.count;
+          this.totalPages = Math.ceil(totalElements / this.currentPageSize);
+          console.log("Total de páginas:", this.totalPages);
+        }),
+        catchError((error) => {
+          console.error("Error al obtener la cantidad de elementos:", error);
+          throw error;
+        })
+      )
+    ).then(() => this.getElementsPag());
   }
 }
