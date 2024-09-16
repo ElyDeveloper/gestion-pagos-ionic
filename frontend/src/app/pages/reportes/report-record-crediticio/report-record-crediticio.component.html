@@ -41,7 +41,7 @@
     </td>
 
     <th class="especial-right">Fecha Proceso:</th>
-    <td>{{ encabezado.fechaProceso }}</td>
+    <td>{{ encabezado.fechaProceso| customDate : 6 : "dd/MM/yyyy"  }}</td>
   </tr>
   <tr>
     <th class="especial-right">Etapa:</th>

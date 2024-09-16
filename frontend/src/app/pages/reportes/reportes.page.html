@@ -8,7 +8,7 @@
       <ion-grid>
         <ion-row>
           <ion-col size="auto">
-            <ion-button color="warning" (click)="clearFilters()">
+            <ion-button color="primary" (click)="clearFilters()">
               <ion-icon name="close-outline" slot="start"></ion-icon>
               Limpiar Filtros
             </ion-button>
@@ -62,7 +62,7 @@
                 (click)="showOpenModal(true, 'asesor')"
                 shape="round"
                 [disabled]="!enableFilterAsesor">
-                <ion-icon name="search-outline" slot="icon-only"></ion-icon>
+                <ion-icon class="py-1" name="search-outline" slot="icon-only"></ion-icon>
               </ion-button>
             </ion-item>
             }
@@ -83,7 +83,7 @@
                 (click)="showOpenModal(true, 'cliente')"
                 shape="round"
                 [disabled]="!enableFilterCliente">
-                <ion-icon name="search-outline" slot="icon-only"></ion-icon>
+                <ion-icon class="py-1" name="search-outline" slot="icon-only"></ion-icon>
               </ion-button>
             </ion-item>
           </ion-card-content>
