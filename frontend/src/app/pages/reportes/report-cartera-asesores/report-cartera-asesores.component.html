@@ -1,3 +1,93 @@
-<p>
-  report-cartera-asesores works!
-</p>
+<div class="header">
+  <h2>{{ company }}</h2>
+  <h3>Cartera de Asesores</h3>
+</div>
+<div class="cliente-info">
+  <div class="info-grid">
+    <div class="info-item">
+      <span class="info-label">CLIENTE:</span>
+      <span class="info-value">Eduardo Josue Orellana Dìaz</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label">NRO. CLIENTE:</span>
+      <span class="info-value">1022</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label">TELEFONO:</span>
+      <span class="info-value">32647048</span>
+    </div>
+  </div>
+</div>
+<table>
+  <tr>
+    <th class="especial-right">Día de Pago:</th>
+    <td>Miércoles</td>
+    <th class="especial-right">Monto Otorgado:</th>
+    <td>{{ 22000 | currency : "L" : "symbol" }}</td>
+  </tr>
+  <tr>
+    <th class="especial-right">Saldo Capital Actual:</th>
+    <td>{{ 20166.67 | currency : "L" : "symbol" }}</td>
+    <th class="especial-right">Saldo Actual:</th>
+    <td>{{ 29241.67 | currency : "L" : "symbol" }}</td>
+  </tr>
+  <tr>
+    <th class="especial-right">Valor Cuota:</th>
+    <td>{{ 2658.33 | currency : "L" : "symbol" }}</td>
+    <th class="especial-right">Plazo:</th>
+    <td>12</td>
+  </tr>
+  <tr>
+    <th class="especial-right">Meses:</th>
+    <td>2</td>
+    <th class="especial-right">Tasa:</th>
+    <td>45%</td>
+  </tr>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID Persona</th>
+      <th>Nombre Cliente</th>
+      <th>Celular</th>
+      <th>Día Pago</th>
+      <th>Monto Otorgado</th>
+      <th>Saldo Capital Actual</th>
+      <th>Saldo Actual</th>
+      <th>Valor Cuota</th>
+      <th>Plazo</th>
+      <th>Meses</th>
+      <th>Tasa</th>
+      <th>Cuotas Pagadas</th>
+      <th>Valor Total</th>
+      <th>Valor Cuotas Atrasadas</th>
+      <th>Días en Mora</th>
+      <th>Total Mora</th>
+      <th>Fecha Vencimiento</th>
+      <th>Mora</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1022</td>
+      <td>Eduardo Josue Orellana Dìaz</td>
+      <td>32647048</td>
+      <td>Miércoles</td>
+      <td>L 22,000.00</td>
+      <td>L 20,166.67</td>
+      <td>L 29,241.67</td>
+      <td>L 2,658.33</td>
+      <td>12</td>
+      <td>2</td>
+      <td>45%</td>
+      <td>1</td>
+      <td>L 31,900.00</td>
+      <td>L 2,658.33</td>
+      <td>0</td>
+      <td>L 2,660.99</td>
+      <td>27/11/2024</td>
+      <td>L 2.66</td>
+    </tr>
+  </tbody>
+</table>

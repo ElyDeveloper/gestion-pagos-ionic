@@ -6,54 +6,54 @@
   <div class="info-grid">
     <div class="info-item">
       <span class="info-label">CLIENTE:</span>
-      <span class="info-value">JOSE CARLOS RIVERA LOPEZ</span>
+      <span class="info-value"
+        >{{ selectedCliente?.nombres || "N/A" }}
+        {{ selectedCliente?.apellidos }}</span
+      >
     </div>
     <div class="info-item">
       <span class="info-label">NRO. CLIENTE:</span>
-      <span class="info-value">290155500411</span>
-    </div>
-    <div class="info-item">
-      <span class="info-label">CIUDAD:</span>
-      <span class="info-value">BENI</span>
+      <span class="info-value">{{ selectedCliente?.id || "N/A" }}</span>
     </div>
     <div class="info-item">
       <span class="info-label">DIRECCION:</span>
-      <span class="info-value">AV. PEDRO AGUIRRE CABRERA 1565</span>
+      <span class="info-value">{{ selectedCliente?.direccion || "N/A" }}</span>
     </div>
     <div class="info-item">
       <span class="info-label">TELEFONO:</span>
-      <span class="info-value">999999999</span>
+      <span class="info-value">{{ selectedCliente?.cel || "N/A" }}</span>
     </div>
   </div>
 </div>
 <table>
   <tr>
     <th class="especial-right">Fecha Impresion:</th>
-    <td>13/09/2024</td>
-    <th class="especial-right">Operacion:</th>
-    <td>290155500411:51</td>
-  </tr>
-  <tr>
+    <td>{{ subtractHours(dateNow, 6) | customDate : 6 : "dd/MM/yyyy" }}</td>
     <th class="especial-right">Asesor:</th>
-    <td colspan="3">JOSE CARLOS RIVERA LOPEZ</td>
+    <td>
+      {{ selectedAsesor?.nombre || "N/A" }} {{ selectedAsesor?.apellido }}
+    </td>
   </tr>
   <tr>
     <th class="especial-right">Producto:</th>
-    <td>Comercio</td>
+    <td>
+      {{ encabezado.producto }}
+    </td>
+
     <th class="especial-right">Fecha Proceso:</th>
-    <td>30/12/2023</td>
+    <td>{{ encabezado.fechaProceso }}</td>
   </tr>
   <tr>
     <th class="especial-right">Etapa:</th>
-    <td>Vigente Y Normales</td>
+    <td>{{ encabezado.etapa }}</td>
     <th class="especial-right">Record Crediticio:</th>
-    <td>Bueno</td>
+    <td>{{ encabezado.recordCrediticio }}</td>
   </tr>
   <tr>
     <th class="especial-right">Nro.Total Ptmos.:</th>
-    <td>1</td>
+    <td>{{ encabezado.numeroTotalPtmos }}</td>
     <th class="especial-right">Cantidad Desembolso:</th>
-    <td>L. 12000.00</td>
+    <td>{{ encabezado.cantidadDesembolso | currency : "L" : "symbol" }}</td>
   </tr>
 </table>
 
@@ -68,6 +68,19 @@
     <th>Mora</th>
     <th>Total</th>
   </tr>
+  <!-- @for (item of cuerpo; track $index) {
+  <tr>
+    <td>{{ item.id }}</td>
+    <td>{{ item.fechaVencimiento }}</td>
+    <td>{{ item.fechaCancelacion }}</td>
+    <td>{{ item.diasAtraso }}</td>
+    <td>{{ item.capital | currency : "L" : "symbol" }}</td>
+    <td>{{ item.interes | currency : "L" : "symbol" }}</td>
+    <td>{{ item.mora | currency : "L" : "symbol" }}</td>
+    <td>{{ item.total | currency : "L" : "symbol" }}</td>
+  </tr>
+
+  } -->
   <tr>
     <td>1</td>
     <td>01/02/2024</td>
@@ -160,6 +173,29 @@
   </tr>
 </table>
 
+<hr />
+<p><strong>Detalle de Prestamos Activos:</strong></p>
+<table>
+  <tr>
+    <th>Fecha</th>
+    <th>Plazo</th>
+    <th>Monto</th>
+    <th>Asesor</th>
+    <th>Tasa</th>
+    <th>Tipo</th>
+  </tr>
+  <tr>
+    <td>01/10/2024</td>
+    <td>N</td>
+    <td>6</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
+
+<hr />
+<p><strong>Detalle de Prestamos Cancelados:</strong></p>
 <table>
   <tr>
     <th>Fecha</th>

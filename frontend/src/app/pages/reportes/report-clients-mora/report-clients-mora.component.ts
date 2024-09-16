@@ -38,21 +38,15 @@ export class ReportClientsMoraComponent implements OnInit {
 
   asesorSelected: any = null;
 
-  private suscriptions: Subscription[] = [];
   private _globalService = inject(GlobalService);
   constructor() {
-    this.dateNow = this.subtractHours(this.dateNow, 6);
+    
   }
 
   ngOnInit(): void {
     this.idUser = this.currentUser.id;
           this.getPrestamosWithMora();
   }
-
-  ngOnDestroy() {
-    this.suscriptions.forEach((sub) => sub.unsubscribe());
-  }
-
   subtractHours(date: Date, hours: number): Date {
     const newDate = new Date(date);
     newDate.setHours(newDate.getHours() - hours);
@@ -95,11 +89,7 @@ export class ReportClientsMoraComponent implements OnInit {
         )
     );
   }
-
-  ionViewDidLeave() {
-    this.suscriptions.forEach((sub) => sub.unsubscribe());
-  }
-
+  
   scrollToElement(section: string): void {
     const element = document.getElementById(section);
     if (element) {

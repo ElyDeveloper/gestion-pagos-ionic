@@ -232,6 +232,33 @@ export class UsuarioClienteController {
     return userClients;
   }
 
+  @get('/usuario-clientes/by-cliente/{id}')
+  @response(200, {
+    description: 'UsuarioCliente model instance',
+    content: {
+      'application/json': {
+        schema: getModelSchemaRef(UsuarioCliente, {includeRelations: true}),
+      },
+    },
+  })
+  async findByClienteId(
+    @param.path.number('id') id: number,
+  ): Promise<any> {
+    console.log('Buscando Usuario Cliente:', id);
+    const userClients = await this.usuarioClienteRepository.find({
+      where: {
+        clienteId: id,
+      },
+      include: [{relation: 'usuario'}],
+    });
+
+    if (userClients.length > 0) {
+      return userClients[0];
+    }
+
+    return [];
+  }
+
   @patch('/usuario-clientes/{id}')
   @response(204, {
     description: 'UsuarioCliente PATCH success',

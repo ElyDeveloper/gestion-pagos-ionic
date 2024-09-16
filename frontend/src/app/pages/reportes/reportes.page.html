@@ -35,7 +35,7 @@
   </ion-card>
   <ion-grid>
     <ion-row>
-      <ion-col size-xs="12" size-md="6" size-lg="4">
+      <ion-col size-xs="12" size-md="6" size-lg="6">
         <ion-card>
           <ion-card-header>
             @if(currentUser.rolid!==3){
@@ -88,7 +88,9 @@
             </ion-item>
           </ion-card-content>
         </ion-card>
+      </ion-col>
 
+      <ion-col size-xs="12" size-md="6" size-lg="6">
         <ion-card>
           <ion-card-header>
             <ion-card-title>Reportes</ion-card-title>
@@ -118,7 +120,7 @@
         </ion-card>
       </ion-col>
 
-      <ion-col size-xs="12" size-md="6" size-lg="8">
+      <ion-col size-xs="12" size-md="12" size-lg="12">
         <ion-card style="min-height: 100vh">
           <ion-card-header>
             <ion-card-title>Reporte Actual</ion-card-title>
@@ -138,18 +140,14 @@
               <app-report-clients-mora
                 [company]="company"
                 [currentUser]="currentUser"></app-report-clients-mora>
-              } @case ('record-crediticio') { @if (selectedCliente) {
+              } @case ('record-crediticio') {
               <app-report-record-crediticio
-                [selectedCliente]="selectCliente"
                 [company]="company"></app-report-record-crediticio>
-              } @else {
-              <report-loader
-                [loading]="loading"
-                [textLoader]="'cliente'"></report-loader>
-              } } @case ('cartera-asesor') { @if (selectedAsesor ||
+              } @case ('cartera-asesor') { @if (selectedAsesor ||
               currentUser.rolid === 3) {
               <app-report-cartera-asesores
-                [idAsesor]="selectedAsesor?.id || 0"></app-report-cartera-asesores>
+                [company]="company"
+                [selectedAsesor]="selectedAsesor"></app-report-cartera-asesores>
               } @else {
               <report-loader
                 [loading]="loading"

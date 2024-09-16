@@ -13,6 +13,7 @@ import { LoaderService } from "src/app/shared/services/loader.service";
 import { environment } from "src/environments/environment";
 import { ReportCarteraAsesoresComponent } from "./report-cartera-asesores/report-cartera-asesores.component";
 import { ReportClientsMoraComponent } from "./report-clients-mora/report-clients-mora.component";
+import { ReportRecordCrediticioComponent } from "./report-record-crediticio/report-record-crediticio.component";
 
 @Component({
   selector: "app-reportes",
@@ -43,6 +44,9 @@ export class ReportesPage implements OnInit {
 
   @ViewChild(ReportClientsMoraComponent)
   reportClientsMoraComponent!: ReportClientsMoraComponent;
+
+  @ViewChild(ReportRecordCrediticioComponent)
+  reportRecordCrediticioComponent!: ReportRecordCrediticioComponent;
 
   @ViewChild("modalClienteSelector")
   modalClienteSelector!: TemplateRef<any>;
@@ -99,6 +103,11 @@ export class ReportesPage implements OnInit {
         break;
       case "estado-cuenta":
         // this.reportClientsMoraComponent.getEstadosCuentas();
+        break;
+      case "record-crediticio":
+        this.reportRecordCrediticioComponent.getForCliente(
+          this.selectedCliente
+        );
         break;
       case "cartera-asesor":
         this.reportCarteraAsesor.getCarteraAsesor();
@@ -208,6 +217,8 @@ export class ReportesPage implements OnInit {
     this.selectedCliente = cliente;
     console.log("Cliente seleccionada: ", this.selectedCliente);
     this.isModalOpen = false;
+
+    this.obtenerReporte();
   }
 
   printSection() {

@@ -94,6 +94,8 @@
   /* Page layout adjustments */
   @page {
     margin: 2cm;
+    size: landscape;
+
   }
 
   p {
