@@ -8,23 +8,12 @@
       <ion-grid>
         <ion-row>
           <ion-col size="auto">
-            <ion-button
-              color="success"
-              (click)="showOpenModal(true, 'asesor')"
-              [disabled]="!isFilterAsesor">
-              <ion-icon name="person-add-outline" slot="start"></ion-icon>
-              Seleccionar Asesor
+            <ion-button color="warning" (click)="clearFilters()">
+              <ion-icon name="close-outline" slot="start"></ion-icon>
+              Limpiar Filtros
             </ion-button>
           </ion-col>
-          <ion-col size="auto">
-            <ion-button
-              color="success"
-              (click)="showOpenModal(true, 'cliente')"
-              [disabled]="!isFilterCliente">
-              <ion-icon name="person-add-outline" slot="start"></ion-icon>
-              Seleccionar Cliente
-            </ion-button>
-          </ion-col>
+
           <ion-col size="auto">
             <ion-button
               color="danger"
@@ -43,27 +32,40 @@
       <ion-col size-xs="12" size-md="6" size-lg="4">
         <ion-card>
           <ion-card-header>
+            @if(currentUser.rolid!==3){
             <ion-card-title>Panel Administrativo</ion-card-title>
+            }@else {
+            <ion-card-title>Panel Asesor</ion-card-title>
+            }
           </ion-card-header>
           <ion-card-content class="p-4">
-            <ion-grid>
+            <!-- <ion-grid>
               <ion-row>
+                @if(currentUser.rolid!==3){
                 <ion-col size="auto">
                   <ion-item>
-                    <ion-toggle [disabled]="!enableFilterAsesor" (ionChange)="filterAsesor($event)"
+                    <ion-toggle
+                      [(ngModel)]="isFilterAsesor"
+                      [disabled]="!enableFilterAsesor"
+                      (ionChange)="filterAsesor($event)"
                       >Filtrar por Asesor</ion-toggle
                     >
                   </ion-item>
                 </ion-col>
+                }
                 <ion-col size="auto">
                   <ion-item>
-                    <ion-toggle [disabled]="!enableFilterCliente" (ionChange)="filterCliente($event)"
+                    <ion-toggle
+                      [(ngModel)]="isFilterCliente"
+                      [disabled]="!enableFilterCliente"
+                      (ionChange)="filterCliente($event)"
                       >Filtrar por Cliente</ion-toggle
                     >
                   </ion-item>
                 </ion-col>
               </ion-row>
-            </ion-grid>
+            </ion-grid> -->
+            @if(currentUser.rolid!==3){
             <ion-item lines="none" class="ion-margin-top">
               <ion-label>
                 <h2 class="ion-text-wrap">Asesor Seleccionado</h2>
@@ -77,12 +79,14 @@
               <ion-button
                 slot="end"
                 color="primary"
-                (click)="obtenerReporte()"
+                (click)="showOpenModal(true, 'asesor')"
                 shape="round"
-                [disabled]="!selectedAsesor">
+                [disabled]="!enableFilterAsesor">
                 <ion-icon name="search-outline" slot="icon-only"></ion-icon>
               </ion-button>
             </ion-item>
+            }
+
             <ion-item lines="none" class="ion-margin-top">
               <ion-label>
                 <h2 class="ion-text-wrap">Cliente Seleccionado</h2>
@@ -96,14 +100,15 @@
               <ion-button
                 slot="end"
                 color="primary"
-                (click)="obtenerReporte()"
+                (click)="showOpenModal(true, 'cliente')"
                 shape="round"
-                [disabled]="!selectedCliente">
+                [disabled]="!enableFilterCliente">
                 <ion-icon name="search-outline" slot="icon-only"></ion-icon>
               </ion-button>
             </ion-item>
           </ion-card-content>
         </ion-card>
+
         <ion-card>
           <ion-card-header>
             <ion-card-title>Reportes</ion-card-title>
@@ -141,77 +146,37 @@
           <ion-card-content>
             <br />
             <section id="report-print">
-              <ng-container *ngIf="reporteSeleccionado === null">
-                <nz-result nzStatus="info"> </nz-result>
-                <h1 class="text-center">
-                  Selecciona un reporte para visualizar
-                </h1>
-                <nz-list
-                  [nzDataSource]="listData"
-                  [nzRenderItem]="item"
-                  [nzItemLayout]="'vertical'">
-                  <ng-template #item let-item>
-                    <nz-list-item
-                      [nzContent]="loading ? ' ' : item.content"
-                      [nzActions]="loading ? [] : [starAction, likeAction, msgAction]"
-                      [nzExtra]="loading ? null : extra">
-                      <nz-skeleton
-                        [nzLoading]="loading"
-                        [nzActive]="true"
-                        [nzAvatar]="false">
-                        <ng-template #starAction>
-                          <span
-                            nz-icon
-                            nzType="star-o"
-                            style="margin-right: 8px"></span>
-                          156
-                        </ng-template>
-                        <ng-template #likeAction>
-                          <span
-                            nz-icon
-                            nzType="like-o"
-                            style="margin-right: 8px"></span>
-                          156
-                        </ng-template>
-                        <ng-template #msgAction>
-                          <span
-                            nz-icon
-                            nzType="message"
-                            style="margin-right: 8px"></span>
-                          2
-                        </ng-template>
-                        <nz-list-item-meta
-                          [nzAvatar]="item.avatar"
-                          [nzTitle]="nzTitle"
-                          [nzDescription]="item.description">
-                          <ng-template #nzTitle>
-                            <a href="{{ item.href }}">{{ item.title }}</a>
-                          </ng-template>
-                        </nz-list-item-meta>
-                        <ng-template #extra>
-                          <img
-                            width="272"
-                            alt="logo"
-                            src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png" />
-                        </ng-template>
-                      </nz-skeleton>
-                    </nz-list-item>
-                  </ng-template>
-                </nz-list>
-              </ng-container>
-
+              @switch (reporteSeleccionado) { @case ('estado-cuenta') { @if
+              (selectedCliente) {
               <app-report-estado-cuenta
-                [company]="company"
-                *ngIf="reporteSeleccionado === 'estado-cuenta'"></app-report-estado-cuenta>
+                [company]="company"></app-report-estado-cuenta>
+              } @else {
+              <report-loader
+                [loading]="loading"
+                [textLoader]="'cliente'"></report-loader>
+              } } @case ('clientes-mora') {
               <app-report-clients-mora
                 [company]="company"
-                *ngIf="reporteSeleccionado === 'clientes-mora'"></app-report-clients-mora>
+                [currentUser]="currentUser"></app-report-clients-mora>
+              } @case ('record-crediticio') { @if (selectedCliente) {
               <app-report-record-crediticio
-                [company]="company"
-                *ngIf="reporteSeleccionado ==='record-crediticio'"></app-report-record-crediticio>
-
-              <app-report-cartera-asesores [idAsesor]="selectedAsesor?.id || 0"
-                *ngIf="reporteSeleccionado ==='cartera-asesor'"></app-report-cartera-asesores>
+                [selectedCliente]="selectCliente"
+                [company]="company"></app-report-record-crediticio>
+              } @else {
+              <report-loader
+                [loading]="loading"
+                [textLoader]="'cliente'"></report-loader>
+              } } @case ('cartera-asesor') { @if (selectedAsesor ||
+              currentUser.rolid === 3) {
+              <app-report-cartera-asesores
+                [idAsesor]="selectedAsesor?.id || 0"></app-report-cartera-asesores>
+              } @else {
+              <report-loader
+                [loading]="loading"
+                [textLoader]="'asesor'"></report-loader>
+              } } @default {
+              <report-loader [loading]="loading"></report-loader>
+              } }
             </section>
           </ion-card-content>
         </ion-card>
@@ -268,8 +233,8 @@
     </ion-header>
     <ion-content>
       <ion-searchbar
-        (ionInput)="filterAsesores($event)"
-        placeholder="Buscar asesor"></ion-searchbar>
+        (ionInput)="filterClientes($event)"
+        placeholder="Buscar cliente"></ion-searchbar>
       <ion-list>
         <ion-item
           class="user-select-none"

@@ -226,6 +226,10 @@ export class PersonasPage implements OnInit {
   buildColumns() {
     this.columnsData = [
       {
+        key: "id",
+        alias: "Código",
+      },
+      {
         key: "nombres",
         alias: "Nombres",
       },

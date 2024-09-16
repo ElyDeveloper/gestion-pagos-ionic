@@ -69,3 +69,9 @@ th {
       border-bottom: none;
   }
 }
+
+.date-emision{
+  //Colocar parrafos uno al lado del otro modo between
+  display: flex;
+  justify-content: space-between;
+}

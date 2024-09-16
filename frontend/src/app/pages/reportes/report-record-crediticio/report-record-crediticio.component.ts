@@ -7,6 +7,7 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class ReportRecordCrediticioComponent  implements OnInit {
   @Input() company: string = 'Company N/D';
+  @Input() selectedCliente: any = null;
   constructor() { }
 
   ngOnInit() {}

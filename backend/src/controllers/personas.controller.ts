@@ -86,17 +86,6 @@ export class PersonasController {
     return this.usuarioClienteRepository.create(usuarioCliente);
   }
 
-  // @get('/personas/count')
-  // @response(200, {
-  //   description: 'Personas model count',
-  //   content: {'application/json': {schema: CountSchema}},
-  // })
-  // async count(@param.where(Personas) where?: Where<Personas>): Promise<Count> {
-  //   return this.personasRepository.count({
-  //     estado: true,
-  //   });
-  // }
-
   @get('/personas/count')
   @response(200, {
     description: 'Personas model count',
@@ -107,21 +96,43 @@ export class PersonasController {
     currentUser: UserProfile,
     @param.where(Personas) where?: Where<Personas>,
   ): Promise<Count> {
-    console.log('Usuario Logueado: ', currentUser);
     const userId = parseInt(currentUser[securityId], 10);
-    console.log('Id de Usuario Logueado en Clientes: ', userId);
 
     const user = await this.usuarioRepository.findById(userId);
     if (!user) {
       throw new HttpErrors.Unauthorized('Usuario no encontrado');
     }
-    console.log('Usuario encontrado: ', user);
 
     if (user.rolid === 3) {
-      return this.usuarioClienteRepository.count({
-        usuarioId: userId,
+      const usuariosClientes = await this.usuarioClienteRepository.find({
+        where: {
+          usuarioId: userId,
+        },
+        include: [
+          {
+            relation: 'cliente',
+            scope: {
+              where: {
+                and: [{idTipoPersona: 1}, {estado: true}],
+              },
+            },
+          },
+        ],
       });
+
+      // Filtrar y contar solo los clientes con estado=true
+      const clientesActivos = usuariosClientes.filter(
+        uc => uc.cliente && uc.cliente.estado === true,
+      );
+      const cantidadClientesActivos = clientesActivos.length;
+
+      // console.log('Clientes activos: ', clientesActivos);
+      console.log('Cantidad de Clientes activos: ', cantidadClientesActivos);
+
+      return {count: cantidadClientesActivos};
     }
+
+    // Para otros roles, mantenemos la lógica existente
     return this.personasRepository.count({
       estado: true,
     });
@@ -145,12 +156,35 @@ export class PersonasController {
     if (!user) {
       throw new HttpErrors.Unauthorized('Usuario no encontrado');
     }
-    console.log('Usuario encontrado: ', user);
+    // console.log('Usuario encontrado: ', user);
 
     if (user.rolid === 3) {
-      return this.usuarioClienteRepository.count({
-        usuarioId: userId,
+      const usuariosClientes = await this.usuarioClienteRepository.find({
+        where: {
+          usuarioId: userId,
+        },
+        include: [
+          {
+            relation: 'cliente',
+            scope: {
+              where: {
+                and: [{idTipoPersona: 1}, {estado: true}],
+              },
+            },
+          },
+        ],
       });
+
+      // Filtrar y contar solo los clientes con estado=true
+      const clientesActivos = usuariosClientes.filter(
+        uc => uc.cliente && uc.cliente.estado === true,
+      );
+      const cantidadClientesActivos = clientesActivos.length;
+
+      // console.log('Clientes activos: ', clientesActivos);
+      console.log('Cantidad de Clientes activos: ', cantidadClientesActivos);
+
+      return {count: cantidadClientesActivos};
     }
     return this.personasRepository.count({
       idTipoPersona: 1,
@@ -203,86 +237,75 @@ export class PersonasController {
     },
   })
   async dataPaginate(
-    @inject(SecurityBindings.USER)
-    currentUser: UserProfile,
+    @inject(SecurityBindings.USER) currentUser: UserProfile,
     @param.query.number('skip') skip: number,
     @param.query.number('limit') limit: number,
-  ): Promise<any[]> {
-    console.log('Usuario Logueado: ', currentUser);
+  ): Promise<any> {
     const userId = parseInt(currentUser[securityId], 10);
-    console.log('Id de Usuario Logueado: ', userId);
 
     const user = await this.usuarioRepository.findById(userId);
     if (!user) {
       throw new HttpErrors.Unauthorized('Usuario no encontrado');
     }
-    console.log('Usuario encontrado: ', user);
 
     if (user.rolid === 3) {
-      const usuariosCliente = await this.usuarioClienteRepository.find({
-        where: {usuarioId: userId, estado: true},
-        include: [
-          {
-            relation: 'cliente',
-            scope: {
-              where: {estado: true},
-              include: [
-                'nacionalidad',
-                'recordCrediticio',
-                'estadoCivil',
-                'tipoPersona',
-              ],
+      const [usuariosCliente] = await Promise.all([
+        this.usuarioClienteRepository.find({
+          where: {usuarioId: userId, estado: true},
+          include: [
+            {
+              relation: 'cliente',
+              scope: {
+                where: {estado: true},
+                include: [
+                  'nacionalidad',
+                  'recordCrediticio',
+                  'estadoCivil',
+                  'tipoPersona',
+                ],
+              },
             },
-          },
-        ],
-        skip,
-        limit,
-        order: ['id DESC'],
-      });
-
-      // console.log('UsuariosClientes encontrados: ', usuariosCliente);
+          ],
+          skip,
+          limit,
+          order: ['id DESC'],
+        }),
+      ]);
 
       const clients = usuariosCliente
-        .map((uc: any) => {
-          const ucC = uc?.cliente;
-          console.log('Cliente encontrado: ', ucC);
-          return ucC;
-        })
+        .map((uc: any) => uc?.cliente)
         .filter(
           (client): client is NonNullable<typeof client> => client != null,
-        );
-
-      //Encriptar id de clientes
-      clients.forEach((c: any) => {
-        c.idEncrypted = this.jwtService.encryptId(c.id || 0);
-      });
+        )
+        .map(c => ({
+          ...c,
+          idEncrypted: this.jwtService.encryptId(c.id || 0),
+        }));
 
       return clients;
+    } else {
+      const [personas] = await Promise.all([
+        this.personasRepository.find({
+          where: {estado: true},
+          include: [
+            'nacionalidad',
+            'recordCrediticio',
+            'estadoCivil',
+            'tipoPersona',
+          ],
+          skip,
+          limit,
+          order: ['id DESC'],
+        }),
+      ]);
+
+      const personasConIdEncriptado = personas.map(persona => ({
+        ...persona,
+        idEncrypted: this.jwtService.encryptId(persona.id || 0),
+      }));
+
+      return personasConIdEncriptado;
     }
-
-    let personas = await this.personasRepository.find({
-      where: {
-        estado: true,
-      },
-      include: [
-        'nacionalidad',
-        'recordCrediticio',
-        'estadoCivil',
-        'tipoPersona',
-      ],
-      skip,
-      limit,
-      order: ['id DESC'],
-    });
-
-    let copiaSpread = personas.map(persona => ({
-      ...persona,
-      idEncrypted: this.jwtService.encryptId(persona.id || 0),
-    }));
-
-    console.log('Personas encontradas: ', copiaSpread);
-
-    return copiaSpread;
   }
 
   @get('/personas/clientes/paginated')
@@ -308,6 +331,7 @@ export class PersonasController {
     console.log('Id de Usuario Logueado: ', userId);
 
     console.log('Consulta paginada: ', skip);
+
     const personas = await this.personasRepository.find({
       where: {
         idTipoPersona: 1,
@@ -329,7 +353,7 @@ export class PersonasController {
       idEncrypted: this.jwtService.encryptId(persona.id || 0),
     }));
 
-    console.log('Personas encontradas: ', copiaSpread);
+    // console.log('Personas encontradas: ', copiaSpread);
 
     return copiaSpread;
   }
@@ -535,21 +559,58 @@ export class PersonasController {
 
   @get('/personas/todos/search')
   async dataPersonasSearch(
+    @inject(SecurityBindings.USER)
+    currentUser: UserProfile,
     @param.query.string('query') search: string,
   ): Promise<any> {
-    // let PersonasSearch = await this.getPersonasSearch(search);
-    // console.log('PersonasSearch', PersonasSearch);
-    // return PersonasSearch;
-
     console.log('search', search);
 
-    const personas = await this.personasRepository.find({
+    console.log('Usuario Logueado: ', currentUser);
+    const userId = parseInt(currentUser[securityId], 10);
+    console.log('Id de Usuario Logueado: ', userId);
+
+    const user = await this.usuarioRepository.findById(userId);
+    if (!user) {
+      throw new HttpErrors.Unauthorized('Usuario no encontrado');
+    }
+    console.log('Usuario encontrado: ', user);
+
+    let idsClientes: number[] = [];
+    if (user.rolid === 3) {
+      const usuariosCliente = await this.usuarioClienteRepository.find({
+        where: {usuarioId: userId, estado: true},
+        include: [
+          {
+            relation: 'cliente',
+            scope: {
+              where: {estado: true},
+              include: [
+                'nacionalidad',
+                'recordCrediticio',
+                'estadoCivil',
+                'tipoPersona',
+              ],
+            },
+          },
+        ],
+        order: ['id DESC'],
+      });
+
+      //Sacar ids de clientes
+      idsClientes = usuariosCliente.map(uc => uc.clienteId);
+    }
+
+    let personas = await this.personasRepository.find({
       where: {
-        estado: true,
-        or: [
-          {dni: {like: `%${search}%`}},
-          {nombres: {like: `%${search}%`}},
-          {apellidos: {like: `%${search}%`}},
+        and: [
+          {
+            or: [
+              {dni: {like: `%${search}%`}},
+              {nombres: {like: `%${search}%`}},
+              {apellidos: {like: `%${search}%`}},
+            ],
+          },
+          {estado: true},
         ],
       },
       include: [
@@ -560,23 +621,68 @@ export class PersonasController {
       ],
     });
 
+    console.log('Personas encontradas: ', personas.length);
+
+    if (idsClientes && idsClientes.length > 0) {
+      personas = personas.filter(persona =>
+        idsClientes.includes(persona.id || 0),
+      );
+    }
+
     let copiaSpread = personas.map(persona => ({
       ...persona,
       idEncrypted: this.jwtService.encryptId(persona.id || 0),
     }));
 
-    console.log('Personas encontradas: ', copiaSpread);
+    // console.log('Personas encontradas: ', copiaSpread);
 
     return copiaSpread;
   }
 
   @get('/personas/clientes/search')
   async dataClientesSearch(
+    @inject(SecurityBindings.USER)
+    currentUser: UserProfile,
     @param.query.string('query') search: string,
   ): Promise<any> {
     console.log('search', search);
 
-    const personas = await this.personasRepository.find({
+    console.log('Usuario Logueado: ', currentUser);
+    const userId = parseInt(currentUser[securityId], 10);
+    console.log('Id de Usuario Logueado: ', userId);
+
+    const user = await this.usuarioRepository.findById(userId);
+    if (!user) {
+      throw new HttpErrors.Unauthorized('Usuario no encontrado');
+    }
+    console.log('Usuario encontrado: ', user);
+
+    let idsClientes: number[] = [];
+    if (user.rolid === 3) {
+      const usuariosCliente = await this.usuarioClienteRepository.find({
+        where: {usuarioId: userId, estado: true},
+        include: [
+          {
+            relation: 'cliente',
+            scope: {
+              where: {estado: true},
+              include: [
+                'nacionalidad',
+                'recordCrediticio',
+                'estadoCivil',
+                'tipoPersona',
+              ],
+            },
+          },
+        ],
+        order: ['id DESC'],
+      });
+
+      //Sacar ids de clientes
+      idsClientes = usuariosCliente.map(uc => uc.clienteId);
+    }
+
+    let personas = await this.personasRepository.find({
       where: {
         and: [
           {idTipoPersona: 1},
@@ -597,6 +703,13 @@ export class PersonasController {
         'tipoPersona',
       ],
     });
+
+    if (idsClientes && idsClientes.length > 0) {
+      personas = personas.filter(persona =>
+        idsClientes.includes(persona.id || 0),
+      );
+    }
+
     let copiaSpread = personas.map(persona => ({
       ...persona,
       idEncrypted: this.jwtService.encryptId(persona.id || 0),
