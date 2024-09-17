@@ -255,7 +255,7 @@ export class GestionPrestamoPage implements OnInit {
         setter: (data: any) => (this.periodosCobro = data),
       },
       {
-        key: "estados-aprobacions",
+        key: "estados-internos",
         setter: (data: any) => (this.estadosAprobacion = data),
       },
       { key: "monedas", setter: (data: any) => (this.monedas = data) },
@@ -279,7 +279,7 @@ export class GestionPrestamoPage implements OnInit {
   }
 
   initValuesForm() {
-    this.prestamoForm.get("idEstadoAprobacion")?.setValue(1);
+    this.prestamoForm.get("idEstadoInterno")?.setValue(1);
   }
 
   searchDataClient() {
@@ -422,7 +422,7 @@ export class GestionPrestamoPage implements OnInit {
       idCliente: this.clienteSeleccionado.id,
       idProducto: this.prestamoForm.get("idProducto")?.value,
       idPeriodoCobro: this.prestamoForm.get("idPeriodoCobro")?.value,
-      idEstadoAprobacion: this.prestamoForm.get("idEstadoAprobacion")?.value,
+      idEstadoInterno: this.prestamoForm.get("idEstadoInterno")?.value,
       idPlan: idPlan,
       idMoneda: this.prestamoForm.get("idMoneda")?.value,
       idAval: this.avalSeleccionado?.id || null,

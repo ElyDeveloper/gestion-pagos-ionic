@@ -1,5 +1,5 @@
 // export Interfaces para los elementos del encabezado
-export interface Encabezado {
+export interface EncabezadoRecordCrediticio {
   idPrestamo: number | string;
   cliente: string;
   direccion: string;
@@ -14,7 +14,7 @@ export interface Encabezado {
 }
 
 // export Interfaces para los elementos del cuerpo
-export interface Cuerpo {
+export interface CuerpoRecordCrediticio {
   idPrestamo: number;
   fechaVencimiento: string;
   fechaCancelacion: string;
@@ -26,7 +26,7 @@ export interface Cuerpo {
 }
 
 // export Interfaces para los elementos del pie
-export interface Pie {
+export interface PieRecordCrediticio {
   idPrestamo: number;
   fecha: string;
   plazo: string;
@@ -38,7 +38,7 @@ export interface Pie {
 
 // export Interface principal que engloba todas las secciones
 export interface InformePrestamo {
-  encabezados: Encabezado[];
-  cuerpo: Cuerpo[];
-  pie: Pie[];
+  encabezados: EncabezadoRecordCrediticio[];
+  cuerpo: CuerpoRecordCrediticio[];
+  pie: PieRecordCrediticio[];
 }

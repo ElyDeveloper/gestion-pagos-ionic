@@ -1,13 +1,13 @@
 import {inject, Getter} from '@loopback/core';
 import {DefaultCrudRepository, repository, BelongsToAccessor, HasManyRepositoryFactory} from '@loopback/repository';
 import {GestionEdboDataSource} from '../datasources';
-import {Prestamos, PrestamosRelations, Personas, Productos, PlanesPago, Monedas, PeriodosCobro, EstadosAprobacion, Pagos} from '../models';
+import {Prestamos, PrestamosRelations, Personas, Productos, PlanesPago, Monedas, PeriodosCobro, EstadosInternos, Pagos} from '../models';
 import {PersonasRepository} from './personas.repository';
 import {ProductosRepository} from './productos.repository';
 import {PlanesPagoRepository} from './planes-pago.repository';
 import {MonedasRepository} from './monedas.repository';
 import {PeriodosCobroRepository} from './periodos-cobro.repository';
-import {EstadosAprobacionRepository} from './estados-aprobacion.repository';
+import {EstadosInternosRepository} from './estados-internos.repository';
 
 export class PrestamosRepository extends DefaultCrudRepository<
   Prestamos,
@@ -25,18 +25,18 @@ export class PrestamosRepository extends DefaultCrudRepository<
 
   public readonly periodoCobro: BelongsToAccessor<PeriodosCobro, typeof Prestamos.prototype.id>;
 
-  public readonly estadoAprobacion: BelongsToAccessor<EstadosAprobacion, typeof Prestamos.prototype.id>;
+  public readonly estadoInterno: BelongsToAccessor<EstadosInternos, typeof Prestamos.prototype.id>;
 
   public readonly aval: BelongsToAccessor<Personas, typeof Prestamos.prototype.id>;
 
   constructor(
-    @inject('datasources.GestionEDBO') dataSource: GestionEdboDataSource, @repository.getter('PersonasRepository') protected personasRepositoryGetter: Getter<PersonasRepository>, @repository.getter('ProductosRepository') protected productosRepositoryGetter: Getter<ProductosRepository>, @repository.getter('PlanesPagoRepository') protected planesPagoRepositoryGetter: Getter<PlanesPagoRepository>, @repository.getter('MonedasRepository') protected monedasRepositoryGetter: Getter<MonedasRepository>, @repository.getter('PeriodosCobroRepository') protected periodosCobroRepositoryGetter: Getter<PeriodosCobroRepository>, @repository.getter('EstadosAprobacionRepository') protected estadosAprobacionRepositoryGetter: Getter<EstadosAprobacionRepository>,
+    @inject('datasources.GestionEDBO') dataSource: GestionEdboDataSource, @repository.getter('PersonasRepository') protected personasRepositoryGetter: Getter<PersonasRepository>, @repository.getter('ProductosRepository') protected productosRepositoryGetter: Getter<ProductosRepository>, @repository.getter('PlanesPagoRepository') protected planesPagoRepositoryGetter: Getter<PlanesPagoRepository>, @repository.getter('MonedasRepository') protected monedasRepositoryGetter: Getter<MonedasRepository>, @repository.getter('PeriodosCobroRepository') protected periodosCobroRepositoryGetter: Getter<PeriodosCobroRepository>, @repository.getter('EstadosInternosRepository') protected EstadosInternosRepositoryGetter: Getter<EstadosInternosRepository>,
   ) {
     super(Prestamos, dataSource);
     this.aval = this.createBelongsToAccessorFor('aval', personasRepositoryGetter,);
     this.registerInclusionResolver('aval', this.aval.inclusionResolver);
-    this.estadoAprobacion = this.createBelongsToAccessorFor('estadoAprobacion', estadosAprobacionRepositoryGetter,);
-    this.registerInclusionResolver('estadoAprobacion', this.estadoAprobacion.inclusionResolver);
+    this.estadoInterno = this.createBelongsToAccessorFor('estadoInterno', EstadosInternosRepositoryGetter,);
+    this.registerInclusionResolver('estadoInterno', this.estadoInterno.inclusionResolver);
     this.periodoCobro = this.createBelongsToAccessorFor('periodoCobro', periodosCobroRepositoryGetter,);
     this.registerInclusionResolver('periodoCobro', this.periodoCobro.inclusionResolver);
     this.moneda = this.createBelongsToAccessorFor('moneda', monedasRepositoryGetter,);

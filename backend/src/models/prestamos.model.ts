@@ -4,8 +4,7 @@ import {Productos} from './productos.model';
 import {PlanesPago} from './planes-pago.model';
 import {Monedas} from './monedas.model';
 import {PeriodosCobro} from './periodos-cobro.model';
-import {EstadosAprobacion} from './estados-aprobacion.model';
-import {Pagos} from './pagos.model';
+import { EstadosInternos } from './estados-internos.model';
 
 @model({settings: {idInjection: false, mssql: {schema: 'dbo', table: 'Prestamos'}}})
 export class Prestamos extends Entity {
@@ -93,8 +92,8 @@ export class Prestamos extends Entity {
   @belongsTo(() => PeriodosCobro, {name: 'periodoCobro'})
   idPeriodoCobro: number;
 
-  @belongsTo(() => EstadosAprobacion, {name: 'estadoAprobacion'})
-  idEstadoAprobacion: number;
+  @belongsTo(() => EstadosInternos, {name: 'estadoInterno'})
+  idEstadoInterno: number;
 
   @belongsTo(() => Personas, {name: 'aval'})
   idAval: number;

@@ -1,10 +1,9 @@
-import {Entity, hasMany, model, property} from '@loopback/repository';
-import { Prestamos } from './prestamos.model';
+import {Entity, model, property} from '@loopback/repository';
 
 @model({
-  settings: {idInjection: false, mssql: {schema: 'dbo', table: 'EstadosAprobacion'}}
+  settings: {idInjection: false, mssql: {schema: 'dbo', table: 'EstadosInternos'}}
 })
-export class EstadosAprobacion extends Entity {
+export class EstadosInternos extends Entity {
   @property({
     type: 'number',
     jsonSchema: {nullable: false},
@@ -36,20 +35,18 @@ export class EstadosAprobacion extends Entity {
   descripcion?: string;
 
   // Define well-known properties here
-  @hasMany(() => Prestamos, {keyTo: 'idEstadoAprobacion'})
-  prestamos: Prestamos[];
 
   // Indexer property to allow additional data
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [prop: string]: any;
 
-  constructor(data?: Partial<EstadosAprobacion>) {
+  constructor(data?: Partial<EstadosInternos>) {
     super(data);
   }
 }
 
-export interface EstadosAprobacionRelations {
+export interface EstadosInternosRelations {
   // describe navigational properties here
 }
 
-export type EstadosAprobacionWithRelations = EstadosAprobacion & EstadosAprobacionRelations;
+export type EstadosInternosWithRelations = EstadosInternos & EstadosInternosRelations;

@@ -231,7 +231,7 @@ export class CheckPrestamosController {
               fechaInicio: {type: 'string'},
               periodoCobro: {type: 'number'},
               numeroCuotas: {type: 'number'},
-              idEstadoAprobacion: {type: 'number'},
+              idEstadoInterno: {type: 'number'},
             },
           },
         },
@@ -245,7 +245,7 @@ export class CheckPrestamosController {
       fechaInicio: string;
       periodoCobro: number;
       numeroCuotas: number;
-      idEstadoAprobacion: number;
+      idEstadoInterno: number;
     },
   ): Promise<any> {
     const {
@@ -255,7 +255,7 @@ export class CheckPrestamosController {
       fechaInicio,
       periodoCobro,
       numeroCuotas,
-      idEstadoAprobacion,
+      idEstadoInterno,
     } = datos;
 
     await this.validateExistingPayments(planId);
@@ -274,7 +274,7 @@ export class CheckPrestamosController {
       idPrestamo,
       fechaInicio,
       latestDate,
-      idEstadoAprobacion,
+      idEstadoInterno,
     );
 
     return this.saveOrUpdatePaymentDates(planId, fechasPagos);
@@ -342,7 +342,7 @@ export class CheckPrestamosController {
     prestamoId: number,
     fechaInicio: string,
     latestDate: string | undefined,
-    idEstadoAprobacion: number,
+    idEstadoInterno: number,
   ): Promise<void> {
     await this.planesPagoRepository.updateById(planId, {
       fechaInicio,
@@ -350,7 +350,7 @@ export class CheckPrestamosController {
     });
 
     await this.prestamosRepository.updateById(prestamoId, {
-      idEstadoAprobacion,
+      idEstadoInterno,
       fechaAprobacion: new Date().toISOString(),
     });
   }

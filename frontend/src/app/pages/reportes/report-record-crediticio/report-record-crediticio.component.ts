@@ -1,9 +1,9 @@
 import { Component, inject, Input, OnInit } from "@angular/core";
 import { catchError, firstValueFrom, tap } from "rxjs";
 import {
-  Cuerpo,
-  Encabezado,
-  Pie,
+  CuerpoRecordCrediticio,
+  EncabezadoRecordCrediticio,
+  PieRecordCrediticio,
 } from "src/app/shared/interfaces/report-record-crediticio";
 import { GlobalService } from "src/app/shared/services/global.service";
 
@@ -18,7 +18,7 @@ export class ReportRecordCrediticioComponent implements OnInit {
   selectedAsesor: any = null;
 
   idCliente: number = 0;
-  encabezado: Encabezado = {
+  encabezado: EncabezadoRecordCrediticio = {
     idPrestamo: 'N/A',
     cliente: "N/A",
     direccion: "N/A",
@@ -31,8 +31,8 @@ export class ReportRecordCrediticioComponent implements OnInit {
     recordCrediticio: "N/A",
     cantidadDesembolso: 0,
   };
-  pie: Pie[] = [];
-  cuerpo: Cuerpo[] = [];
+  pie: PieRecordCrediticio[] = [];
+  cuerpo: CuerpoRecordCrediticio[] = [];
 
   dateNow: Date = new Date();
 

@@ -31,8 +31,6 @@ export class ReportClientsMoraComponent implements OnInit {
 
   isPrint = false;
 
-  uploader!: FileUploader;
-
   @Input() currentUser: any;
   idUser: number = 0;
 
@@ -90,10 +88,4 @@ export class ReportClientsMoraComponent implements OnInit {
     );
   }
   
-  scrollToElement(section: string): void {
-    const element = document.getElementById(section);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }
 }

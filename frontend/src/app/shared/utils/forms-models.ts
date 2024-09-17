@@ -70,7 +70,7 @@ export class FormModels {
       idCliente: [null],
       idProducto: [null, Validators.required],
       idPeriodoCobro: [null, Validators.required],
-      idEstadoAprobacion: [null, Validators.required],
+      idEstadoInterno: [null, Validators.required],
       idPlan: [null],
       idMoneda: [null, Validators.required],
       idAval: [null],
@@ -91,7 +91,7 @@ export class FormModels {
   checkForm(): FormGroup {
     return this.fb.group({
       fechaInicio: [null, Validators.required],
-      idEstadoAprobacion: [null, Validators.required],
+      idEstadoInterno: [null, Validators.required],
     });
   }
 

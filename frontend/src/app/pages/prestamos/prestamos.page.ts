@@ -40,7 +40,7 @@ export class PrestamosPage implements OnInit {
     idCliente: 0,
     idProducto: 0,
     idPeriodoCobro: 0,
-    idEstadoAprobacion: 0,
+    idEstadoInterno: 0,
     idPlan: 0,
     idMoneda: 0,
     idAval: 0,
@@ -130,7 +130,7 @@ export class PrestamosPage implements OnInit {
   getEstadosAprobacion() {
     // TODO: Implementar la llamada a la API para obtener los estados de aprobación
     Ejemplo: this._globalService
-      .Get("estados-aprobacions")
+      .Get("estados-internos")
       .subscribe((data: any) => {
         this.estadosAprobacion = data;
       });
@@ -225,7 +225,7 @@ export class PrestamosPage implements OnInit {
         alias: "Período de Cobro",
       },
       {
-        key: "estadoAprobacion.nombre",
+        key: "estadoInterno.nombre",
         alias: "Estado de Aprobación",
       },
       {
@@ -317,7 +317,7 @@ export class PrestamosPage implements OnInit {
     this.element = formData;
 
     form.get("fechaInicio")?.setValue(formData.planPago.fechaInicio);
-    form.get("idEstadoAprobacion")?.setValue(formData.idEstadoAprobacion);
+    form.get("idEstadoInterno")?.setValue(formData.idEstadoInterno);
 
     // console.log("Modal Template: ", modalTemplate);
     // console.log("Form Select: ", form);
@@ -496,7 +496,7 @@ export class PrestamosPage implements OnInit {
       fechaInicio: data.fechaInicio,
       periodoCobro: this.element.idPeriodoCobro,
       numeroCuotas: this.element.planPago?.cuotasPagar || 0,
-      idEstadoAprobacion: data.idEstadoAprobacion || 0,
+      idEstadoInterno: data.idEstadoInterno || 0,
     };
     switch (operation) {
       case "create":

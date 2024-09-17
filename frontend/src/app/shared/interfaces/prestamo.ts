@@ -20,7 +20,7 @@ export interface Prestamos {
   idPlan: number;
   idMoneda: number;
   idPeriodoCobro: number;
-  idEstadoAprobacion: number;
+  idEstadoInterno: number;
   idAval: number;
   idEncrypted?:string;
 
@@ -30,7 +30,7 @@ export interface Prestamos {
   planPago?: PlanesPago;
   moneda?: Monedas;
   periodoCobro?: PeriodosCobro;
-  estadoAprobacion?: EstadosAprobacion;
+  estadoInterno?: EstadosAprobacion;
   aval?: Personas;
   pagos?: Pagos[];
 
