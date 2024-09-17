@@ -83,6 +83,10 @@ export class ReportesPage implements OnInit {
     this.suscriptions.push(
       this._authService.getUserInfo().subscribe((user) => {
         this.currentUser = user;
+        if (user?.rolid === 3) {
+          this.selectedAsesor = user;
+          console.log("User es asesor:", user);
+        }
       })
     );
   }
@@ -110,7 +114,7 @@ export class ReportesPage implements OnInit {
         );
         break;
       case "cartera-asesor":
-        this.reportCarteraAsesor.getCarteraAsesor();
+        this.reportCarteraAsesor.getCarteraAsesor(this.selectedAsesor);
         break;
       default:
         break;
@@ -227,12 +231,9 @@ export class ReportesPage implements OnInit {
     this._loaderService.show();
     const customPrintOptions: PrintOptions = new PrintOptions({
       printSectionId: "report-print",
-
       // Add any other print options as needed
     });
     this._printService.styleSheetFile = "assets/css/print.css";
-
-    //eliminar elemento         key: "actions", del objeto columnsData
 
     //esperar 1 segundo para que se muestre el loader
     setTimeout(() => {

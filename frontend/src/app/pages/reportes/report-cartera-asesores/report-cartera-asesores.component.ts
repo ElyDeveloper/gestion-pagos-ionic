@@ -18,13 +18,14 @@ export class ReportCarteraAsesoresComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    this.getCarteraAsesor();
+    this.getCarteraAsesor(this.selectedAsesor);
   }
 
-  async getCarteraAsesor() {
+  async getCarteraAsesor(asesor:any) {
     // prestamos/reporte-cartera-asesor?idUsuario=4
 
-    if (!this.selectedAsesor) return;
+    if (!asesor) return;
+    this.selectedAsesor = asesor;
     await this.fetchCartera();
   }
 

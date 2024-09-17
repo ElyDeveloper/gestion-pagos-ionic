@@ -95,7 +95,6 @@
   @page {
     margin: 2cm;
     size: landscape;
-
   }
 
   p {
@@ -108,15 +107,21 @@
     border-collapse: collapse;
     margin-bottom: 20px;
   }
+
   th,
   td {
     border: 1px solid #ddd;
     padding: 4px;
     text-align: left;
   }
+
   th {
-    background-color: #f2f2f2;
+    background-color: #f2f2f2 !important;
     text-align: center;
+  }
+
+  thead {
+    background-color: #f2f2f2 !important;
   }
 
   .especial-right {
@@ -200,18 +205,4 @@
 .logo {
   width: 100px;
   height: auto;
-}
-
-/* Mobile view adjustments */
-@media (max-width: 600px) {
-  .info-grid {
-    grid-template-columns: 1fr;
-  }
-  .info-item {
-    border-right: none;
-    border-bottom: 1px solid #ccc;
-  }
-  .info-item:last-child {
-    border-bottom: none;
-  }
 }

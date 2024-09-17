@@ -36,7 +36,7 @@
   <ion-grid>
     <ion-row>
       <ion-col size-xs="12" size-md="6" size-lg="6">
-        <ion-card>
+        <ion-card style="min-height: 290px">
           <ion-card-header>
             @if(currentUser.rolid!==3){
             <ion-card-title>Panel Administrativo</ion-card-title>
@@ -62,7 +62,10 @@
                 (click)="showOpenModal(true, 'asesor')"
                 shape="round"
                 [disabled]="!enableFilterAsesor">
-                <ion-icon class="py-1" name="search-outline" slot="icon-only"></ion-icon>
+                <ion-icon
+                  class="py-1"
+                  name="search-outline"
+                  slot="icon-only"></ion-icon>
               </ion-button>
             </ion-item>
             }
@@ -83,7 +86,10 @@
                 (click)="showOpenModal(true, 'cliente')"
                 shape="round"
                 [disabled]="!enableFilterCliente">
-                <ion-icon class="py-1" name="search-outline" slot="icon-only"></ion-icon>
+                <ion-icon
+                  class="py-1"
+                  name="search-outline"
+                  slot="icon-only"></ion-icon>
               </ion-button>
             </ion-item>
           </ion-card-content>
@@ -91,7 +97,7 @@
       </ion-col>
 
       <ion-col size-xs="12" size-md="6" size-lg="6">
-        <ion-card>
+        <ion-card style="min-height: 290px">
           <ion-card-header>
             <ion-card-title>Reportes</ion-card-title>
           </ion-card-header>
@@ -143,16 +149,11 @@
               } @case ('record-crediticio') {
               <app-report-record-crediticio
                 [company]="company"></app-report-record-crediticio>
-              } @case ('cartera-asesor') { @if (selectedAsesor ||
-              currentUser.rolid === 3) {
+              } @case ('cartera-asesor') {
               <app-report-cartera-asesores
                 [company]="company"
                 [selectedAsesor]="selectedAsesor"></app-report-cartera-asesores>
-              } @else {
-              <report-loader
-                [loading]="loading"
-                [textLoader]="'asesor'"></report-loader>
-              } } @default {
+              } @default {
               <report-loader [loading]="loading"></report-loader>
               } }
             </section>

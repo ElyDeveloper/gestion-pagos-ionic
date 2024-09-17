@@ -5,27 +5,23 @@
 <div class="cliente-info">
   <div class="info-grid">
     <div class="info-item">
-      <span class="info-label">CLIENTE:</span>
+      <span class="info-label">ASESOR:</span>
       <span class="info-value">Eduardo Josue Orellana Dìaz</span>
     </div>
     <div class="info-item">
-      <span class="info-label">NRO. CLIENTE:</span>
+      <span class="info-label">COD. ASESOR:</span>
       <span class="info-value">1022</span>
     </div>
     <div class="info-item">
-      <span class="info-label">TELEFONO:</span>
+      <span class="info-label">TELÉFONO:</span>
       <span class="info-value">32647048</span>
     </div>
   </div>
 </div>
 <table>
   <tr>
-    <th class="especial-right">Día de Pago:</th>
-    <td>Miércoles</td>
     <th class="especial-right">Monto Otorgado:</th>
     <td>{{ 22000 | currency : "L" : "symbol" }}</td>
-  </tr>
-  <tr>
     <th class="especial-right">Saldo Capital Actual:</th>
     <td>{{ 20166.67 | currency : "L" : "symbol" }}</td>
     <th class="especial-right">Saldo Actual:</th>
@@ -34,14 +30,19 @@
   <tr>
     <th class="especial-right">Valor Cuota:</th>
     <td>{{ 2658.33 | currency : "L" : "symbol" }}</td>
-    <th class="especial-right">Plazo:</th>
-    <td>12</td>
+    <th class="especial-right">Tasa Promedio:</th>
+    <td>{{ 2658.33 | currency : "L" : "symbol" }}</td>
+    <th class="especial-right">Valor Total a Pagar:</th>
+    <td>{{ 2658.33 | currency : "L" : "symbol" }}</td>
   </tr>
+
   <tr>
-    <th class="especial-right">Meses:</th>
-    <td>2</td>
-    <th class="especial-right">Tasa:</th>
-    <td>45%</td>
+    <th class="especial-right">Valor Cuotas Atrasadas:</th>
+    <td>{{ 2658.33 | currency : "L" : "symbol" }}</td>
+    <th class="especial-right">Total Mora:</th>
+    <td>{{ 2658.33 | currency : "L" : "symbol" }}</td>
+    <th class="especial-right">Mora:</th>
+    <td>{{ 2658.33 | currency : "L" : "symbol" }}</td>
   </tr>
 </table>
 
@@ -69,25 +70,43 @@
     </tr>
   </thead>
   <tbody>
+    @for (item of carteraAsesor; track $index) {
     <tr>
-      <td>1022</td>
-      <td>Eduardo Josue Orellana Dìaz</td>
-      <td>32647048</td>
-      <td>Miércoles</td>
-      <td>L 22,000.00</td>
-      <td>L 20,166.67</td>
-      <td>L 29,241.67</td>
-      <td>L 2,658.33</td>
-      <td>12</td>
-      <td>2</td>
-      <td>45%</td>
-      <td>1</td>
-      <td>L 31,900.00</td>
-      <td>L 2,658.33</td>
-      <td>0</td>
-      <td>L 2,660.99</td>
-      <td>27/11/2024</td>
-      <td>L 2.66</td>
+      <td class="text-center">{{ item.IdPersona }}</td>
+      <td>{{ item.nombreCliente }}</td>
+      <td class="text-center">{{ item.celular }}</td>
+      <td class="text-center">{{ item.diaPago }}</td>
+      <td class="text-center">
+        {{ item.montoOtorgado | currency : "L" : "symbol" }}
+      </td>
+      <td class="text-center">
+        {{ item.saldoCapitalActual | currency : "L" : "symbol" }}
+      </td>
+      <td class="text-center">
+        {{ item.saldoActual | currency : "L" : "symbol" }}
+      </td>
+      <td class="text-center">
+        {{ item.valorCuota | currency : "L" : "symbol" }}
+      </td>
+      <td class="text-center">{{ item.plazo }}</td>
+      <td class="text-center">{{ item.meses }}</td>
+      <td class="text-center">{{ item.tasa }}</td>
+      <td class="text-center">{{ item.cuotasPagadas }}</td>
+      <td class="text-center">
+        {{ item.valorTotal | currency : "L" : "symbol" }}
+      </td>
+      <td class="text-center">
+        {{ item.valorCuotasAtrasadas | currency : "L" : "symbol" }}
+      </td>
+      <td class="text-center">{{ item.diasEnMora }}</td>
+      <td class="text-center">
+        {{ item.totalMora | currency : "L" : "symbol" }}
+      </td>
+      <td class="text-center">
+        {{ item.fechaVencimiento | date : "dd/MM/yyyy" }}
+      </td>
+      <td class="text-center">{{ item.mora | currency : "L" : "symbol" }}</td>
     </tr>
+    }
   </tbody>
 </table>
