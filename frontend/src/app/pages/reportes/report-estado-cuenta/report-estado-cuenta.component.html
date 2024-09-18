@@ -9,24 +9,32 @@
 
 <table>
   <tr>
-    <th class="especial-right">Cód. Préstamo:</th>
-    <td>{{ encabezado.nroPrestamo }}</td>
-    <th class="especial-right">Cód. Cliente:</th>
+    <th class="especial-right">Cliente:</th>
     <td>{{ encabezado.codClientes }}</td>
-    <th class="especial-right">Estado Ptmo. :</th>
-    <td>{{ encabezado.estadoPtmo }}</td>
+    <th class="especial-right">Direccion:</th>
+    <td >{{ encabezado.direccion }}</td>
+    <th class="especial-right">Teléfono:</th>
+    <td >{{ encabezado.telefono }}</td>
   </tr>
   <tr>
+    <th class="especial-right">Cód. Préstamo:</th>
+    <td>{{ encabezado.nroPrestamo }}</td>
+    <th class="especial-right">Estado Ptmo. :</th>
+    <td>{{ encabezado.estadoPtmo ? 'Activo' : 'Inactivo' }}</td>
     <th class="especial-right">Mto. Préstamo:</th>
     <td>{{ encabezado.mtoPrestamo | currency : "L" : "symbol" }}</td>
+  </tr>
+  <tr>
     <th class="especial-right">Saldo Ptmo. :</th>
     <td>{{ encabezado.saldoPtmo | currency : "L" : "symbol" }}</td>
     <th class="especial-right">Asesor:</th>
     <td>{{ encabezado.nombreAsesor }}</td>
-  </tr>
-  <tr>
     <th class="especial-right">F.Desemb. :</th>
     <td>{{ encabezado.fDesembolso | customDate : 6 : "dd/MM/yyyy" }}</td>
+  </tr>
+  <tr>
+    <th class="especial-right">Producto:</th>
+    <td>{{ encabezado.producto }}</td>
     <th class="especial-right">Nro. Cuotas:</th>
     <td>{{ encabezado.plazo }}</td>
     <th class="especial-right">Periodo:</th>
@@ -35,15 +43,10 @@
   <tr>
     <th class="especial-right">T. Mora:</th>
     <td>{{ encabezado.tMora }}</td>
-    <th class="especial-right">Producto:</th>
-    <td>{{ encabezado.producto }}</td>
     <th class="especial-right">Cuota:</th>
     <td>{{ encabezado.cuota | currency : "L" : "symbol" }}</td>
   </tr>
 </table>
-
-<div><strong>Dirección:</strong>{{ encabezado.direccion }}</div>
-<div><strong>Teléfono:</strong>{{ encabezado.telefono }}</div>
 
 <div class="section">SALDOS TOTALES</div>
 <table>

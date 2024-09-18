@@ -21,7 +21,7 @@ export class ReportEstadoCuentaComponent implements OnInit {
   encabezado: EncabezadoEstadoCuenta = {
     nroPrestamo: "N/A",
     codClientes: "N/A",
-    estadoPtmo: "N/A",
+    estadoPtmo: false,
     mtoPrestamo: 0,
     saldoPtmo: 0,
     asesor: "N/A",
