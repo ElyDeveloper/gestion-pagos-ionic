@@ -1,4 +1,4 @@
-import { EstadosInterno } from "./estado-interno";
+import { EstadosInterno } from "./estado-aprobacion";
 import { Monedas } from "./moneda";
 import { Pagos } from "./pago";
 import { PeriodosCobro } from "./periodo-cobro";

@@ -46,7 +46,7 @@
           </ion-card-header>
           <ion-card-content class="p-4">
             @if(currentUser.rolid!==3){
-            <ion-item lines="none" class="ion-margin-top">
+            <ion-item class="ion-margin-top">
               <ion-label>
                 <h2 class="ion-text-wrap">Asesor Seleccionado</h2>
                 <p *ngIf="selectedAsesor; else noAsesor">
@@ -70,7 +70,7 @@
             </ion-item>
             }
 
-            <ion-item lines="none" class="ion-margin-top">
+            <ion-item class="ion-margin-top">
               <ion-label>
                 <h2 class="ion-text-wrap">Cliente Seleccionado</h2>
                 <p *ngIf="selectedCliente; else noCliente">
