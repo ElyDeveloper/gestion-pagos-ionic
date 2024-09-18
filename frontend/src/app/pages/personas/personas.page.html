@@ -79,7 +79,7 @@
           <ion-grid>
             <ion-row>
               <ion-col size-xs="12" size-sm="6" size-md="6">
-                <ion-item>
+                <ion-item lines="none">
                   <ion-label position="stacked" class="bold-label"
                     >DNI:</ion-label
                   >
@@ -91,7 +91,7 @@
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-sm="6" size-md="6">
-                <ion-item>
+                <ion-item lines="none">
                   <ion-label position="stacked" class="bold-label"
                     >Nombres:</ion-label
                   >
@@ -101,7 +101,7 @@
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-sm="6" size-md="6">
-                <ion-item>
+                <ion-item lines="none">
                   <ion-label position="stacked" class="bold-label"
                     >Apellidos:</ion-label
                   >
@@ -111,7 +111,7 @@
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-sm="6" size-md="6">
-                <ion-item>
+                <ion-item lines="none">
                   <ion-label position="stacked" class="bold-label"
                     >Celular:</ion-label
                   >
@@ -123,7 +123,7 @@
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-sm="6" size-md="6">
-                <ion-item>
+                <ion-item lines="none">
                   <ion-label position="stacked" class="bold-label"
                     >Dirección:</ion-label
                   >
@@ -133,7 +133,7 @@
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-sm="6" size-md="6">
-                <ion-item>
+                <ion-item lines="none">
                   <ion-label position="stacked" class="bold-label"
                     >Email:</ion-label
                   >
@@ -144,7 +144,7 @@
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-sm="6" size-md="6">
-                <ion-item>
+                <ion-item lines="none">
                   <ion-label position="stacked" class="bold-label"
                     >Fecha de Ingreso:</ion-label
                   >
@@ -155,7 +155,7 @@
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-sm="6" size-md="6">
-                <ion-item>
+                <ion-item lines="none">
                   <ion-label position="stacked" class="bold-label"
                     >Fecha de Baja:</ion-label
                   >
@@ -166,7 +166,7 @@
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-md="6">
-                <ion-item lines="none">
+                <ion-item lines="none" lines="none">
                   <ion-label position="stacked" class="bold-label"
                     >Estado</ion-label
                   >
@@ -176,21 +176,31 @@
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-sm="6" size-md="6">
-                <ion-item>
+                <ion-item lines="none">
                   <ion-label position="stacked" class="bold-label"
                     >Nacionalidad:</ion-label
                   >
+
                   <ion-input
                     (click)="openSelector('nacionalidad')"
                     readonly
                     [value]="selectedNacionalidad ? selectedNacionalidad.descripcion : ''"
                     placeholder="Seleccione nacionalidad">
+                    @if(selectedNacionalidad){
+                    <ion-avatar slot="start">
+                      <img
+                        [height]="5"
+                        [width]="5"
+                        [src]="selectedNacionalidad.urlBandera"
+                        [alt]="'Bandera de ' + selectedNacionalidad.descripcion" />
+                    </ion-avatar>
+                    }
                   </ion-input>
                 </ion-item>
               </ion-col>
 
               <ion-col size-xs="12" size-sm="6" size-md="6">
-                <ion-item>
+                <ion-item lines="none">
                   <ion-label position="stacked" class="bold-label"
                     >Estado Civil:</ion-label
                   >
@@ -206,7 +216,7 @@
                 </ion-item>
               </ion-col>
               <ion-col size-xs="12" size-sm="6" size-md="6">
-                <ion-item>
+                <ion-item lines="none">
                   <ion-label position="stacked" class="bold-label"
                     >Tipo de Persona:</ion-label
                   >
@@ -223,6 +233,7 @@
               </ion-col>
               <ion-col size-xs="12" size-sm="6" size-md="6">
                 <ion-item
+                  lines="none"
                   [disabled]="this.formAdd.get('idTipoPersona')?.value ===2">
                   <ion-label position="stacked" class="bold-label"
                     >Asesor:</ion-label
@@ -305,7 +316,10 @@
               <p>{{ asesor.correo }}</p>
             </ion-label>
           </ion-item>
-          <ion-item class="user-select-none" (click)="selectAsesor(null)">
+          <ion-item
+            lines="none"
+            class="user-select-none"
+            (click)="selectAsesor(null)">
             <ion-label>
               <h2>Sin Selección</h2>
               <p>N/D</p>

@@ -17,7 +17,7 @@ import {
   Subject,
   switchMap,
 } from "rxjs";
-import { EstadosInterno } from "src/app/shared/interfaces/estado-interno";
+import { EstadosInterno } from "src/app/shared/interfaces/estado-aprobacion";
 import { Monedas } from "src/app/shared/interfaces/moneda";
 import { PeriodosCobro } from "src/app/shared/interfaces/periodo-cobro";
 import { Personas } from "src/app/shared/interfaces/persona";

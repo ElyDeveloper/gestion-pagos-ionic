@@ -4,55 +4,49 @@
 </div>
 
 <div style="text-align: right">
-  <p>13/09/2024 2:34 p.m.</p>
+  <p>{{ subtractHours(dateNow, 6) | customDate : 6 : "dd/MM/yyyy" }}</p>
 </div>
 
 <table>
   <tr>
+    <th class="especial-right">Cliente:</th>
+    <td>{{ encabezado.codClientes }}</td>
+    <th class="especial-right">Direccion:</th>
+    <td >{{ encabezado.direccion }}</td>
+    <th class="especial-right">Teléfono:</th>
+    <td >{{ encabezado.telefono }}</td>
+  </tr>
+  <tr>
     <th class="especial-right">Cód. Préstamo:</th>
-    <td>290155500411:51</td>
-    <th class="especial-right">Cód. Cliente:</th>
-    <td>2920480130 Jose Carlos Rivera Lopez</td>
+    <td>{{ encabezado.nroPrestamo }}</td>
     <th class="especial-right">Estado Ptmo. :</th>
-    <td>Actual</td>
-  </tr>
-  <tr>
+    <td>{{ encabezado.estadoPtmo ? 'Activo' : 'Inactivo' }}</td>
     <th class="especial-right">Mto. Préstamo:</th>
-    <td>12,000.00</td>
-    <th class="especial-right">Saldo Ptmo. :</th>
-    <td>4,344.56</td>
-    <th class="especial-right">Asesor:</th>
-    <td>Jose Eugenio Bobadilla Portillo</td>
+    <td>{{ encabezado.mtoPrestamo | currency : "L" : "symbol" }}</td>
   </tr>
   <tr>
-    <th class="especial-right">Cuotas Pagas:</th>
-    <td>8</td>
+    <th class="especial-right">Saldo Ptmo. :</th>
+    <td>{{ encabezado.saldoPtmo | currency : "L" : "symbol" }}</td>
+    <th class="especial-right">Asesor:</th>
+    <td>{{ encabezado.nombreAsesor }}</td>
     <th class="especial-right">F.Desemb. :</th>
-    <td>30/12/2023</td>
-    <th class="especial-right">F.Vto. :</th>
-    <td>02/01/2025</td>
+    <td>{{ encabezado.fDesembolso | customDate : 6 : "dd/MM/yyyy" }}</td>
+  </tr>
+  <tr>
+    <th class="especial-right">Producto:</th>
+    <td>{{ encabezado.producto }}</td>
+    <th class="especial-right">Nro. Cuotas:</th>
+    <td>{{ encabezado.plazo }}</td>
+    <th class="especial-right">Periodo:</th>
+    <td>{{ encabezado.Periodo }}</td>
   </tr>
   <tr>
     <th class="especial-right">T. Mora:</th>
-    <td>{{ tasaMora }} %</td>
-    <th class="especial-right">Producto:</th>
-    <td>Comercio</td>
+    <td>{{ encabezado.tMora }}</td>
     <th class="especial-right">Cuota:</th>
-    <td>1,293.26</td>
-  </tr>
-  <tr>
-    <th class="especial-right">Plazo:</th>
-    <td>12 cuotas</td>
-    <th class="especial-right">Periodo:</th>
-    <td>30</td>
+    <td>{{ encabezado.cuota | currency : "L" : "symbol" }}</td>
   </tr>
 </table>
-
-<div>
-  <strong>Dirección:</strong> Barrio/Col. ALDEA LLANO REDONDO Ave. 0 Calle. 0
-  Casa. 0
-</div>
-<div><strong>Teléfono:</strong> 93733506 93733506</div>
 
 <div class="section">SALDOS TOTALES</div>
 <table>
@@ -77,7 +71,7 @@
   <tr>
     <th>Nro. Cuota</th>
     <th>Fecha Vto.</th>
-    <th>Capital</th>
+    <th>Cuota</th>
     <th>Int. Corrientes</th>
     <th>Int. Mora</th>
     <th>Otros</th>
@@ -91,24 +85,6 @@
     <td>0.00</td>
     <td>0.00</td>
     <td>1,003.62</td>
-  </tr>
-</table>
-
-<div class="section">SALDOS VENCIDOS-ATRASADOS</div>
-<table>
-  <tr>
-    <th>Capital</th>
-    <th>Int. Corriente</th>
-    <th>Int. Mora</th>
-    <th>Otros</th>
-    <th>Total</th>
-  </tr>
-  <tr>
-    <td>0.00</td>
-    <td>0.00</td>
-    <td>0.00</td>
-    <td>0.00</td>
-    <td>0.00</td>
   </tr>
 </table>
 
@@ -132,7 +108,7 @@
 <table>
   <tr>
     <th>Fecha Pago</th>
-    <th>Nro. Asiento</th>
+    <th>Nro. Cuota</th>
     <th>Total</th>
     <th>Capital</th>
     <th>Int. Corrientes</th>
