@@ -26,7 +26,7 @@
   </tr>
   <tr>
     <th class="especial-right">F.Desemb. :</th>
-    <td>{{ encabezado.fDesembolso }}</td>
+    <td>{{ encabezado.fDesembolso | customDate : 6 : "dd/MM/yyyy" }}</td>
     <th class="especial-right">Nro. Cuotas:</th>
     <td>{{ encabezado.plazo }}</td>
     <th class="especial-right">Periodo:</th>
