@@ -1,4 +1,4 @@
-import { EstadosAprobacion } from "./estado-aprobacion";
+import { EstadosInterno } from "./estado-interno";
 import { Monedas } from "./moneda";
 import { Pagos } from "./pago";
 import { PeriodosCobro } from "./periodo-cobro";
@@ -30,7 +30,7 @@ export interface Prestamos {
   planPago?: PlanesPago;
   moneda?: Monedas;
   periodoCobro?: PeriodosCobro;
-  estadoInterno?: EstadosAprobacion;
+  estadoInterno?: EstadosInterno;
   aval?: Personas;
   pagos?: Pagos[];
 

@@ -1,6 +1,6 @@
 import { Prestamos } from "./prestamo";
 
-export interface EstadosAprobacion {
+export interface EstadosInterno {
   id?: number;
   nombre: string;
   descripcion?: string;

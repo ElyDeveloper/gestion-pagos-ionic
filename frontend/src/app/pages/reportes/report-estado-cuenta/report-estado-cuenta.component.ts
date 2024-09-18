@@ -1,7 +1,8 @@
 import { Component, inject, Input, OnInit } from "@angular/core";
 import { catchError, firstValueFrom, tap } from "rxjs";
 import { GlobalService } from "src/app/shared/services/global.service";
-
+import { environment } from "src/environments/environment";
+const TASA_MORA = environment.percentage * 100;
 @Component({
   selector: "app-report-estado-cuenta",
   templateUrl: "./report-estado-cuenta.component.html",
@@ -9,6 +10,7 @@ import { GlobalService } from "src/app/shared/services/global.service";
 })
 export class ReportEstadoCuentaComponent implements OnInit {
   @Input() company: string = "Company N/D";
+  tasaMora = TASA_MORA;
 
   dateNow: Date = new Date();
 

@@ -17,7 +17,7 @@ import {
   Subject,
   switchMap,
 } from "rxjs";
-import { EstadosAprobacion } from "src/app/shared/interfaces/estado-aprobacion";
+import { EstadosInterno } from "src/app/shared/interfaces/estado-interno";
 import { Monedas } from "src/app/shared/interfaces/moneda";
 import { PeriodosCobro } from "src/app/shared/interfaces/periodo-cobro";
 import { Personas } from "src/app/shared/interfaces/persona";
@@ -46,7 +46,7 @@ export class GestionPrestamoPage implements OnInit {
   planesPagoForm: FormGroup;
   productos: Productos[] = [];
   periodosCobro: PeriodosCobro[] = [];
-  estadosAprobacion: EstadosAprobacion[] = [];
+  estadosInternos: EstadosInterno[] = [];
   monedas: Monedas[] = [];
   clientes: Personas[] = [];
   avales: Personas[] = [];
@@ -256,7 +256,7 @@ export class GestionPrestamoPage implements OnInit {
       },
       {
         key: "estados-internos",
-        setter: (data: any) => (this.estadosAprobacion = data),
+        setter: (data: any) => (this.estadosInternos = data),
       },
       { key: "monedas", setter: (data: any) => (this.monedas = data) },
     ];

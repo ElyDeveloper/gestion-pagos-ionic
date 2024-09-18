@@ -1,6 +1,6 @@
 import { Component, inject, Input, OnInit } from "@angular/core";
 import { catchError, firstValueFrom, tap } from "rxjs";
-import { Cartera } from "src/app/shared/interfaces/cartera";
+import { Cartera } from "src/app/shared/interfaces/report-cartera";
 import { GlobalService } from "src/app/shared/services/global.service";
 
 @Component({
