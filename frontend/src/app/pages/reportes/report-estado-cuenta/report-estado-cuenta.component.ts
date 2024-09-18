@@ -38,7 +38,7 @@ export class ReportEstadoCuentaComponent implements OnInit {
   //   totalSTotales: number;
   // }
   encabezado: EncabezadoEstadoCuenta = {
-    nroPrestamo: 0,
+    nroPrestamo: "N/A",
     codClientes: "N/A",
     estadoPtmo: "N/A",
     mtoPrestamo: 0,
@@ -96,6 +96,7 @@ export class ReportEstadoCuentaComponent implements OnInit {
           tap((data: any) => {
             console.log("Prestamos con mora:", data);
             this.elements = data;
+            this.encabezado = data.encabezados[0];
           }),
           catchError((error) => {
             console.error("Error fetching prestamo:", error);

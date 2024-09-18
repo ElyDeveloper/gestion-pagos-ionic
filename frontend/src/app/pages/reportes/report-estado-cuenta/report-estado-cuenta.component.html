@@ -18,9 +18,9 @@
   </tr>
   <tr>
     <th class="especial-right">Mto. Préstamo:</th>
-    <td>{{ encabezado.mtoPrestamo }}</td>
+    <td>{{ encabezado.mtoPrestamo | currency : "L" : "symbol" }}</td>
     <th class="especial-right">Saldo Ptmo. :</th>
-    <td>{{ encabezado.saldoPtmo }}</td>
+    <td>{{ encabezado.saldoPtmo | currency : "L" : "symbol" }}</td>
     <th class="especial-right">Asesor:</th>
     <td>{{ encabezado.nombreAsesor }}</td>
   </tr>
@@ -28,7 +28,7 @@
     <th class="especial-right">F.Desemb. :</th>
     <td>{{ encabezado.fDesembolso }}</td>
     <th class="especial-right">Plazo:</th>
-    <td>{{ encabezado.plazo }}</td>
+    <td>{{ encabezado.plazo }} cuotas</td>
     <th class="especial-right">Periodo:</th>
     <td>{{ encabezado.Periodo }}</td>
   </tr>
@@ -38,14 +38,12 @@
     <th class="especial-right">Producto:</th>
     <td>{{ encabezado.producto }}</td>
     <th class="especial-right">Cuota:</th>
-    <td>{{ encabezado.cuota }}</td>
+    <td>{{ encabezado.cuota | currency : "L" : "symbol" }}</td>
   </tr>
 </table>
 
-<div>
-  <strong>Dirección:</strong>{{encabezado.direccion}}
-</div>
-<div><strong>Teléfono:</strong>{{encabezado.telefono}}</div>
+<div><strong>Dirección:</strong>{{ encabezado.direccion }}</div>
+<div><strong>Teléfono:</strong>{{ encabezado.telefono }}</div>
 
 <div class="section">SALDOS TOTALES</div>
 <table>
