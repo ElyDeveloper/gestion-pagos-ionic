@@ -4,55 +4,48 @@
 </div>
 
 <div style="text-align: right">
-  <p>13/09/2024 2:34 p.m.</p>
+  <p>{{ subtractHours(dateNow, 6) | customDate : 6 : "dd/MM/yyyy" }}</p>
 </div>
 
 <table>
   <tr>
     <th class="especial-right">Cód. Préstamo:</th>
-    <td>290155500411:51</td>
+    <td>{{ encabezado.nroPrestamo }}</td>
     <th class="especial-right">Cód. Cliente:</th>
-    <td>2920480130 Jose Carlos Rivera Lopez</td>
+    <td>{{ encabezado.codClientes }}</td>
     <th class="especial-right">Estado Ptmo. :</th>
-    <td>Actual</td>
+    <td>{{ encabezado.estadoPtmo }}</td>
   </tr>
   <tr>
     <th class="especial-right">Mto. Préstamo:</th>
-    <td>12,000.00</td>
+    <td>{{ encabezado.mtoPrestamo }}</td>
     <th class="especial-right">Saldo Ptmo. :</th>
-    <td>4,344.56</td>
+    <td>{{ encabezado.saldoPtmo }}</td>
     <th class="especial-right">Asesor:</th>
-    <td>Jose Eugenio Bobadilla Portillo</td>
+    <td>{{ encabezado.nombreAsesor }}</td>
   </tr>
   <tr>
-    <th class="especial-right">Cuotas Pagas:</th>
-    <td>8</td>
     <th class="especial-right">F.Desemb. :</th>
-    <td>30/12/2023</td>
-    <th class="especial-right">F.Vto. :</th>
-    <td>02/01/2025</td>
+    <td>{{ encabezado.fDesembolso }}</td>
+    <th class="especial-right">Plazo:</th>
+    <td>{{ encabezado.plazo }}</td>
+    <th class="especial-right">Periodo:</th>
+    <td>{{ encabezado.Periodo }}</td>
   </tr>
   <tr>
     <th class="especial-right">T. Mora:</th>
-    <td>{{ tasaMora }} %</td>
+    <td>{{ encabezado.tMora }}</td>
     <th class="especial-right">Producto:</th>
-    <td>Comercio</td>
+    <td>{{ encabezado.producto }}</td>
     <th class="especial-right">Cuota:</th>
-    <td>1,293.26</td>
-  </tr>
-  <tr>
-    <th class="especial-right">Plazo:</th>
-    <td>12 cuotas</td>
-    <th class="especial-right">Periodo:</th>
-    <td>30</td>
+    <td>{{ encabezado.cuota }}</td>
   </tr>
 </table>
 
 <div>
-  <strong>Dirección:</strong> Barrio/Col. ALDEA LLANO REDONDO Ave. 0 Calle. 0
-  Casa. 0
+  <strong>Dirección:</strong>{{encabezado.direccion}}
 </div>
-<div><strong>Teléfono:</strong> 93733506 93733506</div>
+<div><strong>Teléfono:</strong>{{encabezado.telefono}}</div>
 
 <div class="section">SALDOS TOTALES</div>
 <table>

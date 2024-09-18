@@ -1,5 +1,6 @@
 import { Component, inject, Input, OnInit } from "@angular/core";
 import { catchError, firstValueFrom, tap } from "rxjs";
+import { EncabezadoEstadoCuenta } from "src/app/shared/interfaces/report-estado-cuenta";
 import { GlobalService } from "src/app/shared/services/global.service";
 import { environment } from "src/environments/environment";
 const TASA_MORA = environment.percentage * 100;
@@ -16,6 +17,45 @@ export class ReportEstadoCuentaComponent implements OnInit {
 
   elements: any[] = [];
   saldosVigentes: any[] = [];
+
+  // export interface EncabezadoEstadoCuenta {
+  //   nroPrestamo: number | string;
+  //   codClientes: string;
+  //   estadoPtmo: boolean | string;
+  //   mtoPrestamo: number;
+  //   saldoPtmo: number;
+  //   asesor: number | string;
+  //   nombreAsesor: string;
+  //   tMora: string;
+  //   fDesembolso: string;
+  //   producto: string;
+  //   cuota: number;
+  //   plazo: number | string;
+  //   Periodo: string;
+  //   direccion: string;
+  //   telefono: string;
+  //   mora: number;
+  //   totalSTotales: number;
+  // }
+  encabezado: EncabezadoEstadoCuenta = {
+    nroPrestamo: 0,
+    codClientes: "N/A",
+    estadoPtmo: "N/A",
+    mtoPrestamo: 0,
+    saldoPtmo: 0,
+    asesor: "N/A",
+    nombreAsesor: "N/A",
+    tMora: "N/A",
+    fDesembolso: "N/A",
+    producto: "N/A",
+    cuota: 0,
+    plazo: "N/A",
+    Periodo: "N/A",
+    direccion: "N/A",
+    telefono: "N/A",
+    mora: 0,
+    totalSTotales: 0,
+  };
 
   isPrint = false;
 
