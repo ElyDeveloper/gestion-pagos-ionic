@@ -454,14 +454,22 @@ export class PrestamosController {
       [],
     );
 
-    const pie = await this.prestamosRepository.dataSource.execute(
+    const activos = await this.prestamosRepository.dataSource.execute(
       `SP_pieRecordCrediticio ${idCliente}`,
     );
+
+    const completados = await this.prestamosRepository.dataSource.execute(
+      `SP_pieRecordCrediticioCompletados ${idCliente}`,
+    );
+
 
     return {
       encabezados,
       cuerpo,
-      pie,
+      pie:{
+        activos,
+        completados
+      },
     };
   }
 
