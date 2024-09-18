@@ -14,8 +14,6 @@ export class ReportEstadoCuentaComponent implements OnInit {
 
   elements: any[] = [];
   saldosVigentes: any[] = [];
-  totalClients = 0;
-  totalMora = 0;
 
   isPrint = false;
 
@@ -27,7 +25,7 @@ export class ReportEstadoCuentaComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    this.getEstadoCuenta();
+    this.getForCliente(this.selectedCliente);
   }
   subtractHours(date: Date, hours: number): Date {
     const newDate = new Date(date);
@@ -35,24 +33,27 @@ export class ReportEstadoCuentaComponent implements OnInit {
     return newDate;
   }
 
+  getForCliente(cliente: any) {
+    this.selectedCliente = cliente;
+    if (cliente) {
+      this.getEstadoCuenta();
+    }
+  }
+
   async getEstadoCuenta() {
-    this.totalClients = 0;
-    this.totalMora = 0;
     await this.fetchEstadoCuenta();
   }
 
   private fetchEstadoCuenta(): Promise<any> {
     return firstValueFrom(
       this._globalService
-        .Get(`prestamos/reporte-estado-cuenta?idCliente=${this.selectedCliente.id}`)
+        .Get(
+          `prestamos/reporte-estado-cuenta?idCliente=${this.selectedCliente.id}`
+        )
         .pipe(
           tap((data: any) => {
             console.log("Prestamos con mora:", data);
             this.elements = data;
-            this.totalClients = this.elements.length;
-            this.elements.forEach((prestamo) => {
-              this.totalMora = this.totalMora + prestamo.montoMora;
-            });
           }),
           catchError((error) => {
             console.error("Error fetching prestamo:", error);
@@ -61,5 +62,4 @@ export class ReportEstadoCuentaComponent implements OnInit {
         )
     );
   }
-
 }

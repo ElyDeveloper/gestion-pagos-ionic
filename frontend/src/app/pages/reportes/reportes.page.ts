@@ -14,6 +14,7 @@ import { environment } from "src/environments/environment";
 import { ReportCarteraAsesoresComponent } from "./report-cartera-asesores/report-cartera-asesores.component";
 import { ReportClientsMoraComponent } from "./report-clients-mora/report-clients-mora.component";
 import { ReportRecordCrediticioComponent } from "./report-record-crediticio/report-record-crediticio.component";
+import { ReportEstadoCuentaComponent } from "./report-estado-cuenta/report-estado-cuenta.component";
 
 @Component({
   selector: "app-reportes",
@@ -44,6 +45,9 @@ export class ReportesPage implements OnInit {
 
   @ViewChild(ReportClientsMoraComponent)
   reportClientsMoraComponent!: ReportClientsMoraComponent;
+
+  @ViewChild(ReportEstadoCuentaComponent)
+  reportEstadoCuentaComponent!: ReportEstadoCuentaComponent;
 
   @ViewChild(ReportRecordCrediticioComponent)
   reportRecordCrediticioComponent!: ReportRecordCrediticioComponent;
@@ -106,7 +110,7 @@ export class ReportesPage implements OnInit {
         this.reportClientsMoraComponent.getForAsesor(this.selectedAsesor);
         break;
       case "estado-cuenta":
-        // this.reportClientsMoraComponent.getEstadosCuentas();
+        this.reportEstadoCuentaComponent.getForCliente(this.selectedCliente);
         break;
       case "record-crediticio":
         this.reportRecordCrediticioComponent.getForCliente(

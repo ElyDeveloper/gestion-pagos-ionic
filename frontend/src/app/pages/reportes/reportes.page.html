@@ -134,15 +134,10 @@
           <ion-card-content>
             <br />
             <section id="report-print">
-              @switch (reporteSeleccionado) { @case ('estado-cuenta') { @if
-              (selectedCliente) {
+              @switch (reporteSeleccionado) { @case ('estado-cuenta') {
               <app-report-estado-cuenta
                 [company]="company"></app-report-estado-cuenta>
-              } @else {
-              <report-loader
-                [loading]="loading"
-                [textLoader]="'cliente'"></report-loader>
-              } } @case ('clientes-mora') {
+              } @case ('clientes-mora') {
               <app-report-clients-mora
                 [company]="company"
                 [currentUser]="currentUser"></app-report-clients-mora>

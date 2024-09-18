@@ -329,17 +329,6 @@ export class GestionPrestamoPage implements OnInit {
     }
   }
 
-  async handleSave(data: any) {
-    if (await this._preventAbuseService.registerClick()) {
-      if (this.isEdit) {
-        // this.handleUserOperation("edit", data);
-      } else if (!this.isEdit) {
-        delete data.id;
-        // this.handleUserOperation("create", data);
-      }
-    }
-  }
-
   searchValueClientChanged(event: any) {
     this.searchTermClient$.next(event);
   }
@@ -381,19 +370,21 @@ export class GestionPrestamoPage implements OnInit {
     this.isModalOpen = true;
   }
 
-  onSubmit() {
-    if (this.prestamoForm.valid && this.planesPagoForm.valid) {
-      const planPago = this.createPlanPago();
+  async onSubmit() {
+    if (await this._preventAbuseService.registerClick()) {
+      if (this.prestamoForm.valid && this.planesPagoForm.valid) {
+        const planPago = this.createPlanPago();
 
-      if (this.isEdit) {
-        this.updatePrestamo(planPago);
+        if (this.isEdit) {
+          this.updatePrestamo(planPago);
+        } else {
+          this.savePrestamo(planPago);
+        }
       } else {
-        this.savePrestamo(planPago);
+        this.toastMessage = "Todos los campos son obligatorios";
+        this.toastColor = "warning";
+        this.isToastOpen = true;
       }
-    } else {
-      this.toastMessage = "Todos los campos son obligatorios";
-      this.toastColor = "warning";
-      this.isToastOpen = true;
     }
   }
 
@@ -469,7 +460,7 @@ export class GestionPrestamoPage implements OnInit {
     console.log("Operación de préstamo exitosa:", response);
     this.toastMessage = "Operación de préstamo exitosa";
     this.toastColor = "success";
-    this.isModalOpen = true;
+    this.isToastOpen = true;
     this.isEdit = false;
     this.cleanForms();
     this.clienteSeleccionado = null;
