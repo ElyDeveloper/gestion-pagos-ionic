@@ -240,7 +240,7 @@
                   </ion-list-header>
                   <ion-list>
                     @for (client of selectedClients; track client.id) {
-                    <ion-item lines="none">
+                    <ion-item >
                       <ion-label>
                         <h2>{{ client.nombres }} {{client.apellidos}}</h2>
                         <p>Email: {{ client.email }}</p>

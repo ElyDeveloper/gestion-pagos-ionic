@@ -55,10 +55,11 @@
 <table>
   <thead>
     <tr>
-      <th>ID Persona</th>
+      <th>ID Cliente</th>
       <th>Nombre Cliente</th>
+      <th>ID Prestamo</th>
       <th>Celular</th>
-      <th>Día Pago</th>
+      <!-- <th>Día Pago</th> -->
       <th>Monto Otorgado</th>
       <th>Saldo Capital Actual</th>
       <th>Saldo Actual</th>
@@ -80,8 +81,9 @@
     <tr>
       <td class="text-center">{{ item.IdPersona }}</td>
       <td>{{ item.nombreCliente }}</td>
+      <td class="text-center">{{ item.prestamoId }}</td>
       <td class="text-center">{{ item.celular }}</td>
-      <td class="text-center">{{ item.diaPago }}</td>
+      <!-- <td class="text-center">{{ item.diaPago }}</td> -->
       <td class="text-center">
         {{ item.montoOtorgado | currency : "L" : "symbol" }}
       </td>
