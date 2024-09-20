@@ -504,6 +504,10 @@ export class PrestamosController {
       [],
     );
 
+    const saldosTotales = ''
+
+    const saldosPendientes = ''
+
     return {
       encabezados,
       saldoVigente,
