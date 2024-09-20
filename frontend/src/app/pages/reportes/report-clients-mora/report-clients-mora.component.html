@@ -20,8 +20,10 @@
         <th>Cod. Préstamo</th>
         <th>Monto Préstamo</th>
         <th>Saldo Ptmo.</th>
+        <th>Cuota en Mora</th>
         <th>Días Mora</th>
-        <th>Monto en Mora</th>
+        <th>Monto de Mora</th>
+        <th>Total a Pagar</th>
       </tr>
     </thead>
     <tbody>
@@ -32,8 +34,10 @@
         <td class="text-center">{{ item.codPrestamo }}</td>
         <td>{{ item.montoPrestamo | currency : "L" : "symbol" }}</td>
         <td>{{ item.saldPtmo | currency : "L" : "symbol" }}</td>
+        <td>{{ item.cuota | currency : "L" : "symbol" }}</td>
         <td class="text-center">{{ item.diasMora }}</td>
         <td>{{ item.montoMora | currency : "L" : "symbol" }}</td>
+        <td>{{ item.montoMora + item.cuota | currency : "L" : "symbol" }}</td>
       </tr>
       }
     </tbody>

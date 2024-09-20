@@ -686,8 +686,6 @@ export class PersonasController {
     let personas = await this.personasRepository.find({
       where: {
         and: [
-          {idTipoPersona: 1},
-          {estado: true},
           {
             or: [
               {id: {like: `%${search}%`}},
@@ -696,6 +694,7 @@ export class PersonasController {
               {apellidos: {like: `%${search}%`}},
             ],
           },
+          {estado: true},
         ],
       },
       include: [
@@ -705,6 +704,8 @@ export class PersonasController {
         'tipoPersona',
       ],
     });
+
+    console.log('Personas encontradas: ', personas.length);
 
     if (idsClientes && idsClientes.length > 0) {
       personas = personas.filter(persona =>
@@ -717,7 +718,7 @@ export class PersonasController {
       idEncrypted: this.jwtService.encryptId(persona.id || 0),
     }));
 
-    console.log('Personas encontradas: ', copiaSpread);
+    // console.log('Personas encontradas: ', copiaSpread);
 
     return copiaSpread;
   }

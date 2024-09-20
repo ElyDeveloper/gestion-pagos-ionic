@@ -116,9 +116,7 @@ export class UserController {
       },
     },
   })
-  async findByRol(
-    @param.path.number('id') id: number,
-  ): Promise<Usuario[]> {
+  async findByRol(@param.path.number('id') id: number): Promise<Usuario[]> {
     return this.usuarioRepository.find({
       where: {rolid: id},
     });
@@ -206,6 +204,36 @@ export class UserController {
     });
   }
 
+  @get('/usuarios/asesores/search')
+  @response(200, {
+    description: 'Usuario model instance',
+    content: {
+      'application/json': {
+        schema: getModelSchemaRef(Usuario, {includeRelations: true}),
+      },
+    },
+  })
+  async searchAsesores(
+    @param.query.string('query') query: string,
+  ): Promise<Usuario[]> {
+    // console.log('query', query);
+    return this.usuarioRepository.find({
+      include: [{relation: 'rol'}],
+      where: {
+        and: [
+          {
+            or: [
+              {nombre: {like: `%${query}%`}},
+              {apellido: {like: `%${query}%`}},
+              {correo: {like: `%${query}%`}},
+            ],
+          },
+          {rolid: 3}, // Asesor
+        ],
+      },
+    });
+  }
+
   @patch('/usuarios/{id}')
   @response(204, {
     description: 'Usuario PATCH success',
@@ -232,7 +260,6 @@ export class UserController {
     @param.path.number('id') id: number,
     @requestBody() usuario: Usuario,
   ): Promise<void> {
-
     const usuarioLocate = await this.usuarioRepository.findById(id);
     const credenciales = await this.credencialesRepository.findOne({
       where: {

@@ -6,7 +6,13 @@ import {
   ViewChild,
 } from "@angular/core";
 import { NgxPrintService, PrintOptions } from "ngx-print";
-import { Subscription } from "rxjs";
+import {
+  debounceTime,
+  distinctUntilChanged,
+  Subject,
+  Subscription,
+  switchMap,
+} from "rxjs";
 import { AuthService } from "src/app/shared/services/auth.service";
 import { GlobalService } from "src/app/shared/services/global.service";
 import { LoaderService } from "src/app/shared/services/loader.service";
@@ -37,6 +43,9 @@ export class ReportesPage implements OnInit {
   reporteSeleccionado: string | null = null;
   isModalOpen = false;
 
+  private searchAsesores$ = new Subject<string>();
+  private searchClientes$ = new Subject<string>();
+
   @ViewChild("modalAsesorSelector")
   modalAsesorSelector!: TemplateRef<any>;
 
@@ -57,15 +66,13 @@ export class ReportesPage implements OnInit {
 
   modalSelected: TemplateRef<any> = this.modalAsesorSelector;
 
-  asesores: any[] = [];
-  clientes: any[] = [];
-  filteredAsesores = this.asesores;
-  filteredClientes = this.clientes;
+  filteredAsesores: any[] = [];
+  filteredClientes: any[] = [];
   selectedAsesor: any = null;
   selectedCliente: any = null;
   currentUser: any = null;
 
-  private suscriptions: Subscription[] = [];
+  private subscriptions: Subscription[] = [];
 
   private _globalService = inject(GlobalService);
   private _printService = inject(NgxPrintService);
@@ -76,15 +83,60 @@ export class ReportesPage implements OnInit {
   ngOnInit() {
     this.company = environment.company;
     this.getCurrentUser();
-    this.getAsesores();
+    this.initAsesoresSearch();
+    this.initClientesSearch();
   }
 
   ionViewDidLeave() {
-    this.suscriptions.forEach((sub) => sub.unsubscribe());
+    this.subscriptions.forEach((sub) => sub.unsubscribe());
+  }
+
+  private initAsesoresSearch() {
+    const subscription = this.searchAsesores$
+      .pipe(
+        debounceTime(1000),
+        distinctUntilChanged(),
+        switchMap((term) =>
+          this._globalService.Get(`usuarios/asesores/search?query=${term}`)
+        )
+      )
+      .subscribe({
+        next: (response: any) => {
+          this.filteredAsesores = response;
+          console.log("Asesores obtenidos:", response);
+        },
+        error: (error) => {
+          console.error("Error al obtener asesores:", error);
+        },
+      });
+
+    this.subscriptions.push(subscription);
+  }
+
+  private initClientesSearch() {
+    const subscription = this.searchClientes$
+      .pipe(
+        debounceTime(1000),
+        distinctUntilChanged(),
+        switchMap((term) =>
+          this._globalService.Get(`personas/clientes/search?query=${term}`)
+        )
+      )
+      .subscribe({
+        next: (response: any) => {
+          this.filteredClientes = response;
+          console.log("Clientes obtenidos:", response);
+        },
+        error: (error) => {
+          console.error("Error al obtener clientes:", error);
+        },
+      });
+
+    this.subscriptions.push(subscription);
   }
 
   getCurrentUser() {
-    this.suscriptions.push(
+    this.subscriptions.push(
       this._authService.getUserInfo().subscribe((user) => {
         this.currentUser = user;
         if (user?.rolid === 3) {
@@ -169,13 +221,9 @@ export class ReportesPage implements OnInit {
     }
   }
 
-  getAsesores() {
-    this.suscriptions.push(
-      this._globalService.GetId("usuarios/roles", 3).subscribe((data: any) => {
-        this.asesores = data;
-        console.log("Asesores: ", this.asesores);
-      })
-    );
+  clearsubscriptions() {
+    this.subscriptions.forEach((sub) => sub.unsubscribe());
+    this.subscriptions = [];
   }
 
   filterAsesores(event: any) {
@@ -184,34 +232,16 @@ export class ReportesPage implements OnInit {
       this.filteredAsesores = [];
       return;
     }
-    this.filteredAsesores = this.asesores.filter(
-      (asesor) =>
-        asesor.nombre.toLowerCase().includes(searchTerm) ||
-        asesor.apellido.toLowerCase().includes(searchTerm) ||
-        asesor.correo.toLowerCase().includes(searchTerm)
-    );
+    this.searchAsesores$.next(searchTerm);
   }
+
   filterClientes(event: any) {
-    console.log("Event: ", event);
     const searchTerm = event.target.value.toLowerCase();
     if (searchTerm === "") {
       this.filteredClientes = [];
       return;
     }
-
-    this.suscriptions.push(
-      this._globalService
-        .Get(`personas/clientes/search?query=${event}`)
-        .subscribe({
-          next: (response: any) => {
-            this.filteredClientes = response;
-            console.log("Elementos obtenidos:", response);
-          },
-          error: (error) => {
-            console.error("Error al obtener los elementos:", error);
-          },
-        })
-    );
+    this.searchClientes$.next(searchTerm);
   }
 
   selectAsesor(asesor: any) {
@@ -235,6 +265,7 @@ export class ReportesPage implements OnInit {
     this._loaderService.show();
     const customPrintOptions: PrintOptions = new PrintOptions({
       printSectionId: "report-print",
+      printTitle:this.reporteSeleccionado + "-" + new Date().toLocaleDateString(),
       // Add any other print options as needed
     });
     this._printService.styleSheetFile = "assets/css/print.css";
