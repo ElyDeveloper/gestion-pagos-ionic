@@ -91,6 +91,13 @@ export class ReportesPage implements OnInit {
     this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 
+  scrollToElement(section: string): void {
+    const element = document.getElementById(section);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
   private initAsesoresSearch() {
     const subscription = this.searchAsesores$
       .pipe(
@@ -163,18 +170,24 @@ export class ReportesPage implements OnInit {
         break;
       case "estado-cuenta":
         this.reportEstadoCuentaComponent.getForCliente(this.selectedCliente);
+
         break;
       case "record-crediticio":
         this.reportRecordCrediticioComponent.getForCliente(
           this.selectedCliente
         );
+
         break;
       case "cartera-asesor":
         this.reportCarteraAsesor.getCarteraAsesor(this.selectedAsesor);
+
         break;
       default:
         break;
     }
+
+    this.scrollToElement("current-report");
+
   }
   handleSave(event: any) {
     console.log("Event:", event);
@@ -219,6 +232,9 @@ export class ReportesPage implements OnInit {
         this.enableFilterAsesor = true;
         break;
     }
+
+    this.scrollToElement("current-report");
+
   }
 
   clearsubscriptions() {
@@ -265,7 +281,8 @@ export class ReportesPage implements OnInit {
     this._loaderService.show();
     const customPrintOptions: PrintOptions = new PrintOptions({
       printSectionId: "report-print",
-      printTitle:this.reporteSeleccionado + "-" + new Date().toLocaleDateString(),
+      printTitle:
+        this.reporteSeleccionado + "-" + new Date().toLocaleDateString(),
       // Add any other print options as needed
     });
     this._printService.styleSheetFile = "assets/css/print.css";
