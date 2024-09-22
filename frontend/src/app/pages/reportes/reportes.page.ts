@@ -159,6 +159,7 @@ export class ReportesPage implements OnInit {
     this.filteredClientes = [];
     this.selectedAsesor = null;
     this.selectedCliente = null;
+    this.reporteSeleccionado = null;
 
     this.obtenerReporte();
   }

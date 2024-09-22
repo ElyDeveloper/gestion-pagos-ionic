@@ -12,15 +12,15 @@
     <th class="especial-right">Cliente:</th>
     <td>{{ encabezado.codClientes }}</td>
     <th class="especial-right">Direccion:</th>
-    <td >{{ encabezado.direccion }}</td>
+    <td>{{ encabezado.direccion }}</td>
     <th class="especial-right">Teléfono:</th>
-    <td >{{ encabezado.telefono }}</td>
+    <td>{{ encabezado.telefono }}</td>
   </tr>
   <tr>
     <th class="especial-right">Cód. Préstamo:</th>
     <td>{{ encabezado.nroPrestamo }}</td>
-    <th class="especial-right">Estado Ptmo. :</th>
-    <td>{{ encabezado.estadoPtmo ? 'Activo' : 'Inactivo' }}</td>
+    <th class="especial-right">Estado Ptmo:</th>
+    <td>{{ encabezado.estadoPtmo ? "Activo" : "Inactivo" }}</td>
     <th class="especial-right">Mto. Préstamo:</th>
     <td>{{ encabezado.mtoPrestamo | currency : "L" : "symbol" }}</td>
   </tr>
@@ -29,7 +29,7 @@
     <td>{{ encabezado.saldoPtmo | currency : "L" : "symbol" }}</td>
     <th class="especial-right">Asesor:</th>
     <td>{{ encabezado.nombreAsesor }}</td>
-    <th class="especial-right">F.Desemb. :</th>
+    <th class="especial-right">F.Desemb:</th>
     <td>{{ encabezado.fDesembolso | customDate : 6 : "dd/MM/yyyy" }}</td>
   </tr>
   <tr>
@@ -74,18 +74,23 @@
     <th>Cuota</th>
     <th>Int. Corrientes</th>
     <th>Int. Mora</th>
-    <th>Otros</th>
+    <th>Días</th>
     <th>Total</th>
   </tr>
+
+  @for (item of saldosVigentes; track $index) {
   <tr>
-    <td>9</td>
-    <td>01/10/2024</td>
-    <td>1,003.62</td>
-    <td>0.00</td>
-    <td>0.00</td>
-    <td>0.00</td>
-    <td>1,003.62</td>
+    <td class="text-center">{{ item.nCuota }}</td>
+    <td class="text-center">
+      {{ item.fechaVto | customDate : 6 : "dd/MM/yyyy" }}
+    </td>
+    <td>{{ item.cuota - item.intCorriente | currency : "L" : "symbol" }}</td>
+    <td>{{ item.intCorriente | currency : "L" : "symbol" }}</td>
+    <td>{{ item.intMora | currency : "L" : "symbol" }}</td>
+    <td class="text-center">{{ item.dias }}</td>
+    <td>{{ item.totalSVigentes | currency : "L" : "symbol" }}</td>
   </tr>
+  }
 </table>
 
 <div class="section">SALDO PENDIENTE A PAGAR-ATRASADOS</div>
@@ -93,117 +98,51 @@
   <tr>
     <th>Nro. Cuota</th>
     <th>Fecha Vto.</th>
-    <th>Días</th>
-    <th>Capital</th>
-    <th>Int. Corriente</th>
+    <th>Cuota</th>
+    <th>Int. Corrientes</th>
     <th>Int. Mora</th>
-    <th>Seguros</th>
-    <th>Otros</th>
+    <th>Días</th>
     <th>Total</th>
   </tr>
+  @for (item of saldosPagarAtrasados; track $index) {
+  <tr>
+    <td class="text-center">{{ item.nCuota }}</td>
+    <td class="text-center">
+      {{ item.fechaVto | customDate : 6 : "dd/MM/yyyy" }}
+    </td>
+    <td>{{ item.cuota - item.intCorriente | currency : "L" : "symbol" }}</td>
+    <td>{{ item.intCorriente | currency : "L" : "symbol" }}</td>
+    <td>{{ item.intMora | currency : "L" : "symbol" }}</td>
+    <td class="text-center">{{ item.dias }}</td>
+    <td>{{ item.totalSVigentes | currency : "L" : "symbol" }}</td>
+  </tr>
+
+  }
   <!-- This section is empty in the image -->
 </table>
 
 <div class="section">DETALLE DE PAGOS EFECTUADOS</div>
 <table>
   <tr>
-    <th>Fecha Pago</th>
     <th>Nro. Cuota</th>
-    <th>Total</th>
+    <th>Fecha Pago</th>
     <th>Capital</th>
     <th>Int. Corrientes</th>
+    <th>Total Cuota</th>
     <th>Int. Mora</th>
-    <th>Otros</th>
     <th>Sdo. Capital</th>
   </tr>
+  @for (item of pagosEfectuados; track $index) {
   <tr>
-    <td>01/2024</td>
-    <td>10080015</td>
-    <td>1,303.00</td>
-    <td>860.07</td>
-    <td>433.33</td>
-    <td>0.00</td>
-    <td>9.60</td>
-    <td>11,139.93</td>
+    <td class="text-center">{{ item.nCuota }}</td>
+    <td class="text-center">
+      {{ item.FechaPago | customDate : 6 : "dd/MM/yyyy" }}
+    </td>
+    <td>{{ item.capital | currency : "L" : "symbol" }}</td>
+    <td>{{ item.intCorrientes | currency : "L" : "symbol" }}</td>
+    <td>{{ item.total | currency : "L" : "symbol" }}</td>
+    <td>{{ item.mora | currency : "L" : "symbol" }}</td>
+    <td>{{ item.sdoCapital | currency : "L" : "symbol" }}</td>
   </tr>
-  <tr>
-    <td>01/03/2024</td>
-    <td>9090321</td>
-    <td>1,282.00</td>
-    <td>740.48</td>
-    <td>541.52</td>
-    <td>0.00</td>
-    <td>0.00</td>
-    <td>10,399.45</td>
-  </tr>
-  <tr>
-    <td>11/03/2024</td>
-    <td>7250057</td>
-    <td>12.00</td>
-    <td>11.26</td>
-    <td>0.47</td>
-    <td>0.27</td>
-    <td>0.00</td>
-    <td>10,388.19</td>
-  </tr>
-  <tr>
-    <td>27/03/2024</td>
-    <td>2780175</td>
-    <td>1,282.00</td>
-    <td>921.77</td>
-    <td>360.23</td>
-    <td>0.00</td>
-    <td>0.00</td>
-    <td>9,466.42</td>
-  </tr>
-  <tr>
-    <td>02/05/2024</td>
-    <td>9090360</td>
-    <td>1,281.00</td>
-    <td>807.68</td>
-    <td>473.32</td>
-    <td>0.00</td>
-    <td>0.00</td>
-    <td>8,658.74</td>
-  </tr>
-  <tr>
-    <td>14/05/2024</td>
-    <td>7250060</td>
-    <td>13.00</td>
-    <td>12.26</td>
-    <td>0.39</td>
-    <td>0.35</td>
-    <td>0.00</td>
-    <td>8,646.48</td>
-  </tr>
-  <tr>
-    <td>31/05/2024</td>
-    <td>9090491</td>
-    <td>1,281.00</td>
-    <td>945.14</td>
-    <td>335.86</td>
-    <td>0.00</td>
-    <td>0.00</td>
-    <td>7,701.34</td>
-  </tr>
-  <tr>
-    <td>01/07/2024</td>
-    <td>9090470</td>
-    <td>1,487.00</td>
-    <td>1,155.41</td>
-    <td>331.59</td>
-    <td>0.00</td>
-    <td>0.00</td>
-    <td>6,545.93</td>
-  </tr>
-  <tr>
-    <td>27/07/2024</td>
-    <td>9090243</td>
-    <td>1,281.00</td>
-    <td>1,044.62</td>
-    <td>236.38</td>
-    <td>0.00</td>
-    <td>0.00</td>
-    <td>5,501.31</td>
-  </tr>
+  }
 </table>

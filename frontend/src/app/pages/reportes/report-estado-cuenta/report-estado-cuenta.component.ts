@@ -1,6 +1,6 @@
 import { Component, inject, Input, OnInit } from "@angular/core";
 import { catchError, firstValueFrom, tap } from "rxjs";
-import { EncabezadoEstadoCuenta } from "src/app/shared/interfaces/report-estado-cuenta";
+import { EncabezadoEstadoCuenta, PagosEfectuados, SaldoEstadoCuenta } from "src/app/shared/interfaces/report-estado-cuenta";
 import { GlobalService } from "src/app/shared/services/global.service";
 import { environment } from "src/environments/environment";
 const TASA_MORA = environment.percentage * 100;
@@ -14,9 +14,6 @@ export class ReportEstadoCuentaComponent implements OnInit {
   tasaMora = TASA_MORA;
 
   dateNow: Date = new Date();
-
-  elements: any[] = [];
-  saldosVigentes: any[] = [];
 
   encabezado: EncabezadoEstadoCuenta = {
     nroPrestamo: "N/A",
@@ -38,11 +35,15 @@ export class ReportEstadoCuentaComponent implements OnInit {
     totalSTotales: 0,
   };
 
+  pagosEfectuados: PagosEfectuados[] = [];
+  saldosVigentes: SaldoEstadoCuenta[] = [];
+  saldosPagarAtrasados: SaldoEstadoCuenta[] = [];
+
   isPrint = false;
 
   @Input() currentUser: any;
 
-  selectedCliente: any = null;
+  @Input() selectedCliente: any = null;
 
   private _globalService = inject(GlobalService);
   constructor() {}
@@ -76,8 +77,32 @@ export class ReportEstadoCuentaComponent implements OnInit {
         .pipe(
           tap((data: any) => {
             console.log("Prestamos con mora:", data);
-            this.elements = data;
             this.encabezado = data.encabezados[0];
+            this.saldosVigentes = data.saldoVigente;
+            this.pagosEfectuados = data.pagosEfectuados;
+            this.saldosPagarAtrasados = data.saldosPagarAtrasados;
+
+            let counter = 1;
+            // console.log("Saldos vigentes:", this.saldosVigentes);
+            this.saldosVigentes.forEach((saldo) => {
+              saldo.nCuota = counter;
+              counter++;
+            });
+
+            counter = 1;
+            // console.log("Saldos a pagar atrasados:", this.saldosPagarAtrasados);
+            this.saldosPagarAtrasados.forEach((saldo) => {
+              saldo.nCuota = counter;
+              counter++;
+            });
+
+            counter = 1;
+            // console.log("Pagos efectuados:", this.pagosEfectuados);
+            this.pagosEfectuados.forEach((pag) => {
+              pag.nCuota = counter;
+              counter++;
+            });
+
           }),
           catchError((error) => {
             console.error("Error fetching prestamo:", error);

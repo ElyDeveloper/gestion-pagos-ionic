@@ -136,14 +136,16 @@
             <section id="report-print">
               @switch (reporteSeleccionado) { @case ('estado-cuenta') {
               <app-report-estado-cuenta
-                [company]="company"></app-report-estado-cuenta>
+                [company]="company"
+                [selectedCliente]="selectedCliente"></app-report-estado-cuenta>
               } @case ('clientes-mora') {
               <app-report-clients-mora
                 [company]="company"
                 [currentUser]="currentUser"></app-report-clients-mora>
               } @case ('record-crediticio') {
               <app-report-record-crediticio
-                [company]="company"></app-report-record-crediticio>
+                [company]="company"
+                [selectedCliente]="selectedCliente"></app-report-record-crediticio>
               } @case ('cartera-asesor') {
               <app-report-cartera-asesores
                 [company]="company"

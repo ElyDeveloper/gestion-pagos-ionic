@@ -14,8 +14,8 @@ import { GlobalService } from "src/app/shared/services/global.service";
 })
 export class ReportRecordCrediticioComponent implements OnInit {
   @Input() company: string = "Company N/D";
-  selectedCliente: any = null;
-  selectedAsesor: any = null;
+  @Input() selectedCliente: any = null;
+  @Input() selectedAsesor: any = null;
 
   idCliente: number = 0;
   encabezado: EncabezadoRecordCrediticio = {
