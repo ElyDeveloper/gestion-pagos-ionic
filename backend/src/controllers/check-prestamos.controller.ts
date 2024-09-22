@@ -181,6 +181,18 @@ export class CheckPrestamosController {
               estado: true,
             });
 
+            //INFO CONTAR TOTAL DE CUOTAS
+            const countCuotasTotales = await this.fechasPagosRepository.count({
+              planId: prestamo.idPlan,
+            });
+
+            if (countCuotasPagadas.count === countCuotasTotales.count) {
+              console.log('Todas las cuotas pagadas.');
+              this.prestamosRepository.updateById(prestamo.id, {
+                idEstadoInterno: 4,
+              });
+            }
+
             console.log('Cuotas pagadas:', countCuotasPagadas.count);
 
             //INFO ACTUALIZAR PLAN DE PAGO

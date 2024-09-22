@@ -97,11 +97,14 @@ export class PrestamosController {
       return this.prestamosRepository.count({
         idCliente: {inq: idsClientes},
         estado: true,
+        or: [{idEstadoInterno: 1}, {idEstadoInterno: 2}],
+
       });
     }
 
     return this.prestamosRepository.count({
       estado: true,
+      or: [{idEstadoInterno: 1}, {idEstadoInterno: 2}],
     });
   }
 
@@ -198,6 +201,9 @@ export class PrestamosController {
           and: [
             {idCliente: {inq: clients.map((c: any) => c.id)}},
             {estado: true},
+            {
+              or: [{idEstadoInterno: 1}, {idEstadoInterno: 2}],
+            },
           ],
         },
         include: [
@@ -227,6 +233,7 @@ export class PrestamosController {
     const prestamos = await this.prestamosRepository.find({
       where: {
         estado: true,
+        or: [{idEstadoInterno: 1}, {idEstadoInterno: 2}],
       },
       include: [
         'cliente',
@@ -403,6 +410,9 @@ export class PrestamosController {
                 },
               },
               {estado: true},
+              {
+                or: [{idEstadoInterno: 1}, {idEstadoInterno: 2}],
+              },
             ],
           },
         ],
@@ -462,13 +472,12 @@ export class PrestamosController {
       `SP_pieRecordCrediticioCompletados ${idCliente}`,
     );
 
-
     return {
       encabezados,
       cuerpo,
-      pie:{
+      pie: {
         activos,
-        completados
+        completados,
       },
     };
   }
@@ -504,10 +513,11 @@ export class PrestamosController {
       [],
     );
 
-    const saldosPagarAtrasados = await this.prestamosRepository.dataSource.execute(
-      `SP_RSaldos_PagarAtrasados ${idCliente}`,
-      [],
-    );
+    const saldosPagarAtrasados =
+      await this.prestamosRepository.dataSource.execute(
+        `SP_RSaldos_PagarAtrasados ${idCliente}`,
+        [],
+      );
 
     return {
       encabezados,
