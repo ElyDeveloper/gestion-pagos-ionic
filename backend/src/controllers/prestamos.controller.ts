@@ -504,13 +504,15 @@ export class PrestamosController {
       [],
     );
 
-    const saldosTotales = ''
-
-    const saldosPendientes = ''
+    const saldosPagarAtrasados = await this.prestamosRepository.dataSource.execute(
+      `SP_RSaldos_PagarAtrasados ${idCliente}`,
+      [],
+    );
 
     return {
       encabezados,
       saldoVigente,
+      saldosPagarAtrasados,
       pagosEfectuados,
     };
   }
