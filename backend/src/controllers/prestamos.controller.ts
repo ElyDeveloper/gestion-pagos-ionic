@@ -98,7 +98,6 @@ export class PrestamosController {
         idCliente: {inq: idsClientes},
         estado: true,
         or: [{idEstadoInterno: 1}, {idEstadoInterno: 2}],
-
       });
     }
 
@@ -232,8 +231,12 @@ export class PrestamosController {
 
     const prestamos = await this.prestamosRepository.find({
       where: {
-        estado: true,
-        or: [{idEstadoInterno: 1}, {idEstadoInterno: 2}],
+        and: [
+          {estado: true},
+          {
+            or: [{idEstadoInterno: 1}, {idEstadoInterno: 2}],
+          },
+        ],
       },
       include: [
         'cliente',
