@@ -332,6 +332,7 @@ export class PrestamosPage implements OnInit {
   onFilterButtonClicked() {
     this.state = !this.state
 
+    this.currentPage = 1;
     this.getCountElements();
   }
   onAddButtonClicked() {
