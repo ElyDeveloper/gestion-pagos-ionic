@@ -88,14 +88,19 @@ export class UsuariosPage implements OnInit {
   @ViewChild("modalSelectClients", { static: true })
   modalSelectClients!: TemplateRef<any>;
 
+  @ViewChild("modalTransfer", { static: true })
+  modalTransfer!: TemplateRef<any>;
+
   modalConfig: ModalConfig = { fieldAliases: {} };
 
   selectedClients: Personas[] = [];
   filteredClients: Personas[] = [];
 
   searchPlaceHolder = "Buscar Cliente...";
-  search: string = "";
-  searchTerm$ = new Subject<string>();
+  searchClient: string = "";
+  searchUser: string = "";
+  searchClient$ = new Subject<string>();
+  searchUser$ = new Subject<string>();
 
   loading = false;
 
@@ -106,6 +111,26 @@ export class UsuariosPage implements OnInit {
   //TODO ESPECIFICOS
   isResetPswd = false;
   isSelectClients = false;
+  isTransfer = false;
+
+  selectedUser: Usuario = {
+    id: 0,
+    nombre: "",
+    apellido: "",
+    telefono: "",
+    correo: "",
+    observacion: "",
+    ad: false,
+    estado: false,
+    changedPassword: false,
+    rolid: 0,
+    rol: {
+      id: 0,
+      nombre: "",
+    },
+  };
+
+  filteredUsers: Usuario[] = [];
 
   constructor(private fb: FormBuilder) {
     this.formModels = new FormModels(this.fb);
@@ -128,32 +153,74 @@ export class UsuariosPage implements OnInit {
   }
 
   initSearcher() {
-    this.searchTerm$
+    this.searchClient$
       .pipe(
         debounceTime(800), // Espera 300 ms después de que el usuario deja de escribir
         distinctUntilChanged() // Asegura que solo se realice una búsqueda si el valor ha cambiado
       )
       .subscribe(() => {
-        if (this.search.trim() === "" || this.search.trim().length < 3) {
+        if (
+          this.searchClient.trim() === "" ||
+          this.searchClient.trim().length < 3
+        ) {
           this.filteredClients = [];
         } else {
-          this.searchData();
+          this.searchDataClients();
+        }
+        // this.searchEmpleado(); // Llama a la función de búsqueda cuando se cumplan las condiciones
+      });
+
+    this.searchUser$
+      .pipe(
+        debounceTime(800), // Espera 300 ms después de que el usuario deja de escribir
+        distinctUntilChanged() // Asegura que solo se realice una búsqueda si el valor ha cambiado
+      )
+      .subscribe(() => {
+        if (
+          this.searchUser.trim() === "" ||
+          this.searchUser.trim().length < 3
+        ) {
+          this.filteredUsers = [];
+        } else {
+          this.searchDataUsers();
         }
         // this.searchEmpleado(); // Llama a la función de búsqueda cuando se cumplan las condiciones
       });
   }
 
-  searchValueChanged(event: any) {
-    this.searchTerm$.next(event);
+  searchValueChanged(event: any, type: string) {
+    console.log("Search value changed:", event.target.value, type);
+    switch (type) {
+      case "client":
+        this.searchClient$.next(event.target.value);
+        break;
+      case "user":
+        this.searchUser$.next(event.target.value);
+        break;
+    }
   }
 
-  searchData() {
+  searchDataClients() {
     this._globalService
-      .Get(`personas/clientes/search?query=${this.search}`)
+      .Get(`personas/clientes/search?query=${this.searchClient}`)
       .subscribe({
         next: (data: any) => {
-          console.log(`Clientes encontrados para ${this.search}:`, data);
+          console.log(`Clientes encontrados para ${this.searchClient}:`, data);
           this.filteredClients = data;
+        },
+        error: (error) => {
+          console.error("Error al obtener clientes:", error);
+        },
+      });
+  }
+
+  searchDataUsers() {
+    this._globalService
+      .Get(`usuarios/asesores/search?query=${this.searchUser}`)
+      .subscribe({
+        next: (data: any) => {
+          console.log(`Asesores encontrados para ${this.searchUser}:`, data);
+          this.filteredUsers = data;
         },
         error: (error) => {
           console.error("Error al obtener clientes:", error);
@@ -194,6 +261,40 @@ export class UsuariosPage implements OnInit {
           },
         });
     }
+  }
+
+  async setTransfer(usuario:any) {
+    console.log("Set transfer: ", usuario);
+
+    //Alerta de si esta seguro de transferir al usuario
+    const alert = await this._alertController.create({
+      header: "Transferir asesor",
+      message: `¿Está seguro de transferir al asesor ${usuario.apellido}, ${usuario.nombre}?`,
+      buttons: [
+        {
+          text: "Cancelar",
+          role: "cancel",
+          cssClass: "secondary",
+          handler: () => {
+            console.log("Transferencia cancelada");
+          },
+        },
+        {
+          text: "Transferir",
+          handler: () => {
+            //TODO ESPECIFICOS
+            this.isResetPswd = true;
+            this.selectedUser = usuario;
+            console.log("Transferencia realizada correctamente");
+            this.toastColor = "success";
+            this.toastMessage = "Transferencia realizada correctamente";
+            this.isToastOpen = true;
+          },
+        },
+      ],
+    });
+
+    await alert.present();
   }
 
   async removeClient(clientRemove: Personas) {
@@ -319,6 +420,13 @@ export class UsuariosPage implements OnInit {
             rolesAuthorized: [1],
           },
           {
+            alias: "Transferir",
+            action: "transfer",
+            icon: "shuffle",
+            color: "warning",
+            rolesAuthorized: [1],
+          },
+          {
             alias: "Contraseña",
             action: "resetPswd",
             icon: "key",
@@ -357,6 +465,7 @@ export class UsuariosPage implements OnInit {
     isElement: boolean,
     isResetPswd: boolean,
     isSelectClients: boolean,
+    isTransfer: boolean,
     modalTemplate: TemplateRef<any>,
     formSelected?: FormGroup<any>
   ) {
@@ -364,6 +473,7 @@ export class UsuariosPage implements OnInit {
     this.isElement = isElement;
     this.isResetPswd = isResetPswd;
     this.isSelectClients = isSelectClients;
+    this.isTransfer = isTransfer;
 
     this.modalSelected = modalTemplate;
     if (formSelected) {
@@ -393,13 +503,29 @@ export class UsuariosPage implements OnInit {
   onAddButtonClicked() {
     this.cleanForm();
     this.setFieldAliases();
-    this.setModalState(false, true, false, false, this.modalAdd, this.formAdd);
+    this.setModalState(
+      false,
+      true,
+      false,
+      false,
+      false,
+      this.modalAdd,
+      this.formAdd
+    );
   }
 
   onEditButtonClicked(data: any) {
     this.setFieldAliases();
     this.formAdd.patchValue(data);
-    this.setModalState(true, true, false, false, this.modalAdd, this.formAdd);
+    this.setModalState(
+      true,
+      true,
+      false,
+      false,
+      false,
+      this.modalAdd,
+      this.formAdd
+    );
   }
 
   //TODO ESPECIFICO
@@ -420,9 +546,16 @@ export class UsuariosPage implements OnInit {
       false,
       true,
       false,
+      false,
       this.modalResetPswd,
       this.formResetPswd
     );
+  }
+
+  onTransferButtonClicked(data: any) {
+    console.log("Data: ", data);
+    this.element = data;
+    this.setModalState(false, false, false, false, true, this.modalTransfer);
   }
 
   onSelectClientsButtonClicked(data: any) {
@@ -441,6 +574,7 @@ export class UsuariosPage implements OnInit {
             false,
             false,
             true,
+            false,
             this.modalSelectClients
           );
           this.selectedClients = response;
@@ -454,7 +588,7 @@ export class UsuariosPage implements OnInit {
   onInfoButtonClicked(data: any) {
     // console.log("Información del usuario:", data);
     this.element = data;
-    this.setModalState(false, false, false, false, this.modalViewInfo);
+    this.setModalState(false, false, false, false, false, this.modalViewInfo);
   }
 
   onDeleteButtonClicked(data: any) {

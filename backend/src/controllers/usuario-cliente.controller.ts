@@ -30,12 +30,12 @@ export class UsuarioClienteController {
     public usuarioClienteRepository: UsuarioClienteRepository,
     @service(JWTService)
     private jwtService: JWTService,
-  ) { }
+  ) {}
 
   @post('/usuario-clientes')
   @response(200, {
     description: 'UsuarioCliente model instance',
-    content: { 'application/json': { schema: getModelSchemaRef(UsuarioCliente) } },
+    content: {'application/json': {schema: getModelSchemaRef(UsuarioCliente)}},
   })
   async create(
     @requestBody({
@@ -44,8 +44,8 @@ export class UsuarioClienteController {
           schema: {
             type: 'object',
             properties: {
-              usuarioId: { type: 'number' },
-              clientsIds: { type: 'array', items: { type: 'string' } },
+              usuarioId: {type: 'number'},
+              clientsIds: {type: 'array', items: {type: 'string'}},
             },
             required: ['usuarioId', 'clientsIds'],
           },
@@ -56,7 +56,7 @@ export class UsuarioClienteController {
       usuarioId: number;
       clientsIds: string[];
     },
-  ): Promise<{ message: string; changes: { added: number; removed: number } }> {
+  ): Promise<{message: string; changes: {added: number; removed: number}}> {
     console.log('Creando usuario-cliente...', usuarioCliente);
     try {
       if (!Array.isArray(usuarioCliente.clientsIds)) {
@@ -64,7 +64,7 @@ export class UsuarioClienteController {
       }
 
       const userClients = await this.usuarioClienteRepository.find({
-        where: { usuarioId: usuarioCliente.usuarioId },
+        where: {usuarioId: usuarioCliente.usuarioId},
       });
 
       const existingClientIds = userClients.map(uc => uc.clienteId);
@@ -80,13 +80,13 @@ export class UsuarioClienteController {
       if (clientsToAdd.length === 0 && clientsToRemove.length === 0) {
         return {
           message: 'No hay cambios en los clientes por usuario',
-          changes: { added: 0, removed: 0 },
+          changes: {added: 0, removed: 0},
         };
       }
 
       await this.usuarioClienteRepository.deleteAll({
         usuarioId: usuarioCliente.usuarioId,
-        clienteId: { inq: clientsToRemove },
+        clienteId: {inq: clientsToRemove},
       });
 
       const newClients = clientsToAdd.map(id => ({
@@ -129,6 +129,47 @@ export class UsuarioClienteController {
   ): Promise<UsuarioCliente> {
     console.log('Creando usuario-cliente...', usuarioCliente);
     return this.usuarioClienteRepository.create(usuarioCliente);
+  }
+
+  @post('/usuario-clientes/transfer')
+  @response(200, {
+    description: 'UsuarioCliente model instance',
+    content: {'application/json': {schema: getModelSchemaRef(UsuarioCliente)}},
+  })
+  async transfer(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(UsuarioCliente, {
+            title: 'NewUsuarioCliente',
+            exclude: ['id'],
+          }),
+        },
+      },
+    })
+    data: any,
+  ): Promise<void> {
+    console.log('Creando usuario-cliente...', data);
+
+    const { idUserOld, idUserNew } = data;
+
+    const userClients = await this.usuarioClienteRepository.find({
+      where: {usuarioId: idUserOld},
+    });
+    
+    const newClientIds = userClients.map((element) => Number(element.clienteId));
+    
+    await this.usuarioClienteRepository.deleteAll({
+      usuarioId: idUserOld,
+      clienteId: {inq: newClientIds},
+    });
+
+    const newClients = newClientIds.map((id:number) => ({
+      usuarioId: idUserNew,
+      clienteId: id,
+    }));
+
+    await this.usuarioClienteRepository.createAll(newClients);
   }
 
   @get('/usuario-clientes/count')
