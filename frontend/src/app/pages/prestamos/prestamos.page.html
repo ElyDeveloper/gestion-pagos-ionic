@@ -10,10 +10,12 @@
     <app-view-data
       [title]="'Prestamos'"
       [context]="'prestamo'"
+      [state]="state"
       [data]="elements"
       [columnsData]="columnsData"
       [currentPage]="currentPage"
       [totalPages]="totalPages"
+      (filterButtonClicked)="onFilterButtonClicked()"
       (addButtonClicked)="onAddButtonClicked()"
       (editButtonClicked)="onEditButtonClicked($event)"
       (deleteButtonClicked)="onDeleteButtonClicked($event)"

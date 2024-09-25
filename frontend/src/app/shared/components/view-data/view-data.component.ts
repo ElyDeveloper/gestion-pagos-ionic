@@ -23,6 +23,8 @@ export class ViewDataComponent implements OnInit {
   @Input() showTitle: boolean = true;
   @Input() showPagination: boolean = true;
   @Input() showAdd: boolean = true;
+  @Input() showFilter: boolean = true;
+  @Input() state: boolean = true;
   @Input() showSearch: boolean = true;
   @Input() isPrint: boolean = false;
   @Input() context: string = "elemento";
@@ -33,6 +35,7 @@ export class ViewDataComponent implements OnInit {
   @Input() data: any[] = []; // Aquí deberías recibir los datos a mostrar en la tabla
   @Input() columnsData: Column[] = []; // Aquí deberías recibir los datos a mostrar en la tabla (cabeceras)
   @Input() title: string = "Sin titulo"; // Aquí deberías recibir los datos a mostrar en la tabla
+  @Output() filterButtonClicked = new EventEmitter<void>();
   @Output() addButtonClicked = new EventEmitter<void>();
   @Output() editButtonClicked = new EventEmitter<any>();
   @Output() deleteButtonClicked = new EventEmitter<any>();
@@ -285,6 +288,11 @@ export class ViewDataComponent implements OnInit {
     }
   }
 
+  async onFilterClick() {
+    if (await this._preventAbuseService.registerClick()) {
+      this.filterButtonClicked.emit();
+    }
+  }
   async onAddButtonClick() {
     if (await this._preventAbuseService.registerClick()) {
       this.addButtonClicked.emit();

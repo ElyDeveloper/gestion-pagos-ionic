@@ -102,7 +102,7 @@ export class HomePage {
       this._globalService.Get("personas/count"),
       this._globalService.Get("personas/clientes/count"),
       this._globalService.Get("contratos-pagos/count"),
-      this._globalService.Get("prestamos/count"),
+      this._globalService.Get(`prestamos/count?state=${true}`),
       this._globalService.Get("pagos/count"),
     ];
 
