@@ -17,19 +17,20 @@ export class MailService {
   }
 
   async sendWelcomeEmail(to: string, password: string) {
-    const mailOptions = {
-      from: keys.SENDER_EMAIL,
-      to: to,
-      subject: 'Bienvenido a nuestra aplicación',
-      text: `Tu contraseña temporal es: ${password}`,
-    };
+    //TODO Impedir envio de correo de bienvenida
+    // const mailOptions = {
+    //   from: keys.SENDER_EMAIL,
+    //   to: to,
+    //   subject: 'Bienvenido a nuestra aplicación',
+    //   text: `Tu contraseña temporal es: ${password}`,
+    // };
 
-    try {
-      await this.transporter.sendMail(mailOptions);
-      console.log('Correo enviado exitosamente');
-    } catch (error) {
-      console.error('Error al enviar correo:', error);
-    }
+    // try {
+    //   await this.transporter.sendMail(mailOptions);
+    //   console.log('Correo enviado exitosamente');
+    // } catch (error) {
+    //   console.error('Error al enviar correo:', error);
+    // }
   }
 
   async sendChangePassword(to: string, password: string) {
