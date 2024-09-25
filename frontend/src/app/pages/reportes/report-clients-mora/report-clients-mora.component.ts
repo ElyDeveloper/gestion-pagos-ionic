@@ -8,6 +8,7 @@ import {
 } from "@angular/core";
 import { FileUploader } from "ng2-file-upload";
 import { catchError, firstValueFrom, Subscription, tap } from "rxjs";
+import { ClienteMora } from "src/app/shared/interfaces/report-mora";
 import { AuthService } from "src/app/shared/services/auth.service";
 import { GlobalService } from "src/app/shared/services/global.service";
 import { environment } from "src/environments/environment";
@@ -25,7 +26,7 @@ export class ReportClientsMoraComponent implements OnInit {
 
   dateNow: Date = new Date();
 
-  elements: any[] = [];
+  elements: ClienteMora[] = [];
   totalClients = 0;
   totalMora = 0;
 

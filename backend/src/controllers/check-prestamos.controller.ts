@@ -181,6 +181,19 @@ export class CheckPrestamosController {
               estado: true,
             });
 
+            //INFO CONTAR TOTAL DE CUOTAS
+            const countCuotasTotales = await this.fechasPagosRepository.count({
+              planId: prestamo.idPlan,
+            });
+
+            if (countCuotasPagadas.count === countCuotasTotales.count) {
+              console.log('Todas las cuotas pagadas.');
+              this.prestamosRepository.updateById(prestamo.id, {
+                idEstadoInterno: 4,
+                estado: false,
+              });
+            }
+
             console.log('Cuotas pagadas:', countCuotasPagadas.count);
 
             //INFO ACTUALIZAR PLAN DE PAGO
@@ -269,12 +282,18 @@ export class CheckPrestamosController {
     );
     const latestDate = this.getLatestPaymentDate(fechasPagos);
 
+    let state = true;
+    if (idEstadoInterno === 3) {
+      state =false;
+    }
+
     await this.updatePlanAndLoan(
       planId,
       idPrestamo,
       fechaInicio,
       latestDate,
       idEstadoInterno,
+      state,
     );
 
     return this.saveOrUpdatePaymentDates(planId, fechasPagos);
@@ -343,6 +362,7 @@ export class CheckPrestamosController {
     fechaInicio: string,
     latestDate: string | undefined,
     idEstadoInterno: number,
+    estado: boolean,
   ): Promise<void> {
     await this.planesPagoRepository.updateById(planId, {
       fechaInicio,
@@ -351,6 +371,7 @@ export class CheckPrestamosController {
 
     await this.prestamosRepository.updateById(prestamoId, {
       idEstadoInterno,
+      estado,
       fechaAprobacion: new Date().toISOString(),
     });
   }

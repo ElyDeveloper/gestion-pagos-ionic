@@ -3,11 +3,16 @@
     <ion-card-title class="d-none d-md-block" *ngIf="showTitle">{{
       title
     }}</ion-card-title>
-    <div
-      class="row d-flex justify-content-end"
-      *ngIf="showAdd && userLogged.rolid !== 3">
-      <div style="width: 150px">
-        <ion-button color="primary" (click)="onAddButtonClick()">
+    <div class="d-flex justify-content-end">
+      <div>
+        <ion-button *ngIf="showFilter" color="warning" (click)="onFilterClick()">
+          Mostrar {{ state ? "Inactivos" : "Activos" }}
+          <ion-icon class="ms-2" name="filter-outline"></ion-icon>
+        </ion-button>
+        <ion-button
+          *ngIf="showAdd && userLogged.rolid !== 3"
+          color="primary"
+          (click)="onAddButtonClick()">
           Agregar <ion-icon name="add-outline"></ion-icon>
         </ion-button>
       </div>

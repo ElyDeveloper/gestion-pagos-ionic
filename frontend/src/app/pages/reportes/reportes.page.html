@@ -46,7 +46,7 @@
           </ion-card-header>
           <ion-card-content class="p-4">
             @if(currentUser.rolid!==3){
-            <ion-item lines="none" class="ion-margin-top">
+            <ion-item class="ion-margin-top">
               <ion-label>
                 <h2 class="ion-text-wrap">Asesor Seleccionado</h2>
                 <p *ngIf="selectedAsesor; else noAsesor">
@@ -70,7 +70,7 @@
             </ion-item>
             }
 
-            <ion-item lines="none" class="ion-margin-top">
+            <ion-item class="ion-margin-top">
               <ion-label>
                 <h2 class="ion-text-wrap">Cliente Seleccionado</h2>
                 <p *ngIf="selectedCliente; else noCliente">
@@ -126,7 +126,7 @@
         </ion-card>
       </ion-col>
 
-      <ion-col size-xs="12" size-md="12" size-lg="12">
+      <ion-col size-xs="12" size-md="12" size-lg="12" id="current-report">
         <ion-card style="min-height: 100vh">
           <ion-card-header>
             <ion-card-title>Reporte Actual</ion-card-title>
@@ -136,14 +136,16 @@
             <section id="report-print">
               @switch (reporteSeleccionado) { @case ('estado-cuenta') {
               <app-report-estado-cuenta
-                [company]="company"></app-report-estado-cuenta>
+                [company]="company"
+                [selectedCliente]="selectedCliente"></app-report-estado-cuenta>
               } @case ('clientes-mora') {
               <app-report-clients-mora
                 [company]="company"
                 [currentUser]="currentUser"></app-report-clients-mora>
               } @case ('record-crediticio') {
               <app-report-record-crediticio
-                [company]="company"></app-report-record-crediticio>
+                [company]="company"
+                [selectedCliente]="selectedCliente"></app-report-record-crediticio>
               } @case ('cartera-asesor') {
               <app-report-cartera-asesores
                 [company]="company"

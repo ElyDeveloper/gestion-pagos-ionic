@@ -80,6 +80,11 @@ export class ReusableModalComponent {
 
           this.saveData.emit();
         }
+
+        if (data?.type === "array") {
+          this.saveData.emit(data.data);
+        }
+
       }
     }
   };

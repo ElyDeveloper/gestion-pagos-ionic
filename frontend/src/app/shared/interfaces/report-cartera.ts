@@ -1,5 +1,6 @@
 export interface Cartera {
   IdPersona: number;
+  prestamoId: number;
   nombreCliente: string;
   celular: string;
   diaPago: string;

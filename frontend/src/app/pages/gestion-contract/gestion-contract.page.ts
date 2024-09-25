@@ -209,6 +209,7 @@ export class GestionContractPage implements OnInit {
     this._loaderService.show();
     const customPrintOptions: PrintOptions = new PrintOptions({
       printSectionId: "print-contract",
+      printTitle: "Contrato de Pago" + "-" + this.clienteSeleccionado.nombres + " " + this.clienteSeleccionado.apellidos,
       openNewTab:true
 
       // Add any other print options as needed

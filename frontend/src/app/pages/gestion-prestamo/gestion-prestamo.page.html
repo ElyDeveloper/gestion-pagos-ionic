@@ -11,7 +11,7 @@
       <ion-grid>
         <ion-row class="ion-align-items-center">
           <ion-col size="12" size-md="6">
-            <ion-item lines="none">
+            <ion-item lines="none" lines="none">
               <ion-icon name="person-outline" slot="start"></ion-icon>
               <ion-label>
                 <h2>Cliente Seleccionado:</h2>
@@ -30,7 +30,7 @@
             </ion-item>
 
             @if(avalSeleccionado){
-            <ion-item lines="none">
+            <ion-item lines="none" lines="none">
               <ion-icon name="person-outline" slot="start"></ion-icon>
               <ion-label>
                 <h2>Aval Seleccionado:</h2>
@@ -51,7 +51,7 @@
           </ion-col>
           <ion-col size="12" size-md="6">
             <ion-list>
-              <ion-item lines="none">
+              <ion-item lines="none" lines="none">
                 <ion-icon
                   [name]="clienteSeleccionado ? 'checkmark-circle' : 'close-circle'"
                   [color]="clienteSeleccionado ? 'success' : 'danger'"
@@ -60,7 +60,7 @@
                   >Selecciona un cliente</ion-label
                 >
               </ion-item>
-              <ion-item lines="none">
+              <ion-item lines="none" lines="none">
                 <ion-icon
                   [name]="!planesPagoForm.invalid ? 'checkmark-circle' : 'close-circle'"
                   [color]="!planesPagoForm.invalid ? 'success' : 'danger'"
@@ -70,7 +70,7 @@
                   >Selecciona un plan de pago</ion-label
                 >
               </ion-item>
-              <ion-item lines="none">
+              <ion-item lines="none" lines="none">
                 <ion-icon
                   [name]="!prestamoForm.invalid ? 'checkmark-circle' : 'close-circle'"
                   [color]="!prestamoForm.invalid ? 'success' : 'danger'"
@@ -113,7 +113,7 @@
                 <!-- Listado de clientes -->
                 <ion-radio-group (ionChange)="onClienteSeleccionado($event)">
                   <ion-list>
-                    <ion-item *ngFor="let cliente of clientes">
+                    <ion-item lines="none" *ngFor="let cliente of clientes">
                       <ion-radio [value]="cliente"
                         >{{ cliente.nombres }} {{ cliente.apellidos }} -
                         {{cliente.dni}}
@@ -138,7 +138,7 @@
                 <!-- Listado de avales -->
                 <ion-radio-group (ionChange)="onAvalSeleccionado($event)">
                   <ion-list>
-                    <ion-item *ngFor="let aval of avales">
+                    <ion-item lines="none" *ngFor="let aval of avales">
                       <ion-radio [value]="aval"
                         >{{ aval.nombres }} {{ aval.apellidos }} - {{aval.dni}}
                       </ion-radio>
@@ -160,7 +160,7 @@
             <ion-grid>
               <ion-row>
                 <ion-col sizeXs="12" sizeSm="6">
-                  <ion-item>
+                  <ion-item lines="none">
                     <ion-label position="stacked" class="bold-label"
                       >Cuotas a Pagar:</ion-label
                     >
@@ -170,7 +170,7 @@
                   </ion-item>
                 </ion-col>
                 <ion-col sizeXs="12" sizeSm="6">
-                  <ion-item>
+                  <ion-item lines="none">
                     <ion-label position="stacked" class="bold-label"
                       >Fecha de Inicio:</ion-label
                     >
@@ -180,7 +180,7 @@
                   </ion-item>
                 </ion-col>
                 <ion-col sizeXs="12" sizeSm="6">
-                  <ion-item>
+                  <ion-item lines="none">
                     <ion-label position="stacked" class="bold-label"
                       >Cuotas Pagadas:</ion-label
                     >
@@ -190,7 +190,7 @@
                   </ion-item>
                 </ion-col>
                 <ion-col sizeXs="12" sizeSm="6">
-                  <ion-item lines="none">
+                  <ion-item lines="none" lines="none">
                     <ion-label position="stacked" class="bold-label"
                       >Estado</ion-label
                     >
@@ -216,7 +216,7 @@
             <ion-grid>
               <ion-row>
                 <ion-col sizeXs="12" sizeSm="6">
-                  <ion-item>
+                  <ion-item lines="none">
                     <ion-label position="stacked" class="bold-label"
                       >Monto:</ion-label
                     >
@@ -227,7 +227,7 @@
                   </ion-item>
                 </ion-col>
                 <ion-col sizeXs="12" sizeSm="6">
-                  <ion-item>
+                  <ion-item lines="none">
                     <ion-label position="stacked" class="bold-label"
                       >Tasa de Interés:</ion-label
                     >
@@ -238,7 +238,7 @@
                   </ion-item>
                 </ion-col>
                 <ion-col sizeXs="12" sizeSm="6">
-                  <ion-item>
+                  <ion-item lines="none">
                     <ion-label position="stacked" class="bold-label"
                       >Total Monto:</ion-label
                     >
@@ -249,7 +249,7 @@
                   </ion-item>
                 </ion-col>
                 <ion-col sizeXs="12" sizeSm="6">
-                  <ion-item>
+                  <ion-item lines="none">
                     <ion-label position="stacked" class="bold-label"
                       >Fecha de Solicitud:</ion-label
                     >
@@ -259,7 +259,7 @@
                   </ion-item>
                 </ion-col>
                 <ion-col sizeXs="12" sizeSm="6">
-                  <ion-item>
+                  <ion-item lines="none">
                     <ion-label position="stacked" class="bold-label"
                       >Producto:</ion-label
                     >
@@ -275,7 +275,7 @@
                   </ion-item>
                 </ion-col>
                 <ion-col sizeXs="12" sizeSm="6">
-                  <ion-item>
+                  <ion-item lines="none">
                     <ion-label position="stacked" class="bold-label"
                       >Periodo de Cobro:</ion-label
                     >
@@ -291,7 +291,7 @@
                   </ion-item>
                 </ion-col>
                 <ion-col sizeXs="12" sizeSm="6">
-                  <ion-item>
+                  <ion-item lines="none">
                     <ion-label position="stacked" class="bold-label"
                       >Estado de Aprobación:</ion-label
                     >
@@ -308,7 +308,7 @@
                   </ion-item>
                 </ion-col>
                 <ion-col sizeXs="12" sizeSm="6">
-                  <ion-item>
+                  <ion-item lines="none">
                     <ion-label position="stacked" class="bold-label"
                       >Moneda:</ion-label
                     >
@@ -324,7 +324,7 @@
                   </ion-item>
                 </ion-col>
                 <ion-col sizeXs="12" sizeSm="6">
-                  <ion-item lines="none">
+                  <ion-item lines="none" lines="none">
                     <ion-label position="stacked" class="bold-label"
                       >Estado</ion-label
                     >

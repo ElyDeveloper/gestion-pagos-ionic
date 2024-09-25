@@ -58,6 +58,7 @@ export class PrestamosPage implements OnInit {
   isModalOpen = false;
   isToastOpen = false;
   isEdit = false;
+  state = true;
 
   suscripciones: Subscription[] = [];
 
@@ -328,6 +329,12 @@ export class PrestamosPage implements OnInit {
     this.isModalOpen = true;
   }
 
+  onFilterButtonClicked() {
+    this.state = !this.state
+
+    this.currentPage = 1;
+    this.getCountElements();
+  }
   onAddButtonClicked() {
     this._router.navigate(["/layout/gestion-prestamo"]);
     // this._router.navigate(["/layout"]);
@@ -554,7 +561,7 @@ export class PrestamosPage implements OnInit {
         await this.getCountElements();
       } else {
         await firstValueFrom(
-          this._globalService.Get(`prestamos/search?query=${event}`).pipe(
+          this._globalService.Get(`prestamos/search?query=${event}&state=${this.state}`).pipe(
             tap((res: any) => {
               this.elements = res;
               console.log("Elementos obtenidos:", res);
@@ -580,7 +587,9 @@ export class PrestamosPage implements OnInit {
     try {
       await firstValueFrom(
         this._globalService
-          .Get(`prestamos/paginated?skip=${skip}&limit=${limit}`)
+          .Get(
+            `prestamos/paginated?skip=${skip}&limit=${limit}&state=${this.state}`
+          )
           .pipe(
             tap((res: any) => {
               this.elements = res;
@@ -601,7 +610,7 @@ export class PrestamosPage implements OnInit {
   private async getCountElements(): Promise<void> {
     try {
       await firstValueFrom(
-        this._globalService.Get("prestamos/count").pipe(
+        this._globalService.Get(`prestamos/count?state=${this.state}`).pipe(
           tap((res: any) => {
             console.log("Cantidad de elementos:", res.count);
             const totalElements = res.count;

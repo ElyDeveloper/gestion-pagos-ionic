@@ -12,7 +12,7 @@ import { CookieService } from "ngx-cookie-service";
     <ion-header [translucent]="true">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-menu-button></ion-menu-button>
+          <ion-menu-button aria-hidden="false"></ion-menu-button>
         </ion-buttons>
         <ion-title size="large" class="ion-hide-md-down"
           >{{ appName }}

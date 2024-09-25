@@ -6,67 +6,74 @@
   <div class="info-grid">
     <div class="info-item">
       <span class="info-label">ASESOR:</span>
-      <span class="info-value">Eduardo Josue Orellana Dìaz</span>
+      <span class="info-value"
+        >{{ selectedAsesor?.nombre || "N/A" }}
+        {{ selectedAsesor?.apellido }}</span
+      >
     </div>
     <div class="info-item">
-      <span class="info-label">COD. ASESOR:</span>
-      <span class="info-value">1022</span>
+      <span class="info-label">CÓD. ASESOR:</span>
+      <span class="info-value">{{ selectedAsesor?.id || "N/A" }} </span>
     </div>
     <div class="info-item">
       <span class="info-label">TELÉFONO:</span>
-      <span class="info-value">32647048</span>
+      <span class="info-value">{{ selectedAsesor?.telefono || "N/A" }} </span>
     </div>
   </div>
 </div>
 <table>
   <tr>
-    <th class="especial-right">Monto Otorgado:</th>
-    <td>{{ 22000 | currency : "L" : "symbol" }}</td>
-    <th class="especial-right">Saldo Capital Actual:</th>
-    <td>{{ 20166.67 | currency : "L" : "symbol" }}</td>
-    <th class="especial-right">Saldo Actual:</th>
-    <td>{{ 29241.67 | currency : "L" : "symbol" }}</td>
+    <th class="especial-right">Total Monto Otorgado:</th>
+    <td>{{ encabezado.montoOtorgado | currency : "L" : "symbol" }}</td>
+    <th class="especial-right">Total Saldo Capital Actual:</th>
+    <td>{{ encabezado.saldoCapitalActual | currency : "L" : "symbol" }}</td>
+    <th class="especial-right">Total Saldo Actual:</th>
+    <td>{{ encabezado.saldoActual | currency : "L" : "symbol" }}</td>
   </tr>
   <tr>
-    <th class="especial-right">Valor Cuota:</th>
-    <td>{{ 2658.33 | currency : "L" : "symbol" }}</td>
+    <th class="especial-right">Total Valor Cuotas:</th>
+    <td>{{ encabezado.valorCuota | currency : "L" : "symbol" }}</td>
     <th class="especial-right">Tasa Promedio:</th>
-    <td>{{ 2658.33 | currency : "L" : "symbol" }}</td>
+    <td>{{ encabezado.tasaPromedio | number : "1.2-2" }}%</td>
     <th class="especial-right">Valor Total a Pagar:</th>
-    <td>{{ 2658.33 | currency : "L" : "symbol" }}</td>
+    <td>{{ encabezado.valorTotalPagar | currency : "L" : "symbol" }}</td>
   </tr>
-
   <tr>
-    <th class="especial-right">Valor Cuotas Atrasadas:</th>
-    <td>{{ 2658.33 | currency : "L" : "symbol" }}</td>
+    <th class="especial-right">Valor Total Cuotas Atrasadas:</th>
+    <td>{{ encabezado.valorCuotasAtrasada | currency : "L" : "symbol" }}</td>
     <th class="especial-right">Total Mora:</th>
-    <td>{{ 2658.33 | currency : "L" : "symbol" }}</td>
-    <th class="especial-right">Mora:</th>
-    <td>{{ 2658.33 | currency : "L" : "symbol" }}</td>
+    <td>{{ encabezado.mora | currency : "L" : "symbol" }}</td>
+    <th class="especial-right">Gran Total con Mora:</th>
+    <td>{{ encabezado.totalConMora | currency : "L" : "symbol" }}</td>
+  </tr>
+  <tr>
+    <th class="especial-right">Fecha de Impresión:</th>
+    <td>{{ subtractHours(dateNow, 6) | customDate : 6 : "dd/MM/yyyy" }}</td>
   </tr>
 </table>
 
 <table>
   <thead>
     <tr>
-      <th>ID Persona</th>
+      <th>ID Cliente</th>
       <th>Nombre Cliente</th>
+      <th>ID Prestamo</th>
       <th>Celular</th>
-      <th>Día Pago</th>
+      <!-- <th>Día Pago</th> -->
       <th>Monto Otorgado</th>
       <th>Saldo Capital Actual</th>
       <th>Saldo Actual</th>
       <th>Valor Cuota</th>
       <th>Plazo</th>
-      <th>Meses</th>
+      <!-- <th>Meses</th> -->
       <th>Tasa</th>
       <th>Cuotas Pagadas</th>
       <th>Valor Total</th>
       <th>Valor Cuotas Atrasadas</th>
-      <th>Días en Mora</th>
-      <th>Total Mora</th>
-      <th>Fecha Vencimiento</th>
       <th>Mora</th>
+      <th>Días en Mora</th>
+      <th>Total Con Mora</th>
+      <th>Fecha Vencimiento</th>
     </tr>
   </thead>
   <tbody>
@@ -74,8 +81,9 @@
     <tr>
       <td class="text-center">{{ item.IdPersona }}</td>
       <td>{{ item.nombreCliente }}</td>
+      <td class="text-center">{{ item.prestamoId }}</td>
       <td class="text-center">{{ item.celular }}</td>
-      <td class="text-center">{{ item.diaPago }}</td>
+      <!-- <td class="text-center">{{ item.diaPago }}</td> -->
       <td class="text-center">
         {{ item.montoOtorgado | currency : "L" : "symbol" }}
       </td>
@@ -89,8 +97,8 @@
         {{ item.valorCuota | currency : "L" : "symbol" }}
       </td>
       <td class="text-center">{{ item.plazo }}</td>
-      <td class="text-center">{{ item.meses }}</td>
-      <td class="text-center">{{ item.tasa }}</td>
+      <!-- <td class="text-center">{{ item.meses }}</td> -->
+      <td class="text-center">{{ item.tasa | number : "1.2-2" }}%</td>
       <td class="text-center">{{ item.cuotasPagadas }}</td>
       <td class="text-center">
         {{ item.valorTotal | currency : "L" : "symbol" }}
@@ -98,6 +106,7 @@
       <td class="text-center">
         {{ item.valorCuotasAtrasadas | currency : "L" : "symbol" }}
       </td>
+      <td class="text-center">{{ item.mora | currency : "L" : "symbol" }}</td>
       <td class="text-center">{{ item.diasEnMora }}</td>
       <td class="text-center">
         {{ item.totalMora | currency : "L" : "symbol" }}
@@ -105,7 +114,6 @@
       <td class="text-center">
         {{ item.fechaVencimiento | date : "dd/MM/yyyy" }}
       </td>
-      <td class="text-center">{{ item.mora | currency : "L" : "symbol" }}</td>
     </tr>
     }
   </tbody>

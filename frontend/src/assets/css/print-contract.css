@@ -2,7 +2,7 @@
   /* General print styles */
   body {
     font-family: Arial, sans-serif;
-    font-size: 12pt;
+    font-size: 14px;
     line-height: 1.3;
     background: none;
     color: #000;
@@ -33,7 +33,7 @@
   }
 
   h2 {
-    font-size: 16pt !important;
+    font-size: 16px !important;
   }
 
   /* Page layout adjustments */
@@ -116,7 +116,7 @@
 .header-title {
   text-align: center;
   margin: 0 0 20px 0;
-  font-size: 24px;
+  font-size: 20px;
   color: #333;
 }
 .header-content {
@@ -129,7 +129,7 @@
 }
 .client-info p {
   margin: 5px 0;
-  font-size: 16px;
+  font-size: 14px;
   color: #555;
 }
 .client-info strong {

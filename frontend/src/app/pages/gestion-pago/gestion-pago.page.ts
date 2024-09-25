@@ -88,6 +88,7 @@ export class GestionPagoPage implements OnInit {
     this._loaderService.show();
     const customPrintOptions: PrintOptions = new PrintOptions({
       printSectionId: "print-fechas-pagos",
+      printTitle: "Fechas de Pago" + " - Prestamo(" + this.prestamoSeleccionado.id + ")",
 
       // Add any other print options as needed
     });
@@ -340,7 +341,7 @@ export class GestionPagoPage implements OnInit {
   private buildColumns(): void {
     this.columnsData = [
       { key: "numero", alias: "No. Cuota" },
-      { key: "id", alias: "Código" },
+      { key: "id", alias: "Código Cuota" },
       { key: "fechaPago", alias: "Fecha de Pago", type: "date" },
       { key: "monto", alias: "Monto Cuota", type: "currency" },
       { key: "mora", alias: "Monto Mora", type: "currency" },

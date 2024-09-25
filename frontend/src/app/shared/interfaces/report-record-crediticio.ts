@@ -16,17 +16,18 @@ export interface EncabezadoRecordCrediticio {
 // export Interfaces para los elementos del cuerpo
 export interface CuerpoRecordCrediticio {
   idPrestamo: number;
+  nCuota: number;
   fechaVencimiento: string;
   fechaCancelacion: string;
-  diasAtraso: number;
+  dias: number;
   capital: number;
-  interes: number;
+  intereses: number;
   mora: number;
-  total: number;
+  cuota: number;
+  saldoCapital: number;
 }
 
-// export Interfaces para los elementos del pie
-export interface PieRecordCrediticio {
+export interface PrestamoRecordCrediticio {
   idPrestamo: number;
   fecha: string;
   plazo: string;
@@ -34,6 +35,11 @@ export interface PieRecordCrediticio {
   asesor: string;
   tasa: number;
   tipo: string;
+}
+
+export interface PieRecordCrediticio {
+  activos: PrestamoRecordCrediticio[];
+  completados: PrestamoRecordCrediticio[];
 }
 
 // export Interface principal que engloba todas las secciones

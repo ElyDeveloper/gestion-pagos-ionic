@@ -14,25 +14,45 @@ import { GlobalService } from "src/app/shared/services/global.service";
 })
 export class ReportRecordCrediticioComponent implements OnInit {
   @Input() company: string = "Company N/D";
-  selectedCliente: any = null;
-  selectedAsesor: any = null;
+  @Input() selectedCliente: any = null;
+  @Input() selectedAsesor: any = null;
 
   idCliente: number = 0;
   encabezado: EncabezadoRecordCrediticio = {
-    idPrestamo: 'N/A',
+    idPrestamo: "N/A",
     cliente: "N/A",
     direccion: "N/A",
     telefono: "N/A",
     asesor: "N/A",
     producto: "N/A",
     etapa: "N/A",
-    numeroTotalPtmos: 'N/A',
+    numeroTotalPtmos: "N/A",
     fechaProceso: "N/A",
     recordCrediticio: "N/A",
     cantidadDesembolso: 0,
   };
-  pie: PieRecordCrediticio[] = [];
   cuerpo: CuerpoRecordCrediticio[] = [];
+
+  // interface PrestamoRecordCrediticio {
+  //   idPrestamo: number;
+  //   fecha: string;
+  //   plazo: string;
+  //   monto: number;
+  //   asesor: string;
+  //   tasa: number;
+  //   tipo: string;
+  // }
+
+  // export interface PieRecordCrediticio {
+  //   pie: {
+  //     activos: PrestamoRecordCrediticio[];
+  //     completados: PrestamoRecordCrediticio[];
+  //   };
+  // }
+  pie: PieRecordCrediticio = {
+    activos: [],
+    completados: [],
+  };
 
   dateNow: Date = new Date();
 
@@ -71,6 +91,11 @@ export class ReportRecordCrediticioComponent implements OnInit {
             console.log("Record Crediticio:", data);
             this.encabezado = data.encabezados[0];
             this.cuerpo = data.cuerpo;
+            let counter = 1;
+            this.cuerpo.forEach((c: CuerpoRecordCrediticio) => {
+              c.nCuota = counter;
+              counter++;
+            });
             this.pie = data.pie;
             this.fetchAsesor();
           }),

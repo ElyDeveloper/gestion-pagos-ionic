@@ -10,10 +10,13 @@
     <app-view-data
       [title]="'Prestamos'"
       [context]="'prestamo'"
+      [state]="state"
+      [showFilter]="true"
       [data]="elements"
       [columnsData]="columnsData"
       [currentPage]="currentPage"
       [totalPages]="totalPages"
+      (filterButtonClicked)="onFilterButtonClicked()"
       (addButtonClicked)="onAddButtonClicked()"
       (editButtonClicked)="onEditButtonClicked($event)"
       (deleteButtonClicked)="onDeleteButtonClicked($event)"
@@ -52,7 +55,7 @@
           <ion-grid>
             <ion-row>
               <ion-col size-xs="12" size-sm="6" size-md="6">
-                <ion-item>
+                <ion-item lines="none">
                   <ion-label position="stacked" class="bold-label"
                     >Fecha de Inicio:</ion-label
                   >
@@ -64,7 +67,7 @@
               </ion-col>
 
               <ion-col size-xs="12" size-sm="6" size-md="6">
-                <ion-item>
+                <ion-item lines="none">
                   <ion-label position="stacked" class="bold-label"
                     >Decisión</ion-label
                   >

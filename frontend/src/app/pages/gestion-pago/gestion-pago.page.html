@@ -12,7 +12,7 @@
         <ion-grid>
           <ion-row class="ion-align-items-center">
             <ion-col size="12" size-md="6">
-              <ion-item lines="none">
+              <ion-item lines="none" lines="none">
                 <ion-icon name="person-outline" slot="start"></ion-icon>
                 <ion-label>
                   <h2>Cliente Seleccionado:</h2>
@@ -26,7 +26,7 @@
                   </p>
                 </ion-label>
               </ion-item>
-              <ion-item lines="none" *ngIf="hasAval">
+              <ion-item lines="none" lines="none" *ngIf="hasAval">
                 <ion-icon name="person-outline" slot="start"></ion-icon>
                 <ion-label>
                   <h2>Aval Seleccionado:</h2>
@@ -58,7 +58,7 @@
           </ion-row>
         </ion-grid>
 
-        <ion-item
+        <ion-item lines="none"
           *ngIf="!existContrato"
           lines="none"
           color="danger"
@@ -81,7 +81,7 @@
               </ion-card-header>
               <ion-card-content>
                 <ion-list>
-                  <ion-item>
+                  <ion-item lines="none">
                     <ion-label>
                       <h5>Fecha de pago seleccionado</h5>
                       <ion-text color="success">
@@ -91,7 +91,7 @@
                     </ion-label>
                   </ion-item>
 
-                  <ion-item>
+                  <ion-item lines="none">
                     <ion-label>
                       <h5>Cuota #</h5>
                       <ion-text color="success">
@@ -100,7 +100,7 @@
                     </ion-label>
                   </ion-item>
 
-                  <ion-item>
+                  <ion-item lines="none">
                     <ion-label>
                       <h5>Adeudo Cancelado</h5>
                       <ion-text color="success">
@@ -109,7 +109,7 @@
                     </ion-label>
                   </ion-item>
 
-                  <ion-item>
+                  <ion-item lines="none">
                     <ion-label>
                       <h5>Monto Cuota</h5>
                       <ion-text color="danger">
@@ -118,7 +118,7 @@
                     </ion-label>
                   </ion-item>
 
-                  <ion-item>
+                  <ion-item lines="none">
                     <ion-label>
                       <h5>Mora</h5>
                       <ion-text color="danger">
@@ -127,7 +127,7 @@
                     </ion-label>
                   </ion-item>
 
-                  <ion-item>
+                  <ion-item lines="none">
                     <ion-label>
                       <h5>Saldo Cuota Pendiente</h5>
                       <ion-text color="danger">
@@ -136,7 +136,7 @@
                     </ion-label>
                   </ion-item>
 
-                  <ion-item>
+                  <ion-item lines="none">
                     <ion-label>
                       <h5>Saldo Mora Pendiente</h5>
                       <ion-text color="danger">
@@ -145,7 +145,7 @@
                     </ion-label>
                   </ion-item>
 
-                  <ion-item>
+                  <ion-item lines="none">
                     <ion-label>
                       <h5>Adeudo Total</h5>
                       <ion-text color="danger">
@@ -154,7 +154,7 @@
                     </ion-label>
                   </ion-item>
 
-                  <ion-item>
+                  <ion-item lines="none">
                     <ion-label>
                       <h5>Días de retraso</h5>
                       <ion-text color="danger"> {{ daysLate }} </ion-text>
@@ -215,7 +215,7 @@
                     <ion-grid>
                       <ion-row>
                         <ion-col size="12">
-                          <ion-item>
+                          <ion-item lines="none">
                             <ion-label position="stacked" class="bold-label"
                               >Fecha registro de pago:</ion-label
                             >
@@ -228,7 +228,7 @@
                         </ion-col>
 
                         <ion-col size="12">
-                          <ion-item>
+                          <ion-item lines="none">
                             <ion-label position="stacked" class="bold-label"
                               >Monto Pago:</ion-label
                             >
@@ -241,7 +241,7 @@
 
                         @if(hasMora){
                         <ion-col size="12">
-                          <ion-item>
+                          <ion-item lines="none">
                             <ion-label position="stacked" class="bold-label"
                               >Mora:</ion-label
                             >

@@ -72,7 +72,16 @@ export class PrestamosController {
   async count(
     @inject(SecurityBindings.USER)
     currentUser: UserProfile,
+    @param.query.boolean('state') state: boolean,
   ): Promise<Count> {
+    let condition: any = {
+      or: [{idEstadoInterno: 1}, {idEstadoInterno: 2}],
+    };
+
+    if (!state) {
+      condition = {};
+    }
+    console.log('Consultando prestamos del Usuario Logueado, Estado: ', state);
     const userId = parseInt(currentUser[securityId], 10);
 
     const user = await this.usuarioRepository.findById(userId);
@@ -95,13 +104,12 @@ export class PrestamosController {
       const idsClientes = usuariosClientes.map(u => u.clienteId);
       // console.log('Ids de Clientes del Usuario Logueado: ', idsClientes);
       return this.prestamosRepository.count({
-        idCliente: {inq: idsClientes},
-        estado: true,
+        and: [{idCliente: {inq: idsClientes}}, {estado: state}, condition],
       });
     }
 
     return this.prestamosRepository.count({
-      estado: true,
+      and: [{estado: state}, condition],
     });
   }
 
@@ -148,7 +156,15 @@ export class PrestamosController {
     currentUser: UserProfile,
     @param.query.number('skip') skip: number,
     @param.query.number('limit') limit: number,
+    @param.query.boolean('state') state: boolean,
   ): Promise<any[]> {
+    let condition: any = {
+      or: [{idEstadoInterno: 1}, {idEstadoInterno: 2}],
+    };
+
+    if (!state) {
+      condition = {};
+    }
     // console.log('Usuario Logueado: ', currentUser);
     const userId = parseInt(currentUser[securityId], 10);
     // console.log('Id de Usuario Logueado: ', userId);
@@ -197,7 +213,8 @@ export class PrestamosController {
         where: {
           and: [
             {idCliente: {inq: clients.map((c: any) => c.id)}},
-            {estado: true},
+            {estado: state},
+            condition,
           ],
         },
         include: [
@@ -226,7 +243,7 @@ export class PrestamosController {
 
     const prestamos = await this.prestamosRepository.find({
       where: {
-        estado: true,
+        and: [{estado: state}, condition],
       },
       include: [
         'cliente',
@@ -348,7 +365,15 @@ export class PrestamosController {
     @inject(SecurityBindings.USER)
     currentUser: UserProfile,
     @param.query.string('query') search: string,
+    @param.query.boolean('state') state: string,
   ): Promise<any[]> {
+    let condition: any = {
+      or: [{idEstadoInterno: 1}, {idEstadoInterno: 2}],
+    };
+
+    if (!state) {
+      condition = {};
+    }
     const userId = parseInt(currentUser[securityId], 10);
     const user = await this.usuarioRepository.findById(userId);
     if (!user) {
@@ -402,7 +427,8 @@ export class PrestamosController {
                   inq: idsClientes,
                 },
               },
-              {estado: true},
+              {estado: state},
+              condition,
             ],
           },
         ],
@@ -462,13 +488,12 @@ export class PrestamosController {
       `SP_pieRecordCrediticioCompletados ${idCliente}`,
     );
 
-
     return {
       encabezados,
       cuerpo,
-      pie:{
+      pie: {
         activos,
-        completados
+        completados,
       },
     };
   }
@@ -504,10 +529,11 @@ export class PrestamosController {
       [],
     );
 
-    const saldosPagarAtrasados = await this.prestamosRepository.dataSource.execute(
-      `SP_RSaldos_PagarAtrasados ${idCliente}`,
-      [],
-    );
+    const saldosPagarAtrasados =
+      await this.prestamosRepository.dataSource.execute(
+        `SP_RSaldos_PagarAtrasados ${idCliente}`,
+        [],
+      );
 
     return {
       encabezados,
