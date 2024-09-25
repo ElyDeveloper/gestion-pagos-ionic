@@ -5,7 +5,7 @@
     }}</ion-card-title>
     <div class="d-flex justify-content-end">
       <div>
-        <ion-button color="warning" (click)="onFilterClick()">
+        <ion-button *ngIf="showFilter" color="warning" (click)="onFilterClick()">
           Mostrar {{ state ? "Inactivos" : "Activos" }}
           <ion-icon class="ms-2" name="filter-outline"></ion-icon>
         </ion-button>

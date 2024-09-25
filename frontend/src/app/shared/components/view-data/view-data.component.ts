@@ -23,7 +23,7 @@ export class ViewDataComponent implements OnInit {
   @Input() showTitle: boolean = true;
   @Input() showPagination: boolean = true;
   @Input() showAdd: boolean = true;
-  @Input() showFilter: boolean = true;
+  @Input() showFilter: boolean = false;
   @Input() state: boolean = true;
   @Input() showSearch: boolean = true;
   @Input() isPrint: boolean = false;
