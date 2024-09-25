@@ -16,6 +16,7 @@ import {
   Observable,
   of,
   Subject,
+  Subscription,
   switchMap,
   takeUntil,
   tap,
@@ -116,11 +117,11 @@ export class UsuariosPage implements OnInit {
     this.formResetPswd = this.formModels.resetPswdForm();
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.initSearcher();
+  }
 
   ionViewWillEnter() {
-    this.initSearcher();
-
     this.getRoles();
     this.getCountElements();
     this.buildColumns();
@@ -151,6 +152,7 @@ export class UsuariosPage implements OnInit {
       .Get(`personas/clientes/search?query=${this.search}`)
       .subscribe({
         next: (data: any) => {
+          console.log(`Clientes encontrados para ${this.search}:`, data);
           this.filteredClients = data;
         },
         error: (error) => {
@@ -168,7 +170,29 @@ export class UsuariosPage implements OnInit {
       this.removeClient(clientOp);
     } else {
       console.log("Agregar Cliente:", clientOp);
-      this.selectedClients.push(clientOp);
+
+      const usuarioClient = {
+        usuarioId: this.element.id,
+        clienteId: clientOp.id,
+      };
+
+      console.log("Usuario-Cliente:", usuarioClient);
+      const suscription: Subscription = this._globalService
+        .Post("usuario-clientes/one", usuarioClient)
+        .subscribe({
+          next: () => {
+            this.selectedClients.push(clientOp);
+            console.log("Cliente agregado correctamente");
+            this.toastColor = "success";
+            this.toastMessage = "Cliente agregado correctamente";
+            this.isToastOpen = true;
+            //Eliminar la suscripción para liberar recursos
+            suscription.unsubscribe();
+          },
+          error: (error) => {
+            console.error("Error al agregar cliente:", error);
+          },
+        });
     }
   }
 
@@ -455,20 +479,9 @@ export class UsuariosPage implements OnInit {
   }
 
   async handleSave(data: any) {
+    console.log("Data a Guardar: ", data);
 
-    console.log('Data a Guardar: ', data)
-
-    if (this.isSelectClients) {
-      console.log("Data de clientes seleccionados: ", data);
-      const clientsIds = data.map((client: Personas) => client.id);
-      const saveData = {
-        usuarioId: this.element.id,
-        clientsIds,
-      };
-
-      console.log("Data para guardar asignacion de clientes: ", saveData);
-      this.handleUserOperation("asignClients", saveData);
-    } else if (this.isResetPswd) {
+    if (this.isResetPswd) {
       this.handleUserOperation("resetPswd", data);
     } else if (this.isElement) {
       data = this.prepareData(data);
@@ -488,10 +501,7 @@ export class UsuariosPage implements OnInit {
     return data;
   }
 
-  handleUserOperation(
-    operation: "edit" | "create" | "resetPswd" | "asignClients",
-    data: any
-  ) {
+  handleUserOperation(operation: "edit" | "create" | "resetPswd", data: any) {
     let operationText: string;
     let apiCall: Observable<any>;
 
@@ -507,10 +517,6 @@ export class UsuariosPage implements OnInit {
       case "resetPswd":
         operationText = "Restableciendo contraseña de";
         apiCall = this._globalService.Post("reset-password", data);
-        break;
-      case "asignClients":
-        operationText = "Asignando clientes a";
-        apiCall = this._globalService.Post("usuario-clientes", data);
         break;
     }
 

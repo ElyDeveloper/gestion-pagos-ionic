@@ -30,12 +30,12 @@ export class UsuarioClienteController {
     public usuarioClienteRepository: UsuarioClienteRepository,
     @service(JWTService)
     private jwtService: JWTService,
-  ) {}
+  ) { }
 
   @post('/usuario-clientes')
   @response(200, {
     description: 'UsuarioCliente model instance',
-    content: {'application/json': {schema: getModelSchemaRef(UsuarioCliente)}},
+    content: { 'application/json': { schema: getModelSchemaRef(UsuarioCliente) } },
   })
   async create(
     @requestBody({
@@ -44,8 +44,8 @@ export class UsuarioClienteController {
           schema: {
             type: 'object',
             properties: {
-              usuarioId: {type: 'number'},
-              clientsIds: {type: 'array', items: {type: 'string'}},
+              usuarioId: { type: 'number' },
+              clientsIds: { type: 'array', items: { type: 'string' } },
             },
             required: ['usuarioId', 'clientsIds'],
           },
@@ -56,20 +56,19 @@ export class UsuarioClienteController {
       usuarioId: number;
       clientsIds: string[];
     },
-  ): Promise<{message: string; changes: {added: number; removed: number}}> {
+  ): Promise<{ message: string; changes: { added: number; removed: number } }> {
+    console.log('Creando usuario-cliente...', usuarioCliente);
     try {
       if (!Array.isArray(usuarioCliente.clientsIds)) {
         throw new Error('clientsIds debe ser un array');
       }
 
       const userClients = await this.usuarioClienteRepository.find({
-        where: {usuarioId: usuarioCliente.usuarioId},
+        where: { usuarioId: usuarioCliente.usuarioId },
       });
 
       const existingClientIds = userClients.map(uc => uc.clienteId);
-      const newClientIds = usuarioCliente.clientsIds.map(id =>
-        this.jwtService.decryptId(id),
-      );
+      const newClientIds = usuarioCliente.clientsIds.map(id => Number(id));
 
       const clientsToAdd = newClientIds.filter(
         id => !existingClientIds.includes(id),
@@ -81,13 +80,13 @@ export class UsuarioClienteController {
       if (clientsToAdd.length === 0 && clientsToRemove.length === 0) {
         return {
           message: 'No hay cambios en los clientes por usuario',
-          changes: {added: 0, removed: 0},
+          changes: { added: 0, removed: 0 },
         };
       }
 
       await this.usuarioClienteRepository.deleteAll({
         usuarioId: usuarioCliente.usuarioId,
-        clienteId: {inq: clientsToRemove},
+        clienteId: { inq: clientsToRemove },
       });
 
       const newClients = clientsToAdd.map(id => ({
@@ -108,6 +107,28 @@ export class UsuarioClienteController {
       console.error('Error al actualizar clientes por usuario:', error);
       throw new Error('Error al procesar la solicitud');
     }
+  }
+
+  @post('/usuario-clientes/one')
+  @response(200, {
+    description: 'UsuarioCliente model instance',
+    content: {'application/json': {schema: getModelSchemaRef(UsuarioCliente)}},
+  })
+  async createOne(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(UsuarioCliente, {
+            title: 'NewUsuarioCliente',
+            exclude: ['id'],
+          }),
+        },
+      },
+    })
+    usuarioCliente: Omit<UsuarioCliente, 'id'>,
+  ): Promise<UsuarioCliente> {
+    console.log('Creando usuario-cliente...', usuarioCliente);
+    return this.usuarioClienteRepository.create(usuarioCliente);
   }
 
   @get('/usuario-clientes/count')
@@ -241,9 +262,7 @@ export class UsuarioClienteController {
       },
     },
   })
-  async findByClienteId(
-    @param.path.number('id') id: number,
-  ): Promise<any> {
+  async findByClienteId(@param.path.number('id') id: number): Promise<any> {
     console.log('Buscando Usuario Cliente:', id);
     const userClients = await this.usuarioClienteRepository.find({
       where: {
