@@ -43,6 +43,8 @@ export class ReportesPage implements OnInit {
   reporteSeleccionado: string | null = null;
   isModalOpen = false;
 
+  searchClient: string = "";
+  searchAsesor: string = "";
   private searchAsesores$ = new Subject<string>();
   private searchClientes$ = new Subject<string>();
 
@@ -83,14 +85,16 @@ export class ReportesPage implements OnInit {
   ngOnInit() {
     this.company = environment.company;
     this.getCurrentUser();
-    this.initAsesoresSearch();
-    this.initClientesSearch();
+    this.initSearcher();
   }
 
   ionViewDidLeave() {
     this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
-
+  ngOnDestroy() {
+    this.searchClientes$.complete();
+    this.searchAsesores$.complete();
+  }
   scrollToElement(section: string): void {
     const element = document.getElementById(section);
     if (element) {
@@ -98,48 +102,80 @@ export class ReportesPage implements OnInit {
     }
   }
 
-  private initAsesoresSearch() {
-    const subscription = this.searchAsesores$
+  initSearcher() {
+    this.searchClientes$
       .pipe(
-        debounceTime(1000),
-        distinctUntilChanged(),
-        switchMap((term) =>
-          this._globalService.Get(`usuarios/asesores/search?query=${term}`)
-        )
+        debounceTime(800), // Espera 300 ms después de que el usuario deja de escribir
+        distinctUntilChanged() // Asegura que solo se realice una búsqueda si el valor ha cambiado
       )
-      .subscribe({
-        next: (response: any) => {
-          this.filteredAsesores = response;
-          console.log("Asesores obtenidos:", response);
-        },
-        error: (error) => {
-          console.error("Error al obtener asesores:", error);
-        },
+      .subscribe(() => {
+        if (
+          this.searchClient.trim() === "" ||
+          this.searchClient.trim().length < 3
+        ) {
+          this.filteredClientes = [];
+        } else {
+          this.searchDataClients();
+        }
+        // this.searchEmpleado(); // Llama a la función de búsqueda cuando se cumplan las condiciones
       });
 
-    this.subscriptions.push(subscription);
+    this.searchAsesores$
+      .pipe(
+        debounceTime(800), // Espera 300 ms después de que el usuario deja de escribir
+        distinctUntilChanged() // Asegura que solo se realice una búsqueda si el valor ha cambiado
+      )
+      .subscribe(() => {
+        if (
+          this.searchAsesor.trim() === "" ||
+          this.searchAsesor.trim().length < 3
+        ) {
+          this.filteredAsesores = [];
+        } else {
+          this.searchDataUsers();
+        }
+        // this.searchEmpleado(); // Llama a la función de búsqueda cuando se cumplan las condiciones
+      });
   }
 
-  private initClientesSearch() {
-    const subscription = this.searchClientes$
-      .pipe(
-        debounceTime(1000),
-        distinctUntilChanged(),
-        switchMap((term) =>
-          this._globalService.Get(`personas/clientes/search?query=${term}`)
-        )
-      )
+  searchValueChanged(event: any, type: string) {
+    console.log("Search value changed:", event.target.value, type);
+    switch (type) {
+      case "cliente":
+        this.searchClientes$.next(event.target.value);
+        break;
+      case "asesor":
+        this.searchAsesores$.next(event.target.value);
+        break;
+    }
+  }
+
+  searchDataClients() {
+    this._globalService
+      .Get(`personas/clientes/search?query=${this.searchClient}`)
       .subscribe({
-        next: (response: any) => {
-          this.filteredClientes = response;
-          console.log("Clientes obtenidos:", response);
+        next: (data: any) => {
+          console.log(`Clientes encontrados para ${this.searchClient}:`, data);
+          this.filteredClientes = data;
         },
         error: (error) => {
           console.error("Error al obtener clientes:", error);
         },
       });
+  }
 
-    this.subscriptions.push(subscription);
+  searchDataUsers() {
+    this._globalService
+      .Get(`usuarios/asesores/search?query=${this.searchAsesor}`)
+      .subscribe({
+        next: (data: any) => {
+          console.log(`Asesores encontrados para ${this.searchAsesor}:`, data);
+          this.filteredAsesores = data;
+        },
+        error: (error) => {
+          console.error("Error al obtener clientes:", error);
+        },
+      });
   }
 
   getCurrentUser() {
@@ -188,7 +224,6 @@ export class ReportesPage implements OnInit {
     }
 
     this.scrollToElement("current-report");
-
   }
   handleSave(event: any) {
     console.log("Event:", event);
@@ -235,30 +270,11 @@ export class ReportesPage implements OnInit {
     }
 
     this.scrollToElement("current-report");
-
   }
 
   clearsubscriptions() {
     this.subscriptions.forEach((sub) => sub.unsubscribe());
     this.subscriptions = [];
-  }
-
-  filterAsesores(event: any) {
-    const searchTerm = event.target.value.toLowerCase();
-    if (searchTerm === "") {
-      this.filteredAsesores = [];
-      return;
-    }
-    this.searchAsesores$.next(searchTerm);
-  }
-
-  filterClientes(event: any) {
-    const searchTerm = event.target.value.toLowerCase();
-    if (searchTerm === "") {
-      this.filteredClientes = [];
-      return;
-    }
-    this.searchClientes$.next(searchTerm);
   }
 
   selectAsesor(asesor: any) {

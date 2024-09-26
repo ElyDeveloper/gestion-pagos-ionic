@@ -177,8 +177,14 @@
     </ion-header>
     <ion-content>
       <ion-searchbar
+        [placeholder]="'Buscar Asesor...'"
+        [(ngModel)]="searchAsesor"
+        (ionInput)="searchValueChanged($event, 'asesor')">
+      </ion-searchbar>
+
+      <!-- <ion-searchbar
         (ionInput)="filterAsesores($event)"
-        placeholder="Buscar asesor"></ion-searchbar>
+        placeholder="Buscar asesor"></ion-searchbar> -->
       <ion-list>
         <ion-item
           class="user-select-none"
@@ -209,8 +215,13 @@
     </ion-header>
     <ion-content>
       <ion-searchbar
+        [placeholder]="'Buscar Cliente...'"
+        [(ngModel)]="searchClient"
+        (ionInput)="searchValueChanged($event, 'cliente')">
+      </ion-searchbar>
+      <!-- <ion-searchbar
         (ionInput)="filterClientes($event)"
-        placeholder="Buscar cliente"></ion-searchbar>
+        placeholder="Buscar cliente"></ion-searchbar> -->
       <ion-list>
         <ion-item
           class="user-select-none"
