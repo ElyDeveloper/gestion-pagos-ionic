@@ -65,7 +65,7 @@ export class LoginPage implements OnInit {
       this.suscriptions.push(
         this._globalService.Post("login", this.user).subscribe({
           next: (result: any) => {
-            console.log("Login Result", result);
+            //console.log("Login Result", result);
 
             const { token, usuario } = result;
 
@@ -129,7 +129,7 @@ export class LoginPage implements OnInit {
           role: "cancel",
           cssClass: "secondary",
           handler: () => {
-            console.log("Redirección cancelada");
+            //console.log("Redirección cancelada");
             this.toastMessage = "Por favor, cambie su contraseña.";
             this.setOpenedToast(false);
             this.setOpenedToast(true);

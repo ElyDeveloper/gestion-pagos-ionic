@@ -62,9 +62,9 @@ export class NotifyController {
 
       if (rolId) {
         const rolUsuario = rolId.rolid;
-        // console.log('RolUsuario: ', rolUsuario);
+        // //console.log('RolUsuario: ', rolUsuario);
         if (rolUsuario == 1 || rolUsuario == 2) {
-          console.log('Código de verificación enviado: ', content);
+          //console.log('Código de verificación enviado: ', content);
           if (operation == true) {
             if (typeof content === 'string') {
               return {error: 'Error al enviar el correo'};
@@ -74,7 +74,7 @@ export class NotifyController {
               'Código de verificación',
               `Su código de verificación es: ${content.codigo}`,
             );
-            console.log('Resultado de envío de correo: ', result);
+            //console.log('Resultado de envío de correo: ', result);
             if (result) {
               return {
                 message: 'Código de verificación enviado',

@@ -112,8 +112,9 @@ export class PagosPage implements OnInit {
   ngOnInit() {}
 
   async onSaveData() {
-    console.log("Se guardara el archivo:", this.uploadedFile);
+    //console.log("Se guardara el archivo:", this.uploadedFile);
 
+    console.log("Pago seleccionado:", this.pagoSeleccionado);
     this._globalService
       .PatchWithFile(
         "pagos/updateFile",
@@ -130,7 +131,7 @@ export class PagosPage implements OnInit {
           this.isModalOpen = false;
         },
         error: (error) => {
-          console.log("Error al subir el archivo:", error);
+          //console.log("Error al subir el archivo:", error);
           this.toastMessage = "Error al subir el archivo";
           this.toastColor = "danger";
           this.isToastOpen = true;
@@ -143,16 +144,16 @@ export class PagosPage implements OnInit {
   }
 
   onModalOpenChange(event: any) {
-    console.log("Modal abierto:", event);
+    //console.log("Modal abierto:", event);
     this.isModalOpen = event;
   }
 
   onUploaderChange(event: any) {
-    console.log("Cambio en el uploader:", event);
+    //console.log("Cambio en el uploader:", event);
   }
 
   onFileSelected(event: any) {
-    console.log("Archivo seleccionado:", event);
+    //console.log("Archivo seleccionado:", event);
     this.uploadedFile = event;
   }
 
@@ -162,15 +163,21 @@ export class PagosPage implements OnInit {
   }
 
   onUploadButtonClicked(event: any) {
+    console.log("Abrir botón para subir comprobante:", event);
     // Aquí puedes procesar el archivo como necesites
     this.pagoSeleccionado = event?.documentosTipoDoc?.documentos || null;
-    console.log("Pago seleccionado:", this.pagoSeleccionado);
+    if (!this.pagoSeleccionado) {
+      this.pagoSeleccionado = {
+        idPago: event?.id || 0,
+      }
+    }
+    //console.log("Pago seleccionado:", this.pagoSeleccionado);
     this.modalSelected = this.modalUpload;
     this.isModalOpen = true;
   }
 
   onOpenButtonClicked(event: any) {
-    console.log("Abrir botón:", event);
+    //console.log("Abrir botón:", event);
     // Aquí puedes abrir un modal o acción relacionada con el elemento seleccionado
 
     const idDecrypted = event?.documentosTipoDoc?.documentos?.id || 0;
@@ -178,7 +185,7 @@ export class PagosPage implements OnInit {
       .GetIdEncrypted("encrypted-id", Number(idDecrypted))
       .subscribe({
         next: (data: any) => {
-          console.log("ID encriptado:", data.idEncrypted);
+          //console.log("ID encriptado:", data.idEncrypted);
           if (data) {
             this._router.navigate([`/view-file/${data.idEncrypted}`]);
           } else {
@@ -268,10 +275,10 @@ export class PagosPage implements OnInit {
   getCountElements() {
     this._globalService.Get("pagos/count").subscribe({
       next: (response: any) => {
-        console.log("Cantidad de elementos:", response.count);
+        //console.log("Cantidad de elementos:", response.count);
         const totalElements = response.count;
         this.totalPages = Math.ceil(totalElements / this.currentPageSize);
-        console.log("Total de páginas:", this.totalPages);
+        //console.log("Total de páginas:", this.totalPages);
         this.getElementsPag();
       },
       error: (error) => {
@@ -281,7 +288,7 @@ export class PagosPage implements OnInit {
   }
 
   onPageChange(event: any) {
-    console.log("Evento de cambio de página:", event);
+    //console.log("Evento de cambio de página:", event);
     this.currentPage = event;
     this.getElementsPag();
   }
@@ -295,7 +302,7 @@ export class PagosPage implements OnInit {
       .Get(`pagos/paginated?skip=${skip}&limit=${limit}`)
       .subscribe({
         next: (response: any) => {
-          console.log("Element os obtenidos:", response);
+          //console.log("Element os obtenidos:", response);
           this.elements = response;
 
           this.elements.forEach((element: any) => {

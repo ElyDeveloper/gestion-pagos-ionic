@@ -50,9 +50,9 @@ export class AuthService {
         limit: 1,
       });
 
-      console.log('Comprobo por username');
+      //console.log('Comprobo por username');
     }
-    console.log('credentialsss: ', credentials);
+    //console.log('credentialsss: ', credentials);
 
     if (!credentials) return error.CREDENTIALS_NOT_REGISTER;
 
@@ -60,7 +60,7 @@ export class AuthService {
       where: {correo: credentials.correo},
     });
 
-    // console.log('user', user);
+    // //console.log('user', user);
 
     if (!user) return error.CREDENTIALS_NOT_REGISTER;
 
@@ -71,7 +71,7 @@ export class AuthService {
     if (!matchCredencials) return error.INVALID_PASSWORD;
 
     let userReturn: any = user;
-    console.log('userReturn', userReturn);
+    //console.log('userReturn', userReturn);
     // const idEncrypted = await this.jwtService.encryptId(
     //   credentials.id || 0,
     // );
@@ -85,7 +85,7 @@ export class AuthService {
       usuario: userReturn,
     };
 
-    // console.log('auth', auth);
+    // //console.log('auth', auth);
     return auth;
   }
 
@@ -182,7 +182,7 @@ export class AuthService {
       usuario.changedPassword = true;
       await this.usuarioRepository.update(usuario);
     } else {
-      console.log('Usuario no encontrado');
+      //console.log('Usuario no encontrado');
       return error.CREDENTIALS_ALREDY_EXIST;
     }
 

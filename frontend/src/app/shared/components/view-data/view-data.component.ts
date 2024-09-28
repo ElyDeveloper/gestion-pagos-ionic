@@ -74,7 +74,7 @@ export class ViewDataComponent implements OnInit {
     this._authService.getUserInfo().subscribe({
       next: (user: any) => {
         this.userLogged = user;
-        // console.log("User logged: ", this.userLogged);
+        // //console.log("User logged: ", this.userLogged);
         this.initSearcher();
         this.updateVisiblePages();
       },
@@ -134,7 +134,7 @@ export class ViewDataComponent implements OnInit {
     const defaultColor = "secondary";
 
     if (color) {
-      // console.log("Color: ", color);
+      // //console.log("Color: ", color);
       return `text-bg-${color}`;
     }
 
@@ -143,7 +143,7 @@ export class ViewDataComponent implements OnInit {
 
   getCellColor(row: any, column: any): string {
     const value = this.getCellValue(row, column);
-    // console.log("Value: ", value);
+    // //console.log("Value: ", value);
     const columns = this.getCellColorOptions(column);
     return columns[value];
   }
@@ -158,7 +158,7 @@ export class ViewDataComponent implements OnInit {
   getValuesArray(row: any, column: Column): any {
     let primaryValue = this.getNestedValue(row, column.key);
 
-    // console.log("primaryValue: ", primaryValue);
+    // //console.log("primaryValue: ", primaryValue);
 
     return primaryValue;
   }
@@ -187,7 +187,7 @@ export class ViewDataComponent implements OnInit {
       return column.addText(primaryValue, secondaryValue);
     }
 
-    // console.log('primaryValue', primaryValue);
+    // //console.log('primaryValue', primaryValue);
     return this.formatValue(primaryValue);
   }
 
@@ -195,7 +195,7 @@ export class ViewDataComponent implements OnInit {
     const urlKey = column.imageUrl;
     const urlValue = this.getCellValue(row, { key: urlKey, alias: "Imagen" });
     const onlyIdentifier = urlValue.split("/").pop();
-    // console.log(onlyIdentifier);
+    // //console.log(onlyIdentifier);
 
     if (onlyIdentifier) {
       return onlyIdentifier;
@@ -356,7 +356,7 @@ export class ViewDataComponent implements OnInit {
             role: "cancel",
             cssClass: "secondary",
             handler: () => {
-              console.log("Eliminación cancelada");
+              //console.log("Eliminación cancelada");
             },
           },
           {
@@ -392,20 +392,20 @@ export class ViewDataComponent implements OnInit {
 
   async onOpen(data: any) {
     if (await this._preventAbuseService.registerClick()) {
-      console.log("Se click en abrir");
+      //console.log("Se click en abrir");
       this.openButtonClicked.emit(data);
     }
   }
 
   async onSelectClients(data: any) {
     if (await this._preventAbuseService.registerClick()) {
-      console.log("Se click en seleccionar clientes");
+      //console.log("Se click en seleccionar clientes");
       this.selectClientClicked.emit(data);
     }
   }
   async onTransfer(data: any) {
     if (await this._preventAbuseService.registerClick()) {
-      console.log("Se click en seleccionar clientes");
+      //console.log("Se click en seleccionar clientes");
       this.transferClicked.emit(data);
     }
   }

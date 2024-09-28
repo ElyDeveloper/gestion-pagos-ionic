@@ -78,13 +78,13 @@ export class AuthController {
     })
     reset: any,
   ): Promise<any> {
-    console.log('desde frontend', reset);
+    //console.log('desde frontend', reset);
 
     // Obtener todos los usuarios
     let user = await this.credencialesRepository.findOne({
       where: {correo: reset.identificator},
     });
-    console.log('Usuarios', user);
+    //console.log('Usuarios', user);
 
     if (!user) {
       return {error: 'Usuario no encontrado'};

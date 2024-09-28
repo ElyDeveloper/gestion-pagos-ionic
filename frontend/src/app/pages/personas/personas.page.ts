@@ -108,7 +108,7 @@ export class PersonasPage implements OnInit {
     this.formAdd = this.formModels.personasForm();
     this.formSelected = this.formAdd;
     this.formSelectedX = this.formAdd;
-    // console.log("Formulario de cliente:", this.formAdd);
+    // //console.log("Formulario de cliente:", this.formAdd);
   }
 
   ngOnInit() {
@@ -153,7 +153,7 @@ export class PersonasPage implements OnInit {
 
   selectNacionalidad(nacionalidad: any) {
     this.selectedNacionalidad = nacionalidad;
-    console.log("Nacionalidad seleccionada: ", this.selectedNacionalidad);
+    //console.log("Nacionalidad seleccionada: ", this.selectedNacionalidad);
     this.formAdd.patchValue({ idNacionalidad: nacionalidad.id });
     this.isModalOpenX = false;
   }
@@ -174,7 +174,7 @@ export class PersonasPage implements OnInit {
 
   selectAsesor(asesor: any) {
     this.selectedAsesor = asesor;
-    console.log("Asesor seleccionada: ", this.selectedAsesor);
+    //console.log("Asesor seleccionada: ", this.selectedAsesor);
     this.isModalOpenX = false;
   }
 
@@ -182,18 +182,18 @@ export class PersonasPage implements OnInit {
     this._authService.getUserInfo().subscribe({
       next: (user: any) => {
         this.currentUser = user;
-        console.log("Usuario actual: ", this.currentUser);
+        //console.log("Usuario actual: ", this.currentUser);
       },
       error: (error: any) => {
         console.error("Error al obtener información del usuario:", error);
       },
     });
-    console.log("Usuario actual: ", this.currentUser);
+    //console.log("Usuario actual: ", this.currentUser);
   }
 
   //TODO: ESPECIFICO
   goAction(action: string) {
-    // console.log("Accion capturada: ", action);
+    // //console.log("Accion capturada: ", action);
     this.currentPage = 1;
     this.currentPageSize = 10;
     this.title = action;
@@ -205,11 +205,11 @@ export class PersonasPage implements OnInit {
   cargarOpciones() {
     this._globalService.Get("nacionalidades").subscribe((data: any) => {
       this.nacionalidades = data;
-      // console.log(this.nacionalidades);
+      // //console.log(this.nacionalidades);
     });
     this._globalService.GetId("usuarios/roles", 3).subscribe((data: any) => {
       this.asesores = data;
-      console.log("Asesores: ", this.asesores);
+      //console.log("Asesores: ", this.asesores);
     });
     this._globalService.Get("record-crediticios").subscribe((data: any) => {
       this.recordsCrediticios = data;
@@ -337,7 +337,7 @@ export class PersonasPage implements OnInit {
     if (formData) {
       formData = this._globalService.parseObjectDates(formData);
     }
-    console.log("Form Data:", formData);
+    //console.log("Form Data:", formData);
 
     this.selectedNacionalidad = null;
     this.selectedAsesor = null;
@@ -354,7 +354,7 @@ export class PersonasPage implements OnInit {
           next: (asesor: any) => {
             this.selectedAsesor = asesor?.usuario || null;
             this.lastSelectedAsesor = this.selectedAsesor;
-            console.log("Asesor seleccionado: ", this.selectedAsesor);
+            //console.log("Asesor seleccionado: ", this.selectedAsesor);
           },
           error: (error: any) => {
             console.error("Error al obtener información del asesor:", error);
@@ -393,14 +393,14 @@ export class PersonasPage implements OnInit {
   }
 
   onInfoButtonClicked(data: any) {
-    // console.log("Información del cliente:", data);
+    // //console.log("Información del cliente:", data);
     this.element = data;
     this.modalSelected = this.modalViewInfo;
     this.isModalOpen = true;
   }
 
   async onDeleteButtonClicked(data: any) {
-    console.log("Eliminar cliente Obtenido:", data);
+    //console.log("Eliminar cliente Obtenido:", data);
     try {
       await this.showLoader("Eliminando cliente");
       await firstValueFrom(this._globalService.Delete("personas", data.id));
@@ -412,7 +412,7 @@ export class PersonasPage implements OnInit {
   }
 
   async handleSaveX(data: any) {
-    console.log("Datos del cliente antes guardar:", data);
+    //console.log("Datos del cliente antes guardar:", data);
   }
 
   async handleSave(data: any) {
@@ -428,7 +428,7 @@ export class PersonasPage implements OnInit {
       await this.showLoader(`${operationText} cliente`);
 
       const response = await this.performApiCall(operation, data);
-      console.log(`Cliente ${operationText.toLowerCase()}:`, data);
+      //console.log(`Cliente ${operationText.toLowerCase()}:`, data);
 
       if (operation === "create") {
         await this.handleAsesorCreation(response.id);
@@ -453,13 +453,13 @@ export class PersonasPage implements OnInit {
     data.dni = data.dni.replace(/-/g, "");
     data.cel = data.cel.replace(/-/g, "");
     data.idNacionalidad = this.selectedNacionalidad.id;
-    console.log("Datos del cliente antes de guardar:", data);
+    //console.log("Datos del cliente antes de guardar:", data);
 
     return data;
   }
 
   private async performApiCall(operation: string, data: any): Promise<any> {
-    console.log("Data a guardar performApicall: ", data);
+    //console.log("Data a guardar performApicall: ", data);
     return operation === "edit"
       ? await firstValueFrom(
           this._globalService.PutId("personas", data.id, data)
@@ -480,7 +480,7 @@ export class PersonasPage implements OnInit {
 
   private async handleAsesorUpdate(clienteId: number) {
     if (this.selectedAsesor) {
-      console.log("Actualizando asesor del cliente:", this.selectedAsesor);
+      //console.log("Actualizando asesor del cliente:", this.selectedAsesor);
       await firstValueFrom(
         this._globalService.PutId("personas/asesor", clienteId, {
           usuarioId: this.selectedAsesor.id,
@@ -520,13 +520,13 @@ export class PersonasPage implements OnInit {
   }
 
   async onPageChange(event: any) {
-    console.log("Evento de cambio de página:", event);
+    //console.log("Evento de cambio de página:", event);
     this.currentPage = event;
     await this.getElementsPag();
   }
 
   async onSearchData(event: any): Promise<void> {
-    console.log("Evento de búsqueda:", event);
+    //console.log("Evento de búsqueda:", event);
     try {
       if (event === "") {
         await this.getCountElements();
@@ -537,7 +537,7 @@ export class PersonasPage implements OnInit {
             .pipe(
               tap((res: any) => {
                 this.elements = res;
-                console.log("Elementos obtenidos:", res);
+                //console.log("Elementos obtenidos:", res);
               }),
               catchError((error) => {
                 console.error("Error al obtener los elementos:", error);
@@ -562,7 +562,7 @@ export class PersonasPage implements OnInit {
         .Get(`personas/${this.action}/paginated?skip=${skip}&limit=${limit}`)
         .pipe(
           tap((response: any) => {
-            console.log("Elementos obtenidos:", response);
+            //console.log("Elementos obtenidos:", response);
             this.elements = response; // Asumiendo que la respuesta tiene una propiedad 'data'
           }),
           catchError((error) => {
@@ -577,10 +577,10 @@ export class PersonasPage implements OnInit {
     return firstValueFrom(
       this._globalService.Get("personas/count").pipe(
         tap((response: any) => {
-          console.log("Cantidad de elementos:", response.count);
+          //console.log("Cantidad de elementos:", response.count);
           const totalElements = response.count;
           this.totalPages = Math.ceil(totalElements / this.currentPageSize);
-          console.log("Total de páginas:", this.totalPages);
+          //console.log("Total de páginas:", this.totalPages);
         }),
         catchError((error) => {
           console.error("Error al obtener la cantidad de elementos:", error);

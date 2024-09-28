@@ -99,7 +99,7 @@ export class ReportEstadoCuentaComponent implements OnInit {
         )
         .pipe(
           tap((data: any) => {
-            console.log("Prestamos con mora:", data);
+            //console.log("Prestamos con mora:", data);
 
             if (data.encabezados.length > 0) {
               this.encabezado = data.encabezados[0];
@@ -109,21 +109,21 @@ export class ReportEstadoCuentaComponent implements OnInit {
             this.saldosPagarAtrasados = data.saldosPagarAtrasados;
 
             let counter = 1;
-            // console.log("Saldos vigentes:", this.saldosVigentes);
+            // //console.log("Saldos vigentes:", this.saldosVigentes);
             this.saldosVigentes.forEach((saldo) => {
               saldo.nCuota = counter;
               counter++;
             });
 
             counter = 1;
-            // console.log("Saldos a pagar atrasados:", this.saldosPagarAtrasados);
+            // //console.log("Saldos a pagar atrasados:", this.saldosPagarAtrasados);
             this.saldosPagarAtrasados.forEach((saldo) => {
               saldo.nCuota = counter;
               counter++;
             });
 
             counter = 1;
-            // console.log("Pagos efectuados:", this.pagosEfectuados);
+            // //console.log("Pagos efectuados:", this.pagosEfectuados);
             this.pagosEfectuados.forEach((pag) => {
               pag.nCuota = counter;
               counter++;

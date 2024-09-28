@@ -100,7 +100,7 @@ export class PrestamosPage implements OnInit {
     this.formAdd = this.formModels.prestamoForm();
     this.formAprobar = this.formModels.checkForm();
     this.formSelected = this.formAdd;
-    console.log("Formulario de cliente:", this.formAdd);
+    //console.log("Formulario de cliente:", this.formAdd);
   }
 
   ngOnInit() {
@@ -118,13 +118,13 @@ export class PrestamosPage implements OnInit {
     this._authService.getUserInfo().subscribe({
       next: (user: any) => {
         this.currentUser = user;
-        console.log("Usuario actual: ", this.currentUser);
+        //console.log("Usuario actual: ", this.currentUser);
       },
       error: (error: any) => {
         console.error("Error al obtener información del usuario:", error);
       },
     });
-    console.log("Usuario actual: ", this.currentUser);
+    //console.log("Usuario actual: ", this.currentUser);
   }
 
   //TODO: ESPECIFICO
@@ -314,14 +314,14 @@ export class PrestamosPage implements OnInit {
         );
       }
     }
-    console.log("Form Data:", formData);
+    //console.log("Form Data:", formData);
     this.element = formData;
 
     form.get("fechaInicio")?.setValue(formData.planPago.fechaInicio);
     form.get("idEstadoInterno")?.setValue(formData.idEstadoInterno);
 
-    // console.log("Modal Template: ", modalTemplate);
-    // console.log("Form Select: ", form);
+    // //console.log("Modal Template: ", modalTemplate);
+    // //console.log("Form Select: ", form);
 
     this.modalSelected = modalTemplate;
     this.formSelected = form;
@@ -345,27 +345,27 @@ export class PrestamosPage implements OnInit {
   }
 
   onContractButtonClicked(data: any) {
-    console.log("Contrato del cliente:", data);
+    //console.log("Contrato del cliente:", data);
     this._router.navigate(["/layout/gestion-contrato/" + data.idEncrypted]);
   }
 
   onPagoButtonClicked(data: any) {
-    console.log("Contrato del cliente:", data);
+    //console.log("Contrato del cliente:", data);
     this._router.navigate(["/layout/gestion-pago/" + data.idEncrypted]);
   }
 
   onInfoButtonClicked(data: any) {
-    // console.log("Información del cliente:", data);
+    // //console.log("Información del cliente:", data);
     this.element = data;
     this.modalSelected = this.modalViewInfo;
     this.isModalOpen = true;
   }
 
   onPlanButtonClicked(data: any) {
-    console.log("Información del prestamo:", data);
+    //console.log("Información del prestamo:", data);
     this._globalService.Get("fechas-pagos/plan/" + data.planPago.id).subscribe({
       next: (response: any) => {
-        console.log("Plan de pago:", response);
+        //console.log("Plan de pago:", response);
         this.proyeccionesPlan = response;
         //Agregar columna numero correlativo
         this.proyeccionesPlan.forEach((plan: any) => {
@@ -388,12 +388,12 @@ export class PrestamosPage implements OnInit {
   }
 
   onDeleteButtonClicked(data: any) {
-    console.log("Eliminar presta,mo Obtenido:", data);
+    //console.log("Eliminar presta,mo Obtenido:", data);
     this.textLoader = "Eliminando prestamo";
     this._loaderService.show();
     this._globalService.Delete("prestamos", data.id).subscribe({
       next: (response: any) => {
-        console.log("cliente eliminado:", response);
+        //console.log("cliente eliminado:", response);
         this.getCountElements();
         this._loaderService.hide();
         this.toastMessage = "prestamo eliminado correctamente";
@@ -410,7 +410,7 @@ export class PrestamosPage implements OnInit {
 
   handleSave(data: any) {
     //TODO ONLY DEBUG
-    // console.log(`Datos del formulario: `, data);
+    // //console.log(`Datos del formulario: `, data);
     switch (this.typeFormSelected) {
       case "formAdd":
         if (this.isEdit) {
@@ -439,7 +439,7 @@ export class PrestamosPage implements OnInit {
     this._loaderService.show();
 
     //TODO COMENTAR
-    console.log(`Datos del ${this.elementType}: `, data);
+    //console.log(`Datos del ${this.elementType}: `, data);
 
     apiCall.subscribe({
       next: (response: any) =>
@@ -458,7 +458,7 @@ export class PrestamosPage implements OnInit {
     // this._loaderService.show();
 
     //TODO COMENTAR
-    // console.log(`Datos del ${this.elementType}: `, data);
+    // //console.log(`Datos del ${this.elementType}: `, data);
 
     apiCall.subscribe({
       next: (response: any) =>
@@ -508,7 +508,7 @@ export class PrestamosPage implements OnInit {
     switch (operation) {
       case "create":
         //TODO ONLY DEBUG
-        console.log("Entro aquí: ", dataSave);
+        //console.log("Entro aquí: ", dataSave);
         return {
           operationText: "Guardando",
           apiCall: this._globalService.Post(
@@ -523,7 +523,7 @@ export class PrestamosPage implements OnInit {
 
   private handleOperationSuccess(response: any, operationText: string): void {
     //TODO: COMENTAR
-    console.log(`cliente ${operationText.toLowerCase()}:`, response);
+    //console.log(`cliente ${operationText.toLowerCase()}:`, response);
     this.isModalOpen = false;
     this._loaderService.hide();
     this.toastColor = "success";
@@ -549,13 +549,13 @@ export class PrestamosPage implements OnInit {
   }
 
   onPageChange(event: any) {
-    console.log("Evento de cambio de página:", event);
+    //console.log("Evento de cambio de página:", event);
     this.currentPage = event;
     this.getElementsPag();
   }
 
   async onSearchData(event: any): Promise<void> {
-    console.log("Evento de búsqueda:", event);
+    //console.log("Evento de búsqueda:", event);
     try {
       if (event === "") {
         await this.getCountElements();
@@ -564,7 +564,7 @@ export class PrestamosPage implements OnInit {
           this._globalService.Get(`prestamos/search?query=${event}&state=${this.state}`).pipe(
             tap((res: any) => {
               this.elements = res;
-              console.log("Elementos obtenidos:", res);
+              //console.log("Elementos obtenidos:", res);
             }),
             catchError((error) => {
               console.error("Error al obtener los elementos:", error);
@@ -593,7 +593,7 @@ export class PrestamosPage implements OnInit {
           .pipe(
             tap((res: any) => {
               this.elements = res;
-              console.log("Elementos obtenidos:", res);
+              //console.log("Elementos obtenidos:", res);
             }),
             catchError((error) => {
               console.error("Error al obtener los elementos:", error);
@@ -612,10 +612,10 @@ export class PrestamosPage implements OnInit {
       await firstValueFrom(
         this._globalService.Get(`prestamos/count?state=${this.state}`).pipe(
           tap((res: any) => {
-            console.log("Cantidad de elementos:", res.count);
+            //console.log("Cantidad de elementos:", res.count);
             const totalElements = res.count;
             this.totalPages = Math.ceil(totalElements / this.currentPageSize);
-            console.log("Total de páginas:", this.totalPages);
+            //console.log("Total de páginas:", this.totalPages);
           }),
           catchError((error) => {
             console.error("Error al obtener la cantidad de elementos:", error);

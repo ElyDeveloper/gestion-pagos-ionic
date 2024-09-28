@@ -137,7 +137,7 @@ export class ReportesPage implements OnInit {
   }
 
   searchValueChanged(event: any, type: string) {
-    console.log("Search value changed:", event.target.value, type);
+    //console.log("Search value changed:", event.target.value, type);
     switch (type) {
       case "cliente":
         this.searchClientes$.next(event.target.value);
@@ -153,7 +153,7 @@ export class ReportesPage implements OnInit {
       .Get(`personas/clientes/search?query=${this.searchClient}`)
       .subscribe({
         next: (data: any) => {
-          console.log(`Clientes encontrados para ${this.searchClient}:`, data);
+          //console.log(`Clientes encontrados para ${this.searchClient}:`, data);
           this.filteredClientes = data;
         },
         error: (error) => {
@@ -167,7 +167,7 @@ export class ReportesPage implements OnInit {
       .Get(`usuarios/asesores/search?query=${this.searchAsesor}`)
       .subscribe({
         next: (data: any) => {
-          console.log(`Asesores encontrados para ${this.searchAsesor}:`, data);
+          //console.log(`Asesores encontrados para ${this.searchAsesor}:`, data);
           this.filteredAsesores = data;
         },
         error: (error) => {
@@ -182,7 +182,7 @@ export class ReportesPage implements OnInit {
         this.currentUser = user;
         if (user?.rolid === 3) {
           this.selectedAsesor = user;
-          console.log("User es asesor:", user);
+          //console.log("User es asesor:", user);
         }
       })
     );
@@ -224,7 +224,7 @@ export class ReportesPage implements OnInit {
     this.scrollToElement("current-report");
   }
   handleSave(event: any) {
-    console.log("Event:", event);
+    //console.log("Event:", event);
   }
 
   showOpenModal(value: boolean, type: string) {
@@ -277,14 +277,14 @@ export class ReportesPage implements OnInit {
 
   selectAsesor(asesor: any) {
     this.selectedAsesor = asesor;
-    console.log("Asesor seleccionada: ", this.selectedAsesor);
+    //console.log("Asesor seleccionada: ", this.selectedAsesor);
     this.isModalOpen = false;
 
     this.obtenerReporte();
   }
   selectCliente(cliente: any) {
     this.selectedCliente = cliente;
-    console.log("Cliente seleccionada: ", this.selectedCliente);
+    //console.log("Cliente seleccionada: ", this.selectedCliente);
     this.isModalOpen = false;
 
     this.obtenerReporte();

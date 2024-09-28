@@ -13,9 +13,9 @@ export class TaskService {
   }
 
   async start() {
-    console.log(
-      'Iniciando el servicio de programación de tareas para Honduras...',
-    );
+    //console.log(
+    //   'Iniciando el servicio de programación de tareas para Honduras...',
+    // );
     // await this.loadTasks();
     this.scheduleFetchJob();
   }
@@ -49,20 +49,20 @@ export class TaskService {
   //     );
 
   //     this.tasks.set(task.id, scheduledTask);
-  //     console.log(
+  //     //console.log(
   //       `Tarea programada: ${task.nombre} para ${executionDate.toLocaleString('es-HN', {timeZone: this.timezone})}`,
   //     );
   //   } else {
-  //     console.log(`La tarea ${task.nombre} ya ha pasado y no será programada.`);
+  //     //console.log(`La tarea ${task.nombre} ya ha pasado y no será programada.`);
   //   }
   // }
 
   private executeTask(task: Task) {
-    console.log(`Ejecutando tarea: ${task.nombre}`);
-    console.log('Datos de la tarea:', task.data);
-    console.log(
-      `Hora de ejecución: ${new Date().toLocaleString('es-HN', {timeZone: this.timezone})}`,
-    );
+    //console.log(`Ejecutando tarea: ${task.nombre}`);
+    //console.log('Datos de la tarea:', task.data);
+    //console.log(
+    //   `Hora de ejecución: ${new Date().toLocaleString('es-HN', {timeZone: this.timezone})}`,
+    // );
     // Aquí puedes agregar lógica adicional para manejar la tarea
   }
 
@@ -81,7 +81,7 @@ export class TaskService {
     cron.schedule(
       '0 * * * *',
       async () => {
-        console.log('Buscando nuevas tareas...');
+        //console.log('Buscando nuevas tareas...');
         // await this.loadTasks();
       },
       {

@@ -57,7 +57,7 @@ export class ViewFilesPage implements OnInit {
 
                   if (this.isImage || this.isPdf) {
                     const unsafeUrl = URL.createObjectURL(blob);
-                    // console.log("unsafeUrl: ", unsafeUrl);
+                    // //console.log("unsafeUrl: ", unsafeUrl);
 
                     this.fileUrl = unsafeUrl;
                   } else {
@@ -105,6 +105,6 @@ export class ViewFilesPage implements OnInit {
 
   onImageLoad() {
     // You can add any logic here that needs to run after the image loads
-    console.log("Image loaded");
+    //console.log("Image loaded");
   }
 }

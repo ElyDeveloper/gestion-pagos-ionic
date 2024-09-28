@@ -40,9 +40,9 @@ export class GlobalController {
     },
   })
   async getIdEncrypted(@param.path.number('id') id: number): Promise<any> {
-    console.log('Id to encrypt:', id);
+    //console.log('Id to encrypt:', id);
     const encoded = await this.jwtService.encryptId(id);
-    console.log('Id encrypted:', encoded);
+    //console.log('Id encrypted:', encoded);
     return {
       idEncrypted: encoded,
     };

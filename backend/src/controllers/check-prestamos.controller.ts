@@ -107,6 +107,8 @@ export class CheckPrestamosController {
           const {fechaPago, idFechaPago, monto, mora, idPrestamo} = dataSend;
           const file = req.file;
 
+          console.log('Archivo cargado:', file);
+
           // Buscar el IdDocumento usando el IDPrestamo
           const contrato = await this.contratosPagoRepository.findOne({
             where: {idPrestamo},
@@ -130,7 +132,7 @@ export class CheckPrestamosController {
               (1000 * 60 * 60 * 24),
           );
 
-          // console.log('Dias de retraso:', diasRetraso);
+          // //console.log('Dias de retraso:', diasRetraso);
 
           //INFO INSERTAR EN PAGOS
           const pago = await this.pagosRepository.create({
@@ -153,8 +155,8 @@ export class CheckPrestamosController {
 
           const deuda = fechasPago.monto + mora;
 
-          console.log('Total pagado:', totalPagado);
-          console.log('Deuda:', deuda);
+          //console.log('Total pagado:', totalPagado);
+          //console.log('Deuda:', deuda);
 
           if (totalPagado >= deuda) {
             //INFO INSERTAR EN FECHAS_PAGOS
@@ -187,14 +189,14 @@ export class CheckPrestamosController {
             });
 
             if (countCuotasPagadas.count === countCuotasTotales.count) {
-              console.log('Todas las cuotas pagadas.');
+              //console.log('Todas las cuotas pagadas.');
               this.prestamosRepository.updateById(prestamo.id, {
                 idEstadoInterno: 4,
                 estado: false,
               });
             }
 
-            console.log('Cuotas pagadas:', countCuotasPagadas.count);
+            //console.log('Cuotas pagadas:', countCuotasPagadas.count);
 
             //INFO ACTUALIZAR PLAN DE PAGO
             await this.planesPagoRepository.updateById(prestamo.idPlan, {
@@ -284,7 +286,7 @@ export class CheckPrestamosController {
 
     let state = true;
     if (idEstadoInterno === 3) {
-      state =false;
+      state = false;
     }
 
     await this.updatePlanAndLoan(
@@ -438,18 +440,41 @@ export class CheckPrestamosController {
         }
 
         try {
+          // console.log('Data:', req.body);
           const dataSend = JSON.parse(req.body.data);
-          const {id} = dataSend;
+          // console.log('Datos recibidos:', dataSend);
+          const {id, idPago} = dataSend;
+
           const file = req.file;
 
-          console.log('Archivo cargado:', file);
+          // console.log('Archivo cargado:', file);
+
+          let newId = 0;
+          if (!id) {
+            const dtd = await this.documentosTipoDocRepository.create({
+              idTipoDocumento: 1, // Id del tipo de documento
+              idDocumento: idPago, // Id del prestamo
+            });
+
+            newId = dtd.id || 0;
+          }
 
           //Actualizar el campo UrlDocumento en la tabla documentos si esta presente
           if (file !== undefined) {
-            await this.documentosRepository.updateById(id, {
-              urlDocumento: file ? file?.path : undefined,
-              fechaSubida: new Date().toISOString(),
-            });
+            if (newId !== 0) {
+              // console.log('Insertando documento:', newId);
+              await this.documentosRepository.create({
+                idDocTipDoc: newId, // Id del prestamo
+                urlDocumento: file?.path, // Url del documento
+                fechaSubida: new Date().toISOString(),
+              });
+            } else {
+              // console.log('Actualizando documento:', id);
+              await this.documentosRepository.updateById(id, {
+                urlDocumento: file ? file?.path : undefined,
+                fechaSubida: new Date().toISOString(),
+              });
+            }
 
             resolve({
               message: 'Archivo cargado y datos guardados exitosamente.',
@@ -462,6 +487,7 @@ export class CheckPrestamosController {
             });
           }
         } catch (error) {
+          console.log('Error al procesar la solicitud:', error);
           return reject({error: 'Error al procesar la solicitud.'});
         }
       });
@@ -520,11 +546,14 @@ export class CheckPrestamosController {
     @param.path.number('id') id: number,
     @inject(RestBindings.Http.RESPONSE) response: Response,
   ): Promise<any> {
-    console.log('Descargando archivo:', id);
+    //console.log('Descargando archivo:', id);
     try {
+      if (id === 0) {
+        return response.status(404).send('Document not found');
+      }
       const documento = await this.documentosRepository.findById(id);
 
-      console.log('Archivo encontrado:', documento);
+      //console.log('Archivo encontrado:', documento);
 
       if (!documento) {
         response.status(404).send('Document not found');
@@ -545,7 +574,7 @@ export class CheckPrestamosController {
       }
 
       const mimeType = this.getMimeType(fullPath);
-      console.log('Tipo MIME:', mimeType);
+      //console.log('Tipo MIME:', mimeType);
 
       const stats = fs.statSync(fullPath);
       response.setHeader('Content-Type', mimeType);

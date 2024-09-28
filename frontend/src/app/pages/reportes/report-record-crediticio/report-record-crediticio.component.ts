@@ -105,7 +105,7 @@ export class ReportRecordCrediticioComponent implements OnInit {
         .Get(`prestamos/reporte-recordCrediticio?idCliente=${this.idCliente}`)
         .pipe(
           tap((data: any) => {
-            console.log("Record Crediticio:", data);
+            //console.log("Record Crediticio:", data);
             if (data.encabezados.length > 0) {
               this.encabezado = data.encabezados[0];
             }
@@ -132,7 +132,7 @@ export class ReportRecordCrediticioComponent implements OnInit {
         .Get(`usuario-clientes/by-cliente/${this.selectedCliente.id}`)
         .pipe(
           tap((asesor: any) => {
-            console.log("Asesor:", asesor);
+            //console.log("Asesor:", asesor);
             this.selectedAsesor = asesor;
           }),
           catchError((error) => {

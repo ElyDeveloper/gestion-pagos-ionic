@@ -22,7 +22,7 @@ export class OwnerStrategy implements AuthenticationStrategy {
   }
   async authenticate(request: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): Promise<UserProfile | RedirectRoute | undefined> {
     const token = parseBearerToken(request) || "";
-    console.log(" token desde owner ", token)
+    //console.log(" token desde owner ", token)
     if (!token) {
       throw new HttpErrors[401]("No existe un token en la solicitud.")
     }

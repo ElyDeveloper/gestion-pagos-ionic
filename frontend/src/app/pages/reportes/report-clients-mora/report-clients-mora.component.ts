@@ -74,7 +74,7 @@ export class ReportClientsMoraComponent implements OnInit {
         .Get(`prestamos/reporte-mora?idUsuario=${this.idUser}`)
         .pipe(
           tap((data: any) => {
-            console.log("Prestamos con mora:", data);
+            //console.log("Prestamos con mora:", data);
             this.elements = data;
             this.totalClients = this.elements.length;
             this.elements.forEach((prestamo) => {

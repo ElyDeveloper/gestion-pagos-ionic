@@ -57,7 +57,7 @@ export class UsuarioClienteController {
       clientsIds: string[];
     },
   ): Promise<{message: string; changes: {added: number; removed: number}}> {
-    console.log('Creando usuario-cliente...', usuarioCliente);
+    //console.log('Creando usuario-cliente...', usuarioCliente);
     try {
       if (!Array.isArray(usuarioCliente.clientsIds)) {
         throw new Error('clientsIds debe ser un array');
@@ -127,7 +127,7 @@ export class UsuarioClienteController {
     })
     usuarioCliente: Omit<UsuarioCliente, 'id'>,
   ): Promise<UsuarioCliente> {
-    console.log('Creando usuario-cliente...', usuarioCliente);
+    //console.log('Creando usuario-cliente...', usuarioCliente);
     return this.usuarioClienteRepository.create(usuarioCliente);
   }
 
@@ -149,7 +149,7 @@ export class UsuarioClienteController {
     })
     data: any,
   ): Promise<void> {
-    console.log('Creando usuario-cliente...', data);
+    //console.log('Creando usuario-cliente...', data);
 
     const { idUserOld, idUserNew } = data;
 
@@ -257,7 +257,7 @@ export class UsuarioClienteController {
     @param.filter(UsuarioCliente, {exclude: 'where'})
     filter?: FilterExcludingWhere<UsuarioCliente>,
   ): Promise<UsuarioCliente> {
-    console.log('Buscando Usuario Cliente:', id);
+    //console.log('Buscando Usuario Cliente:', id);
     return this.usuarioClienteRepository.findById(id, {
       include: [{relation: 'Cliente'}, {relation: 'Usuario'}],
     });
@@ -277,7 +277,7 @@ export class UsuarioClienteController {
     @param.filter(UsuarioCliente, {exclude: 'where'})
     filter?: FilterExcludingWhere<UsuarioCliente>,
   ): Promise<UsuarioCliente[]> {
-    console.log('Buscando Usuario Cliente:', id);
+    //console.log('Buscando Usuario Cliente:', id);
     const userClients = await this.usuarioClienteRepository.find({
       where: {
         usuarioId: id,
@@ -304,7 +304,7 @@ export class UsuarioClienteController {
     },
   })
   async findByClienteId(@param.path.number('id') id: number): Promise<any> {
-    console.log('Buscando Usuario Cliente:', id);
+    //console.log('Buscando Usuario Cliente:', id);
     const userClients = await this.usuarioClienteRepository.find({
       where: {
         clienteId: id,

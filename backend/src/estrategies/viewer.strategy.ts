@@ -23,7 +23,7 @@ export class ViewerStrategy implements AuthenticationStrategy {
   }
   async authenticate(request: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>): Promise<UserProfile | RedirectRoute | undefined> {
     const token = parseBearerToken(request);
-    console.log(" token desde vv ", token)
+    //console.log(" token desde vv ", token)
 
     if (!token) {
       throw new HttpErrors[401]("No existe un token en la solicitud.")

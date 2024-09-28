@@ -120,7 +120,7 @@ export class CredencialController {
   ): Promise<Credenciales> {
     try {
       const idUser = this.jwtService.decryptId(id);
-      console.log('id User: ', idUser);
+      //console.log('id User: ', idUser);
       const credenciales = await this.credencialesRepository.findById(
         idUser,
         filter,

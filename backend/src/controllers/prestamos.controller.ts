@@ -81,7 +81,7 @@ export class PrestamosController {
     if (!state) {
       condition = {};
     }
-    console.log('Consultando prestamos del Usuario Logueado, Estado: ', state);
+    //console.log('Consultando prestamos del Usuario Logueado, Estado: ', state);
     const userId = parseInt(currentUser[securityId], 10);
 
     const user = await this.usuarioRepository.findById(userId);
@@ -89,10 +89,10 @@ export class PrestamosController {
       throw new HttpErrors.Unauthorized('Usuario no encontrado');
     }
 
-    // console.log('Usuario Logueado en prestamos: ', user);
+    // //console.log('Usuario Logueado en prestamos: ', user);
 
     if (user.rolid === 3) {
-      // console.log('Consultando prestamos de todos los clientes');
+      // //console.log('Consultando prestamos de todos los clientes');
       const usuariosClientes = await this.usuarioClienteRepository.find({
         where: {
           usuarioId: userId,
@@ -100,9 +100,9 @@ export class PrestamosController {
         include: ['cliente'],
       });
 
-      // console.log('Clientes del Usuario Logueado: ', usuariosClientes);
+      // //console.log('Clientes del Usuario Logueado: ', usuariosClientes);
       const idsClientes = usuariosClientes.map(u => u.clienteId);
-      // console.log('Ids de Clientes del Usuario Logueado: ', idsClientes);
+      // //console.log('Ids de Clientes del Usuario Logueado: ', idsClientes);
       return this.prestamosRepository.count({
         and: [{idCliente: {inq: idsClientes}}, {estado: state}, condition],
       });
@@ -165,16 +165,16 @@ export class PrestamosController {
     if (!state) {
       condition = {};
     }
-    // console.log('Usuario Logueado: ', currentUser);
+    // //console.log('Usuario Logueado: ', currentUser);
     const userId = parseInt(currentUser[securityId], 10);
-    // console.log('Id de Usuario Logueado: ', userId);
-    // console.log('Llamada de paginacion');
+    // //console.log('Id de Usuario Logueado: ', userId);
+    // //console.log('Llamada de paginacion');
 
     const user = await this.usuarioRepository.findById(userId);
     if (!user) {
       throw new HttpErrors.Unauthorized('Usuario no encontrado');
     }
-    // console.log('Usuario encontrado: ', user);
+    // //console.log('Usuario encontrado: ', user);
 
     if (user.rolid === 3) {
       const usuariosCliente = await this.usuarioClienteRepository.find({
@@ -196,12 +196,12 @@ export class PrestamosController {
         order: ['id DESC'],
       });
 
-      // console.log('UsuariosClientes encontrados: ', usuariosCliente);
+      // //console.log('UsuariosClientes encontrados: ', usuariosCliente);
 
       const clients = usuariosCliente
         .map((uc: any) => {
           const ucC = uc?.cliente;
-          console.log('Cliente encontrado: ', ucC);
+          //console.log('Cliente encontrado: ', ucC);
           return ucC;
         })
         .filter(
@@ -236,7 +236,7 @@ export class PrestamosController {
         idEncrypted: this.jwtService.encryptId(prestamo.id || 0),
       }));
 
-      // console.log('Personas encontradas: ', copiaSpread);
+      // //console.log('Personas encontradas: ', copiaSpread);
 
       return copiaSpread;
     }
@@ -264,7 +264,7 @@ export class PrestamosController {
       idEncrypted: this.jwtService.encryptId(prestamo.id || 0),
     }));
 
-    // console.log('Personas encontradas: ', copiaSpread);
+    // //console.log('Personas encontradas: ', copiaSpread);
 
     return copiaSpread;
   }
@@ -396,7 +396,7 @@ export class PrestamosController {
       },
     });
 
-    console.log('Clientes encontrados: ', clientes.length);
+    //console.log('Clientes encontrados: ', clientes.length);
 
     if (user.rolid === 3) {
       const usuariosCliente = await this.usuarioClienteRepository.find({
@@ -414,7 +414,7 @@ export class PrestamosController {
       idsClientes = clientes.map(c => c.id || 0);
     }
 
-    console.log('Ids de Clientes: ', idsClientes);
+    //console.log('Ids de Clientes: ', idsClientes);
 
     const prestamos = await this.prestamosRepository.find({
       where: {
@@ -449,7 +449,7 @@ export class PrestamosController {
       idEncrypted: this.jwtService.encryptId(prestamo.id || 0),
     }));
 
-    // console.log('Personas encontradas: ', copiaSpread);
+    // //console.log('Personas encontradas: ', copiaSpread);
 
     return copiaSpread;
   }

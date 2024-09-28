@@ -48,7 +48,7 @@ export class ForgotPasswordPage implements OnInit {
 
     //Verificar si el tiempo de expiracion ha pasado
     const expirationDate = new Date(expirationCode);
-    // console.log("Expiracion code: ", expirationDate);
+    // //console.log("Expiracion code: ", expirationDate);
     if (expirationDate.getTime() < new Date().getTime()) {
       this.isCodeActive = false;
     } else {
@@ -65,7 +65,7 @@ export class ForgotPasswordPage implements OnInit {
   ionViewDidLeave() {
     if (this.countdownSubscription) {
       this.countdownSubscription.unsubscribe();
-      console.log("Unsubscribed from countdown");
+      //console.log("Unsubscribed from countdown");
     }
   }
 
@@ -84,7 +84,7 @@ export class ForgotPasswordPage implements OnInit {
           .toString()
           .padStart(2, "0")}`;
 
-        // console.log("Remaining time: ", this.remainingTime);
+        // //console.log("Remaining time: ", this.remainingTime);
         //Si llega a 0 redirigir a la pagina de inicio
         if (this.remainingTime == "0:00") {
           this.toastMessage =
@@ -118,7 +118,7 @@ export class ForgotPasswordPage implements OnInit {
         })
         .subscribe({
           next: (result: any) => {
-            console.log(result);
+            //console.log(result);
             if (result.error) {
               //Mostrar toast
               this.toastMessage = result.error;
@@ -137,7 +137,7 @@ export class ForgotPasswordPage implements OnInit {
             }
           },
           error: (error) => {
-            console.log(error);
+            //console.log(error);
             this.toastMessage =
               "Ha ocurrido un error, por favor intente de nuevo.";
             this.isToastOpen = true;

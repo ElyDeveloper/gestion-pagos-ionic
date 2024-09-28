@@ -71,7 +71,7 @@ export class HomePage {
   ngOnInit(): void {}
 
   ionViewDidEnter() {
-    console.log("Llamado a obtencion de usuario");
+    //console.log("Llamado a obtencion de usuario");
     this.getUserLoggedIn();
   }
 
@@ -85,7 +85,7 @@ export class HomePage {
       this._authService.getUserInfo().subscribe({
         next: (user: any) => {
           this.userLogged = user;
-          console.log("User logged: ", this.userLogged);
+          //console.log("User logged: ", this.userLogged);
           this.updateFolderCounts();
         },
         error: (error) => {
@@ -130,7 +130,7 @@ export class HomePage {
   }
 
   openFolder(folderName: string) {
-    console.log(`Abriendo carpeta: ${folderName}`);
+    //console.log(`Abriendo carpeta: ${folderName}`);
     // Aquí puedes agregar la lógica para abrir cada carpeta
     // this.navCtrl.navigateForward(`/${folderName.toLowerCase()}`);
   }

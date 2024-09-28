@@ -102,7 +102,7 @@ export class GestionContractPage implements OnInit {
         next: (data: any) => {
           const { exist, content, correlativo } = data;
 
-          console.log("Contrato existente", data);
+          //console.log("Contrato existente", data);
           if (exist) {
             this.existContrato = true;
             this.correlativo = correlativo;
@@ -192,7 +192,7 @@ export class GestionContractPage implements OnInit {
     this._loaderService.show();
     this._globalService.Post("contratos-pagos", contractSave).subscribe({
       next: (data: any) => {
-        console.log("Contrato guardado correctamente", data);
+        //console.log("Contrato guardado correctamente", data);
         this.isPrint = false;
         this.printSection();
       },
@@ -235,10 +235,10 @@ export class GestionContractPage implements OnInit {
         return;
       }
 
-      console.log("ID Encrypted:", id);
+      //console.log("ID Encrypted:", id);
 
       const idDecrypted = await this.getDecryptedId(id);
-      console.log("Decrypted ID:", idDecrypted);
+      //console.log("Decrypted ID:", idDecrypted);
       if (!idDecrypted) return;
 
       const prestamo = await this.fetchPrestamo(idDecrypted);
@@ -265,8 +265,8 @@ export class GestionContractPage implements OnInit {
       this._globalService.GetId("prestamos", idDecrypted).pipe(
         tap((prestamo: any) => {
           prestamo = this._globalService.parseObjectDates(prestamo);
-          console.log("Prestamo:", prestamo);
-          console.log("Plan de Pago:", prestamo.planPago);
+          //console.log("Prestamo:", prestamo);
+          //console.log("Plan de Pago:", prestamo.planPago);
         }),
         catchError((error) => {
           console.error("Error fetching prestamo:", error);
@@ -300,7 +300,7 @@ export class GestionContractPage implements OnInit {
   }
 
   formatDate(fechaStr: string): string {
-    // console.log('FEcha: ', fechaStr)
+    // //console.log('FEcha: ', fechaStr)
     if (fechaStr) {
       const fecha = fechaStr.split("-");
       const dia = parseInt(fecha[2]);

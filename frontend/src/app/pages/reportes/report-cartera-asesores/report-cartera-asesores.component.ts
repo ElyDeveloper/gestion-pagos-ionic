@@ -58,7 +58,7 @@ export class ReportCarteraAsesoresComponent implements OnInit {
         )
         .pipe(
           tap((cartera: any) => {
-            console.log("Cartera asesor:", cartera);
+            //console.log("Cartera asesor:", cartera);
             this.carteraAsesor = cartera;
 
             const initialEncabezado = {

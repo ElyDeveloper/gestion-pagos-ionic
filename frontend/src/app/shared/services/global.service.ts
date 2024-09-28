@@ -97,7 +97,7 @@ export class GlobalService {
       formData.append("file", selectedFile, selectedFile.name);
     }
 
-    console.log("Data a enviar en acualizacion: ", dataSend);
+    //console.log("Data a enviar en acualizacion: ", dataSend);
 
     return this._http.patch(`${API_URL}${endPoint}`, formData);
   }

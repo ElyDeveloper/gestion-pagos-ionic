@@ -138,7 +138,7 @@ export class GestionPagoPage implements OnInit {
           next: (data: any) => {
             const { exist } = data;
 
-            console.log("Contrato existente", data);
+            //console.log("Contrato existente", data);
             if (exist) {
               this.existContrato = true;
               this.getFechasPago(this.prestamoSeleccionado);
@@ -172,9 +172,9 @@ export class GestionPagoPage implements OnInit {
         return;
       }
       if (data.estado === true) {
-        console.log("Modo Edicion");
+        //console.log("Modo Edicion");
       } else {
-        console.log("Modo Creación");
+        //console.log("Modo Creación");
       }
 
       if (data.fechaPago === "" || data.fechaPago === null) {
@@ -191,18 +191,18 @@ export class GestionPagoPage implements OnInit {
         return;
       }
 
-      console.log("Formulario de Registro de Pago: ", data);
+      //console.log("Formulario de Registro de Pago: ", data);
 
       const file = this.uploaderComponent?.uploader?.queue[0]?._file;
 
-      console.log("Archivo subido: ", file);
+      //console.log("Archivo subido: ", file);
 
       data.idPrestamo = this.prestamoSeleccionado.id;
       data.mora = this.mora;
 
       this._globalService.PostWithFile("pagos/saveFile", data, file).subscribe({
         next: (response) => {
-          console.log("Respuesta del Servidor: ", response);
+          //console.log("Respuesta del Servidor: ", response);
           this.getFechasPago(this.prestamoSeleccionado);
           this.uploaderComponent?.uploader?.clearQueue();
 
@@ -252,10 +252,10 @@ export class GestionPagoPage implements OnInit {
         }
       });
 
-      console.log("Fechas de pagos: ", fechasPagos);
+      //console.log("Fechas de pagos: ", fechasPagos);
     }
     this.daysLate += oldDaysLate;
-    console.log("Días de atraso: ", this.daysLate);
+    //console.log("Días de atraso: ", this.daysLate);
     mora = this.calculateMora(this.pagoSeleccionado.monto, this.daysLate);
     this.mora = mora;
     this.calculateTotales();
@@ -265,7 +265,7 @@ export class GestionPagoPage implements OnInit {
 
   calculateMora(monto: number, daysLate: number): number {
     const moraForDay = Number(((PERCENTAGE / 30) * monto).toFixed(2));
-    console.log("Mora por dia: ", moraForDay);
+    //console.log("Mora por dia: ", moraForDay);
     return Number((daysLate * moraForDay).toFixed(2));
   }
 
@@ -315,8 +315,8 @@ export class GestionPagoPage implements OnInit {
       this._globalService.GetId("prestamos", idDecrypted).pipe(
         tap((prestamo: any) => {
           prestamo = this._globalService.parseObjectDates(prestamo);
-          console.log("Prestamo:", prestamo);
-          console.log("Plan de Pago:", prestamo.planPago);
+          //console.log("Prestamo:", prestamo);
+          //console.log("Plan de Pago:", prestamo.planPago);
         }),
         catchError((error) => {
           console.error("Error fetching prestamo:", error);
@@ -389,7 +389,7 @@ export class GestionPagoPage implements OnInit {
 
   onselectButtonClicked(data: any): void {
     this.resetPaymentValues();
-    // console.log("Elemento seleccionado:", data);
+    // //console.log("Elemento seleccionado:", data);
     this.pagoSeleccionado = data;
 
     this.calculatePaymentDetails(data);
@@ -407,7 +407,7 @@ export class GestionPagoPage implements OnInit {
   }
 
   onDeleteButtonClicked(data: any) {
-    console.log("Elemento eliminado:", data);
+    //console.log("Elemento eliminado:", data);
     this._globalService.Delete("pagos", data.id).subscribe({
       next: async () => {
         this.toastColor = "success";
@@ -444,7 +444,7 @@ export class GestionPagoPage implements OnInit {
       );
       this.montoPagado = total;
       this.adeudoCuota = total >= data.monto ? 0 : data.monto - total;
-      // console.log("Total pagado:", total);
+      // //console.log("Total pagado:", total);
     }
   }
 
@@ -455,7 +455,7 @@ export class GestionPagoPage implements OnInit {
   getMora(id: number): void {
     this._globalService.GetId("moras/fecha-pago", id).subscribe({
       next: (response: any) => {
-        console.log("Mora:", response);
+        //console.log("Mora:", response);
         const mora = this.calculateTotalMora(response);
         if (mora > 0) {
           this.mora = this.calculateTotalMora(response);
@@ -480,19 +480,19 @@ export class GestionPagoPage implements OnInit {
     this.adeudoMora =
       this.montoPagado > this.pagoSeleccionado.monto ? diferencia : this.mora;
     this.adeudoTotal = diferencia;
-    // console.log("Diferencia:", diferencia);
+    // //console.log("Diferencia:", diferencia);
     this.pagoForm.get("monto")?.setValue(this.adeudoTotal.toFixed(2));
   }
 
   onUploaderChange(uploader: any): void {
-    console.log(uploader);
+    //console.log(uploader);
   }
 
   private getFechasPago(data: any): void {
-    console.log("Información del prestamo:", data);
+    //console.log("Información del prestamo:", data);
     this._globalService.Get(`fechas-pagos/plan/${data.planPago.id}`).subscribe({
       next: (response: any) => {
-        console.log("Plan de pago:", response);
+        //console.log("Plan de pago:", response);
         this.elements = this.processFechasPago(response);
         const lastValue = this.elements.filter((cuota) => cuota.estado).length;
         this.selectPago(lastValue);
@@ -535,7 +535,7 @@ export class GestionPagoPage implements OnInit {
 
       if (cuota?.moras) {
         cuota.mora = cuota.moras.mora;
-        console.log("Mora en DB:", cuota.mora);
+        //console.log("Mora en DB:", cuota.mora);
       }
 
       return cuota;

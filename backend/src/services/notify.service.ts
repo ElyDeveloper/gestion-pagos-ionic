@@ -33,7 +33,7 @@ export class NotifyService {
 
     try {
       const info = await transporter.sendMail(mailOptions);
-      console.log('Email enviado:', info.response);
+      //console.log('Email enviado:', info.response);
       return true;
     } catch (error) {
       console.error('Error al enviar el email:', error);

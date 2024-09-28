@@ -20,7 +20,7 @@ export class PreventAbuseService {
   }
 
   async registerClick(): Promise<boolean> {
-    console.log("Se hizo click");
+    //console.log("Se hizo click");
     const currentTime = Date.now();
     if (currentTime - this.lastClickTime < 1500) {
       await this.showAbuseTost();

@@ -52,7 +52,7 @@ export class VerifyCodePage implements OnInit {
 
     //Verificar si el tiempo de expiracion ha pasado
     const expirationDate = new Date(expirationCode);
-    // console.log("Expiracion code: ", expirationDate);
+    // //console.log("Expiracion code: ", expirationDate);
     if (expirationDate.getTime() < new Date().getTime()) {
       this.router.navigate(["forgot-password"]);
     } else {
@@ -68,7 +68,7 @@ export class VerifyCodePage implements OnInit {
   ionViewDidLeave() {
     if (this.countdownSubscription) {
       this.countdownSubscription.unsubscribe();
-      console.log("Unsubscribed from countdown");
+      //console.log("Unsubscribed from countdown");
     }
   }
 
@@ -77,11 +77,11 @@ export class VerifyCodePage implements OnInit {
   }
 
   submitForm(event: any): void {
-    console.log("Form submitted", event);
+    //console.log("Form submitted", event);
     // Implement your code verification logic here
     this._globalService.Post("verify-code", { code: event }).subscribe({
       next: (result: any) => {
-        console.log("Result: ", result);
+        //console.log("Result: ", result);
         if (result.error) {
           this.toastMessage = result.error;
           this.isToastOpen = true;
@@ -113,7 +113,7 @@ export class VerifyCodePage implements OnInit {
           .toString()
           .padStart(2, "0")}`;
 
-        // console.log("Remaining time: ", this.remainingTime);
+        // //console.log("Remaining time: ", this.remainingTime);
         //Si llega a 0 redirigir a la pagina de inicio
         if (this.remainingTime == "0:00") {
           this.toastMessage = "El tiempo de verificación ha expirado";

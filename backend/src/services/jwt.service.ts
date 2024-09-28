@@ -43,10 +43,10 @@ export class JWTService {
       role: credentials.role,
     };
 
-    console.log(
-      'Codigo generado: ',
-      await this.jwtService.generateToken(userProfile),
-    );
+    //console.log(
+    //   'Codigo generado: ',
+    //   await this.jwtService.generateToken(userProfile),
+    // );
     return await this.jwtService.generateToken(userProfile);
   }
 
@@ -116,7 +116,7 @@ export class JWTService {
 
   // async generateCode(request: gCodeInterface) {
   //   const newCode = new CodigoVerificacion;
-  //   console.log(request.identificator);
+  //   //console.log(request.identificator);
 
   //   let credentialsExist = await this.credencialesRepository.findOne({where: {correo: request.identificator}});
 
@@ -193,7 +193,7 @@ export class JWTService {
       },
     });
 
-    console.log('codes: ', codes);
+    //console.log('codes: ', codes);
 
     if (codes.length >= 3) {
       return {operation: false, content: 'limit'};

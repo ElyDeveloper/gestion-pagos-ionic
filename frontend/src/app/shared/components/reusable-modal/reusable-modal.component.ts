@@ -55,7 +55,7 @@ export class ReusableModalComponent {
   save = async (data: any, isForm: boolean = true) => {
     if (await this._preventAbuseService.registerClick()) {
       if (isForm) {
-        console.log("Es formulario");
+        //console.log("Es formulario");
         if (this.formSave.invalid) {
           const invalidFields: string[] = [];
 
@@ -76,7 +76,7 @@ export class ReusableModalComponent {
         this.saveData.emit(data);
       } else {
         if (data?.type === "file") {
-          console.log("No es formulario");
+          //console.log("No es formulario");
 
           this.saveData.emit();
         }

@@ -147,13 +147,13 @@ export class GestionPrestamoPage implements OnInit {
 
     setTimeout(() => {
       const tasa = this.prestamoForm.get("tasaInteres")?.value;
-      console.log("Tasa: ", tasa);
-      console.log("Tasa: ", tasa);
+      //console.log("Tasa: ", tasa);
+      //console.log("Tasa: ", tasa);
 
       //eliminar textos y simbolos, solo dejar numeros
       let numero = this.extractNumber(tasa);
 
-      console.log("numero: ", numero);
+      //console.log("numero: ", numero);
 
       if (monto && numero) {
         const totalMonto = monto * (1 + numero / 100);
@@ -163,7 +163,7 @@ export class GestionPrestamoPage implements OnInit {
   }
 
   extractNumber(input: string): number {
-    // console.log("Input: ", input);
+    // //console.log("Input: ", input);
     if (input) {
       //Verificar si es string
       if (typeof input === "string") {
@@ -270,7 +270,7 @@ export class GestionPrestamoPage implements OnInit {
     this._globalService.Get(endpoint).subscribe({
       next: (response: any) => {
         setter(response);
-        console.log(`${endpoint} obtenidos:`, response);
+        //console.log(`${endpoint} obtenidos:`, response);
       },
       error: (error) => {
         console.error(`Error al obtener ${endpoint}:`, error);
@@ -288,7 +288,7 @@ export class GestionPrestamoPage implements OnInit {
       .subscribe({
         next: (response: any) => {
           this.clientes = response;
-          console.log("Clientes obtenidos:", response);
+          //console.log("Clientes obtenidos:", response);
         },
         error: (error) => {
           console.error("Error al obtener clientes:", error);
@@ -302,7 +302,7 @@ export class GestionPrestamoPage implements OnInit {
       .subscribe({
         next: (response: any) => {
           this.avales = response;
-          console.log("Avales obtenidos:", response);
+          //console.log("Avales obtenidos:", response);
         },
         error: (error) => {
           console.error("Error al obtener avales:", error);
@@ -312,15 +312,15 @@ export class GestionPrestamoPage implements OnInit {
 
   onClienteSeleccionado(event: any) {
     this.clienteSeleccionado = event.detail.value;
-    console.log("Cliente seleccionado: ", this.clienteSeleccionado);
+    //console.log("Cliente seleccionado: ", this.clienteSeleccionado);
   }
   onAvalSeleccionado(event: any) {
     this.avalSeleccionado = event.detail.value;
-    console.log("Aval seleccionado: ", this.avalSeleccionado);
+    //console.log("Aval seleccionado: ", this.avalSeleccionado);
   }
 
   changeAval(event: any) {
-    console.log("Change: " + event.detail.checked);
+    //console.log("Change: " + event.detail.checked);
     const val = event.detail.checked;
 
     if (!val) {
@@ -424,12 +424,12 @@ export class GestionPrestamoPage implements OnInit {
     const idPlan = this.prestamoSeleccionado.planPago.id;
     const idPrestamo = this.prestamoSeleccionado.id;
 
-    console.log("Plan Pago: ", planPago);
+    //console.log("Plan Pago: ", planPago);
 
     this._globalService.PutId("planes-pagos", idPlan, planPago).subscribe({
       next: () => {
         const prestamo = this.createPrestamo(idPlan);
-        console.log("Prestamo a guardar: ", prestamo);
+        //console.log("Prestamo a guardar: ", prestamo);
         this._globalService.PutId("prestamos", idPrestamo, prestamo).subscribe({
           next: () => {
             this.handlePrestamoSuccess.bind(this);
@@ -446,7 +446,7 @@ export class GestionPrestamoPage implements OnInit {
     this._globalService.Post("planes-pagos", planPago).subscribe({
       next: (response: any) => {
         const prestamo = this.createPrestamo(response.id);
-        console.log("Prestamo a guardar: ", prestamo);
+        //console.log("Prestamo a guardar: ", prestamo);
         this._globalService.Post("prestamos", prestamo).subscribe({
           next: this.handlePrestamoSuccess.bind(this),
           error: this.handlePrestamoError.bind(this),
@@ -457,7 +457,7 @@ export class GestionPrestamoPage implements OnInit {
   }
 
   private handlePrestamoSuccess(response: any) {
-    console.log("Operación de préstamo exitosa:", response);
+    //console.log("Operación de préstamo exitosa:", response);
     this.toastMessage = "Operación de préstamo exitosa";
     this.toastColor = "success";
     this.isToastOpen = true;

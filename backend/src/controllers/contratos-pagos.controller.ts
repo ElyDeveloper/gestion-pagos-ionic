@@ -53,7 +53,7 @@ export class ContratosPagosController {
     const content = JSON.parse(contratosPago.contenido);
     const xml = this.globalService.jsonToXml(content);
 
-    console.log('ContratosPago XML: ', xml);
+    //console.log('ContratosPago XML: ', xml);
 
     contratosPago.contenido = xml;
 
@@ -90,7 +90,7 @@ export class ContratosPagosController {
       limit: 1,
     });
 
-    // console.log(lastContrato);
+    // //console.log(lastContrato);
 
     if (lastContrato.length === 0) {
       return {correlativo: 'CON-1'};
@@ -117,7 +117,7 @@ export class ContratosPagosController {
     @param.query.number('skip') skip: number,
     @param.query.number('limit') limit: number,
   ): Promise<any[]> {
-    console.log('Llamada de paginacion');
+    //console.log('Llamada de paginacion');
     const contratos = await this.contratosPagoRepository.find({
       include: [
         {relation: 'prestamo', scope: {include: [{relation: 'cliente'}]}},
@@ -131,7 +131,7 @@ export class ContratosPagosController {
       idPrestamoEncrypted: this.jwtService.encryptId(contrato.idPrestamo|| 0),
     }));
 
-    console.log('Contratos encontrados: ', copiaSpread);
+    //console.log('Contratos encontrados: ', copiaSpread);
 
     return copiaSpread;
   }
@@ -159,7 +159,7 @@ export class ContratosPagosController {
     const content = contrato.contenido;
     const objeto = await this.globalService.xmlToJson(content);
 
-    console.log('ContratosPago JSON: ', objeto);
+    //console.log('ContratosPago JSON: ', objeto);
     return {exist: true, content: objeto, correlativo: contrato.correlativo};
   }
 
@@ -182,7 +182,7 @@ export class ContratosPagosController {
 
     contratos.map(async contrato => {
       const json = await this.globalService.xmlToJson(contrato.contenido);
-      console.log('ContratosPago JSON: ', json);
+      //console.log('ContratosPago JSON: ', json);
       return contrato;
     });
 

@@ -136,7 +136,7 @@ export class UsuariosPage implements OnInit {
     this.formModels = new FormModels(this.fb);
     this.formAdd = this.formModels.usuarioForm();
     this.formSelected = this.formAdd;
-    console.log("Formulario de usuario:", this.formAdd);
+    //console.log("Formulario de usuario:", this.formAdd);
 
     //TODO ESPECIFICO
     this.formResetPswd = this.formModels.resetPswdForm();
@@ -189,7 +189,7 @@ export class UsuariosPage implements OnInit {
   }
 
   searchValueChanged(event: any, type: string) {
-    console.log("Search value changed:", event.target.value, type);
+    //console.log("Search value changed:", event.target.value, type);
     switch (type) {
       case "client":
         this.searchClient$.next(event.target.value);
@@ -205,7 +205,7 @@ export class UsuariosPage implements OnInit {
       .Get(`personas/clientes/search?query=${this.searchClient}`)
       .subscribe({
         next: (data: any) => {
-          console.log(`Clientes encontrados para ${this.searchClient}:`, data);
+          //console.log(`Clientes encontrados para ${this.searchClient}:`, data);
           this.filteredClients = data;
         },
         error: (error) => {
@@ -219,7 +219,7 @@ export class UsuariosPage implements OnInit {
       .Get(`usuarios/asesores/search?query=${this.searchUser}`)
       .subscribe({
         next: (data: any) => {
-          console.log(`Asesores encontrados para ${this.searchUser}:`, data);
+          //console.log(`Asesores encontrados para ${this.searchUser}:`, data);
           this.filteredUsers = data;
         },
         error: (error) => {
@@ -233,23 +233,23 @@ export class UsuariosPage implements OnInit {
 
     // Verifica si el cliente ya está en la lista de seleccionados
     if (this.selectedClients.some((client) => client.dni === clientOp.dni)) {
-      console.log("Remover Cliente:", clientOp);
+      //console.log("Remover Cliente:", clientOp);
       this.removeClient(clientOp);
     } else {
-      console.log("Agregar Cliente:", clientOp);
+      //console.log("Agregar Cliente:", clientOp);
 
       const usuarioClient = {
         usuarioId: this.element.id,
         clienteId: clientOp.id,
       };
 
-      console.log("Usuario-Cliente:", usuarioClient);
+      //console.log("Usuario-Cliente:", usuarioClient);
       const suscription: Subscription = this._globalService
         .Post("usuario-clientes/one", usuarioClient)
         .subscribe({
           next: () => {
             this.selectedClients.push(clientOp);
-            console.log("Cliente agregado correctamente");
+            //console.log("Cliente agregado correctamente");
             this.toastColor = "success";
             this.toastMessage = "Cliente agregado correctamente";
             this.isToastOpen = true;
@@ -264,7 +264,7 @@ export class UsuariosPage implements OnInit {
   }
 
   async setTransfer(usuario:any) {
-    console.log("Set transfer: ", usuario);
+    //console.log("Set transfer: ", usuario);
 
     //Alerta de si esta seguro de transferir al usuario
     const alert = await this._alertController.create({
@@ -276,7 +276,7 @@ export class UsuariosPage implements OnInit {
           role: "cancel",
           cssClass: "secondary",
           handler: () => {
-            console.log("Transferencia cancelada");
+            //console.log("Transferencia cancelada");
           },
         },
         {
@@ -285,7 +285,7 @@ export class UsuariosPage implements OnInit {
             //TODO ESPECIFICOS
             this.isResetPswd = true;
             this.selectedUser = usuario;
-            console.log("Transferencia realizada correctamente");
+            //console.log("Transferencia realizada correctamente");
             this.toastColor = "success";
             this.toastMessage = "Transferencia realizada correctamente";
             this.isToastOpen = true;
@@ -307,7 +307,7 @@ export class UsuariosPage implements OnInit {
           role: "cancel",
           cssClass: "secondary",
           handler: () => {
-            console.log("Eliminación cancelada");
+            //console.log("Eliminación cancelada");
           },
         },
         {
@@ -317,7 +317,7 @@ export class UsuariosPage implements OnInit {
               .Delete("usuario-clientes/by-cliente", clientRemove.id || 0)
               .subscribe({
                 next: () => {
-                  console.log("Cliente eliminado correctamente");
+                  //console.log("Cliente eliminado correctamente");
                   this.toastColor = "success";
                   this.toastMessage = "Cliente eliminado correctamente";
                   this.isToastOpen = true;
@@ -343,7 +343,7 @@ export class UsuariosPage implements OnInit {
   ionViewWillLeave() {}
   // TODO ESPECIFICO
   onSelect(items: Personas[]) {
-    console.log("Items SelectedItems:", this.selectedClients);
+    //console.log("Items SelectedItems:", this.selectedClients);
   }
 
   setOpenedToast(value: boolean) {
@@ -448,7 +448,7 @@ export class UsuariosPage implements OnInit {
   getCellValue(row: any, key: string): any {
     const result = key.split(".").reduce((o, k) => (o || {})[k], row);
 
-    // console.log("Resultado de la celda:", result);
+    // //console.log("Resultado de la celda:", result);
     return result;
   }
 
@@ -530,7 +530,7 @@ export class UsuariosPage implements OnInit {
 
   //TODO ESPECIFICO
   onResetPasswordButtonClicked(data: any) {
-    console.log("Data: ", data);
+    //console.log("Data: ", data);
     this.formResetPswd.get("identificator")?.setValue(data.correo);
 
     const fieldAliases: FieldAliases = {
@@ -553,13 +553,13 @@ export class UsuariosPage implements OnInit {
   }
 
   onTransferButtonClicked(data: any) {
-    console.log("Data: ", data);
+    //console.log("Data: ", data);
     this.element = data;
     this.setModalState(false, false, false, false, true, this.modalTransfer);
   }
 
   onSelectClientsButtonClicked(data: any) {
-    console.log("Data: ", data);
+    //console.log("Data: ", data);
     this.element = data;
     this.filteredClients = [];
     this.selectedClients = [];
@@ -568,7 +568,7 @@ export class UsuariosPage implements OnInit {
       .Get(`usuario-clientes/by-usuario/${data.id}`)
       .subscribe({
         next: (response: any) => {
-          console.log("Clientes del usuario:", response);
+          //console.log("Clientes del usuario:", response);
           this.setModalState(
             false,
             false,
@@ -586,18 +586,18 @@ export class UsuariosPage implements OnInit {
   }
 
   onInfoButtonClicked(data: any) {
-    // console.log("Información del usuario:", data);
+    // //console.log("Información del usuario:", data);
     this.element = data;
     this.setModalState(false, false, false, false, false, this.modalViewInfo);
   }
 
   onDeleteButtonClicked(data: any) {
-    console.log("Eliminar usuario Obtenido:", data);
+    //console.log("Eliminar usuario Obtenido:", data);
     this.textLoader = "Eliminando Usuario";
     this._loaderService.show();
     this._globalService.Delete("usuarios", data.id).subscribe({
       next: (response: any) => {
-        console.log("Usuario eliminado:", response);
+        //console.log("Usuario eliminado:", response);
         this.getCountElements();
         this._loaderService.hide();
         this.toastMessage = "Usuario eliminado correctamente";
@@ -613,7 +613,7 @@ export class UsuariosPage implements OnInit {
   }
 
   async handleSave(data: any) {
-    console.log("Data a Guardar: ", data);
+    //console.log("Data a Guardar: ", data);
 
     if (this.isResetPswd) {
       this.handleUserOperation("resetPswd", data);
@@ -659,7 +659,7 @@ export class UsuariosPage implements OnInit {
 
     apiCall.subscribe({
       next: (response: any) => {
-        console.log(`Usuario ${operationText.toLowerCase()}:`, response);
+        //console.log(`Usuario ${operationText.toLowerCase()}:`, response);
         this.isModalOpen = false;
         this._loaderService.hide();
         this.toastMessage = `Usuario ${operationText.toLowerCase()} correctamente`;
@@ -679,20 +679,20 @@ export class UsuariosPage implements OnInit {
   }
 
   onPageChange(event: any) {
-    console.log("Evento de cambio de página:", event);
+    //console.log("Evento de cambio de página:", event);
     this.currentPage = event;
     this.getElementsPag();
   }
 
   onSearchData(event: any) {
-    console.log("Evento de búsqueda:", event);
+    //console.log("Evento de búsqueda:", event);
     if (event === "") {
       this.getCountElements();
     } else {
       this._globalService.Get(`usuarios/search?query=${event}`).subscribe({
         next: (response: any) => {
           this.elements = response;
-          console.log("Elementos obtenidos:", response);
+          //console.log("Elementos obtenidos:", response);
         },
         error: (error) => {
           console.error("Error al obtener los elementos:", error);
@@ -711,7 +711,7 @@ export class UsuariosPage implements OnInit {
       .subscribe({
         next: (response: any) => {
           this.elements = response;
-          console.log("Elementos obtenidos:", response);
+          //console.log("Elementos obtenidos:", response);
         },
         error: (error) => {
           console.error("Error al obtener los elementos:", error);
@@ -722,10 +722,10 @@ export class UsuariosPage implements OnInit {
   getCountElements() {
     this._globalService.Get("usuarios/count").subscribe({
       next: (response: any) => {
-        console.log("Cantidad de elementos:", response.count);
+        //console.log("Cantidad de elementos:", response.count);
         const totalElements = response.count;
         this.totalPages = Math.ceil(totalElements / this.currentPageSize);
-        console.log("Total de páginas:", this.totalPages);
+        //console.log("Total de páginas:", this.totalPages);
         this.getElementsPag();
       },
       error: (error) => {
@@ -739,7 +739,7 @@ export class UsuariosPage implements OnInit {
     this._globalService.Get("roles").subscribe({
       next: (roles: any) => {
         this.roles = roles;
-        console.log("Roles obtenidos:", this.roles);
+        //console.log("Roles obtenidos:", this.roles);
       },
       error: (error) => {
         console.error("Error al obtener los roles:", error);

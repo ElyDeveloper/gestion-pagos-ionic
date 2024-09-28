@@ -191,7 +191,7 @@ export class UserController {
     },
   })
   async search(@param.query.string('query') query: string): Promise<Usuario[]> {
-    // console.log('query', query);
+    // //console.log('query', query);
     return this.usuarioRepository.find({
       include: [{relation: 'rol'}],
       where: {
@@ -216,7 +216,7 @@ export class UserController {
   async searchAsesores(
     @param.query.string('query') query: string,
   ): Promise<Usuario[]> {
-    // console.log('query', query);
+    // //console.log('query', query);
     return this.usuarioRepository.find({
       include: [{relation: 'rol'}],
       where: {
@@ -267,7 +267,7 @@ export class UserController {
       },
     });
 
-    console.log('credenciales: ', credenciales);
+    //console.log('credenciales: ', credenciales);
 
     if (credenciales) {
       await this.credencialesRepository.updateById(credenciales.id, {
@@ -297,7 +297,7 @@ export class UserController {
     let result = await this.credencialesRepository.dataSource.execute(
       `${viewOf.GET_CREDENTIAL} Where us.id = '${id}'`,
     );
-    console.log('**********************', result);
+    //console.log('**********************', result);
 
     return result;
   }

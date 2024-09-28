@@ -27,7 +27,7 @@ export class MailService {
 
     // try {
     //   await this.transporter.sendMail(mailOptions);
-    //   console.log('Correo enviado exitosamente');
+    //   //console.log('Correo enviado exitosamente');
     // } catch (error) {
     //   console.error('Error al enviar correo:', error);
     // }
@@ -43,7 +43,7 @@ export class MailService {
 
     try {
       await this.transporter.sendMail(mailOptions);
-      console.log('Correo enviado exitosamente');
+      //console.log('Correo enviado exitosamente');
     } catch (error) {
       console.error('Error al enviar correo:', error);
     }

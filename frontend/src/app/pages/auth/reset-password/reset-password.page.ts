@@ -34,14 +34,14 @@ export class ResetPasswordPage implements OnInit {
   ngOnInit() {}
 
   ionViewWillEnter() {
-    console.log("ForgotPasswordPage");
+    //console.log("ForgotPasswordPage");
     this.route.paramMap.subscribe((params) => {
       const id = params.get("id");
       if (id !== null) {
         this.userId = id;
         this.consultarCredenciales(id);
       } else {
-        console.log('El parametro "id" no esta presente en la URL');
+        //console.log('El parametro "id" no esta presente en la URL');
       }
     });
   }
@@ -53,7 +53,7 @@ export class ResetPasswordPage implements OnInit {
   consultarCredenciales(id: string): void {
     this._globalService.Get("credenciales/" + id).subscribe({
       next: (response: any) => {
-        console.log("Response", response);
+        //console.log("Response", response);
         if (response.error) {
           this.toastMessage = response.error;
           this.isToastOpen = true;
@@ -77,13 +77,13 @@ export class ResetPasswordPage implements OnInit {
 
   resetPassword() {
     if (this.validateForm.valid) {
-      console.log("Form submitted", this.validateForm.value);
+      //console.log("Form submitted", this.validateForm.value);
       // Implement your form submission logic here
       this._globalService
         .Post("reset-password", this.validateForm.value)
         .subscribe({
           next: (response: any) => {
-            console.log("Response", response);
+            //console.log("Response", response);
             if (response.error) {
               this.toastMessage = response.error;
               this.isToastOpen = true;
@@ -115,7 +115,7 @@ export class ResetPasswordPage implements OnInit {
           role: "cancel",
           cssClass: "secondary",
           handler: () => {
-            console.log("Redirección cancelada");
+            //console.log("Redirección cancelada");
           },
         },
         {

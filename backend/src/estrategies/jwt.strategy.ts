@@ -17,13 +17,13 @@ export class MyAuthStrategyProvider implements AuthenticationStrategy {
 
   async authenticate(request: Request): Promise<UserProfile | undefined> {
     const token = parseBearerToken(request);
-    console.log("Tokennn", token);
+    //console.log("Tokennn", token);
     if (!token) {
       throw new HttpErrors.Unauthorized("No existe un token en la solicitud.");
     }
 
     const decodedToken = await this.jwtService.VerifyToken(token);
-    console.log("Token decodificado", decodedToken);
+    //console.log("Token decodificado", decodedToken);
     const userProfile = await this.strategyService.autheticate(decodedToken);
 
     if (!userProfile) {

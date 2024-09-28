@@ -119,7 +119,7 @@ export class MoraController {
   async findByIdFechaPago(
     @param.path.number('id') id: number,
   ): Promise<Moras[]> {
-    console.log('Buscando moras por fecha de pago:', id);
+    //console.log('Buscando moras por fecha de pago:', id);
     return this.morasRepository.find({
       where: {idFechaPago: id},
     });

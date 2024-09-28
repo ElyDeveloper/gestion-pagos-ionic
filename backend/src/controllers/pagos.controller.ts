@@ -116,8 +116,8 @@ export class PagosController {
     @param.query.number('skip') skip: number,
     @param.query.number('limit') limit: number,
   ): Promise<Pagos[]> {
-    console.log('skip', skip);
-    console.log('limit', limit);
+    //console.log('skip', skip);
+    //console.log('limit', limit);
     return this.pagosRepository.find({
       include: [
         {
@@ -200,7 +200,7 @@ export class PagosController {
   async findByIdFechaPago(
     @param.path.number('id') id: number,
   ): Promise<Pagos[]> {
-    console.log('Buscando pagos por fecha de pago:', id);
+    //console.log('Buscando pagos por fecha de pago:', id);
     return this.pagosRepository.find({
       where: {idFechaPago: id},
     });
@@ -294,7 +294,7 @@ export class PagosController {
         estado: true,
       });
 
-      console.log('Cuotas pagadas:', countCuotasPagadas.count);
+      //console.log('Cuotas pagadas:', countCuotasPagadas.count);
 
       //INFO ACTUALIZAR PLAN DE PAGO
       await this.planesPagoRepository.updateById(fechaPago.planId, {

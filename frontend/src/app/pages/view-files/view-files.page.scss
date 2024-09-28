@@ -28,3 +28,37 @@
     margin: 0;
   }
 }
+
+.fixed-controls {
+  position: fixed; /* Fija el elemento en la pantalla */
+  bottom: 20px; /* Distancia desde el fondo */
+  left: 50%; /* Centra horizontalmente */
+  transform: translateX(-50%); /* Ajusta para centrar completamente */
+  z-index: 1000; /* Asegúrate de que esté por encima de otros elementos */
+  padding: 10px; /* Espaciado interno */
+  border-radius: 8px; /* Bordes redondeados */
+}
+
+.image-viewer {
+  position: relative; /* Para posicionar elementos relativos a este contenedor */
+  overflow: auto; /* Permite el desplazamiento */
+  height: 80vh; /* Altura máxima del contenedor */
+}
+
+.image-viewer img {
+  display: block; /* Asegúrate de que la imagen se comporte correctamente */
+  max-width: none; /* Evita que la imagen se reduzca automáticamente */
+}
+
+// .button-container {
+//   display: flex;
+//   justify-content: space-around; /* Espaciado uniforme entre botones */
+//   align-items: center; /* Centra verticalmente */
+//   padding: 10px; /* Espaciado interno */
+// }
+
+// .button-container ion-button {
+//   width: 60px; /* Ancho del botón */
+//   height: 60px; /* Alto del botón */
+//   border-radius: 50%; /* Hace que el botón sea redondo */
+// }
