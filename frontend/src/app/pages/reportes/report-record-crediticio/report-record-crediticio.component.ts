@@ -106,7 +106,9 @@ export class ReportRecordCrediticioComponent implements OnInit {
         .pipe(
           tap((data: any) => {
             console.log("Record Crediticio:", data);
-            this.encabezado = data.encabezados[0];
+            if (data.encabezados.lengt > 0) {
+              this.encabezado = data.encabezados[0];
+            }
             this.cuerpo = data.cuerpo;
             let counter = 1;
             this.cuerpo.forEach((c: CuerpoRecordCrediticio) => {

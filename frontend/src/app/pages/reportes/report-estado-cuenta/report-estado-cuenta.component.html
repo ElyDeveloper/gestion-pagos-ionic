@@ -10,7 +10,7 @@
 <table>
   <tr>
     <th class="especial-right">Cliente:</th>
-    <td>{{ encabezado.codClientes }}</td>
+    <td>{{ encabezado.codClientes || 'N/A' }}</td>
     <th class="especial-right">Direccion:</th>
     <td>{{ encabezado.direccion }}</td>
     <th class="especial-right">Teléfono:</th>
@@ -111,7 +111,11 @@
         calculateTotalSaldosVigentes("intMora") | currency : "L" : "symbol"
       }}</strong>
     </td>
-    <td></td>
+    <td>
+      <strong>
+        {{calculateTotalSaldosVigentes("dias") }}
+      </strong>
+    </td>
     <!-- Puedes dejar esto vacío o agregar otro total si es necesario -->
     <td>
       <strong>{{

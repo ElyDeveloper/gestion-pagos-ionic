@@ -62,7 +62,7 @@
       <!-- <th>Día Pago</th> -->
       <th>Monto Otorgado</th>
       <th>Saldo Capital Prestamo</th>
-      <!-- <th>Saldo Capital</th> -->
+      <th>Saldo Total Prestamo</th>
       <th>Valor Cuota</th>
       <th>Plazo</th>
       <!-- <th>Meses</th> -->
@@ -90,9 +90,9 @@
       <td class="text-center">
         {{ item.saldoCapitalActual | currency : "L" : "symbol" }}
       </td>
-      <!-- <td class="text-center">
+      <td class="text-center">
         {{ item.saldoActual | currency : "L" : "symbol" }}
-      </td> -->
+      </td>
       <td class="text-center">
         {{ item.valorCuota | currency : "L" : "symbol" }}
       </td>
