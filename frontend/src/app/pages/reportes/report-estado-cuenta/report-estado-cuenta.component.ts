@@ -101,7 +101,7 @@ export class ReportEstadoCuentaComponent implements OnInit {
           tap((data: any) => {
             console.log("Prestamos con mora:", data);
 
-            if (data.encabezados.lengt > 0) {
+            if (data.encabezados.length > 0) {
               this.encabezado = data.encabezados[0];
             }
             this.saldosVigentes = data.saldoVigente;
