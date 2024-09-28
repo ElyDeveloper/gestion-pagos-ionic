@@ -15,6 +15,7 @@
   <table class="custom-table">
     <thead>
       <tr>
+        <th>Cod. Cuota</th>
         <th>Cod. Cliente</th>
         <th>Nombre</th>
         <th>Cod. Préstamo</th>
@@ -29,6 +30,7 @@
     <tbody>
       @for (item of elements; track $index) {
       <tr>
+        <td class="text-center">{{ item.idCuota}}</td>
         <td class="text-center">{{ item.codCliente }}</td>
         <td>{{ item.nombre }}</td>
         <td class="text-center">{{ item.codPrestamo }}</td>

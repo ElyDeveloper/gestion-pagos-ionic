@@ -51,6 +51,25 @@ export class ReportEstadoCuentaComponent implements OnInit {
   ngOnInit(): void {
     this.getForCliente(this.selectedCliente);
   }
+
+  calculateTotalSaldosVigentes(property: keyof SaldoEstadoCuenta): number {
+    return this.saldosVigentes.reduce((accumulator, current) => {
+      return accumulator + (current[property] as number || 0);
+    }, 0);
+  }
+
+  calculateTotalPagarAtrasados(property: keyof SaldoEstadoCuenta): number {
+    return this.saldosPagarAtrasados.reduce((accumulator, current) => {
+      return accumulator + (current[property] as number || 0);
+    }, 0);
+  }
+  
+  calculateTotalPagosEfectuados(property: keyof PagosEfectuados): number {
+    return this.pagosEfectuados.reduce((accumulator, current) => {
+      return accumulator + (current[property] as number || 0);
+    }, 0);
+  }
+  
   subtractHours(date: Date, hours: number): Date {
     const newDate = new Date(date);
     newDate.setHours(newDate.getHours() - hours);

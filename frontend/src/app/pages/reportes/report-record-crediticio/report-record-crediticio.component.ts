@@ -4,6 +4,7 @@ import {
   CuerpoRecordCrediticio,
   EncabezadoRecordCrediticio,
   PieRecordCrediticio,
+  PrestamoRecordCrediticio,
 } from "src/app/shared/interfaces/report-record-crediticio";
 import { GlobalService } from "src/app/shared/services/global.service";
 
@@ -62,6 +63,22 @@ export class ReportRecordCrediticioComponent implements OnInit {
 
   ngOnInit() {
     this.getForCliente(this.selectedCliente);
+  }
+
+  calculateTotalDetallesPagos(property: keyof CuerpoRecordCrediticio): number {
+    return this.cuerpo.reduce((accumulator, current) => {
+      return accumulator + (current[property] as number || 0);
+    }, 0);
+  }
+  calculateTotalPrestamosActivos(property: keyof PrestamoRecordCrediticio): number {
+    return this.pie.activos.reduce((accumulator, current) => {
+      return accumulator + (current[property] as number || 0);
+    }, 0);
+  }
+  calculateTotalPrestamosCompletados(property: keyof PrestamoRecordCrediticio): number {
+    return this.pie.completados.reduce((accumulator, current) => {
+      return accumulator + (current[property] as number || 0);
+    }, 0);
   }
 
   subtractHours(date: Date, hours: number): Date {

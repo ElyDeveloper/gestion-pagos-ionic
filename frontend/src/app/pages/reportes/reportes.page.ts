@@ -110,8 +110,7 @@ export class ReportesPage implements OnInit {
       )
       .subscribe(() => {
         if (
-          this.searchClient.trim() === "" ||
-          this.searchClient.trim().length < 3
+          this.searchClient.trim() === ""
         ) {
           this.filteredClientes = [];
         } else {
@@ -127,8 +126,7 @@ export class ReportesPage implements OnInit {
       )
       .subscribe(() => {
         if (
-          this.searchAsesor.trim() === "" ||
-          this.searchAsesor.trim().length < 3
+          this.searchAsesor.trim() === ""
         ) {
           this.filteredAsesores = [];
         } else {
@@ -269,7 +267,7 @@ export class ReportesPage implements OnInit {
         break;
     }
 
-    this.scrollToElement("current-report");
+    // this.scrollToElement("current-report");
   }
 
   clearsubscriptions() {

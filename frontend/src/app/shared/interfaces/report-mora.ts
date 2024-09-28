@@ -1,4 +1,5 @@
 export interface ClienteMora {
+  idCuota: number;
   codCliente: number;
   nombre: string;
   codPrestamo: number;

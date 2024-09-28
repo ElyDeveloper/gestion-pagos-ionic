@@ -288,10 +288,10 @@ export class PersonasPage implements OnInit {
         imageUrl: "nacionalidad.urlBandera",
         type: "image",
       },
-      {
-        key: "recordCrediticio.descripcion",
-        alias: "Récord Crediticio",
-      },
+      // {
+      //   key: "recordCrediticio.descripcion",
+      //   alias: "Récord Crediticio",
+      // },
       {
         key: "tipoPersona.descripcion",
         alias: "Tipo de Persona",
