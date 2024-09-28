@@ -111,7 +111,7 @@
         calculateTotalSaldosVigentes("intMora") | currency : "L" : "symbol"
       }}</strong>
     </td>
-    <td>
+    <td class="text-center">
       <strong>
         {{calculateTotalSaldosVigentes("dias") }}
       </strong>
@@ -171,7 +171,11 @@
         calculateTotalPagarAtrasados("intMora") | currency : "L" : "symbol"
       }}</strong>
     </td>
-    <td></td>
+    <td>
+      <strong>
+        {{ calculateTotalPagarAtrasados("dias") }}
+      </strong>
+    </td>
     <!-- Puedes dejar esto vacío o agregar otro total si es necesario -->
     <td>
       <strong>{{
