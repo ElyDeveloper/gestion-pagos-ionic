@@ -88,6 +88,33 @@
   </tr>
 
   }
+  <tr>
+    <td colspan="3" class="especial-right"><strong>Total Pagos:</strong></td>
+    <td class="text-center"> {{calculateTotalDetallesPagos("dias")}} </td>
+    <td>
+      <strong>{{ calculateTotalDetallesPagos("capital") | currency : "L" : "symbol" }}</strong>
+    </td>
+    <td>
+      <strong>{{ calculateTotalDetallesPagos("intereses") | currency : "L" : "symbol" }}</strong>
+    </td>
+    <td>
+      <strong>{{ calculateTotalDetallesPagos("mora") | currency : "L" : "symbol" }}</strong>
+    </td>
+    <td>
+      <strong>{{ calculateTotalDetallesPagos("cuota") | currency : "L" : "symbol" }}</strong>
+    </td>
+    <td>
+      <strong *ngIf="cuerpo.length > 0">{{
+        cuerpo[cuerpo.length - 1].saldoCapital || 0
+          | currency : "L" : "symbol"
+      }}</strong>
+
+      <strong *ngIf="cuerpo.length == 0">{{
+        0 | currency : "L" : "symbol"
+      }}</strong>
+    </td>
+
+  </tr>
 </table>
 
 <hr />
@@ -105,7 +132,9 @@
   @for (item of pie.activos; track $index) {
   <tr>
     <td class="text-center">{{ item.idPrestamo }}</td>
-    <td class="text-center">{{ item.fecha | customDate : 6 : "dd/MM/yyyy" }}</td>
+    <td class="text-center">
+      {{ item.fecha | customDate : 6 : "dd/MM/yyyy" }}
+    </td>
     <td class="text-center">{{ item.plazo }}</td>
     <td>{{ item.monto | currency : "L" : "symbol" }}</td>
     <td>{{ item.asesor }}</td>
@@ -113,6 +142,15 @@
     <td class="text-center">{{ item.tipo }}</td>
   </tr>
   }
+  <tr>
+    <td colspan="2" class="especial-right"><strong>Total Activos:</strong></td>
+    <td></td>
+    <td>
+      <strong>{{
+        calculateTotalPrestamosActivos("monto") | currency : "L" : "symbol"
+      }}</strong>
+    </td>
+  </tr>
 </table>
 
 <hr />
@@ -130,7 +168,9 @@
   @for (item of pie.completados; track $index) {
   <tr>
     <td class="text-center">{{ item.idPrestamo }}</td>
-    <td class="text-center">{{ item.fecha | customDate : 6 : "dd/MM/yyyy" }}</td>
+    <td class="text-center">
+      {{ item.fecha | customDate : 6 : "dd/MM/yyyy" }}
+    </td>
     <td class="text-center">{{ item.plazo }}</td>
     <td>{{ item.monto | currency : "L" : "symbol" }}</td>
     <td>{{ item.asesor }}</td>
@@ -138,4 +178,13 @@
     <td class="text-center">{{ item.tipo }}</td>
   </tr>
   }
+  <tr>
+    <td colspan="2" class="especial-right"><strong>Total Completados:</strong></td>
+    <td></td>
+    <td>
+      <strong>{{
+        calculateTotalPrestamosCompletados("monto") | currency : "L" : "symbol"
+      }}</strong>
+    </td>
+  </tr>
 </table>

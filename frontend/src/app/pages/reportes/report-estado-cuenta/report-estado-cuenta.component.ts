@@ -1,6 +1,10 @@
 import { Component, inject, Input, OnInit } from "@angular/core";
 import { catchError, firstValueFrom, tap } from "rxjs";
-import { EncabezadoEstadoCuenta, PagosEfectuados, SaldoEstadoCuenta } from "src/app/shared/interfaces/report-estado-cuenta";
+import {
+  EncabezadoEstadoCuenta,
+  PagosEfectuados,
+  SaldoEstadoCuenta,
+} from "src/app/shared/interfaces/report-estado-cuenta";
 import { GlobalService } from "src/app/shared/services/global.service";
 import { environment } from "src/environments/environment";
 const TASA_MORA = environment.percentage * 100;
@@ -51,6 +55,25 @@ export class ReportEstadoCuentaComponent implements OnInit {
   ngOnInit(): void {
     this.getForCliente(this.selectedCliente);
   }
+
+  calculateTotalSaldosVigentes(property: keyof SaldoEstadoCuenta): number {
+    return this.saldosVigentes.reduce((accumulator, current) => {
+      return accumulator + ((current[property] as number) || 0);
+    }, 0);
+  }
+
+  calculateTotalPagarAtrasados(property: keyof SaldoEstadoCuenta): number {
+    return this.saldosPagarAtrasados.reduce((accumulator, current) => {
+      return accumulator + ((current[property] as number) || 0);
+    }, 0);
+  }
+
+  calculateTotalPagosEfectuados(property: keyof PagosEfectuados): number {
+    return this.pagosEfectuados.reduce((accumulator, current) => {
+      return accumulator + ((current[property] as number) || 0);
+    }, 0);
+  }
+
   subtractHours(date: Date, hours: number): Date {
     const newDate = new Date(date);
     newDate.setHours(newDate.getHours() - hours);
@@ -77,7 +100,10 @@ export class ReportEstadoCuentaComponent implements OnInit {
         .pipe(
           tap((data: any) => {
             console.log("Prestamos con mora:", data);
-            this.encabezado = data.encabezados[0];
+
+            if (data.encabezados.lengt > 0) {
+              this.encabezado = data.encabezados[0];
+            }
             this.saldosVigentes = data.saldoVigente;
             this.pagosEfectuados = data.pagosEfectuados;
             this.saldosPagarAtrasados = data.saldosPagarAtrasados;
@@ -102,7 +128,6 @@ export class ReportEstadoCuentaComponent implements OnInit {
               pag.nCuota = counter;
               counter++;
             });
-
           }),
           catchError((error) => {
             console.error("Error fetching prestamo:", error);

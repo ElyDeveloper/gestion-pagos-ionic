@@ -41,6 +41,7 @@ export class ViewDataComponent implements OnInit {
   @Output() deleteButtonClicked = new EventEmitter<any>();
   @Output() infoButtonClicked = new EventEmitter<any>();
   @Output() selectClientClicked = new EventEmitter<any>();
+  @Output() transferClicked = new EventEmitter<any>();
   @Output() checkButtonClicked = new EventEmitter<any>();
   @Output() selectButtonClicked = new EventEmitter<any>();
   @Output() openButtonClicked = new EventEmitter<any>();
@@ -281,6 +282,9 @@ export class ViewDataComponent implements OnInit {
       case "asignClients":
         this.onSelectClients(row);
         break;
+      case "transfer":
+        this.onTransfer(row);
+        break;
       case "resetPswd":
         this.onResetPassword(row);
         break;
@@ -397,6 +401,12 @@ export class ViewDataComponent implements OnInit {
     if (await this._preventAbuseService.registerClick()) {
       console.log("Se click en seleccionar clientes");
       this.selectClientClicked.emit(data);
+    }
+  }
+  async onTransfer(data: any) {
+    if (await this._preventAbuseService.registerClick()) {
+      console.log("Se click en seleccionar clientes");
+      this.transferClicked.emit(data);
     }
   }
 

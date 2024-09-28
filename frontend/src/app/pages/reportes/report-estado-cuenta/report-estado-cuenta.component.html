@@ -10,7 +10,7 @@
 <table>
   <tr>
     <th class="especial-right">Cliente:</th>
-    <td>{{ encabezado.codClientes }}</td>
+    <td>{{ encabezado.codClientes || 'N/A' }}</td>
     <th class="especial-right">Direccion:</th>
     <td>{{ encabezado.direccion }}</td>
     <th class="especial-right">Teléfono:</th>
@@ -71,7 +71,7 @@
   <tr>
     <th>Nro. Cuota</th>
     <th>Fecha Vto.</th>
-    <th>Cuota</th>
+    <th>Capital Cuota</th>
     <th>Int. Corrientes</th>
     <th>Int. Mora</th>
     <th>Días</th>
@@ -84,13 +84,46 @@
     <td class="text-center">
       {{ item.fechaVto | customDate : 6 : "dd/MM/yyyy" }}
     </td>
-    <td>{{ item.cuota - item.intCorriente | currency : "L" : "symbol" }}</td>
+    <td>{{ item.capital | currency : "L" : "symbol" }}</td>
     <td>{{ item.intCorriente | currency : "L" : "symbol" }}</td>
     <td>{{ item.intMora | currency : "L" : "symbol" }}</td>
     <td class="text-center">{{ item.dias }}</td>
     <td>{{ item.totalSVigentes | currency : "L" : "symbol" }}</td>
   </tr>
   }
+  <!-- Fila de Totales -->
+  <tr>
+    <td colspan="2" class="especial-right">
+      <strong>Totales Saldos Vigentes</strong>
+    </td>
+    <td>
+      <strong>{{
+        calculateTotalSaldosVigentes("capital") | currency : "L" : "symbol"
+      }}</strong>
+    </td>
+    <td>
+      <strong>{{
+        calculateTotalSaldosVigentes("intCorriente") | currency : "L" : "symbol"
+      }}</strong>
+    </td>
+    <td>
+      <strong>{{
+        calculateTotalSaldosVigentes("intMora") | currency : "L" : "symbol"
+      }}</strong>
+    </td>
+    <td>
+      <strong>
+        {{calculateTotalSaldosVigentes("dias") }}
+      </strong>
+    </td>
+    <!-- Puedes dejar esto vacío o agregar otro total si es necesario -->
+    <td>
+      <strong>{{
+        calculateTotalSaldosVigentes("totalSVigentes")
+          | currency : "L" : "symbol"
+      }}</strong>
+    </td>
+  </tr>
 </table>
 
 <div class="section">SALDO PENDIENTE A PAGAR-ATRASADOS</div>
@@ -98,7 +131,7 @@
   <tr>
     <th>Nro. Cuota</th>
     <th>Fecha Vto.</th>
-    <th>Cuota</th>
+    <th>Capital Cuota</th>
     <th>Int. Corrientes</th>
     <th>Int. Mora</th>
     <th>Días</th>
@@ -118,6 +151,35 @@
   </tr>
 
   }
+  <!-- Fila de Totales -->
+  <tr>
+    <td colspan="2" class="especial-right">
+      <strong>Totales Saldos Pagar</strong>
+    </td>
+    <td>
+      <strong>{{
+        calculateTotalPagarAtrasados("capital") | currency : "L" : "symbol"
+      }}</strong>
+    </td>
+    <td>
+      <strong>{{
+        calculateTotalPagarAtrasados("intCorriente") | currency : "L" : "symbol"
+      }}</strong>
+    </td>
+    <td>
+      <strong>{{
+        calculateTotalPagarAtrasados("intMora") | currency : "L" : "symbol"
+      }}</strong>
+    </td>
+    <td></td>
+    <!-- Puedes dejar esto vacío o agregar otro total si es necesario -->
+    <td>
+      <strong>{{
+        calculateTotalPagarAtrasados("totalSVigentes")
+          | currency : "L" : "symbol"
+      }}</strong>
+    </td>
+  </tr>
   <!-- This section is empty in the image -->
 </table>
 
@@ -126,7 +188,7 @@
   <tr>
     <th>Nro. Cuota</th>
     <th>Fecha Pago</th>
-    <th>Capital</th>
+    <th>Capital Cuota</th>
     <th>Int. Corrientes</th>
     <th>Total Cuota</th>
     <th>Int. Mora</th>
@@ -145,4 +207,41 @@
     <td>{{ item.sdoCapital | currency : "L" : "symbol" }}</td>
   </tr>
   }
+  <!-- Fila de Totales -->
+  <tr>
+    <td colspan="2" class="especial-right">
+      <strong>Totales Pagos Efectuados</strong>
+    </td>
+    <td>
+      <strong>{{
+        calculateTotalPagosEfectuados("capital") | currency : "L" : "symbol"
+      }}</strong>
+    </td>
+    <td>
+      <strong>{{
+        calculateTotalPagosEfectuados("intCorrientes")
+          | currency : "L" : "symbol"
+      }}</strong>
+    </td>
+    <td>
+      <strong>{{
+        calculateTotalPagosEfectuados("total") | currency : "L" : "symbol"
+      }}</strong>
+    </td>
+    <td>
+      <strong>{{
+        calculateTotalPagosEfectuados("mora") | currency : "L" : "symbol"
+      }}</strong>
+    </td>
+    <td>
+      <strong *ngIf="pagosEfectuados.length > 0">{{
+        pagosEfectuados[pagosEfectuados.length - 1].sdoCapital || 0
+          | currency : "L" : "symbol"
+      }}</strong>
+
+      <strong *ngIf="pagosEfectuados.length == 0">{{
+        0 | currency : "L" : "symbol"
+      }}</strong>
+    </td>
+  </tr>
 </table>

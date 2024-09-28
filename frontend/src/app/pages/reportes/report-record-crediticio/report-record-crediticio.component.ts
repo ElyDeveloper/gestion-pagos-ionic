@@ -4,6 +4,7 @@ import {
   CuerpoRecordCrediticio,
   EncabezadoRecordCrediticio,
   PieRecordCrediticio,
+  PrestamoRecordCrediticio,
 } from "src/app/shared/interfaces/report-record-crediticio";
 import { GlobalService } from "src/app/shared/services/global.service";
 
@@ -64,6 +65,22 @@ export class ReportRecordCrediticioComponent implements OnInit {
     this.getForCliente(this.selectedCliente);
   }
 
+  calculateTotalDetallesPagos(property: keyof CuerpoRecordCrediticio): number {
+    return this.cuerpo.reduce((accumulator, current) => {
+      return accumulator + (current[property] as number || 0);
+    }, 0);
+  }
+  calculateTotalPrestamosActivos(property: keyof PrestamoRecordCrediticio): number {
+    return this.pie.activos.reduce((accumulator, current) => {
+      return accumulator + (current[property] as number || 0);
+    }, 0);
+  }
+  calculateTotalPrestamosCompletados(property: keyof PrestamoRecordCrediticio): number {
+    return this.pie.completados.reduce((accumulator, current) => {
+      return accumulator + (current[property] as number || 0);
+    }, 0);
+  }
+
   subtractHours(date: Date, hours: number): Date {
     const newDate = new Date(date);
     newDate.setHours(newDate.getHours() - hours);
@@ -89,7 +106,9 @@ export class ReportRecordCrediticioComponent implements OnInit {
         .pipe(
           tap((data: any) => {
             console.log("Record Crediticio:", data);
-            this.encabezado = data.encabezados[0];
+            if (data.encabezados.lengt > 0) {
+              this.encabezado = data.encabezados[0];
+            }
             this.cuerpo = data.cuerpo;
             let counter = 1;
             this.cuerpo.forEach((c: CuerpoRecordCrediticio) => {

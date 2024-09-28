@@ -19,6 +19,7 @@
       (deleteButtonClicked)="onDeleteButtonClicked($event)"
       (resetPasswordButtonClicked)="onResetPasswordButtonClicked($event)"
       (infoButtonClicked)="onInfoButtonClicked($event)"
+      (transferClicked)="onTransferButtonClicked($event)"
       (selectClientClicked)="onSelectClientsButtonClicked($event)"
       (currentPageOut)="onPageChange($event)"
       (searchOut)="onSearchData($event)">
@@ -218,6 +219,48 @@
       </ion-content>
     </ng-template>
 
+    <ng-template #modalTransfer let-close="close" let-save="save">
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Transferir Cartera</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="close()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <ion-grid>
+          <ion-row>
+            <ion-col size="12">
+              <ion-card>
+                <ion-card-header>
+                  <ion-card-title>Usuario Destino</ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                  <ion-searchbar
+                    [placeholder]="'Buscar Asesor...'"
+                    [(ngModel)]="searchUser"
+                    (ionInput)="searchValueChanged($event, 'user')">
+                  </ion-searchbar>
+                  <ion-list>
+                    <ion-item *ngFor="let usuario of filteredUsers">
+                      <ion-label>{{ usuario.nombre }}</ion-label>
+                      <ion-button
+                        slot="end"
+                        (click)="setTransfer(usuario)">
+                        <ion-icon name="arrow-forward"></ion-icon>
+                      </ion-button>
+                    </ion-item>
+                  </ion-list>
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      
+      </ion-content>
+    </ng-template>
+
     <ng-template #modalSelectClients let-close="close" let-save="save">
       <ion-header>
         <ion-toolbar>
@@ -234,8 +277,8 @@
               <ion-col size-xs="12" size-sm="12" size-md="12">
                 <ion-searchbar
                   [placeholder]="searchPlaceHolder"
-                  [(ngModel)]="search"
-                  (ionInput)="searchValueChanged($event)">
+                  [(ngModel)]="searchClient"
+                  (ionInput)="searchValueChanged($event, 'client')">
                 </ion-searchbar>
                 <ion-list *ngIf="filteredClients.length > 0">
                   @for (client of filteredClients; track client.id) {
@@ -247,18 +290,6 @@
                       {{client.dni}}</ion-label
                     >
                   </ion-item>
-                  <!-- <ion-item>
-                    <ion-label>
-                      <h2>{{ client.nombres }} {{client.apellidos}}</h2>
-                      <p>Email: {{ client.email }}</p>
-                    </ion-label>
-                    <ion-button
-                      slot="end"
-                      fill="clear"
-                      (click)="removeClient(client)">
-                      <ion-icon name="close-circle-outline"></ion-icon>
-                    </ion-button>
-                  </ion-item> -->
                   }
                 </ion-list>
               </ion-col>
@@ -294,19 +325,6 @@
               </ion-col>
             </ion-row>
           </ion-grid>
-
-          <!-- <ion-grid>
-            <ion-row class="ion-justify-content-center">
-              <ion-col size-xs="12" size-sm="8" size-md="6" size-lg="4">
-                <ion-button
-                  expand="block"
-                  (click)="save({type:'array', data:this.selectedClients}, false)"
-                  class="ion-margin-top">
-                  Guardar Selección
-                </ion-button>
-              </ion-col>
-            </ion-row>
-          </ion-grid> -->
         </section>
       </ion-content>
     </ng-template>
