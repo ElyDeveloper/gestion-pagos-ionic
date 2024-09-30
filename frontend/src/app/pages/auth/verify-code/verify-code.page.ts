@@ -1,10 +1,8 @@
 import { Component, inject, OnInit } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { interval, Subscription, takeWhile } from "rxjs";
 import { NgxOtpInputComponentOptions } from "ngx-otp-input";
 import { GlobalService } from "src/app/shared/services/global.service";
 import { Router } from "@angular/router";
-import { CookieService } from "ngx-cookie-service";
 
 @Component({
   selector: "app-verify-code",
@@ -37,7 +35,6 @@ export class VerifyCodePage implements OnInit {
 
   private countdownSubscription!: Subscription;
   private _globalService = inject(GlobalService);
-  _cookieService = inject(CookieService);
   private router = inject(Router);
   constructor() {}
 
@@ -45,24 +42,24 @@ export class VerifyCodePage implements OnInit {
 
   ionViewWillEnter() {
     //Tomar el expiracion-code de la cookie
-    const expirationCode = this._cookieService.get("expiration-code");
+    const expirationCode = localStorage.getItem("expiration-code");
     if (!expirationCode) {
       this.router.navigate(["forgot-password"]);
+    } else {
+      const expirationDate = new Date(expirationCode);
+      if (expirationDate.getTime() < new Date().getTime()) {
+        this.router.navigate(["forgot-password"]);
+      } else {
+        //Mostrar el tiempo restante
+        const durationInSeconds = Math.floor(
+          (expirationDate.getTime() - new Date().getTime()) / 1000
+        );
+
+        this.startCountdown(durationInSeconds);
+      }
     }
 
     //Verificar si el tiempo de expiracion ha pasado
-    const expirationDate = new Date(expirationCode);
-    // //console.log("Expiracion code: ", expirationDate);
-    if (expirationDate.getTime() < new Date().getTime()) {
-      this.router.navigate(["forgot-password"]);
-    } else {
-      //Mostrar el tiempo restante
-      const durationInSeconds = Math.floor(
-        (expirationDate.getTime() - new Date().getTime()) / 1000
-      );
-
-      this.startCountdown(durationInSeconds);
-    }
   }
 
   ionViewDidLeave() {

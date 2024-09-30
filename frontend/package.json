@@ -39,7 +39,6 @@
     "ng-zorro-antd": "^18.1.1",
     "ng2-file-upload": "^7.0.1",
     "ng2-pdf-viewer": "^10.3.0",
-    "ngx-cookie-service": "^18.0.0",
     "ngx-otp-input": "^1.1.0",
     "ngx-print": "^1.5.1",
     "ngx-spinner": "^17.0.0",

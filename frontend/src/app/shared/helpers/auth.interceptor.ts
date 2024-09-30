@@ -1,14 +1,18 @@
 import { HttpInterceptorFn, HttpErrorResponse } from "@angular/common/http";
 import { inject } from "@angular/core";
-import { CookieService } from "ngx-cookie-service";
 import { Router } from "@angular/router";
 import { catchError } from "rxjs/operators";
 import { throwError } from "rxjs";
 
 export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
-    const cookieService = inject(CookieService);
     const router = inject(Router);
-    const token = cookieService.get('tokensession');
+    let token = null;
+
+    //verificar si la llave tokensession existe en el local storage
+    if (localStorage.getItem('tokensession')) {
+        token = localStorage.getItem('tokensession');
+    }
+
 
     if (token) {
         const modifiedReq = req.clone({

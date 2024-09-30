@@ -1,9 +1,7 @@
 import { Component, inject, OnInit, ViewChild } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { ActivatedRoute, Router } from "@angular/router";
-import { CookieService } from "ngx-cookie-service";
+import { Router } from "@angular/router";
 import { interval, Subscription, takeWhile } from "rxjs";
-import { key } from "src/app/libraries/key.library";
 import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
 import { GlobalService } from "src/app/shared/services/global.service";
 
@@ -26,7 +24,6 @@ export class ForgotPasswordPage implements OnInit {
   private countdownSubscription!: Subscription;
 
   private _globalService = inject(GlobalService);
-  private _cookieService = inject(CookieService);
 
   private router = inject(Router);
   constructor(private fb: FormBuilder) {
@@ -39,26 +36,25 @@ export class ForgotPasswordPage implements OnInit {
 
   ionViewWillEnter() {
     //Tomar el expiracion-code de la cookie
-    const expirationCode = this._cookieService.get("expiration-code");
+    const expirationCode = localStorage.getItem("expiration-code");
 
-    if (expirationCode == "") {
+    if (expirationCode) {
       this.isCodeActive = false;
+
+      //Verificar si el tiempo de expiracion ha pasado
+      const expirationDate = new Date(expirationCode);
+      if (expirationDate.getTime() < new Date().getTime()) {
+        this.isCodeActive = false;
+      } else {
+        this.isCodeActive = true;
+        //Mostrar el tiempo restante
+        const durationInSeconds = Math.floor(
+          (expirationDate.getTime() - new Date().getTime()) / 1000
+        );
+
+        this.startCountdown(durationInSeconds);
+      }
       return;
-    }
-
-    //Verificar si el tiempo de expiracion ha pasado
-    const expirationDate = new Date(expirationCode);
-    // //console.log("Expiracion code: ", expirationDate);
-    if (expirationDate.getTime() < new Date().getTime()) {
-      this.isCodeActive = false;
-    } else {
-      this.isCodeActive = true;
-      //Mostrar el tiempo restante
-      const durationInSeconds = Math.floor(
-        (expirationDate.getTime() - new Date().getTime()) / 1000
-      );
-
-      this.startCountdown(durationInSeconds);
     }
   }
 
@@ -126,12 +122,8 @@ export class ForgotPasswordPage implements OnInit {
               this.loaderComponent.hide();
             } else {
               //Setear la expiracion del token en cookies
-              this._cookieService.set(
-                "expiration-code",
-                result.expiration,
-                key.CODE_VERIFICATION_EXPIRATION_TIME,
-                ""
-              );
+
+              localStorage.setItem("expiration-code", result.expiration);
               this.router.navigate(["/verify-code"]);
               // this.router.navigate(["/verify-code"]);
             }

@@ -3,7 +3,6 @@ import { Router } from "@angular/router";
 import { SplashScreen } from "@capacitor/splash-screen";
 import { ValidatorFn, AbstractControl } from "@angular/forms";
 import { GlobalService } from "src/app/shared/services/global.service";
-import { CookieService } from "ngx-cookie-service";
 import { key } from "src/app/libraries/key.library";
 import { AuthService } from "src/app/shared/services/auth.service";
 import { AlertController } from "@ionic/angular";
@@ -39,7 +38,6 @@ export class LoginPage implements OnInit {
 
   private _router = inject(Router);
   private _globalService = inject(GlobalService);
-  private _cookieService = inject(CookieService);
   private _authService = inject(AuthService);
   private _alertController = inject(AlertController);
   private _loaderService = inject(LoaderService);
@@ -80,14 +78,9 @@ export class LoginPage implements OnInit {
             }
 
             if (token) {
-              //Eliminar todas las cookies
-              this._cookieService.delete("tokensession");
-              this._cookieService.set(
-                "tokensession",
-                result.token,
-                key.TOKEN_EXPIRATION_TIME,
-                ""
-              );
+
+              //Guardar el token de session en el local storage
+              localStorage.setItem("tokensession", token);
 
               // Usar el AuthService para almacenar la información del usuario
               this._authService.setUserInfo(result.usuario);

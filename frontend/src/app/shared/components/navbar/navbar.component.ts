@@ -4,7 +4,6 @@ import { filter } from "rxjs";
 import { AuthService } from "../../services/auth.service";
 import { Usuario } from "../../interfaces/usuario";
 import { environment } from "src/environments/environment";
-import { CookieService } from "ngx-cookie-service";
 
 @Component({
   selector: "app-navbar",
@@ -86,7 +85,6 @@ export class NavbarComponent implements OnInit {
 
   private router = inject(Router);
   private _authService = inject(AuthService);
-  private _cookieService = inject(CookieService);
 
   constructor() {}
 
@@ -114,9 +112,6 @@ export class NavbarComponent implements OnInit {
   }
 
   logout() {
-    //console.log("logout");
-    //Eliminar las cookies
-    this._cookieService.delete("tokensession");
     this.router.navigate(["/login"]);
   }
 }
