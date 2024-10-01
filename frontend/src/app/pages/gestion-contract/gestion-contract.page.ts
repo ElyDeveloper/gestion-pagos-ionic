@@ -42,6 +42,7 @@ export class GestionContractPage implements OnInit {
   isEdit = false;
   hasAval = false;
   existContrato: boolean = false;
+  isAprobado: boolean = false;
 
   editarBancoDepositar: boolean = false;
   editarCuentaBancaria: boolean = false;
@@ -81,9 +82,7 @@ export class GestionContractPage implements OnInit {
 
   constructor() {}
 
-  ngOnInit() {
-    
-  }
+  ngOnInit() {}
 
   ionViewDidEnter() {
     this.getPrestamo();
@@ -92,7 +91,6 @@ export class GestionContractPage implements OnInit {
 
   ionViewWillLeave() {
     this._titleService.setTitle("Gestión Pagos");
-
   }
 
   verifyExist() {
@@ -148,7 +146,6 @@ export class GestionContractPage implements OnInit {
         new Date().getTime()
     );
   }
-
 
   generateContract() {
     //Validar que todos los campos estén llenos
@@ -209,8 +206,13 @@ export class GestionContractPage implements OnInit {
     this._loaderService.show();
     const customPrintOptions: PrintOptions = new PrintOptions({
       printSectionId: "print-contract",
-      printTitle: "Contrato de Pago" + "-" + this.clienteSeleccionado.nombres + " " + this.clienteSeleccionado.apellidos,
-      openNewTab:true
+      printTitle:
+        "Contrato de Pago" +
+        "-" +
+        this.clienteSeleccionado.nombres +
+        " " +
+        this.clienteSeleccionado.apellidos,
+      openNewTab: true,
 
       // Add any other print options as needed
     });
@@ -284,6 +286,10 @@ export class GestionContractPage implements OnInit {
     this.isEdit = true;
     this.setTitle();
     this.verifyExist();
+
+    if (prestamo.estadoInterno === 2) {
+      this.isAprobado = true;
+    }
   }
 
   private resetPrestamoState(): void {

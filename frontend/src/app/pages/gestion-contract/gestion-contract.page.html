@@ -13,7 +13,7 @@
     <ion-card-header>
       <ion-card-title>Datos Empresa/Bancarios</ion-card-title>
       <div class="d-flex justify-content-end">
-        <ion-button color="danger" (click)="generateContract()">
+        <ion-button color="danger" (click)="generateContract()" [disabled]="!isAprobado">
           Generar Contrato
           <ion-icon slot="end" name="document-text-outline"></ion-icon>
         </ion-button>
@@ -39,7 +39,7 @@
                   style="flex: 1">
                 </ion-input>
                 <ion-button
-                  [disabled]="existContrato"
+                  [disabled]="existContrato || !isAprobado"
                   shape="round"
                   (click)="editarBancoDepositar = !editarBancoDepositar"
                   style="margin-left: 8px">
@@ -64,7 +64,7 @@
                   style="flex: 1">
                 </ion-input>
                 <ion-button
-                  [disabled]="existContrato"
+                  [disabled]="existContrato || !isAprobado"
                   shape="round"
                   (click)="editarCuentaBancaria = !editarCuentaBancaria"
                   style="margin-left: 8px">
@@ -89,7 +89,7 @@
                   style="flex: 1">
                 </ion-input>
                 <ion-button
-                  [disabled]="existContrato"
+                  [disabled]="existContrato || !isAprobado"
                   shape="round"
                   (click)="editarDireccionEmpresa = !editarDireccionEmpresa"
                   style="margin-left: 8px">
@@ -114,7 +114,7 @@
                   style="flex: 1">
                 </ion-input>
                 <ion-button
-                  [disabled]="existContrato"
+                  [disabled]="existContrato || !isAprobado"
                   shape="round"
                   (click)="editarCiudadBanco = !editarCiudadBanco"
                   style="margin-left: 8px">
@@ -140,7 +140,7 @@
                   style="flex: 1">
                 </ion-input>
                 <ion-button
-                  [disabled]="existContrato"
+                  [disabled]="existContrato || !isAprobado"
                   shape="round"
                   (click)="editarFechaAcuerdo = !editarFechaAcuerdo"
                   style="margin-left: 8px">
@@ -165,7 +165,7 @@
                   style="flex: 1">
                 </ion-input>
                 <ion-button
-                  [disabled]="existContrato"
+                  [disabled]="existContrato || !isAprobado"
                   shape="round"
                   (click)="editarLugarAcuerdo = !editarLugarAcuerdo"
                   style="margin-left: 8px">
@@ -181,6 +181,10 @@
       <div class="alert alert-danger" role="alert" *ngIf="existContrato">
         Ya existe un contrato generado para este préstamo, por políticas de
         seguridad no se puede modificar el contenido de este documento.
+      </div>
+
+      <div class="alert alert-warning" role="alert" *ngIf="!isAprobado">
+        El prestamo no esta aprobado, no se podrá generar el contrato.
       </div>
     </ion-card-content>
   </ion-card>
