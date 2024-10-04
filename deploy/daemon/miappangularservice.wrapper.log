@@ -12,3 +12,9 @@
 2024-09-25 18:18:36 - Started 8660
 2024-09-27 20:53:20 - Starting C:\Program Files\nodejs\node.exe  --harmony X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\node_modules\node-windows\lib\wrapper.js --file X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\server.js --scriptoptions= --log "MiAppAngularService wrapper" --grow 0.25 --wait 1 --maxrestarts 3 --abortonerror n --stopparentfirst undefined
 2024-09-27 20:53:20 - Started 7408
+2024-10-03 14:05:12 - Starting C:\Program Files\nodejs\node.exe  --harmony X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\node_modules\node-windows\lib\wrapper.js --file X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\server.js --scriptoptions= --log "MiAppAngularService wrapper" --grow 0.25 --wait 1 --maxrestarts 3 --abortonerror n --stopparentfirst undefined
+2024-10-03 14:05:12 - Started 5968
+2024-10-03 14:27:50 - Starting C:\Program Files\nodejs\node.exe  --harmony X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\node_modules\node-windows\lib\wrapper.js --file X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\server.js --scriptoptions= --log "MiAppAngularService wrapper" --grow 0.25 --wait 1 --maxrestarts 3 --abortonerror n --stopparentfirst undefined
+2024-10-03 14:27:50 - Started 6804
+2024-10-04 00:45:17 - Starting C:\Program Files\nodejs\node.exe  --harmony X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\node_modules\node-windows\lib\wrapper.js --file X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\server.js --scriptoptions= --log "MiAppAngularService wrapper" --grow 0.25 --wait 1 --maxrestarts 3 --abortonerror n --stopparentfirst undefined
+2024-10-04 00:45:17 - Started 6848
