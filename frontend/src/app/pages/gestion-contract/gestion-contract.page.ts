@@ -287,7 +287,7 @@ export class GestionContractPage implements OnInit {
     this.setTitle();
     this.verifyExist();
 
-    if (prestamo.estadoInterno === 2) {
+    if (prestamo.estadoInterno.id === 2) {
       this.isAprobado = true;
     }
   }
