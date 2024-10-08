@@ -114,16 +114,22 @@ export class PrestamosPage implements OnInit {
     this.buildColumnsPlan();
   }
 
+  ngOnDestroy() {
+    this.suscripciones.forEach((sub) => sub.unsubscribe());
+  }
+
   getCurrentUser() {
-    this._authService.getUserInfo().subscribe({
-      next: (user: any) => {
-        this.currentUser = user;
-        //console.log("Usuario actual: ", this.currentUser);
-      },
-      error: (error: any) => {
-        console.error("Error al obtener información del usuario:", error);
-      },
-    });
+    this.suscripciones.push(
+      this._authService.getUserInfo().subscribe({
+        next: (user: any) => {
+          this.currentUser = user;
+          console.log("Usuario actual: ", this.currentUser);
+        },
+        error: (error: any) => {
+          console.error("Error al obtener información del usuario:", error);
+        },
+      })
+    );
     //console.log("Usuario actual: ", this.currentUser);
   }
 
@@ -330,7 +336,7 @@ export class PrestamosPage implements OnInit {
   }
 
   onFilterButtonClicked() {
-    this.state = !this.state
+    this.state = !this.state;
 
     this.currentPage = 1;
     this.getCountElements();
@@ -561,16 +567,18 @@ export class PrestamosPage implements OnInit {
         await this.getCountElements();
       } else {
         await firstValueFrom(
-          this._globalService.Get(`prestamos/search?query=${event}&state=${this.state}`).pipe(
-            tap((res: any) => {
-              this.elements = res;
-              //console.log("Elementos obtenidos:", res);
-            }),
-            catchError((error) => {
-              console.error("Error al obtener los elementos:", error);
-              throw error;
-            })
-          )
+          this._globalService
+            .Get(`prestamos/search?query=${event}&state=${this.state}`)
+            .pipe(
+              tap((res: any) => {
+                this.elements = res;
+                //console.log("Elementos obtenidos:", res);
+              }),
+              catchError((error) => {
+                console.error("Error al obtener los elementos:", error);
+                throw error;
+              })
+            )
         );
       }
     } catch (error) {

@@ -31,8 +31,10 @@ export class AuthService {
   }
 
   setUserInfo(user: Usuario): void {
-    localStorage.setItem('userInfo', JSON.stringify(user));
     this.userInfo.next(user);
+
+    // console.log('Usuario: ', user)
+    localStorage.setItem('userInfo', JSON.stringify(user));
   }
 
   getUserInfo(): Observable<Usuario | null> {

@@ -13,6 +13,8 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
         token = localStorage.getItem('tokensession');
     }
 
+    console.log('Token de sesión: ', token)
+
 
     if (token) {
         const modifiedReq = req.clone({
