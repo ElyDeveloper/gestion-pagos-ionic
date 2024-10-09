@@ -27,6 +27,10 @@ import { NzSkeletonModule } from "ng-zorro-antd/skeleton";
 import { NzListModule } from "ng-zorro-antd/list";
 import { PreventAbuseService } from "./services/prevent-abuse.service";
 
+//NG-ZORRO
+import { NzPaginationModule } from 'ng-zorro-antd/pagination';
+
+
 @NgModule({
   declarations: [
     ViewDataComponent,
@@ -49,6 +53,7 @@ import { PreventAbuseService } from "./services/prevent-abuse.service";
     NzResultModule, // IMPORTANT: for Ant Design Result Module
     NzSkeletonModule, // IMPORTANT: for Ant Design Skeleton Module
     NzListModule, // IMPORTANT: for Ant Design List Module
+    NzPaginationModule, // IMPORTANT: for Ant Design Pagination Module
   ],
   exports: [
     AuthModule,
@@ -69,6 +74,7 @@ import { PreventAbuseService } from "./services/prevent-abuse.service";
     NzResultModule, // IMPORTANT: for Ant Design Result Module
     NzSkeletonModule, // IMPORTANT: for Ant Design Skeleton Module
     NzListModule, // IMPORTANT: for Ant Design List Module
+    NzPaginationModule, // IMPORTANT: for Ant Design Pagination Module
   ],
   providers: [DatePipe, PreventAbuseService],
 })

@@ -2,6 +2,19 @@ table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 20px;
+
+  /* Hace que la tabla sea un bloque */
+}
+
+.table-sticky {
+  height: 300px; /* Ajusta la altura según sea necesario */
+  overflow-y: auto; /* Permite el scroll vertical */
+  display: block; 
+}
+
+.thead-sticky {
+  position: sticky; /* Hace que el encabezado sea pegajoso */
+  top: 0; /* Fija el encabezado en la parte superior */
 }
 
 th,
@@ -27,7 +40,6 @@ th {
   margin-top: 15px;
   font-weight: bold;
 }
-
 
 .cliente-info {
   font-family: Arial, sans-serif;
@@ -61,19 +73,21 @@ th {
 }
 @media (max-width: 600px) {
   .info-grid {
-      grid-template-columns: 1fr;
+    grid-template-columns: 1fr;
   }
   .info-item {
-      border-right: none;
-      border-bottom: 1px solid #ccc; /* Borde inferior para vista móvil */
+    border-right: none;
+    border-bottom: 1px solid #ccc; /* Borde inferior para vista móvil */
   }
   .info-item:last-child {
-      border-bottom: none;
+    border-bottom: none;
   }
 }
 
-.date-emision{
+.date-emision {
   //Colocar parrafos uno al lado del otro modo between
   display: flex;
   justify-content: space-between;
 }
+
+

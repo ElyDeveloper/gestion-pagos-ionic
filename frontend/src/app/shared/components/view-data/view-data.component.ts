@@ -425,6 +425,7 @@ export class ViewDataComponent implements OnInit {
   }
 
   goToPage(page: number) {
+    console.log("Ir a la página", page);
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
       this.currentPageOut.emit(this.currentPage);

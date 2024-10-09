@@ -5,7 +5,10 @@
     }}</ion-card-title>
     <div class="d-flex justify-content-end">
       <div>
-        <ion-button *ngIf="showFilter" color="warning" (click)="onFilterClick()">
+        <ion-button
+          *ngIf="showFilter"
+          color="warning"
+          (click)="onFilterClick()">
           Mostrar {{ state ? "Inactivos" : "Activos" }}
           <ion-icon class="ms-2" name="filter-outline"></ion-icon>
         </ion-button>
@@ -205,9 +208,13 @@
 
 <!-- Seccion de paginacion -->
 <section
-  class="d-flex justify-content-center"
+  class="d-flex justify-content-center mb-5"
   *ngIf="search === '' && showPagination === true">
-  <nav aria-label="Page navigation" class="mt-3">
+  <nz-pagination
+    [nzPageIndex]="currentPage"
+    [nzTotal]="totalPages * 10"
+    (nzPageIndexChange)="goToPage($event)"></nz-pagination>
+  <!-- <nav aria-label="Page navigation" class="mt-3">
     <ul class="pagination justify-content-end">
       <li class="page-item" [class.disabled]="currentPage === 1">
         <a class="page-link" (click)="previousPage()" role="button" tabindex="0"
@@ -240,5 +247,5 @@
         ></a>
       </li>
     </ul>
-  </nav>
+  </nav> -->
 </section>
