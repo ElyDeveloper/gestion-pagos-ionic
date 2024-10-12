@@ -18,3 +18,11 @@
 2024-10-03 14:27:50 - Started 6804
 2024-10-04 00:45:17 - Starting C:\Program Files\nodejs\node.exe  --harmony X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\node_modules\node-windows\lib\wrapper.js --file X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\server.js --scriptoptions= --log "MiAppAngularService wrapper" --grow 0.25 --wait 1 --maxrestarts 3 --abortonerror n --stopparentfirst undefined
 2024-10-04 00:45:17 - Started 6848
+2024-10-08 23:00:26 - Starting C:\Program Files\nodejs\node.exe  --harmony X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\node_modules\node-windows\lib\wrapper.js --file X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\server.js --scriptoptions= --log "MiAppAngularService wrapper" --grow 0.25 --wait 1 --maxrestarts 3 --abortonerror n --stopparentfirst undefined
+2024-10-08 23:00:26 - Started 6728
+2024-10-09 06:42:46 - Starting C:\Program Files\nodejs\node.exe  --harmony X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\node_modules\node-windows\lib\wrapper.js --file X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\server.js --scriptoptions= --log "MiAppAngularService wrapper" --grow 0.25 --wait 1 --maxrestarts 3 --abortonerror n --stopparentfirst undefined
+2024-10-09 06:42:46 - Started 7456
+2024-10-10 06:54:53 - Starting C:\Program Files\nodejs\node.exe  --harmony X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\node_modules\node-windows\lib\wrapper.js --file X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\server.js --scriptoptions= --log "MiAppAngularService wrapper" --grow 0.25 --wait 1 --maxrestarts 3 --abortonerror n --stopparentfirst undefined
+2024-10-10 06:54:53 - Started 6008
+2024-10-10 06:55:48 - Starting C:\Program Files\nodejs\node.exe  --harmony X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\node_modules\node-windows\lib\wrapper.js --file X:\Proyectos\ionic-projects\gestion-pagos-ionic\deploy\server.js --scriptoptions= --log "MiAppAngularService wrapper" --grow 0.25 --wait 1 --maxrestarts 3 --abortonerror n --stopparentfirst undefined
+2024-10-10 06:55:48 - Started 6768
