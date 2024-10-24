@@ -1,8 +1,9 @@
-import {Entity, model, property, belongsTo} from '@loopback/repository';
+import {Entity, model, property, belongsTo, hasOne} from '@loopback/repository';
 import {RecordCrediticio} from './record-crediticio.model';
 import {Nacionalidades} from './nacionalidades.model';
 import {EstadoCivil} from './estado-civil.model';
 import {TipoPersonas} from './tipo-personas.model';
+import {UsuarioCliente} from './usuario-cliente.model';
 
 @model({settings: {idInjection: false, mssql: {schema: 'dbo', table: 'Personas'}}})
 export class Personas extends Entity {
@@ -112,6 +113,9 @@ export class Personas extends Entity {
 
   @belongsTo(() => TipoPersonas, {name: 'tipoPersona'})
   idTipoPersona: number;
+
+  @hasOne(() => UsuarioCliente, {keyTo: 'clienteId'})
+  usuarioCliente: UsuarioCliente;
   // Define well-known properties here
 
   // Indexer property to allow additional data

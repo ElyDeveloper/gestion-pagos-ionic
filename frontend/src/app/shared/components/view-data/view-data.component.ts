@@ -9,7 +9,12 @@ import {
 } from "@angular/core";
 import { Column } from "../../interfaces/table";
 import { AlertController } from "@ionic/angular";
-import { debounceTime, distinctUntilChanged, Subject } from "rxjs";
+import {
+  debounceTime,
+  distinctUntilChanged,
+  firstValueFrom,
+  Subject,
+} from "rxjs";
 import { AuthService } from "../../services/auth.service";
 import { Router } from "@angular/router";
 import { PreventAbuseService } from "../../services/prevent-abuse.service";
@@ -71,18 +76,17 @@ export class ViewDataComponent implements OnInit {
   }
 
   getUserLoggedIn() {
-    this._authService.getUserInfo().subscribe({
-      next: (user: any) => {
+    firstValueFrom(this._authService.getUserInfo())
+      .then((user: any) => {
         this.userLogged = user;
-        // //console.log("User logged: ", this.userLogged);
+        //console.log("User logged: ", this.userLogged);
         this.initSearcher();
         this.updateVisiblePages();
-      },
-      error: (error) => {
+      })
+      .catch((error) => {
         console.error("Error al obtener usuario logueado", error);
         this._router.navigate(["/login"]);
-      },
-    });
+      });
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -166,7 +170,7 @@ export class ViewDataComponent implements OnInit {
   getCellValue(row: any, column: Column): any {
     let primaryValue = this.getNestedValue(row, column.key);
 
-    if (primaryValue===null && column.type !== "currency") { 
+    if (primaryValue === null && column.type !== "currency") {
       return "N/A";
     }
 

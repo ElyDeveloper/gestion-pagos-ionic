@@ -13,7 +13,7 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
         token = localStorage.getItem('tokensession');
     }
 
-    console.log('Token de sesión: ', token)
+    // console.log('Token de sesión: ', token)
 
 
     if (token) {
