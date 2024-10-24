@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from "@angular/core";
-import { interval, Subscription, takeWhile } from "rxjs";
+import { firstValueFrom, interval, Subscription, takeWhile } from "rxjs";
 import { NgxOtpInputComponentOptions } from "ngx-otp-input";
 import { GlobalService } from "src/app/shared/services/global.service";
 import { Router } from "@angular/router";
@@ -74,52 +74,46 @@ export class VerifyCodePage implements OnInit {
   }
 
   submitForm(event: any): void {
-    //console.log("Form submitted", event);
-    // Implement your code verification logic here
-    this._globalService.Post("verify-code", { code: event }).subscribe({
-      next: (result: any) => {
-        //console.log("Result: ", result);
-        if (result.error) {
-          this.toastMessage = result.error;
-          this.isToastOpen = true;
-        } else {
-          this.router.navigate(["reset-password", result.userId]);
-        }
-      },
-      error: (error) => {
-        console.error("Error verifying code: ", error);
-        //Mostrar toast
-        this.toastMessage = "Error verificando el código";
+    firstValueFrom(
+      this._globalService.Post("verify-code", { code: event })
+    ).then((result: any) => {
+      if (result.error) {
+        this.toastMessage = result.error;
         this.isToastOpen = true;
-      },
+      } else {
+        this.router.navigate(["reset-password", result.userId]);
+      }
+    }).catch(error => {
+      console.error("Error verifying code: ", error);
+      this.toastMessage = "Error verificando el código";
+      this.isToastOpen = true;
     });
   }
 
   private startCountdown(durationInSeconds: number) {
     const endTime = new Date().getTime() + durationInSeconds * 1000;
-
-    this.countdownSubscription = interval(1000)
-      .pipe(takeWhile(() => new Date().getTime() < endTime))
-      .subscribe(() => {
-        const remaining = endTime - new Date().getTime();
-        const minutes = Math.floor(
-          (remaining % (1000 * 60 * 60)) / (1000 * 60)
-        );
-        const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
-        this.remainingTime = `${minutes}:${seconds
-          .toString()
-          .padStart(2, "0")}`;
-
-        // //console.log("Remaining time: ", this.remainingTime);
-        //Si llega a 0 redirigir a la pagina de inicio
-        if (this.remainingTime == "0:00") {
-          this.toastMessage = "El tiempo de verificación ha expirado";
-          this.isToastOpen = true;
-          //esperar 3 segundos antes de redirigir
-          setTimeout(() => {
-            this.router.navigate(["forgot-password"]);
-          }, 3000);
-        }
-      });
+  
+    firstValueFrom(
+      interval(1000).pipe(
+        takeWhile(() => new Date().getTime() < endTime)
+      )
+    ).then(() => {
+      const remaining = endTime - new Date().getTime();
+      const minutes = Math.floor(
+        (remaining % (1000 * 60 * 60)) / (1000 * 60)
+      );
+      const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+      this.remainingTime = `${minutes}:${seconds
+        .toString()
+        .padStart(2, "0")}`;
+  
+      if (this.remainingTime == "0:00") {
+        this.toastMessage = "El tiempo de verificación ha expirado";
+        this.isToastOpen = true;
+        setTimeout(() => {
+          this.router.navigate(["forgot-password"]);
+        }, 3000);
+      }
+    });
   }
 }

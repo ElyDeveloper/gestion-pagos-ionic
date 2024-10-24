@@ -7,7 +7,7 @@ import {
 } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
-import { Observable } from "rxjs";
+import { firstValueFrom, Observable } from "rxjs";
 import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
 import { ContratosPago } from "src/app/shared/interfaces/contrato";
 import { Column } from "src/app/shared/interfaces/table";
@@ -182,31 +182,31 @@ export class ContratosPagoPage implements OnInit {
     //console.log("Eliminar cliente Obtenido:", data);
     this.textLoader = "Eliminando cliente";
     this.loaderComponent.show();
-    this._globalService.Delete("personas", data.id).subscribe({
-      next: (response: any) => {
-        //console.log("cliente eliminado:", response);
-        this.getCountElements();
-        this.loaderComponent.hide();
-        this.toastMessage = "cliente eliminado correctamente";
-        this.setOpenedToast(true);
-      },
-      error: (error: any) => {
-        console.error("Error al eliminar el cliente:", error);
-        this.loaderComponent.hide();
-        this.toastMessage = "Error al eliminar el cliente";
-        this.setOpenedToast(true);
-      },
+    
+    firstValueFrom(
+      this._globalService.Delete("personas", data.id)
+    ).then((response: any) => {
+      //console.log("cliente eliminado:", response);
+      this.getCountElements();
+      this.loaderComponent.hide();
+      this.toastMessage = "cliente eliminado correctamente";
+      this.setOpenedToast(true);
+    }).catch((error: any) => {
+      console.error("Error al eliminar el cliente:", error);
+      this.loaderComponent.hide();
+      this.toastMessage = "Error al eliminar el cliente";
+      this.setOpenedToast(true);
     });
   }
 
   handleUserOperation(operation: "edit" | "create", data: any) {
     data.fechaIngreso = new Date(data.fechaIngreso);
     //console.log("Datos del cliente:", data);
-
+  
     // return;
     let operationText: string;
     let apiCall: Observable<any>;
-
+  
     switch (operation) {
       case "edit":
         operationText = "Editado";
@@ -218,28 +218,25 @@ export class ContratosPagoPage implements OnInit {
         apiCall = this._globalService.Post("personas", data);
         break;
     }
-
+  
     this.textLoader = `${operationText} cliente`;
     this.loaderComponent.show();
-
-    apiCall.subscribe({
-      next: (response: any) => {
-        //console.log(`cliente ${operationText.toLowerCase()}:`, response);
-        this.isModalOpen = false;
-        this.loaderComponent.hide();
-        this.toastMessage = `cliente ${operationText.toLowerCase()} correctamente`;
-        this.setOpenedToast(true);
-        this.cleanForm();
-        this.getCountElements();
-      },
-      error: (error: any) => {
-        console.error(
-          `Error al ${operationText.toLowerCase()} el cliente:`,
-          error
-        );
-        this.loaderComponent.hide();
-        this.toastMessage = `Error al ${operationText.toLowerCase()} el cliente`;
-      },
+  
+    firstValueFrom(apiCall).then(() => {
+      //console.log(`cliente ${operationText.toLowerCase()}:`, response);
+      this.isModalOpen = false;
+      this.loaderComponent.hide();
+      this.toastMessage = `cliente ${operationText.toLowerCase()} correctamente`;
+      this.setOpenedToast(true);
+      this.cleanForm();
+      this.getCountElements();
+    }).catch((error: any) => {
+      console.error(
+        `Error al ${operationText.toLowerCase()} el cliente:`,
+        error
+      );
+      this.loaderComponent.hide();
+      this.toastMessage = `Error al ${operationText.toLowerCase()} el cliente`;
     });
   }
 
@@ -263,17 +260,14 @@ export class ContratosPagoPage implements OnInit {
     if (event === "") {
       this.getCountElements();
     } else {
-      this._globalService
-        .Get(`contratos-pagos/search?query=${event}`)
-        .subscribe({
-          next: (response: any) => {
-            this.elements = response;
-            //console.log("Elementos obtenidos:", response);
-          },
-          error: (error) => {
-            console.error("Error al obtener los elementos:", error);
-          },
-        });
+      firstValueFrom(
+        this._globalService.Get(`contratos-pagos/search?query=${event}`)
+      ).then((response: any) => {
+        this.elements = response;
+        //console.log("Elementos obtenidos:", response);
+      }).catch((error) => {
+        console.error("Error al obtener los elementos:", error);
+      });
     }
   }
 
@@ -281,32 +275,28 @@ export class ContratosPagoPage implements OnInit {
     this.elements = [];
     const skip = this.currentPage * this.currentPageSize - this.currentPageSize;
     const limit = this.currentPageSize;
-
-    this._globalService
-      .Get(`contratos-pagos/paginated?skip=${skip}&limit=${limit}`)
-      .subscribe({
-        next: (response: any) => {
-          this.elements = response;
-          //console.log("Elementos obtenidos:", response);
-        },
-        error: (error) => {
-          console.error("Error al obtener los elementos:", error);
-        },
-      });
+  
+    firstValueFrom(
+      this._globalService.Get(`contratos-pagos/paginated?skip=${skip}&limit=${limit}`)
+    ).then((response: any) => {
+      this.elements = response;
+      //console.log("Elementos obtenidos:", response);
+    }).catch((error) => {
+      console.error("Error al obtener los elementos:", error);
+    });
   }
 
   getCountElements() {
-    this._globalService.Get("contratos-pagos/count").subscribe({
-      next: (response: any) => {
-        //console.log("Cantidad de elementos:", response.count);
-        const totalElements = response.count;
-        this.totalPages = Math.ceil(totalElements / this.currentPageSize);
-        //console.log("Total de páginas:", this.totalPages);
-        this.getElementsPag();
-      },
-      error: (error) => {
-        console.error("Error al obtener la cantidad de elementos:", error);
-      },
+    firstValueFrom(
+      this._globalService.Get("contratos-pagos/count")
+    ).then((response: any) => {
+      //console.log("Cantidad de elementos:", response.count);
+      const totalElements = response.count;
+      this.totalPages = Math.ceil(totalElements / this.currentPageSize);
+      //console.log("Total de páginas:", this.totalPages);
+      this.getElementsPag();
+    }).catch((error) => {
+      console.error("Error al obtener la cantidad de elementos:", error);
     });
   }
 }

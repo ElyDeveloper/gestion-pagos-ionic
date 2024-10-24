@@ -94,46 +94,46 @@ export class GestionContractPage implements OnInit {
   }
 
   verifyExist() {
-    this._globalService
-      .Get(`contratos-pagos/verify/${this.prestamoSeleccionado.id}`)
-      .subscribe({
-        next: (data: any) => {
-          const { exist, content, correlativo } = data;
+    firstValueFrom(
+      this._globalService.Get(
+        `contratos-pagos/verify/${this.prestamoSeleccionado.id}`
+      )
+    )
+      .then((data: any) => {
+        const { exist, content, correlativo } = data;
 
-          //console.log("Contrato existente", data);
-          if (exist) {
-            this.existContrato = true;
-            this.correlativo = correlativo;
-            //INFO: Otra Data
-            this.nombreEmpresa = content.nombreEmpresa;
-            this.bancoDepositar = content.bancoDepositar;
-            this.ciudadBanco = content.ciudadBanco;
-            this.cuentaBancaria = content.cuentaBancaria;
-            this.direccionEmpresa = content.direccionEmpresa;
-            this.fechaAcuerdo = content.fechaAcuerdo;
-            this.lugarAcuerdo = content.lugarAcuerdo;
-          } else {
-            // this.saveContract();
-          }
-        },
-        error: (error: any) => {
-          console.error("Error al verificar si existe el contrato", error);
-        },
+        //console.log("Contrato existente", data);
+        if (exist) {
+          this.existContrato = true;
+          this.correlativo = correlativo;
+          //INFO: Otra Data
+          this.nombreEmpresa = content.nombreEmpresa;
+          this.bancoDepositar = content.bancoDepositar;
+          this.ciudadBanco = content.ciudadBanco;
+          this.cuentaBancaria = content.cuentaBancaria;
+          this.direccionEmpresa = content.direccionEmpresa;
+          this.fechaAcuerdo = content.fechaAcuerdo;
+          this.lugarAcuerdo = content.lugarAcuerdo;
+        } else {
+          // this.saveContract();
+        }
+      })
+      .catch((error: any) => {
+        console.error("Error al verificar si existe el contrato", error);
       });
   }
 
   getCorrelativo() {
-    this._globalService.Get("contratos-pagos/correlativo").subscribe({
-      next: (data: any) => {
+    firstValueFrom(this._globalService.Get("contratos-pagos/correlativo"))
+      .then((data: any) => {
         this.correlativo = data.correlativo;
-      },
-      error: (error: any) => {
+      })
+      .catch((error: any) => {
         console.error(
           "Error al obtener la cantidad de contratos de pago",
           error
         );
-      },
-    });
+      });
   }
 
   setTitle() {
@@ -165,7 +165,6 @@ export class GestionContractPage implements OnInit {
 
     if (this.existContrato) {
       this._loaderService.show();
-
       this.printSection();
       return;
     }
@@ -187,18 +186,16 @@ export class GestionContractPage implements OnInit {
     };
 
     this._loaderService.show();
-    this._globalService.Post("contratos-pagos", contractSave).subscribe({
-      next: (data: any) => {
+    firstValueFrom(this._globalService.Post("contratos-pagos", contractSave))
+      .then((data: any) => {
         //console.log("Contrato guardado correctamente", data);
         this.isPrint = false;
         this.printSection();
-      },
-      error: (error: any) => {
+      })
+      .catch((error: any) => {
         this._loaderService.show();
-
         console.error("Error al guardar el contrato", error);
-      },
-    });
+      });
   }
 
   printSection() {

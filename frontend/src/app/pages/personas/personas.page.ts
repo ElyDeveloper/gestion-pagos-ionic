@@ -93,8 +93,6 @@ export class PersonasPage implements OnInit {
   estadosCiviles: any[] = [];
   tiposPersona: any[] = [];
 
-  suscripciones: Subscription[] = [];
-
   currentUser: Usuario | null = null;
 
   filteredNacionalidades = this.nacionalidades;
@@ -179,15 +177,14 @@ export class PersonasPage implements OnInit {
   }
 
   getCurrentUser() {
-    this._authService.getUserInfo().subscribe({
-      next: (user: any) => {
+    firstValueFrom(this._authService.getUserInfo())
+      .then((user: any) => {
         this.currentUser = user;
         //console.log("Usuario actual: ", this.currentUser);
-      },
-      error: (error: any) => {
+      })
+      .catch((error: any) => {
         console.error("Error al obtener información del usuario:", error);
-      },
-    });
+      });
     //console.log("Usuario actual: ", this.currentUser);
   }
 
@@ -202,24 +199,47 @@ export class PersonasPage implements OnInit {
   }
 
   //TODO: ESPECIFICO
-  cargarOpciones() {
-    this._globalService.Get("nacionalidades").subscribe((data: any) => {
-      this.nacionalidades = data;
-      // //console.log(this.nacionalidades);
-    });
-    this._globalService.GetId("usuarios/roles", 3).subscribe((data: any) => {
-      this.asesores = data;
-      //console.log("Asesores: ", this.asesores);
-    });
-    this._globalService.Get("record-crediticios").subscribe((data: any) => {
-      this.recordsCrediticios = data;
-    });
-    this._globalService.Get("estado-civils").subscribe((data: any) => {
-      this.estadosCiviles = data;
-    });
-    this._globalService.Get("tipo-personas").subscribe((data: any) => {
-      this.tiposPersona = data;
-    });
+  async cargarOpciones() {
+    try {
+      // Definir todas las promesas que se ejecutarán en paralelo
+      const promises = [
+        {
+          promise: firstValueFrom(this._globalService.Get("nacionalidades")),
+          setter: (data: any) => (this.nacionalidades = data),
+        },
+        {
+          promise: firstValueFrom(
+            this._globalService.GetId("usuarios/roles", 3)
+          ),
+          setter: (data: any) => (this.asesores = data),
+        },
+        {
+          promise: firstValueFrom(
+            this._globalService.Get("record-crediticios")
+          ),
+          setter: (data: any) => (this.recordsCrediticios = data),
+        },
+        {
+          promise: firstValueFrom(this._globalService.Get("estado-civils")),
+          setter: (data: any) => (this.estadosCiviles = data),
+        },
+        {
+          promise: firstValueFrom(this._globalService.Get("tipo-personas")),
+          setter: (data: any) => (this.tiposPersona = data),
+        },
+      ];
+
+      // Ejecutar todas las promesas en paralelo
+      const results = await Promise.all(promises.map((p) => p.promise));
+
+      // Asignar los resultados usando los setters
+      results.forEach((result, index) => {
+        promises[index].setter(result);
+      });
+    } catch (error) {
+      console.error("Error al cargar las opciones:", error);
+      // Aquí puedes manejar el error como prefieras (mostrar un mensaje, etc.)
+    }
   }
 
   setOpenedToast(value: boolean) {
@@ -330,7 +350,6 @@ export class PersonasPage implements OnInit {
 
   private setModalState(isEdit: boolean, modalTemplate: any, formData?: any) {
     //TODO ESPEDIFICO
-    this.suscripciones.forEach((sub) => sub.unsubscribe());
 
     this.isEdit = isEdit;
 
@@ -349,18 +368,15 @@ export class PersonasPage implements OnInit {
       this.selectedNacionalidad = this.nacionalidades.find(
         (n) => n.id === formData.idNacionalidad
       );
-      this.suscripciones.push(
-        this._globalService.GetId("personas/asesor", formData.id).subscribe({
-          next: (asesor: any) => {
-            this.selectedAsesor = asesor?.usuario || null;
-            this.lastSelectedAsesor = this.selectedAsesor;
-            //console.log("Asesor seleccionado: ", this.selectedAsesor);
-          },
-          error: (error: any) => {
-            console.error("Error al obtener información del asesor:", error);
-          },
+      firstValueFrom(this._globalService.GetId("personas/asesor", formData.id))
+        .then((asesor: any) => {
+          this.selectedAsesor = asesor?.usuario || null;
+          this.lastSelectedAsesor = this.selectedAsesor;
+          //console.log("Asesor seleccionado: ", this.selectedAsesor);
         })
-      );
+        .catch((error: any) => {
+          console.error("Error al obtener información del asesor:", error);
+        });
     } else if (!isEdit) {
       this.cleanForm();
     }
@@ -557,12 +573,15 @@ export class PersonasPage implements OnInit {
     const skip = this.currentPage * this.currentPageSize - this.currentPageSize;
     const limit = this.currentPageSize;
 
+    const idUser = this.currentUser?.id;
     return firstValueFrom(
       this._globalService
-        .Get(`personas/${this.action}/paginated?skip=${skip}&limit=${limit}`)
+        .Get(
+          `personas/${this.action}/paginated/${idUser}?skip=${skip}&limit=${limit}`
+        )
         .pipe(
           tap((response: any) => {
-            //console.log("Elementos obtenidos:", response);
+            console.log("Elementos obtenidos:", response);
             this.elements = response; // Asumiendo que la respuesta tiene una propiedad 'data'
           }),
           catchError((error) => {
@@ -574,8 +593,9 @@ export class PersonasPage implements OnInit {
   }
 
   private getCountElements(): Promise<void> {
+    const idUser = this.currentUser?.id;
     return firstValueFrom(
-      this._globalService.Get("personas/count").pipe(
+      this._globalService.Get(`personas/count/${idUser}`).pipe(
         tap((response: any) => {
           //console.log("Cantidad de elementos:", response.count);
           const totalElements = response.count;

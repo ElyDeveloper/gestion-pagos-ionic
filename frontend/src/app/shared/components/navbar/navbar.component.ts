@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from "@angular/core";
 import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
-import { filter } from "rxjs";
+import { filter, firstValueFrom } from "rxjs";
 import { AuthService } from "../../services/auth.service";
 import { Usuario } from "../../interfaces/usuario";
 import { environment } from "src/environments/environment";
@@ -97,14 +97,13 @@ export class NavbarComponent implements OnInit {
   }
 
   getUserLogged() {
-    this._authService.getUserInfo().subscribe({
-      next: (user: any) => {
+    firstValueFrom(this._authService.getUserInfo())
+      .then((user: any) => {
         this.user = user;
-      },
-      error: (error) => {
+      })
+      .catch((error) => {
         console.error("Error al obtener usuario logueado", error);
-      },
-    });
+      });
   }
 
   setOpen(isOpen: boolean) {

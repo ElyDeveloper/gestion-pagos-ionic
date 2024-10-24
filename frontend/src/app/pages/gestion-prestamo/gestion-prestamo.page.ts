@@ -11,6 +11,7 @@ import {
   catchError,
   debounceTime,
   distinctUntilChanged,
+  firstValueFrom,
   forkJoin,
   map,
   of,
@@ -24,6 +25,7 @@ import { Personas } from "src/app/shared/interfaces/persona";
 import { PlanesPago } from "src/app/shared/interfaces/plan-pago";
 import { Prestamos } from "src/app/shared/interfaces/prestamo";
 import { Productos } from "src/app/shared/interfaces/producto";
+import { AuthService } from "src/app/shared/services/auth.service";
 import { GlobalService } from "src/app/shared/services/global.service";
 import { PreventAbuseService } from "src/app/shared/services/prevent-abuse.service";
 import { FormModels } from "src/app/shared/utils/forms-models";
@@ -73,6 +75,7 @@ export class GestionPrestamoPage implements OnInit {
   formSelected: FormGroup;
 
   private _globalService = inject(GlobalService);
+  private _authService = inject(AuthService);
   private _route = inject(ActivatedRoute);
   private _router = inject(Router);
   private _preventAbuseService = inject(PreventAbuseService);
@@ -96,34 +99,33 @@ export class GestionPrestamoPage implements OnInit {
   }
 
   getPrestamo() {
-    this._route.paramMap
-      .pipe(
+    firstValueFrom(
+      this._route.paramMap.pipe(
         map((params) => params.get("id")),
         switchMap((id) =>
           id ? this._globalService.GetIdString("decrypted-id", id) : of(null)
         )
       )
-      .subscribe({
-        next: (convertedId: any) => {
-          if (convertedId) {
-            this.fetchAndSetPrestamo(convertedId);
-          } else {
-            this.resetPrestamoState();
-          }
-        },
-        error: (error) => console.error("Error getting prestamo:", error),
-      });
+    )
+      .then((convertedId: any) => {
+        if (convertedId) {
+          this.fetchAndSetPrestamo(convertedId);
+        } else {
+          this.resetPrestamoState();
+        }
+      })
+      .catch((error) => console.error("Error getting prestamo:", error));
   }
 
   private fetchAndSetPrestamo(id: number) {
-    this._globalService.GetId("prestamos", id).subscribe({
-      next: (prestamo: any) => {
+    firstValueFrom(this._globalService.GetId("prestamos", id))
+      .then((prestamo: any) => {
         prestamo = this._globalService.parseObjectDates(prestamo);
         this.setPrestamo(prestamo);
-      },
-      error: (error) =>
-        console.error("Error fetching prestamo details:", error),
-    });
+      })
+      .catch((error) =>
+        console.error("Error fetching prestamo details:", error)
+      );
   }
 
   private setPrestamo(prestamo: any) {
@@ -163,7 +165,7 @@ export class GestionPrestamoPage implements OnInit {
   }
 
   extractNumber(input: string): number {
-    // //console.log("Input: ", input);
+    //console.log("Input: ", input);
     if (input) {
       //Verificar si es string
       if (typeof input === "string") {
@@ -267,15 +269,14 @@ export class GestionPrestamoPage implements OnInit {
   }
 
   private fetchData(endpoint: string, setter: (data: any) => void) {
-    this._globalService.Get(endpoint).subscribe({
-      next: (response: any) => {
+    firstValueFrom(this._globalService.Get(endpoint))
+      .then((response: any) => {
         setter(response);
         //console.log(`${endpoint} obtenidos:`, response);
-      },
-      error: (error) => {
+      })
+      .catch((error) => {
         console.error(`Error al obtener ${endpoint}:`, error);
-      },
-    });
+      });
   }
 
   initValuesForm() {
@@ -283,31 +284,41 @@ export class GestionPrestamoPage implements OnInit {
   }
 
   searchDataClient() {
-    this._globalService
-      .Get(`personas/clientes/search?query=${this.searchClient}`)
-      .subscribe({
-        next: (response: any) => {
-          this.clientes = response;
-          //console.log("Clientes obtenidos:", response);
-        },
-        error: (error) => {
+    firstValueFrom(this._authService.getUserInfo()).then((user: any) => {
+      const idUser = user.id;
+
+      firstValueFrom(
+        this._globalService.Get(
+          `personas/clientes/search/${idUser}?query=${this.searchClient}`
+        )
+      )
+        .then((clientes: any) => {
+          this.clientes = clientes;
+          //console.log("Clientes obtenidos:", clientes);
+        })
+        .catch((error) => {
           console.error("Error al obtener clientes:", error);
-        },
-      });
+        });
+    });
   }
 
   searchDataAval() {
-    this._globalService
-      .Get(`personas/avales/search?query=${this.searchAval}`)
-      .subscribe({
-        next: (response: any) => {
-          this.avales = response;
-          //console.log("Avales obtenidos:", response);
-        },
-        error: (error) => {
+    firstValueFrom(this._authService.getUserInfo()).then((user: any) => {
+      const idUser = user.id;
+
+      firstValueFrom(
+        this._globalService.Get(
+          `personas/avales/search/${idUser}?query=${this.searchAval}`
+        )
+      )
+        .then((avales: any) => {
+          this.avales = avales;
+          //console.log("Avales obtenidos:", avales);
+        })
+        .catch((error) => {
           console.error("Error al obtener avales:", error);
-        },
-      });
+        });
+    });
   }
 
   onClienteSeleccionado(event: any) {
@@ -426,34 +437,34 @@ export class GestionPrestamoPage implements OnInit {
 
     //console.log("Plan Pago: ", planPago);
 
-    this._globalService.PutId("planes-pagos", idPlan, planPago).subscribe({
-      next: () => {
+    firstValueFrom(this._globalService.PutId("planes-pagos", idPlan, planPago))
+      .then(() => {
         const prestamo = this.createPrestamo(idPlan);
         //console.log("Prestamo a guardar: ", prestamo);
-        this._globalService.PutId("prestamos", idPrestamo, prestamo).subscribe({
-          next: () => {
+
+        firstValueFrom(
+          this._globalService.PutId("prestamos", idPrestamo, prestamo)
+        )
+          .then(() => {
             this.handlePrestamoSuccess.bind(this);
             this._router.navigate(["layout/prestamos"]);
-          },
-          error: this.handlePrestamoError.bind(this),
-        });
-      },
-      error: this.handlePrestamoError.bind(this),
-    });
+          })
+          .catch(this.handlePrestamoError.bind(this));
+      })
+      .catch(this.handlePrestamoError.bind(this));
   }
 
   private savePrestamo(planPago: PlanesPago) {
-    this._globalService.Post("planes-pagos", planPago).subscribe({
-      next: (response: any) => {
+    firstValueFrom(this._globalService.Post("planes-pagos", planPago))
+      .then((response: any) => {
         const prestamo = this.createPrestamo(response.id);
         //console.log("Prestamo a guardar: ", prestamo);
-        this._globalService.Post("prestamos", prestamo).subscribe({
-          next: this.handlePrestamoSuccess.bind(this),
-          error: this.handlePrestamoError.bind(this),
-        });
-      },
-      error: this.handlePrestamoError.bind(this),
-    });
+
+        firstValueFrom(this._globalService.Post("prestamos", prestamo))
+          .then(this.handlePrestamoSuccess.bind(this))
+          .catch(this.handlePrestamoError.bind(this));
+      })
+      .catch(this.handlePrestamoError.bind(this));
   }
 
   private handlePrestamoSuccess(response: any) {

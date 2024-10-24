@@ -6,7 +6,7 @@ import {
   ViewChild,
 } from "@angular/core";
 import { Router } from "@angular/router";
-import { Subscription } from "rxjs";
+import { firstValueFrom, Subscription } from "rxjs";
 import { Pagos } from "src/app/shared/interfaces/pago";
 import { Column } from "src/app/shared/interfaces/table";
 import { GlobalService } from "src/app/shared/services/global.service";
@@ -111,31 +111,30 @@ export class PagosPage implements OnInit {
 
   ngOnInit() {}
 
-  async onSaveData() {
+  onSaveData() {
     //console.log("Se guardara el archivo:", this.uploadedFile);
 
     console.log("Pago seleccionado:", this.pagoSeleccionado);
-    this._globalService
-      .PatchWithFile(
+    firstValueFrom(
+      this._globalService.PatchWithFile(
         "pagos/updateFile",
         this.pagoSeleccionado,
         this.uploadedFile
       )
-      .subscribe({
-        next: () => {
-          this.getCountElements();
-          this.toastMessage = "Archivo subido correctamente";
-          this.toastColor = "success";
-          this.isToastOpen = true;
-          this.uploadedFile = null;
-          this.isModalOpen = false;
-        },
-        error: (error) => {
-          //console.log("Error al subir el archivo:", error);
-          this.toastMessage = "Error al subir el archivo";
-          this.toastColor = "danger";
-          this.isToastOpen = true;
-        },
+    )
+      .then(() => {
+        this.getCountElements();
+        this.toastMessage = "Archivo subido correctamente";
+        this.toastColor = "success";
+        this.isToastOpen = true;
+        this.uploadedFile = null;
+        this.isModalOpen = false;
+      })
+      .catch((error) => {
+        //console.log("Error al subir el archivo:", error);
+        this.toastMessage = "Error al subir el archivo";
+        this.toastColor = "danger";
+        this.isToastOpen = true;
       });
   }
 
@@ -169,7 +168,7 @@ export class PagosPage implements OnInit {
     if (!this.pagoSeleccionado) {
       this.pagoSeleccionado = {
         idPago: event?.id || 0,
-      }
+      };
     }
     //console.log("Pago seleccionado:", this.pagoSeleccionado);
     this.modalSelected = this.modalUpload;
@@ -181,23 +180,22 @@ export class PagosPage implements OnInit {
     // Aquí puedes abrir un modal o acción relacionada con el elemento seleccionado
 
     const idDecrypted = event?.documentosTipoDoc?.documentos?.id || 0;
-    this._globalService
-      .GetIdEncrypted("encrypted-id", Number(idDecrypted))
-      .subscribe({
-        next: (data: any) => {
-          //console.log("ID encriptado:", data.idEncrypted);
-          if (data) {
-            this._router.navigate([`/view-file/${data.idEncrypted}`]);
-          } else {
-            console.error("No se encuentra el documento del pago.");
-            this.toastColor = "danger";
-            this.toastMessage = "No se encuentra el documento del pago.";
-            this.isToastOpen = true;
-          }
-        },
-        error: (error) => {
-          console.error("Error al obtener la ID encriptada:", error);
-        },
+    firstValueFrom(
+      this._globalService.GetIdEncrypted("encrypted-id", Number(idDecrypted))
+    )
+      .then((data: any) => {
+        //console.log("ID encriptado:", data.idEncrypted);
+        if (data) {
+          this._router.navigate([`/view-file/${data.idEncrypted}`]);
+        } else {
+          console.error("No se encuentra el documento del pago.");
+          this.toastColor = "danger";
+          this.toastMessage = "No se encuentra el documento del pago.";
+          this.isToastOpen = true;
+        }
+      })
+      .catch((error) => {
+        console.error("Error al obtener la ID encriptada:", error);
       });
 
     // redirigir a view-file
@@ -273,18 +271,17 @@ export class PagosPage implements OnInit {
     ];
   }
   getCountElements() {
-    this._globalService.Get("pagos/count").subscribe({
-      next: (response: any) => {
+    firstValueFrom(this._globalService.Get("pagos/count"))
+      .then((response: any) => {
         //console.log("Cantidad de elementos:", response.count);
         const totalElements = response.count;
         this.totalPages = Math.ceil(totalElements / this.currentPageSize);
         //console.log("Total de páginas:", this.totalPages);
         this.getElementsPag();
-      },
-      error: (error) => {
+      })
+      .catch((error) => {
         console.error("Error al obtener la cantidad de elementos:", error);
-      },
-    });
+      });
   }
 
   onPageChange(event: any) {
@@ -298,21 +295,20 @@ export class PagosPage implements OnInit {
     const skip = this.currentPage * this.currentPageSize - this.currentPageSize;
     const limit = this.currentPageSize;
 
-    this._globalService
-      .Get(`pagos/paginated?skip=${skip}&limit=${limit}`)
-      .subscribe({
-        next: (response: any) => {
-          //console.log("Element os obtenidos:", response);
-          this.elements = response;
+    firstValueFrom(
+      this._globalService.Get(`pagos/paginated?skip=${skip}&limit=${limit}`)
+    )
+      .then((response: any) => {
+        //console.log("Element os obtenidos:", response);
+        this.elements = response;
 
-          this.elements.forEach((element: any) => {
-            element.cuota.planPago.prestamos =
-              element.cuota.planPago.prestamos[0];
-          });
-        },
-        error: (error) => {
-          console.error("Error al obtener los elementos:", error);
-        },
+        this.elements.forEach((element: any) => {
+          element.cuota.planPago.prestamos =
+            element.cuota.planPago.prestamos[0];
+        });
+      })
+      .catch((error) => {
+        console.error("Error al obtener los elementos:", error);
       });
   }
 

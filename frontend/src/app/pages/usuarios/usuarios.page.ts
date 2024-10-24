@@ -11,6 +11,7 @@ import {
   catchError,
   debounceTime,
   distinctUntilChanged,
+  firstValueFrom,
   isEmpty,
   map,
   Observable,
@@ -201,30 +202,33 @@ export class UsuariosPage implements OnInit {
   }
 
   searchDataClients() {
-    this._globalService
-      .Get(`personas/clientes/search?query=${this.searchClient}`)
-      .subscribe({
-        next: (data: any) => {
-          //console.log(`Clientes encontrados para ${this.searchClient}:`, data);
-          this.filteredClients = data;
-        },
-        error: (error) => {
-          console.error("Error al obtener clientes:", error);
-        },
+    const idUser = this.element.id;
+    firstValueFrom(
+      this._globalService.Get(
+        `personas/clientes/search/${idUser}?query=${this.searchClient}`
+      )
+    )
+      .then((data: any) => {
+        //console.log(`Clientes encontrados para ${this.searchClient}:`, data);
+        this.filteredClients = data;
+      })
+      .catch((error) => {
+        console.error("Error al obtener clientes:", error);
       });
   }
 
   searchDataUsers() {
-    this._globalService
-      .Get(`usuarios/asesores/search?query=${this.searchUser}`)
-      .subscribe({
-        next: (data: any) => {
-          //console.log(`Asesores encontrados para ${this.searchUser}:`, data);
-          this.filteredUsers = data;
-        },
-        error: (error) => {
-          console.error("Error al obtener clientes:", error);
-        },
+    firstValueFrom(
+      this._globalService.Get(
+        `usuarios/asesores/search?query=${this.searchUser}`
+      )
+    )
+      .then((data: any) => {
+        //console.log(`Asesores encontrados para ${this.searchUser}:`, data);
+        this.filteredUsers = data;
+      })
+      .catch((error) => {
+        console.error("Error al obtener clientes:", error);
       });
   }
 
@@ -244,26 +248,23 @@ export class UsuariosPage implements OnInit {
       };
 
       //console.log("Usuario-Cliente:", usuarioClient);
-      const suscription: Subscription = this._globalService
-        .Post("usuario-clientes/one", usuarioClient)
-        .subscribe({
-          next: () => {
-            this.selectedClients.push(clientOp);
-            //console.log("Cliente agregado correctamente");
-            this.toastColor = "success";
-            this.toastMessage = "Cliente agregado correctamente";
-            this.isToastOpen = true;
-            //Eliminar la suscripción para liberar recursos
-            suscription.unsubscribe();
-          },
-          error: (error) => {
-            console.error("Error al agregar cliente:", error);
-          },
+      const suscription = firstValueFrom(
+        this._globalService.Post("usuario-clientes/one", usuarioClient)
+      )
+        .then(() => {
+          this.selectedClients.push(clientOp);
+          //console.log("Cliente agregado correctamente");
+          this.toastColor = "success";
+          this.toastMessage = "Cliente agregado correctamente";
+          this.isToastOpen = true;
+        })
+        .catch((error) => {
+          console.error("Error al agregar cliente:", error);
         });
     }
   }
 
-  async setTransfer(usuario:any) {
+  async setTransfer(usuario: any) {
     //console.log("Set transfer: ", usuario);
 
     //Alerta de si esta seguro de transferir al usuario
@@ -313,24 +314,26 @@ export class UsuariosPage implements OnInit {
         {
           text: "Eliminar",
           handler: () => {
-            this._globalService
-              .Delete("usuario-clientes/by-cliente", clientRemove.id || 0)
-              .subscribe({
-                next: () => {
-                  //console.log("Cliente eliminado correctamente");
-                  this.toastColor = "success";
-                  this.toastMessage = "Cliente eliminado correctamente";
-                  this.isToastOpen = true;
-                  this.selectedClients = this.selectedClients.filter(
-                    (client) => client.dni !== clientRemove.dni
-                  );
-                },
-                error: (error) => {
-                  console.error("Error al eliminar cliente:", error);
-                  this.toastColor = "danger";
-                  this.toastMessage = "Error al eliminar cliente";
-                  this.isToastOpen = true;
-                },
+            firstValueFrom(
+              this._globalService.Delete(
+                "usuario-clientes/by-cliente",
+                clientRemove.id || 0
+              )
+            )
+              .then(() => {
+                //console.log("Cliente eliminado correctamente");
+                this.toastColor = "success";
+                this.toastMessage = "Cliente eliminado correctamente";
+                this.isToastOpen = true;
+                this.selectedClients = this.selectedClients.filter(
+                  (client) => client.dni !== clientRemove.dni
+                );
+              })
+              .catch((error) => {
+                console.error("Error al eliminar cliente:", error);
+                this.toastColor = "danger";
+                this.toastMessage = "Error al eliminar cliente";
+                this.isToastOpen = true;
               });
           },
         },
@@ -564,24 +567,23 @@ export class UsuariosPage implements OnInit {
     this.filteredClients = [];
     this.selectedClients = [];
 
-    this._globalService
-      .Get(`usuario-clientes/by-usuario/${data.id}`)
-      .subscribe({
-        next: (response: any) => {
-          //console.log("Clientes del usuario:", response);
-          this.setModalState(
-            false,
-            false,
-            false,
-            true,
-            false,
-            this.modalSelectClients
-          );
-          this.selectedClients = response;
-        },
-        error: (error: any) => {
-          console.error("Error al obtener clientes del usuario:", error);
-        },
+    firstValueFrom(
+      this._globalService.Get(`usuario-clientes/by-usuario/${data.id}`)
+    )
+      .then((response: any) => {
+        //console.log("Clientes del usuario:", response);
+        this.setModalState(
+          false,
+          false,
+          false,
+          true,
+          false,
+          this.modalSelectClients
+        );
+        this.selectedClients = response;
+      })
+      .catch((error: any) => {
+        console.error("Error al obtener clientes del usuario:", error);
       });
   }
 
@@ -595,21 +597,21 @@ export class UsuariosPage implements OnInit {
     //console.log("Eliminar usuario Obtenido:", data);
     this.textLoader = "Eliminando Usuario";
     this._loaderService.show();
-    this._globalService.Delete("usuarios", data.id).subscribe({
-      next: (response: any) => {
+
+    firstValueFrom(this._globalService.Delete("usuarios", data.id))
+      .then((response: any) => {
         //console.log("Usuario eliminado:", response);
         this.getCountElements();
         this._loaderService.hide();
         this.toastMessage = "Usuario eliminado correctamente";
         this.setOpenedToast(true);
-      },
-      error: (error: any) => {
+      })
+      .catch((error: any) => {
         console.error("Error al eliminar el usuario:", error);
         this._loaderService.hide();
         this.toastMessage = "Error al eliminar el usuario";
         this.setOpenedToast(true);
-      },
-    });
+      });
   }
 
   async handleSave(data: any) {
@@ -657,8 +659,8 @@ export class UsuariosPage implements OnInit {
     this.textLoader = `${operationText} Usuario`;
     this._loaderService.show();
 
-    apiCall.subscribe({
-      next: (response: any) => {
+    firstValueFrom(apiCall)
+      .then((response: any) => {
         //console.log(`Usuario ${operationText.toLowerCase()}:`, response);
         this.isModalOpen = false;
         this._loaderService.hide();
@@ -666,16 +668,15 @@ export class UsuariosPage implements OnInit {
         this.setOpenedToast(true);
         this.cleanForm();
         this.getCountElements();
-      },
-      error: (error: any) => {
+      })
+      .catch((error: any) => {
         console.error(
           `Error al ${operationText.toLowerCase()} el usuario:`,
           error
         );
         this._loaderService.hide();
         this.toastMessage = `Error al ${operationText.toLowerCase()} el usuario`;
-      },
-    });
+      });
   }
 
   onPageChange(event: any) {
@@ -689,15 +690,14 @@ export class UsuariosPage implements OnInit {
     if (event === "") {
       this.getCountElements();
     } else {
-      this._globalService.Get(`usuarios/search?query=${event}`).subscribe({
-        next: (response: any) => {
+      firstValueFrom(this._globalService.Get(`usuarios/search?query=${event}`))
+        .then((response: any) => {
           this.elements = response;
           //console.log("Elementos obtenidos:", response);
-        },
-        error: (error) => {
+        })
+        .catch((error) => {
           console.error("Error al obtener los elementos:", error);
-        },
-      });
+        });
     }
   }
 
@@ -706,44 +706,41 @@ export class UsuariosPage implements OnInit {
     const skip = this.currentPage * this.currentPageSize - this.currentPageSize;
     const limit = this.currentPageSize;
 
-    this._globalService
-      .Get(`usuarios/paginated?skip=${skip}&limit=${limit}`)
-      .subscribe({
-        next: (response: any) => {
-          this.elements = response;
-          //console.log("Elementos obtenidos:", response);
-        },
-        error: (error) => {
-          console.error("Error al obtener los elementos:", error);
-        },
+    firstValueFrom(
+      this._globalService.Get(`usuarios/paginated?skip=${skip}&limit=${limit}`)
+    )
+      .then((response: any) => {
+        this.elements = response;
+        //console.log("Elementos obtenidos:", response);
+      })
+      .catch((error) => {
+        console.error("Error al obtener los elementos:", error);
       });
   }
 
   getCountElements() {
-    this._globalService.Get("usuarios/count").subscribe({
-      next: (response: any) => {
+    firstValueFrom(this._globalService.Get("usuarios/count"))
+      .then((response: any) => {
         //console.log("Cantidad de elementos:", response.count);
         const totalElements = response.count;
         this.totalPages = Math.ceil(totalElements / this.currentPageSize);
         //console.log("Total de páginas:", this.totalPages);
         this.getElementsPag();
-      },
-      error: (error) => {
+      })
+      .catch((error) => {
         console.error("Error al obtener la cantidad de elementos:", error);
-      },
-    });
+      });
   }
 
   // TODO: ESPECIFICO
   getRoles() {
-    this._globalService.Get("roles").subscribe({
-      next: (roles: any) => {
+    firstValueFrom(this._globalService.Get("roles"))
+      .then((roles: any) => {
         this.roles = roles;
         //console.log("Roles obtenidos:", this.roles);
-      },
-      error: (error) => {
+      })
+      .catch((error) => {
         console.error("Error al obtener los roles:", error);
-      },
-    });
+      });
   }
 }

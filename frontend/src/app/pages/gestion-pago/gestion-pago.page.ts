@@ -62,8 +62,6 @@ export class GestionPagoPage implements OnInit {
   adeudoTotal: number = 0;
   daysLate: number = 0;
 
-  private suscriptions: Subscription[] = [];
-
   formModels: FormModels;
   pagoForm: FormGroup;
 
@@ -80,7 +78,7 @@ export class GestionPagoPage implements OnInit {
     this.pagoForm = this.formModels.pagoForm();
   }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {}
 
   printSection() {
     this.isPrint = true;
@@ -88,7 +86,8 @@ export class GestionPagoPage implements OnInit {
     this._loaderService.show();
     const customPrintOptions: PrintOptions = new PrintOptions({
       printSectionId: "print-fechas-pagos",
-      printTitle: "Fechas de Pago" + " - Prestamo(" + this.prestamoSeleccionado.id + ")",
+      printTitle:
+        "Fechas de Pago" + " - Prestamo(" + this.prestamoSeleccionado.id + ")",
 
       // Add any other print options as needed
     });
@@ -131,39 +130,34 @@ export class GestionPagoPage implements OnInit {
   }
 
   verifyExistContract() {
-    this.suscriptions.push(
-      this._globalService
-        .Get(`contratos-pagos/verify/${this.prestamoSeleccionado.id}`)
-        .subscribe({
-          next: (data: any) => {
-            const { exist } = data;
+    firstValueFrom(
+      this._globalService.Get(
+        `contratos-pagos/verify/${this.prestamoSeleccionado.id}`
+      )
+    )
+      .then((data: any) => {
+        const { exist } = data;
 
-            //console.log("Contrato existente", data);
-            if (exist) {
-              this.existContrato = true;
-              this.getFechasPago(this.prestamoSeleccionado);
-            } else {
-              this.existContrato = false;
-            }
-          },
-          error: (error: any) => {
-            console.error("Error al verificar si existe el contrato", error);
-          },
-        })
-    );
+        //console.log("Contrato existente", data);
+        if (exist) {
+          this.existContrato = true;
+          this.getFechasPago(this.prestamoSeleccionado);
+        } else {
+          this.existContrato = false;
+        }
+      })
+      .catch((error: any) => {
+        console.error("Error al verificar si existe el contrato", error);
+      });
   }
 
   ionViewDidEnter() {
     this.getPrestamo();
     this.buildColumns();
   }
-  ionViewDidLeave() {
-    this.suscriptions.forEach((sub) => sub.unsubscribe());
-  }
 
   async save(data: any) {
     if (await this._preventAbuseService.registerClick()) {
-
       // return;
       if (data.monto > this.adeudoTotal) {
         this.toastColor = "danger";
@@ -200,8 +194,10 @@ export class GestionPagoPage implements OnInit {
       data.idPrestamo = this.prestamoSeleccionado.id;
       data.mora = this.mora;
 
-      this._globalService.PostWithFile("pagos/saveFile", data, file).subscribe({
-        next: (response) => {
+      firstValueFrom(
+        this._globalService.PostWithFile("pagos/saveFile", data, file)
+      )
+        .then((response) => {
           //console.log("Respuesta del Servidor: ", response);
           this.getFechasPago(this.prestamoSeleccionado);
           this.uploaderComponent?.uploader?.clearQueue();
@@ -210,15 +206,14 @@ export class GestionPagoPage implements OnInit {
           this.toastColor = "success";
           this.toastMessage = "Pago guardado correctamente";
           this.isToastOpen = true;
-        },
-        error: (error) => {
+        })
+        .catch((error) => {
           console.error("Error en el Servidor: ", error);
           // TODO: Mostrar mensaje de error
           this.toastColor = "danger";
           this.toastMessage = "Error al guardar el pago";
           this.isToastOpen = true;
-        },
-      });
+        });
     }
   }
 
@@ -408,22 +403,21 @@ export class GestionPagoPage implements OnInit {
 
   onDeleteButtonClicked(data: any) {
     //console.log("Elemento eliminado:", data);
-    this._globalService.Delete("pagos", data.id).subscribe({
-      next: async () => {
+    firstValueFrom(this._globalService.Delete("pagos", data.id))
+      .then(async () => {
         this.toastColor = "success";
         this.toastMessage = "Pago eliminado exitosamente.";
         this.isToastOpen = true;
 
         const prestamo = await this.fetchPrestamo(this.prestamoSeleccionado.id);
         this.updatePrestamoState(prestamo);
-      },
-      error: (error: any) => {
+      })
+      .catch((error: any) => {
         this.toastColor = "danger";
         this.toastMessage = "Error al eliminar el pago.";
         this.isToastOpen = true;
         console.error("Error al eliminar el pago:", error);
-      },
-    });
+      });
   }
 
   private resetPaymentValues(): void {
@@ -453,17 +447,16 @@ export class GestionPagoPage implements OnInit {
   }
 
   getMora(id: number): void {
-    this._globalService.GetId("moras/fecha-pago", id).subscribe({
-      next: (response: any) => {
+    firstValueFrom(this._globalService.GetId("moras/fecha-pago", id))
+      .then((response: any) => {
         //console.log("Mora:", response);
         const mora = this.calculateTotalMora(response);
         if (mora > 0) {
           this.mora = this.calculateTotalMora(response);
         }
         this.calculateTotales();
-      },
-      error: (error: any) => console.error("Error al obtener la mora:", error),
-    });
+      })
+      .catch((error: any) => console.error("Error al obtener la mora:", error));
   }
 
   private calculateTotalMora(moraData: any[]): number {
@@ -490,17 +483,18 @@ export class GestionPagoPage implements OnInit {
 
   private getFechasPago(data: any): void {
     //console.log("Información del prestamo:", data);
-    this._globalService.Get(`fechas-pagos/plan/${data.planPago.id}`).subscribe({
-      next: (response: any) => {
+    firstValueFrom(
+      this._globalService.Get(`fechas-pagos/plan/${data.planPago.id}`)
+    )
+      .then((response: any) => {
         //console.log("Plan de pago:", response);
         this.elements = this.processFechasPago(response);
         const lastValue = this.elements.filter((cuota) => cuota.estado).length;
         this.selectPago(lastValue);
-      },
-      error: (error: any) => {
+      })
+      .catch((error: any) => {
         console.error("Error al obtener el plan de pago:", error);
-      },
-    });
+      });
   }
 
   private processFechasPago(fechasPago: any[]): any[] {

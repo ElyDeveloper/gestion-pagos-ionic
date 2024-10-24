@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, ViewChild } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
-import { interval, Subscription, takeWhile } from "rxjs";
+import { firstValueFrom, interval, Subscription, takeWhile } from "rxjs";
 import { LoaderComponent } from "src/app/shared/components/loader/loader.component";
 import { GlobalService } from "src/app/shared/services/global.service";
 
@@ -67,28 +67,28 @@ export class ForgotPasswordPage implements OnInit {
 
   private startCountdown(durationInSeconds: number) {
     const endTime = new Date().getTime() + durationInSeconds * 1000;
-
-    this.countdownSubscription = interval(1000)
-      .pipe(takeWhile(() => new Date().getTime() < endTime))
-      .subscribe(() => {
-        const remaining = endTime - new Date().getTime();
-        const minutes = Math.floor(
-          (remaining % (1000 * 60 * 60)) / (1000 * 60)
-        );
-        const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
-        this.remainingTime = `${minutes}:${seconds
-          .toString()
-          .padStart(2, "0")}`;
-
-        // //console.log("Remaining time: ", this.remainingTime);
-        //Si llega a 0 redirigir a la pagina de inicio
-        if (this.remainingTime == "0:00") {
-          this.toastMessage =
-            "El tiempo de verificación ha expirado, solicite un nuevo código.";
-          this.isToastOpen = true;
-          this.isCodeActive = false;
-        }
-      });
+  
+    firstValueFrom(
+      interval(1000).pipe(
+        takeWhile(() => new Date().getTime() < endTime)
+      )
+    ).then(() => {
+      const remaining = endTime - new Date().getTime();
+      const minutes = Math.floor(
+        (remaining % (1000 * 60 * 60)) / (1000 * 60)
+      );
+      const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+      this.remainingTime = `${minutes}:${seconds
+        .toString()
+        .padStart(2, "0")}`;
+  
+      if (this.remainingTime == "0:00") {
+        this.toastMessage =
+          "El tiempo de verificación ha expirado, solicite un nuevo código.";
+        this.isToastOpen = true;
+        this.isCodeActive = false;
+      }
+    });
   }
 
   setOpenedToast(value: boolean) {
@@ -105,39 +105,27 @@ export class ForgotPasswordPage implements OnInit {
     if (this.validateForm.valid) {
       this.textLoader = "Generando código, por favor espere";
       this.loaderComponent.show();
-      this._globalService
-        .Post("send-email", {
+  
+      firstValueFrom(
+        this._globalService.Post("send-email", {
           identificator: this.validateForm.value.identificator,
-          // subject: 'Codigo de verificación',
-          // text: 'Su codigo de verificacion es : ',
           option: 1,
         })
-        .subscribe({
-          next: (result: any) => {
-            //console.log(result);
-            if (result.error) {
-              //Mostrar toast
-              this.toastMessage = result.error;
-              this.isToastOpen = true;
-              this.loaderComponent.hide();
-            } else {
-              //Setear la expiracion del token en cookies
-
-              localStorage.setItem("expiration-code", result.expiration);
-              this.router.navigate(["/verify-code"]);
-              // this.router.navigate(["/verify-code"]);
-            }
-          },
-          error: (error) => {
-            //console.log(error);
-            this.toastMessage =
-              "Ha ocurrido un error, por favor intente de nuevo.";
-            this.isToastOpen = true;
-          },
-          complete: () => {
-            this.loaderComponent.hide();
-          },
-        });
+      ).then((result: any) => {
+        if (result.error) {
+          this.toastMessage = result.error;
+          this.isToastOpen = true;
+          this.loaderComponent.hide();
+        } else {
+          localStorage.setItem("expiration-code", result.expiration);
+          this.router.navigate(["/verify-code"]);
+        }
+        this.loaderComponent.hide();
+      }).catch(error => {
+        this.toastMessage = "Ha ocurrido un error, por favor intente de nuevo.";
+        this.isToastOpen = true;
+        this.loaderComponent.hide();
+      });
     } else {
       Object.values(this.validateForm.controls).forEach((control) => {
         if (control.invalid) {

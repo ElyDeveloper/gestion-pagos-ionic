@@ -6,7 +6,7 @@ import { GlobalService } from "src/app/shared/services/global.service";
 import { key } from "src/app/libraries/key.library";
 import { AuthService } from "src/app/shared/services/auth.service";
 import { AlertController } from "@ionic/angular";
-import { Subscription } from "rxjs";
+import { firstValueFrom, Subscription } from "rxjs";
 import { LoaderService } from "src/app/shared/services/loader.service";
 
 interface Login {
@@ -34,7 +34,6 @@ export class LoginPage implements OnInit {
     password: "",
   };
 
-  suscriptions: Subscription[] = [];
 
   private _router = inject(Router);
   private _globalService = inject(GlobalService);
@@ -50,62 +49,51 @@ export class LoginPage implements OnInit {
     this.isToastOpen = value;
   }
 
-  ionViewWillLeave() {
-    this.suscriptions.forEach((sub) => sub.unsubscribe());
-    this.suscriptions = [];
-  }
-
-  async login() {
+  login() {
     if (this.validateForm()) {
       this.textLoader = "Iniciando Sesión";
       this._loaderService.show();
 
-      this.suscriptions.push(
-        this._globalService.Post("login", this.user).subscribe({
-          next: (result: any) => {
-            //console.log("Login Result", result);
+      firstValueFrom(
+        this._globalService.Post("login", this.user)
+      ).then((result: any) => {
+        const { token, usuario } = result;
 
-            const { token, usuario } = result;
+        if (usuario && usuario.changedPassword === false) {
+          this._loaderService.hide();
+          this.toastMessage = "Por favor, cambie su contraseña.";
+          this.setOpenedToast(true);
 
-            if (usuario && usuario.changedPassword === false) {
-              this._loaderService.hide();
-              this.toastMessage = "Por favor, cambie su contraseña.";
-              this.setOpenedToast(true);
+          //Preguntar si se redirige a la página de cambio de contraseña
+          this.questRedirect(usuario.id);
+          return;
+        }
 
-              //Preguntar si se redirige a la página de cambio de contraseña
-              this.questRedirect(usuario.id);
-              return;
-            }
+        if (token) {
+          //Guardar el token de session en el local storage
+          localStorage.setItem("tokensession", token);
 
-            if (token) {
+          // Usar el AuthService para almacenar la información del usuario
+          this._authService.setUserInfo(result.usuario);
 
-              //Guardar el token de session en el local storage
-              localStorage.setItem("tokensession", token);
-
-              // Usar el AuthService para almacenar la información del usuario
-              this._authService.setUserInfo(result.usuario);
-
-              this.toastColor = "success";
-              this.toastMessage = "Bienvenido " + this.user.identificator;
-              this.setOpenedToast(true);
-              setTimeout(() => {
-                this._loaderService.hide();
-                this._router.navigate(["/layout"]);
-              }, 2000);
-            } else {
-              this._loaderService.hide();
-              this.toastMessage = "Usuario o contraseña incorrectos.";
-              this.setOpenedToast(true);
-            }
-          },
-          error: (error: any) => {
-            console.error(error);
+          this.toastColor = "success";
+          this.toastMessage = "Bienvenido " + this.user.identificator;
+          this.setOpenedToast(true);
+          setTimeout(() => {
             this._loaderService.hide();
-            this.toastMessage = "Error al iniciar sesión";
-            this.setOpenedToast(true);
-          },
-        })
-      );
+            this._router.navigate(["/layout"]);
+          }, 2000);
+        } else {
+          this._loaderService.hide();
+          this.toastMessage = "Usuario o contraseña incorrectos.";
+          this.setOpenedToast(true);
+        }
+      }).catch((error:any) => {
+        console.error(error);
+        this._loaderService.hide();
+        this.toastMessage = "Error al iniciar sesión";
+        this.setOpenedToast(true);
+      });
     } else {
       this.toastMessage = "Por favor, corrija los errores en el formulario.";
       this.setOpenedToast(true);

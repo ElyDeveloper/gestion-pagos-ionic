@@ -38,14 +38,14 @@
       <ion-col size-xs="12" size-md="6" size-lg="6">
         <ion-card style="min-height: 290px">
           <ion-card-header>
-            @if(currentUser.rolid!==3){
+            @if(currentUser?.rolid!==3){
             <ion-card-title>Panel Administrativo</ion-card-title>
             }@else {
             <ion-card-title>Panel Asesor</ion-card-title>
             }
           </ion-card-header>
           <ion-card-content class="p-4">
-            @if(currentUser.rolid!==3){
+            @if(currentUser?.rolid!==3){
             <ion-item class="ion-margin-top">
               <ion-label>
                 <h2 class="ion-text-wrap">Asesor Seleccionado</h2>

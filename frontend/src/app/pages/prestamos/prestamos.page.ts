@@ -60,8 +60,6 @@ export class PrestamosPage implements OnInit {
   isEdit = false;
   state = true;
 
-  suscripciones: Subscription[] = [];
-
   textLoader: string = "Cargando...";
   toastMessage: string = "cliente guardado correctamente";
   toastColor: string = "primary";
@@ -114,33 +112,26 @@ export class PrestamosPage implements OnInit {
     this.buildColumnsPlan();
   }
 
-  ngOnDestroy() {
-    this.suscripciones.forEach((sub) => sub.unsubscribe());
-  }
-
   getCurrentUser() {
-    this.suscripciones.push(
-      this._authService.getUserInfo().subscribe({
-        next: (user: any) => {
-          this.currentUser = user;
-          console.log("Usuario actual: ", this.currentUser);
-        },
-        error: (error: any) => {
-          console.error("Error al obtener información del usuario:", error);
-        },
+    firstValueFrom(this._authService.getUserInfo())
+      .then((user: any) => {
+        this.currentUser = user;
+        console.log("Usuario actual: ", this.currentUser);
       })
-    );
+      .catch((error: any) => {
+        console.error("Error al obtener información del usuario:", error);
+      });
+
     //console.log("Usuario actual: ", this.currentUser);
   }
 
   //TODO: ESPECIFICO
   getEstadosAprobacion() {
-    // TODO: Implementar la llamada a la API para obtener los estados de aprobación
-    Ejemplo: this._globalService
-      .Get("estados-internos")
-      .subscribe((data: any) => {
+    firstValueFrom(this._globalService.Get("estados-internos")).then(
+      (data: any) => {
         this.estadosAprobacion = data;
-      });
+      }
+    );
   }
 
   //TODO: ESPECIFICO
@@ -369,8 +360,10 @@ export class PrestamosPage implements OnInit {
 
   onPlanButtonClicked(data: any) {
     //console.log("Información del prestamo:", data);
-    this._globalService.Get("fechas-pagos/plan/" + data.planPago.id).subscribe({
-      next: (response: any) => {
+    firstValueFrom(
+      this._globalService.Get("fechas-pagos/plan/" + data.planPago.id)
+    )
+      .then((response: any) => {
         //console.log("Plan de pago:", response);
         this.proyeccionesPlan = response;
         //Agregar columna numero correlativo
@@ -379,14 +372,13 @@ export class PrestamosPage implements OnInit {
         });
         this.modalSelected = this.modalViewPlan;
         this.isModalOpen = true;
-      },
-      error: (error: any) => {
+      })
+      .catch((error: any) => {
         console.error("Error al obtener el plan de pago:", error);
         this._loaderService.hide();
         this.toastMessage = "Error al obtener el plan de pago";
         this.setOpenedToast(true);
-      },
-    });
+      });
   }
 
   onCheckButtonClicked(data: any) {
@@ -397,21 +389,21 @@ export class PrestamosPage implements OnInit {
     //console.log("Eliminar presta,mo Obtenido:", data);
     this.textLoader = "Eliminando prestamo";
     this._loaderService.show();
-    this._globalService.Delete("prestamos", data.id).subscribe({
-      next: (response: any) => {
+
+    firstValueFrom(this._globalService.Delete("prestamos", data.id))
+      .then((response: any) => {
         //console.log("cliente eliminado:", response);
         this.getCountElements();
         this._loaderService.hide();
         this.toastMessage = "prestamo eliminado correctamente";
         this.setOpenedToast(true);
-      },
-      error: (error: any) => {
+      })
+      .catch((error: any) => {
         console.error("Error al eliminar el prestamo:", error);
         this._loaderService.hide();
         this.toastMessage = "Error al eliminar el prestamo";
         this.setOpenedToast(true);
-      },
-    });
+      });
   }
 
   handleSave(data: any) {
@@ -447,11 +439,11 @@ export class PrestamosPage implements OnInit {
     //TODO COMENTAR
     //console.log(`Datos del ${this.elementType}: `, data);
 
-    apiCall.subscribe({
-      next: (response: any) =>
-        this.handleOperationSuccess(response, operationText),
-      error: (error: any) => this.handleOperationError(error, operationText),
-    });
+    firstValueFrom(apiCall)
+      .then((response: any) =>
+        this.handleOperationSuccess(response, operationText)
+      )
+      .catch((error: any) => this.handleOperationError(error, operationText));
   }
 
   handleAprobar(operation: "create", data: any): void {
@@ -466,11 +458,11 @@ export class PrestamosPage implements OnInit {
     //TODO COMENTAR
     // //console.log(`Datos del ${this.elementType}: `, data);
 
-    apiCall.subscribe({
-      next: (response: any) =>
-        this.handleOperationSuccess(response, operationText),
-      error: (error: any) => this.handleOperationError(error, operationText),
-    });
+    firstValueFrom(apiCall)
+      .then((response: any) =>
+        this.handleOperationSuccess(response, operationText)
+      )
+      .catch((error: any) => this.handleOperationError(error, operationText));
   }
 
   private getOperationConfigElement(

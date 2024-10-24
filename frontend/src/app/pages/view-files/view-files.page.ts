@@ -8,6 +8,7 @@ import {
 import { DomSanitizer, SafeUrl } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
 import { HttpResponse } from "@capacitor/core";
+import { firstValueFrom } from "rxjs";
 import { GlobalService } from "src/app/shared/services/global.service";
 
 @Component({
@@ -41,13 +42,15 @@ export class ViewFilesPage implements OnInit {
   }
 
   getFile() {
-    this.route.paramMap.subscribe((params) => {
+    firstValueFrom(this.route.paramMap).then((params) => {
       const id = params.get("id");
       if (id) {
-        this.globalService.GetIdDecrypted("decrypted-id", id).subscribe({
-          next: (decryptedId: any) => {
-            this.globalService.downloadFile("getFile", decryptedId).subscribe({
-              next: (response: any) => {
+        firstValueFrom(this.globalService.GetIdDecrypted("decrypted-id", id))
+          .then((decryptedId: any) => {
+            firstValueFrom(
+              this.globalService.downloadFile("getFile", decryptedId)
+            )
+              .then((response: any) => {
                 const blob = response.body;
                 if (blob) {
                   const contentType =
@@ -57,25 +60,23 @@ export class ViewFilesPage implements OnInit {
 
                   if (this.isImage || this.isPdf) {
                     const unsafeUrl = URL.createObjectURL(blob);
-                    // //console.log("unsafeUrl: ", unsafeUrl);
+                    //console.log("unsafeUrl: ", unsafeUrl);
 
                     this.fileUrl = unsafeUrl;
                   } else {
                     this.error = "Unsupported file type";
                   }
                 }
-              },
-              error: (error) => {
+              })
+              .catch((error) => {
                 console.error("Error downloading file: ", error);
                 this.error = "Error downloading file";
-              },
-            });
-          },
-          error: (error) => {
+              });
+          })
+          .catch((error) => {
             console.error("Error decrypting ID: ", error);
             this.error = "Error decrypting ID";
-          },
-        });
+          });
       } else {
         this.router.navigate(["/layout/home"]);
       }

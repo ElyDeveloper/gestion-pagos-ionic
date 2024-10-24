@@ -9,6 +9,7 @@ import { NgxPrintService, PrintOptions } from "ngx-print";
 import {
   debounceTime,
   distinctUntilChanged,
+  firstValueFrom,
   Subject,
   Subscription,
   switchMap,
@@ -109,9 +110,7 @@ export class ReportesPage implements OnInit {
         distinctUntilChanged() // Asegura que solo se realice una búsqueda si el valor ha cambiado
       )
       .subscribe(() => {
-        if (
-          this.searchClient.trim() === ""
-        ) {
+        if (this.searchClient.trim() === "") {
           this.filteredClientes = [];
         } else {
           this.searchDataClients();
@@ -125,9 +124,7 @@ export class ReportesPage implements OnInit {
         distinctUntilChanged() // Asegura que solo se realice una búsqueda si el valor ha cambiado
       )
       .subscribe(() => {
-        if (
-          this.searchAsesor.trim() === ""
-        ) {
+        if (this.searchAsesor.trim() === "") {
           this.filteredAsesores = [];
         } else {
           this.searchDataUsers();
@@ -149,43 +146,43 @@ export class ReportesPage implements OnInit {
   }
 
   searchDataClients() {
-    this._globalService
-      .Get(`personas/clientes/search?query=${this.searchClient}`)
-      .subscribe({
-        next: (data: any) => {
-          //console.log(`Clientes encontrados para ${this.searchClient}:`, data);
-          this.filteredClientes = data;
-        },
-        error: (error) => {
-          console.error("Error al obtener clientes:", error);
-        },
+    firstValueFrom(
+      this._globalService.Get(
+        `personas/clientes/search?query=${this.searchClient}`
+      )
+    )
+      .then((data: any) => {
+        //console.log(`Clientes encontrados para ${this.searchClient}:`, data);
+        this.filteredClientes = data;
+      })
+      .catch((error) => {
+        console.error("Error al obtener clientes:", error);
       });
   }
 
   searchDataUsers() {
-    this._globalService
-      .Get(`usuarios/asesores/search?query=${this.searchAsesor}`)
-      .subscribe({
-        next: (data: any) => {
-          //console.log(`Asesores encontrados para ${this.searchAsesor}:`, data);
-          this.filteredAsesores = data;
-        },
-        error: (error) => {
-          console.error("Error al obtener clientes:", error);
-        },
+    firstValueFrom(
+      this._globalService.Get(
+        `usuarios/asesores/search?query=${this.searchAsesor}`
+      )
+    )
+      .then((data: any) => {
+        //console.log(`Asesores encontrados para ${this.searchAsesor}:`, data);
+        this.filteredAsesores = data;
+      })
+      .catch((error) => {
+        console.error("Error al obtener clientes:", error);
       });
   }
 
   getCurrentUser() {
-    this.subscriptions.push(
-      this._authService.getUserInfo().subscribe((user) => {
-        this.currentUser = user;
-        if (user?.rolid === 3) {
-          this.selectedAsesor = user;
-          //console.log("User es asesor:", user);
-        }
-      })
-    );
+    firstValueFrom(this._authService.getUserInfo()).then((user) => {
+      this.currentUser = user;
+      if (user?.rolid === 3) {
+        this.selectedAsesor = user;
+        //console.log("User es asesor:", user);
+      }
+    });
   }
 
   clearFilters() {
@@ -214,6 +211,9 @@ export class ReportesPage implements OnInit {
 
         break;
       case "cartera-asesor":
+        if (this.currentUser?.rolid === 3) {
+          this.selectedAsesor = this.currentUser;
+        }
         this.reportCarteraAsesor.getCarteraAsesor(this.selectedAsesor);
 
         break;
@@ -264,6 +264,11 @@ export class ReportesPage implements OnInit {
         break;
       case "cartera-asesor":
         this.enableFilterAsesor = true;
+        if (this.currentUser?.rolid === 3) {
+          setTimeout(() => {
+            this.selectAsesor(this.currentUser);
+          }, 2000);
+        }
         break;
     }
 
