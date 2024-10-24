@@ -244,7 +244,6 @@ export class PersonasController {
     @param.path.number('idUser') idUser: number,
     @param.query.number('skip') skip: number,
     @param.query.number('limit') limit: number,
-
   ): Promise<any> {
     // const userId = parseInt(currentUser[securityId], 10);
 
@@ -563,7 +562,7 @@ export class PersonasController {
     }
   }
 
-  @get('/personas/todos/search/{idUser')
+  @get('/personas/todos/search/{idUser}')
   async dataPersonasSearch(
     // @inject(SecurityBindings.USER)
     // currentUser: UserProfile,
@@ -626,7 +625,6 @@ export class PersonasController {
         'recordCrediticio',
         'estadoCivil',
         'tipoPersona',
-        'usuarioCliente'
       ],
     });
 

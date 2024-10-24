@@ -21,3 +21,4 @@ export * from './documentos-tipo-doc.controller';
 export * from './contratos-pagos.controller';
 export * from './global.controller';
 export * from './estados-internos.controller';
+export * from './personas-usuario-cliente.controller';
