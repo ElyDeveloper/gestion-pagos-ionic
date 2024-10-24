@@ -86,7 +86,7 @@ export class PersonasController {
     return this.usuarioClienteRepository.create(usuarioCliente);
   }
 
-  @get('/personas/count')
+  @get('/personas/count/{idUser}')
   @response(200, {
     description: 'Personas model count',
     content: {'application/json': {schema: CountSchema}},
@@ -94,11 +94,13 @@ export class PersonasController {
   async countPersonas(
     @inject(SecurityBindings.USER)
     currentUser: UserProfile,
+    @param.path.number('idUser') idUser: number,
     @param.where(Personas) where?: Where<Personas>,
   ): Promise<Count> {
-    const userId = parseInt(currentUser[securityId], 10);
+    // const userId = parseInt(currentUser[securityId], 10);
 
-    const user = await this.usuarioRepository.findById(userId);
+    const user = await this.usuarioRepository.findById(idUser);
+    console.log('currentUser: ', user);
     if (!user) {
       throw new HttpErrors.Unauthorized('Usuario no encontrado');
     }
@@ -106,7 +108,7 @@ export class PersonasController {
     if (user.rolid === 3) {
       const usuariosClientes = await this.usuarioClienteRepository.find({
         where: {
-          usuarioId: userId,
+          usuarioId: idUser,
         },
         include: [
           {
@@ -138,7 +140,7 @@ export class PersonasController {
     });
   }
 
-  @get('/personas/clientes/count')
+  @get('/personas/clientes/count/{idUser}')
   @response(200, {
     description: 'Personas model count',
     content: {'application/json': {schema: CountSchema}},
@@ -146,13 +148,14 @@ export class PersonasController {
   async countClientes(
     @inject(SecurityBindings.USER)
     currentUser: UserProfile,
+    @param.path.number('idUser') idUser: number,
     @param.where(Personas) where?: Where<Personas>,
   ): Promise<Count> {
     //console.log('Usuario Logueado: ', currentUser);
-    const userId = parseInt(currentUser[securityId], 10);
+    // const userId = parseInt(currentUser[securityId], 10);
     //console.log('Id de Usuario Logueado en Clientes: ', userId);
 
-    const user = await this.usuarioRepository.findById(userId);
+    const user = await this.usuarioRepository.findById(idUser);
     if (!user) {
       throw new HttpErrors.Unauthorized('Usuario no encontrado');
     }
@@ -161,7 +164,7 @@ export class PersonasController {
     if (user.rolid === 3) {
       const usuariosClientes = await this.usuarioClienteRepository.find({
         where: {
-          usuarioId: userId,
+          usuarioId: idUser,
         },
         include: [
           {
@@ -224,7 +227,7 @@ export class PersonasController {
     return this.personasRepository.find();
   }
 
-  @get('/personas/todos/paginated')
+  @get('/personas/todos/paginated/{idUser}')
   @response(200, {
     description: 'List of Personas model',
     content: {
@@ -237,13 +240,15 @@ export class PersonasController {
     },
   })
   async dataPaginate(
-    @inject(SecurityBindings.USER) currentUser: UserProfile,
+    // @inject(SecurityBindings.USER) currentUser: UserProfile,
+    @param.path.number('idUser') idUser: number,
     @param.query.number('skip') skip: number,
     @param.query.number('limit') limit: number,
-  ): Promise<any> {
-    const userId = parseInt(currentUser[securityId], 10);
 
-    const user = await this.usuarioRepository.findById(userId);
+  ): Promise<any> {
+    // const userId = parseInt(currentUser[securityId], 10);
+
+    const user = await this.usuarioRepository.findById(idUser);
     if (!user) {
       throw new HttpErrors.Unauthorized('Usuario no encontrado');
     }
@@ -251,7 +256,7 @@ export class PersonasController {
     if (user.rolid === 3) {
       const [usuariosCliente] = await Promise.all([
         this.usuarioClienteRepository.find({
-          where: {usuarioId: userId, estado: true},
+          where: {usuarioId: idUser, estado: true},
           include: [
             {
               relation: 'cliente',
@@ -308,7 +313,7 @@ export class PersonasController {
     }
   }
 
-  @get('/personas/clientes/paginated')
+  @get('/personas/clientes/paginated/{idUser}')
   @response(200, {
     description: 'List of Personas model',
     content: {
@@ -321,13 +326,14 @@ export class PersonasController {
     },
   })
   async dataPaginateClientes(
-    @inject(SecurityBindings.USER)
-    currentUser: UserProfile,
+    // @inject(SecurityBindings.USER)
+    // currentUser: UserProfile,
+    @param.path.number('idUser') idUser: number,
     @param.query.number('skip') skip: number,
     @param.query.number('limit') limit: number,
   ): Promise<any[]> {
     //console.log('Usuario Logueado: ', currentUser);
-    const userId = parseInt(currentUser[securityId], 10);
+    // const userId = parseInt(currentUser[securityId], 10);
     //console.log('Id de Usuario Logueado: ', userId);
 
     //console.log('Consulta paginada: ', skip);
@@ -353,7 +359,7 @@ export class PersonasController {
       idEncrypted: this.jwtService.encryptId(persona.id || 0),
     }));
 
-    // //console.log('Personas encontradas: ', copiaSpread);
+    //console.log('Personas encontradas: ', copiaSpread);
 
     return copiaSpread;
   }
@@ -499,7 +505,7 @@ export class PersonasController {
     @param.path.number('id') id: number,
     @requestBody() usuarioCliente: any,
   ): Promise<void> {
-    // //console.log('personas', id, usuarioCliente);
+    //console.log('personas', id, usuarioCliente);
 
     const userClient = await this.usuarioClienteRepository.findOne({
       where: {
@@ -557,16 +563,17 @@ export class PersonasController {
     }
   }
 
-  @get('/personas/todos/search')
+  @get('/personas/todos/search/{idUser')
   async dataPersonasSearch(
-    @inject(SecurityBindings.USER)
-    currentUser: UserProfile,
+    // @inject(SecurityBindings.USER)
+    // currentUser: UserProfile,
+    @param.path.number('idUser') userId: number,
     @param.query.string('query') search: string,
   ): Promise<any> {
     //console.log('search', search);
 
     //console.log('Usuario Logueado: ', currentUser);
-    const userId = parseInt(currentUser[securityId], 10);
+    // const userId = parseInt(currentUser[securityId], 10);
     //console.log('Id de Usuario Logueado: ', userId);
 
     const user = await this.usuarioRepository.findById(userId);
@@ -619,6 +626,7 @@ export class PersonasController {
         'recordCrediticio',
         'estadoCivil',
         'tipoPersona',
+        'usuarioCliente'
       ],
     });
 
@@ -635,21 +643,22 @@ export class PersonasController {
       idEncrypted: this.jwtService.encryptId(persona.id || 0),
     }));
 
-    // //console.log('Personas encontradas: ', copiaSpread);
+    //console.log('Personas encontradas: ', copiaSpread);
 
     return copiaSpread;
   }
 
-  @get('/personas/clientes/search')
+  @get('/personas/clientes/search/{idUser}')
   async dataClientesSearch(
-    @inject(SecurityBindings.USER)
-    currentUser: UserProfile,
+    // @inject(SecurityBindings.USER)
+    // currentUser: UserProfile,
+    @param.path.number('idUser') userId: number,
     @param.query.string('query') search: string,
   ): Promise<any> {
     //console.log('search', search);
 
     //console.log('Usuario Logueado: ', currentUser);
-    const userId = parseInt(currentUser[securityId], 10);
+    // const userId = parseInt(currentUser[securityId], 10);
     //console.log('Id de Usuario Logueado: ', userId);
 
     const user = await this.usuarioRepository.findById(userId);
@@ -718,7 +727,7 @@ export class PersonasController {
       idEncrypted: this.jwtService.encryptId(persona.id || 0),
     }));
 
-    // //console.log('Personas encontradas: ', copiaSpread);
+    //console.log('Personas encontradas: ', copiaSpread);
 
     return copiaSpread;
   }
@@ -728,7 +737,7 @@ export class PersonasController {
     @param.query.string('query') search: string,
   ): Promise<any> {
     // let PersonasSearch = await this.getPersonasSearch(search);
-    // //console.log('PersonasSearch', PersonasSearch);
+    //console.log('PersonasSearch', PersonasSearch);
     // return PersonasSearch;
 
     //console.log('search', search);

@@ -1,10 +1,13 @@
-import {Entity, model, property, belongsTo} from '@loopback/repository';
+import {Entity, model, property, belongsTo, hasOne} from '@loopback/repository';
 import {RecordCrediticio} from './record-crediticio.model';
 import {Nacionalidades} from './nacionalidades.model';
 import {EstadoCivil} from './estado-civil.model';
 import {TipoPersonas} from './tipo-personas.model';
+import {UsuarioCliente} from './usuario-cliente.model';
 
-@model({settings: {idInjection: false, mssql: {schema: 'dbo', table: 'Personas'}}})
+@model({
+  settings: {idInjection: false, mssql: {schema: 'dbo', table: 'Personas'}},
+})
 export class Personas extends Entity {
   @property({
     type: 'number',
@@ -13,7 +16,15 @@ export class Personas extends Entity {
     scale: 0,
     generated: 1,
     id: 1,
-    mssql: {columnName: 'Id', dataType: 'int', dataLength: null, dataPrecision: 10, dataScale: 0, nullable: 'NO', generated: 1},
+    mssql: {
+      columnName: 'Id',
+      dataType: 'int',
+      dataLength: null,
+      dataPrecision: 10,
+      dataScale: 0,
+      nullable: 'NO',
+      generated: 1,
+    },
   })
   id?: number;
 
@@ -22,7 +33,15 @@ export class Personas extends Entity {
     jsonSchema: {nullable: true},
     length: 13,
     generated: false,
-    mssql: {columnName: 'DNI', dataType: 'varchar', dataLength: 13, dataPrecision: null, dataScale: null, nullable: 'YES', generated: false},
+    mssql: {
+      columnName: 'DNI',
+      dataType: 'varchar',
+      dataLength: 13,
+      dataPrecision: null,
+      dataScale: null,
+      nullable: 'YES',
+      generated: false,
+    },
   })
   dni?: string;
 
@@ -32,7 +51,15 @@ export class Personas extends Entity {
     jsonSchema: {nullable: false},
     length: 100,
     generated: false,
-    mssql: {columnName: 'Nombres', dataType: 'varchar', dataLength: 100, dataPrecision: null, dataScale: null, nullable: 'NO', generated: false},
+    mssql: {
+      columnName: 'Nombres',
+      dataType: 'varchar',
+      dataLength: 100,
+      dataPrecision: null,
+      dataScale: null,
+      nullable: 'NO',
+      generated: false,
+    },
   })
   nombres: string;
 
@@ -42,7 +69,15 @@ export class Personas extends Entity {
     jsonSchema: {nullable: false},
     length: 100,
     generated: false,
-    mssql: {columnName: 'Apellidos', dataType: 'varchar', dataLength: 100, dataPrecision: null, dataScale: null, nullable: 'NO', generated: false},
+    mssql: {
+      columnName: 'Apellidos',
+      dataType: 'varchar',
+      dataLength: 100,
+      dataPrecision: null,
+      dataScale: null,
+      nullable: 'NO',
+      generated: false,
+    },
   })
   apellidos: string;
 
@@ -52,7 +87,15 @@ export class Personas extends Entity {
     jsonSchema: {nullable: false},
     length: 12,
     generated: false,
-    mssql: {columnName: 'Cel', dataType: 'varchar', dataLength: 12, dataPrecision: null, dataScale: null, nullable: 'NO', generated: false},
+    mssql: {
+      columnName: 'Cel',
+      dataType: 'varchar',
+      dataLength: 12,
+      dataPrecision: null,
+      dataScale: null,
+      nullable: 'NO',
+      generated: false,
+    },
   })
   cel: string;
 
@@ -62,7 +105,15 @@ export class Personas extends Entity {
     jsonSchema: {nullable: false},
     length: 200,
     generated: false,
-    mssql: {columnName: 'Direccion', dataType: 'varchar', dataLength: 200, dataPrecision: null, dataScale: null, nullable: 'NO', generated: false},
+    mssql: {
+      columnName: 'Direccion',
+      dataType: 'varchar',
+      dataLength: 200,
+      dataPrecision: null,
+      dataScale: null,
+      nullable: 'NO',
+      generated: false,
+    },
   })
   direccion: string;
 
@@ -72,7 +123,15 @@ export class Personas extends Entity {
     jsonSchema: {nullable: false},
     length: 100,
     generated: false,
-    mssql: {columnName: 'Email', dataType: 'varchar', dataLength: 100, dataPrecision: null, dataScale: null, nullable: 'NO', generated: false},
+    mssql: {
+      columnName: 'Email',
+      dataType: 'varchar',
+      dataLength: 100,
+      dataPrecision: null,
+      dataScale: null,
+      nullable: 'NO',
+      generated: false,
+    },
   })
   email: string;
 
@@ -81,7 +140,15 @@ export class Personas extends Entity {
     required: true,
     jsonSchema: {nullable: false},
     generated: false,
-    mssql: {columnName: 'FechaIngreso', dataType: 'date', dataLength: null, dataPrecision: null, dataScale: null, nullable: 'NO', generated: false},
+    mssql: {
+      columnName: 'FechaIngreso',
+      dataType: 'date',
+      dataLength: null,
+      dataPrecision: null,
+      dataScale: null,
+      nullable: 'NO',
+      generated: false,
+    },
   })
   fechaIngreso: string;
 
@@ -89,7 +156,15 @@ export class Personas extends Entity {
     type: 'date',
     jsonSchema: {nullable: true},
     generated: false,
-    mssql: {columnName: 'FechaBaja', dataType: 'date', dataLength: null, dataPrecision: null, dataScale: null, nullable: 'YES', generated: false},
+    mssql: {
+      columnName: 'FechaBaja',
+      dataType: 'date',
+      dataLength: null,
+      dataPrecision: null,
+      dataScale: null,
+      nullable: 'YES',
+      generated: false,
+    },
   })
   fechaBaja?: string;
   @property({
@@ -97,7 +172,15 @@ export class Personas extends Entity {
     required: true,
     jsonSchema: {nullable: false},
     generated: false,
-    mssql: {columnName: 'Estado', dataType: 'bit', dataLength: null, dataPrecision: null, dataScale: null, nullable: 'NO', generated: false},
+    mssql: {
+      columnName: 'Estado',
+      dataType: 'bit',
+      dataLength: null,
+      dataPrecision: null,
+      dataScale: null,
+      nullable: 'NO',
+      generated: false,
+    },
   })
   estado: boolean;
 
@@ -112,8 +195,10 @@ export class Personas extends Entity {
 
   @belongsTo(() => TipoPersonas, {name: 'tipoPersona'})
   idTipoPersona: number;
-  // Define well-known properties here
 
+  @hasOne(() => UsuarioCliente, {keyTo: 'clienteId'})
+  usuarioCliente: UsuarioCliente;
+  // Define well-known properties here
   // Indexer property to allow additional data
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [prop: string]: any;
