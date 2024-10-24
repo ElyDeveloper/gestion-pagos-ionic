@@ -78,11 +78,13 @@ export class LoginPage implements OnInit {
 
           this.toastColor = "success";
           this.toastMessage = "Bienvenido " + this.user.identificator;
+          
+          this._loaderService.hide();
           this.setOpenedToast(true);
           setTimeout(() => {
-            this._loaderService.hide();
-            this._router.navigate(["/layout"]);
-          }, 2000);
+            this._router.navigate(["/layout/home"]);
+
+          },1000)
         } else {
           this._loaderService.hide();
           this.toastMessage = "Usuario o contraseña incorrectos.";

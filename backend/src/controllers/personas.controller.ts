@@ -100,7 +100,7 @@ export class PersonasController {
     // const userId = parseInt(currentUser[securityId], 10);
 
     const user = await this.usuarioRepository.findById(idUser);
-    console.log('currentUser: ', user);
+    // console.log('currentUser: ', user);
     if (!user) {
       throw new HttpErrors.Unauthorized('Usuario no encontrado');
     }
@@ -156,10 +156,11 @@ export class PersonasController {
     //console.log('Id de Usuario Logueado en Clientes: ', userId);
 
     const user = await this.usuarioRepository.findById(idUser);
+    console.log('currentUser: ', user);
     if (!user) {
       throw new HttpErrors.Unauthorized('Usuario no encontrado');
     }
-    // //console.log('Usuario encontrado: ', user);
+    //console.log('Usuario encontrado: ', user);
 
     if (user.rolid === 3) {
       const usuariosClientes = await this.usuarioClienteRepository.find({
@@ -184,7 +185,7 @@ export class PersonasController {
       );
       const cantidadClientesActivos = clientesActivos.length;
 
-      // //console.log('Clientes activos: ', clientesActivos);
+      //console.log('Clientes activos: ', clientesActivos);
       //console.log('Cantidad de Clientes activos: ', cantidadClientesActivos);
 
       return {count: cantidadClientesActivos};
@@ -248,6 +249,7 @@ export class PersonasController {
     // const userId = parseInt(currentUser[securityId], 10);
 
     const user = await this.usuarioRepository.findById(idUser);
+    console.log('Usuario encontrado: ', user);
     if (!user) {
       throw new HttpErrors.Unauthorized('Usuario no encontrado');
     }
@@ -266,6 +268,7 @@ export class PersonasController {
                   'recordCrediticio',
                   'estadoCivil',
                   'tipoPersona',
+                  'usuarioCliente'
                 ],
               },
             },
@@ -296,6 +299,7 @@ export class PersonasController {
             'recordCrediticio',
             'estadoCivil',
             'tipoPersona',
+            'usuarioCliente'
           ],
           skip,
           limit,
@@ -347,6 +351,7 @@ export class PersonasController {
         'recordCrediticio',
         'estadoCivil',
         'tipoPersona',
+        'usuarioCliente'
       ],
       skip,
       limit,
@@ -363,7 +368,7 @@ export class PersonasController {
     return copiaSpread;
   }
 
-  @get('/personas/avales/paginated')
+  @get('/personas/avales/paginated/{idUser}')
   @response(200, {
     description: 'List of Personas model',
     content: {
@@ -389,6 +394,7 @@ export class PersonasController {
         'recordCrediticio',
         'estadoCivil',
         'tipoPersona',
+        'usuarioCliente'
       ],
       skip,
       limit,
@@ -595,6 +601,7 @@ export class PersonasController {
                 'recordCrediticio',
                 'estadoCivil',
                 'tipoPersona',
+                'usuarioCliente'
               ],
             },
           },
@@ -625,6 +632,7 @@ export class PersonasController {
         'recordCrediticio',
         'estadoCivil',
         'tipoPersona',
+        'usuarioCliente'
       ],
     });
 
@@ -641,7 +649,7 @@ export class PersonasController {
       idEncrypted: this.jwtService.encryptId(persona.id || 0),
     }));
 
-    //console.log('Personas encontradas: ', copiaSpread);
+    console.log('Personas encontradas: ', copiaSpread);
 
     return copiaSpread;
   }

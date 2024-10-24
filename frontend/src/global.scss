@@ -38,7 +38,17 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 // @import "@ionic/angular/css/palettes/dark.system.css";
+.table-sticky {
+  height: 500px; /* Ajusta la altura según sea necesario */
+  overflow-y: auto; /* Permite el scroll vertical */
+  display: block; 
+}
 
+.thead-sticky {
+  z-index: 99;
+  position: sticky; /* Hace que el encabezado sea pegajoso */
+  top: 0; /* Fija el encabezado en la parte superior */
+}
 ion-menu-button {
   color: var(--ion-color-primary);
 }

@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from "@angular/core";
 import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
-import { filter, firstValueFrom } from "rxjs";
+import { filter, firstValueFrom, Subscription } from "rxjs";
 import { AuthService } from "../../services/auth.service";
 import { Usuario } from "../../interfaces/usuario";
 import { environment } from "src/environments/environment";
@@ -27,7 +27,7 @@ import { environment } from "src/environments/environment";
         <ion-buttons slot="end">
           <ion-button (click)="setOpen(true)">
             <span class="ion-hide-md-down"
-              >{{ user.nombre }} {{ user.apellido }}
+              >{{ user.nombre }} (Cód - {{ user.id }})
             </span>
             <ion-icon name="ellipsis-vertical-outline"></ion-icon>
           </ion-button>
@@ -83,6 +83,8 @@ export class NavbarComponent implements OnInit {
     },
   ];
 
+  subscription: Subscription = new Subscription();
+
   private router = inject(Router);
   private _authService = inject(AuthService);
 
@@ -96,14 +98,30 @@ export class NavbarComponent implements OnInit {
     this.getUserLogged();
   }
 
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+    console.log("NavbarComponent destroyed");
+  }
+
   getUserLogged() {
-    firstValueFrom(this._authService.getUserInfo())
-      .then((user: any) => {
+    // firstValueFrom(this._authService.getUserInfo())
+    //   .then((user: any) => {
+    //     this.user = user;
+    //   })
+    //   .catch((error) => {
+    //     console.error("Error al obtener usuario logueado", error);
+    //   });
+
+    this.subscription = this._authService.getUserInfo().subscribe({
+      next: (user: any) => {
         this.user = user;
-      })
-      .catch((error) => {
-        console.error("Error al obtener usuario logueado", error);
-      });
+        // console.log("Usuario actual: ", this.user);
+      },
+      error: (error) => {
+        console.error("Error al obtener información del usuario:", error);
+      },
+      complete: () => {},
+    });
   }
 
   setOpen(isOpen: boolean) {

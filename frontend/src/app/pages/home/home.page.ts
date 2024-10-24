@@ -60,6 +60,7 @@ export class HomePage {
   ];
 
   userLogged: any = {};
+  subscription: Subscription = new Subscription();
 
   private navCtrl = inject(NavController);
   private _globalService = inject(GlobalService);
@@ -67,24 +68,40 @@ export class HomePage {
   private _router = inject(Router);
   constructor() {}
 
-  ngOnInit(): void {}
-
-  ionViewDidEnter() {
-    //console.log("Llamado a obtencion de usuario");
+  ngOnInit(): void {
     this.getUserLoggedIn();
   }
 
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+    console.log("HomeComponent destroyed");
+  }
+
+  ionViewWillEnter() {}
+
   getUserLoggedIn() {
-    firstValueFrom(this._authService.getUserInfo())
-      .then((user: any) => {
+    // firstValueFrom(this._authService.getUserInfo())
+    //   .then((user: any) => {
+    //     this.userLogged = user;
+    //     console.log("User logged: ", this.userLogged);
+    //     this.updateFolderCounts();
+    //   })
+    //   .catch((error) => {
+    //     console.error("Error al obtener usuario logueado", error);
+    //     this._router.navigate(["/login"]);
+    //   });
+
+    this.subscription = this._authService.getUserInfo().subscribe({
+      next: (user: any) => {
         this.userLogged = user;
-        //console.log("User logged: ", this.userLogged);
+        console.log("Usuario actual en Home: ", this.userLogged);
         this.updateFolderCounts();
-      })
-      .catch((error) => {
-        console.error("Error al obtener usuario logueado", error);
-        this._router.navigate(["/login"]);
-      });
+      },
+      error: (error) => {
+        console.error("Error al obtener información del usuario:", error);
+      },
+      complete: () => {},
+    });
   }
 
   async updateFolderCounts() {
@@ -97,7 +114,7 @@ export class HomePage {
           this._globalService.Get(`personas/count/${idUser}`),
           this._globalService.Get(`personas/clientes/count/${idUser}`),
           this._globalService.Get("contratos-pagos/count"),
-          this._globalService.Get(`prestamos/count?state=${true}`),
+          this._globalService.Get(`prestamos/count/${idUser}?state=${true}`),
           this._globalService.Get("pagos/count"),
         ])
       );

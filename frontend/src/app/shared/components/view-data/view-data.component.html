@@ -32,10 +32,9 @@
 
   <ion-card-content>
     <ng-container>
-      <section></section>
       <div class="table-responsive d-none d-md-block mt-3">
-        <table class="custom-table">
-          <thead>
+        <table class="custom-table table-sticky">
+          <thead class="thead-sticky">
             <tr>
               <th *ngFor="let column of columnsData" class="text-center">
                 {{ column.alias }}

@@ -6,16 +6,7 @@ table {
   /* Hace que la tabla sea un bloque */
 }
 
-.table-sticky {
-  height: 300px; /* Ajusta la altura según sea necesario */
-  overflow-y: auto; /* Permite el scroll vertical */
-  display: block; 
-}
 
-.thead-sticky {
-  position: sticky; /* Hace que el encabezado sea pegajoso */
-  top: 0; /* Fija el encabezado en la parte superior */
-}
 
 th,
 td {

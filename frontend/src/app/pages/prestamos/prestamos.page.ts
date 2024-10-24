@@ -75,6 +75,7 @@ export class PrestamosPage implements OnInit {
   formSelected: FormGroup;
 
   currentUser: Usuario | null = null;
+  subscription: Subscription = new Subscription();
 
   private _globalService = inject(GlobalService);
   private _router = inject(Router);
@@ -105,6 +106,18 @@ export class PrestamosPage implements OnInit {
     this.getCurrentUser();
   }
 
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+  }
+
+  ionViewWillLeave() {
+    console.log("Componente prestamosPage destruido");
+    //Resetear paginacion
+    this.currentPage = 1;
+    this.currentPageSize = 10;
+    this.totalPages = 0;
+  }
+
   ionViewWillEnter() {
     this.getEstadosAprobacion();
     this.getCountElements();
@@ -113,14 +126,27 @@ export class PrestamosPage implements OnInit {
   }
 
   getCurrentUser() {
-    firstValueFrom(this._authService.getUserInfo())
-      .then((user: any) => {
+    // firstValueFrom(this._authService.getUserInfo())
+    //   .then((user: any) => {
+    //     this.currentUser = user;
+    //     console.log("Usuario actual: ", this.currentUser);
+    //   })
+    //   .catch((error: any) => {
+    //     console.error("Error al obtener información del usuario:", error);
+    //   });
+
+    this.subscription = this._authService.getUserInfo().subscribe({
+      next: (user: any) => {
         this.currentUser = user;
         console.log("Usuario actual: ", this.currentUser);
-      })
-      .catch((error: any) => {
+      },
+      error: (error: any) => {
         console.error("Error al obtener información del usuario:", error);
-      });
+      },
+      complete: () => {
+        this.subscription?.unsubscribe();
+      },
+    });
 
     //console.log("Usuario actual: ", this.currentUser);
   }
@@ -168,6 +194,10 @@ export class PrestamosPage implements OnInit {
       {
         key: "id",
         alias: "Código Prestamo",
+      },
+      {
+        key: "cliente.usuarioCliente.usuarioId",
+        alias: "Código Asesor",
       },
       {
         key: "cliente.nombres",
@@ -456,7 +486,7 @@ export class PrestamosPage implements OnInit {
     // this._loaderService.show();
 
     //TODO COMENTAR
-    // //console.log(`Datos del ${this.elementType}: `, data);
+    //console.log(`Datos del ${this.elementType}: `, data);
 
     firstValueFrom(apiCall)
       .then((response: any) =>
@@ -554,13 +584,14 @@ export class PrestamosPage implements OnInit {
 
   async onSearchData(event: any): Promise<void> {
     //console.log("Evento de búsqueda:", event);
+    const idUser = this.currentUser?.id
     try {
       if (event === "") {
         await this.getCountElements();
       } else {
         await firstValueFrom(
           this._globalService
-            .Get(`prestamos/search?query=${event}&state=${this.state}`)
+            .Get(`prestamos/search/${idUser}?query=${event}&state=${this.state}`)
             .pipe(
               tap((res: any) => {
                 this.elements = res;
@@ -580,6 +611,7 @@ export class PrestamosPage implements OnInit {
   }
 
   private async getElementsPag(): Promise<void> {
+    const idUser = this.currentUser?.id
     this.elements = [];
     const skip = this.currentPage * this.currentPageSize - this.currentPageSize;
     const limit = this.currentPageSize;
@@ -588,12 +620,12 @@ export class PrestamosPage implements OnInit {
       await firstValueFrom(
         this._globalService
           .Get(
-            `prestamos/paginated?skip=${skip}&limit=${limit}&state=${this.state}`
+            `prestamos/paginated/${idUser}?skip=${skip}&limit=${limit}&state=${this.state}`
           )
           .pipe(
             tap((res: any) => {
               this.elements = res;
-              //console.log("Elementos obtenidos:", res);
+              console.log("Elementos obtenidos:", res);
             }),
             catchError((error) => {
               console.error("Error al obtener los elementos:", error);
@@ -608,9 +640,10 @@ export class PrestamosPage implements OnInit {
   }
 
   private async getCountElements(): Promise<void> {
+    const idUser = this.currentUser?.id
     try {
       await firstValueFrom(
-        this._globalService.Get(`prestamos/count?state=${this.state}`).pipe(
+        this._globalService.Get(`prestamos/count/${idUser}?state=${this.state}`).pipe(
           tap((res: any) => {
             //console.log("Cantidad de elementos:", res.count);
             const totalElements = res.count;

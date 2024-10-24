@@ -101,12 +101,14 @@ export class PersonasPage implements OnInit {
   selectedAsesor: any = null;
   lastSelectedAsesor: any = null;
 
+  subscription: Subscription = new Subscription();
+
   constructor(private fb: FormBuilder) {
     this.formModels = new FormModels(this.fb);
     this.formAdd = this.formModels.personasForm();
     this.formSelected = this.formAdd;
     this.formSelectedX = this.formAdd;
-    // //console.log("Formulario de cliente:", this.formAdd);
+    //console.log("Formulario de cliente:", this.formAdd);
   }
 
   ngOnInit() {
@@ -117,6 +119,14 @@ export class PersonasPage implements OnInit {
     this.getCountElements();
     this.buildColumns();
     this.cargarOpciones();
+  }
+
+  ionViewWillLeave() {
+    console.log("PersonasPage.ionViewWillLeave");
+    //Resetear paginacion
+    this.currentPage = 1;
+    this.currentPageSize = 10;
+    this.totalPages = 0;
   }
 
   openSelector(type: "nacionalidad" | "asesor") {
@@ -177,20 +187,31 @@ export class PersonasPage implements OnInit {
   }
 
   getCurrentUser() {
-    firstValueFrom(this._authService.getUserInfo())
-      .then((user: any) => {
-        this.currentUser = user;
+    // firstValueFrom(this._authService.getUserInfo())
+    //   .then((user: any) => {
+    //     this.currentUser = user;
         //console.log("Usuario actual: ", this.currentUser);
-      })
-      .catch((error: any) => {
+    //   })
+    //   .catch((error: any) => {
+    //     console.error("Error al obtener información del usuario:", error);
+    //   });
+
+    this.subscription = this._authService.getUserInfo().subscribe({
+      next: (user: any) => {
+        this.currentUser = user;
+        console.log("Usuario actual en Personas: ", this.currentUser);
+      },
+      error: (error: any) => {
         console.error("Error al obtener información del usuario:", error);
-      });
+      },
+      complete: () => {},
+    })
     //console.log("Usuario actual: ", this.currentUser);
   }
 
   //TODO: ESPECIFICO
   goAction(action: string) {
-    // //console.log("Accion capturada: ", action);
+    //console.log("Accion capturada: ", action);
     this.currentPage = 1;
     this.currentPageSize = 10;
     this.title = action;
@@ -255,7 +276,11 @@ export class PersonasPage implements OnInit {
     this.columnsData = [
       {
         key: "id",
-        alias: "Código",
+        alias: "Código Cliente",
+      },
+      {
+        key: "usuarioCliente.usuarioId",
+        alias: "Código Asesor",
       },
       {
         key: "nombres",
@@ -409,7 +434,7 @@ export class PersonasPage implements OnInit {
   }
 
   onInfoButtonClicked(data: any) {
-    // //console.log("Información del cliente:", data);
+    //console.log("Información del cliente:", data);
     this.element = data;
     this.modalSelected = this.modalViewInfo;
     this.isModalOpen = true;
@@ -542,6 +567,7 @@ export class PersonasPage implements OnInit {
   }
 
   async onSearchData(event: any): Promise<void> {
+    const idUser = this.currentUser?.id;
     //console.log("Evento de búsqueda:", event);
     try {
       if (event === "") {
@@ -549,7 +575,7 @@ export class PersonasPage implements OnInit {
       } else {
         await firstValueFrom(
           this._globalService
-            .Get(`personas/${this.action}/search?query=${event}`)
+            .Get(`personas/${this.action}/search/${idUser}?query=${event}`)
             .pipe(
               tap((res: any) => {
                 this.elements = res;
@@ -593,6 +619,7 @@ export class PersonasPage implements OnInit {
   }
 
   private getCountElements(): Promise<void> {
+    // console.log("Usuario Actual Get Personas Paginate: ", this.currentUser);
     const idUser = this.currentUser?.id;
     return firstValueFrom(
       this._globalService.Get(`personas/count/${idUser}`).pipe(

@@ -64,15 +64,16 @@ export class PrestamosController {
     return this.prestamosRepository.create(prestamos);
   }
 
-  @get('/prestamos/count')
+  @get('/prestamos/count/{idUser}')
   @response(200, {
     description: 'Prestamos model count',
     content: {'application/json': {schema: CountSchema}},
   })
   async count(
-    @inject(SecurityBindings.USER)
-    currentUser: UserProfile,
+    // @inject(SecurityBindings.USER)
+    // currentUser: UserProfile,
     @param.query.boolean('state') state: boolean,
+    @param.path.number('idUser') userId: number,
   ): Promise<Count> {
     let condition: any = {
       or: [{idEstadoInterno: 1}, {idEstadoInterno: 2}],
@@ -82,7 +83,7 @@ export class PrestamosController {
       condition = {};
     }
     //console.log('Consultando prestamos del Usuario Logueado, Estado: ', state);
-    const userId = parseInt(currentUser[securityId], 10);
+    // const userId = parseInt(currentUser[securityId], 10);
 
     const user = await this.usuarioRepository.findById(userId);
     if (!user) {
@@ -142,7 +143,7 @@ export class PrestamosController {
     });
   }
 
-  @get('/prestamos/paginated')
+  @get('/prestamos/paginated/{idUser}')
   @response(200, {
     description: 'List of Prestamos model',
     content: {
@@ -152,8 +153,10 @@ export class PrestamosController {
     },
   })
   async dataPaginate(
-    @inject(SecurityBindings.USER)
-    currentUser: UserProfile,
+    // @inject(SecurityBindings.USER)
+    // currentUser: UserProfile,
+    @param.path.number('idUser') userId: number,
+
     @param.query.number('skip') skip: number,
     @param.query.number('limit') limit: number,
     @param.query.boolean('state') state: boolean,
@@ -165,10 +168,10 @@ export class PrestamosController {
     if (!state) {
       condition = {};
     }
-    // //console.log('Usuario Logueado: ', currentUser);
-    const userId = parseInt(currentUser[securityId], 10);
-    // //console.log('Id de Usuario Logueado: ', userId);
-    // //console.log('Llamada de paginacion');
+    //console.log('Usuario Logueado: ', currentUser);
+    // const userId = parseInt(currentUser[securityId], 10);
+    //console.log('Id de Usuario Logueado: ', userId);
+    //console.log('Llamada de paginacion');
 
     const user = await this.usuarioRepository.findById(userId);
     if (!user) {
@@ -189,6 +192,7 @@ export class PrestamosController {
                 'recordCrediticio',
                 'estadoCivil',
                 'tipoPersona',
+                'usuarioCliente',
               ],
             },
           },
@@ -218,7 +222,7 @@ export class PrestamosController {
           ],
         },
         include: [
-          'cliente',
+          {relation: 'cliente', scope: {include: ['usuarioCliente']}},
           'producto',
           'planPago',
           'moneda',
@@ -236,7 +240,7 @@ export class PrestamosController {
         idEncrypted: this.jwtService.encryptId(prestamo.id || 0),
       }));
 
-      // //console.log('Personas encontradas: ', copiaSpread);
+      //console.log('Personas encontradas: ', copiaSpread);
 
       return copiaSpread;
     }
@@ -246,7 +250,7 @@ export class PrestamosController {
         and: [{estado: state}, condition],
       },
       include: [
-        'cliente',
+        {relation: 'cliente', scope: {include: ['usuarioCliente']}},
         'producto',
         'planPago',
         'moneda',
@@ -264,7 +268,7 @@ export class PrestamosController {
       idEncrypted: this.jwtService.encryptId(prestamo.id || 0),
     }));
 
-    // //console.log('Personas encontradas: ', copiaSpread);
+    //console.log('Personas encontradas: ', copiaSpread);
 
     return copiaSpread;
   }
@@ -360,10 +364,11 @@ export class PrestamosController {
     });
   }
 
-  @get('/prestamos/search')
+  @get('/prestamos/search/{idUser}')
   async dataPrestamosSearch(
-    @inject(SecurityBindings.USER)
-    currentUser: UserProfile,
+    // @inject(SecurityBindings.USER)
+    // currentUser: UserProfile,
+    @param.path.number('idUser') userId: number,
     @param.query.string('query') search: string,
     @param.query.boolean('state') state: string,
   ): Promise<any[]> {
@@ -374,7 +379,7 @@ export class PrestamosController {
     if (!state) {
       condition = {};
     }
-    const userId = parseInt(currentUser[securityId], 10);
+    // const userId = parseInt(currentUser[securityId], 10);
     const user = await this.usuarioRepository.findById(userId);
     if (!user) {
       throw new HttpErrors.Unauthorized('Usuario no encontrado');
@@ -434,7 +439,7 @@ export class PrestamosController {
         ],
       },
       include: [
-        'cliente',
+        {relation: 'cliente', scope: {include: ['usuarioCliente']}},
         'producto',
         'periodoCobro',
         'estadoInterno',
@@ -449,7 +454,7 @@ export class PrestamosController {
       idEncrypted: this.jwtService.encryptId(prestamo.id || 0),
     }));
 
-    // //console.log('Personas encontradas: ', copiaSpread);
+    //console.log('Personas encontradas: ', copiaSpread);
 
     return copiaSpread;
   }
