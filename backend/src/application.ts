@@ -17,7 +17,6 @@ import {ViewerStrategy} from './estrategies/viewer.strategy';
 import {MySequence} from './sequence';
 import {MailService} from './services/mail.service';
 import { JWTAuthenticationComponent } from '@loopback/authentication-jwt';
-import { register } from 'module';
 import { MyAuthStrategyProvider } from './estrategies/jwt.strategy';
 import { SecurityBindings } from '@loopback/security';
 import { CurrentUserProvider } from './providers/current-user.provider';
