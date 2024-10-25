@@ -231,6 +231,7 @@
             <h2>{{ cliente.nombres }} {{ cliente.apellidos }}</h2>
             <p>{{ cliente.email }}</p>
           </ion-label>
+          <ion-badge slot="end">Asesor(COD:{{cliente.usuarioCliente?.usuarioId}})</ion-badge>
         </ion-item>
         <ion-item class="user-select-none" (click)="selectCliente(null)">
           <ion-label>

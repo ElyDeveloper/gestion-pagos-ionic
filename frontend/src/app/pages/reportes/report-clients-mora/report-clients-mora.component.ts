@@ -76,10 +76,17 @@ export class ReportClientsMoraComponent implements OnInit {
           tap((data: any) => {
             //console.log("Prestamos con mora:", data);
             this.elements = data;
-            this.totalClients = this.elements.length;
+            // this.totalClients = this.elements.length;
+
             this.elements.forEach((prestamo) => {
               this.totalMora = this.totalMora + prestamo.montoMora;
+              
             });
+
+            const uniqueClients = new Set(this.elements.map(prestamo => prestamo.codCliente));
+            this.totalClients = uniqueClients.size;
+            
+
           }),
           catchError((error) => {
             console.error("Error fetching prestamo:", error);

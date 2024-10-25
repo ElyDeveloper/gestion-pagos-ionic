@@ -1,4 +1,4 @@
-import {Entity, hasMany, model, property} from '@loopback/repository';
+import {Entity, hasMany, model, property, hasOne} from '@loopback/repository';
 import { Prestamos } from './prestamos.model';
 import { FechasPagos } from './fechas-pagos.model';
 
@@ -68,6 +68,9 @@ export class PlanesPago extends Entity {
 
   @hasMany(() => FechasPagos, {keyTo: 'planId'})
   fechasPagos: FechasPagos[];
+
+  @hasOne(() => Prestamos, {keyTo: 'idPlan'})
+  prestamo: Prestamos;
   // Indexer property to allow additional data
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [prop: string]: any;

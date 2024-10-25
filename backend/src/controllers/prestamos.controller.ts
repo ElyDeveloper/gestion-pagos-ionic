@@ -177,7 +177,7 @@ export class PrestamosController {
     if (!user) {
       throw new HttpErrors.Unauthorized('Usuario no encontrado');
     }
-    // //console.log('Usuario encontrado: ', user);
+    //console.log('Usuario encontrado: ', user);
 
     if (user.rolid === 3) {
       const usuariosCliente = await this.usuarioClienteRepository.find({

@@ -99,7 +99,7 @@ export class ReportEstadoCuentaComponent implements OnInit {
         )
         .pipe(
           tap((data: any) => {
-            console.log("Estado de cuenta:", data);
+            // console.log("Estado de cuenta:", data);
 
             if (data.encabezados.length > 0) {
               this.encabezado = data.encabezados[0];

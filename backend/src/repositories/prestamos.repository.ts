@@ -1,5 +1,5 @@
 import {inject, Getter} from '@loopback/core';
-import {DefaultCrudRepository, repository, BelongsToAccessor, HasManyRepositoryFactory} from '@loopback/repository';
+import {DefaultCrudRepository, repository, BelongsToAccessor, HasManyRepositoryFactory, HasOneRepositoryFactory} from '@loopback/repository';
 import {GestionEdboDataSource} from '../datasources';
 import {Prestamos, PrestamosRelations, Personas, Productos, PlanesPago, Monedas, PeriodosCobro, EstadosInternos, Pagos} from '../models';
 import {PersonasRepository} from './personas.repository';
@@ -29,10 +29,14 @@ export class PrestamosRepository extends DefaultCrudRepository<
 
   public readonly aval: BelongsToAccessor<Personas, typeof Prestamos.prototype.id>;
 
+  public readonly clientePrestamo: HasOneRepositoryFactory<Personas, typeof Prestamos.prototype.id>;
+
   constructor(
     @inject('datasources.GestionEDBO') dataSource: GestionEdboDataSource, @repository.getter('PersonasRepository') protected personasRepositoryGetter: Getter<PersonasRepository>, @repository.getter('ProductosRepository') protected productosRepositoryGetter: Getter<ProductosRepository>, @repository.getter('PlanesPagoRepository') protected planesPagoRepositoryGetter: Getter<PlanesPagoRepository>, @repository.getter('MonedasRepository') protected monedasRepositoryGetter: Getter<MonedasRepository>, @repository.getter('PeriodosCobroRepository') protected periodosCobroRepositoryGetter: Getter<PeriodosCobroRepository>, @repository.getter('EstadosInternosRepository') protected EstadosInternosRepositoryGetter: Getter<EstadosInternosRepository>,
   ) {
     super(Prestamos, dataSource);
+    this.clientePrestamo = this.createHasOneRepositoryFactoryFor('clientePrestamo', personasRepositoryGetter);
+    this.registerInclusionResolver('clientePrestamo', this.clientePrestamo.inclusionResolver);
     this.aval = this.createBelongsToAccessorFor('aval', personasRepositoryGetter,);
     this.registerInclusionResolver('aval', this.aval.inclusionResolver);
     this.estadoInterno = this.createBelongsToAccessorFor('estadoInterno', EstadosInternosRepositoryGetter,);

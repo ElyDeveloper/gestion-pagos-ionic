@@ -281,6 +281,7 @@ export class PersonasPage implements OnInit {
       {
         key: "usuarioCliente.usuarioId",
         alias: "Código Asesor",
+        type: "code",
       },
       {
         key: "nombres",

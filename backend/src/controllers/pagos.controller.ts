@@ -129,7 +129,7 @@ export class PagosController {
                 scope: {
                   include: [
                     {
-                      relation: 'prestamos',
+                      relation: 'prestamo',
                       scope: {
                         include: [
                           {
@@ -306,11 +306,12 @@ export class PagosController {
 
   @get('/pagos/search')
   async dataPagosSearch(
-    @param.query.string('search') search: string,
+    @param.query.string('query') search: string,
   ): Promise<Pagos[]> {
+    console.log('Buscando pagos por código de cuota:', search);
     const pagos = await this.pagosRepository.find({
       where: {
-        id: {like: `%${search}%`},
+        idFechaPago: { like: `%${search}%` },
       },
       include: [
         {
@@ -322,17 +323,11 @@ export class PagosController {
                 scope: {
                   include: [
                     {
-                      relation: 'prestamos',
+                      relation: 'prestamo',
                       scope: {
                         include: [
                           {
                             relation: 'cliente',
-                            // scope: {
-                            //   where: {
-                            //     nombres: {like: `%${search}%`},
-                            //     apellidos: {like: `%${search}%`},
-                            //   },
-                            // },
                           },
                         ],
                       },
@@ -351,6 +346,8 @@ export class PagosController {
         },
       ],
     });
+
+    // console.log('Pagos encontrados:', JSON.stringify(pagos));
 
     return pagos;
   }

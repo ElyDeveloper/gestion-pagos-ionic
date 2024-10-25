@@ -102,9 +102,7 @@ export class PrestamosPage implements OnInit {
     //console.log("Formulario de cliente:", this.formAdd);
   }
 
-  ngOnInit() {
-    this.getCurrentUser();
-  }
+  ngOnInit() {}
 
   ngOnDestroy() {
     this.subscription.unsubscribe();
@@ -119,34 +117,35 @@ export class PrestamosPage implements OnInit {
   }
 
   ionViewWillEnter() {
-    this.getEstadosAprobacion();
-    this.getCountElements();
-    this.buildColumns();
-    this.buildColumnsPlan();
+    this.getCurrentUser();
   }
 
   getCurrentUser() {
-    // firstValueFrom(this._authService.getUserInfo())
-    //   .then((user: any) => {
-    //     this.currentUser = user;
-    //     console.log("Usuario actual: ", this.currentUser);
-    //   })
-    //   .catch((error: any) => {
-    //     console.error("Error al obtener información del usuario:", error);
-    //   });
-
-    this.subscription = this._authService.getUserInfo().subscribe({
-      next: (user: any) => {
+    firstValueFrom(this._authService.getUserInfo())
+      .then((user: any) => {
         this.currentUser = user;
-        console.log("Usuario actual: ", this.currentUser);
-      },
-      error: (error: any) => {
+        console.log("Usuario actual en Prestamos: ", this.currentUser);
+        this.getEstadosAprobacion();
+        this.getCountElements();
+        this.buildColumns();
+        this.buildColumnsPlan();
+      })
+      .catch((error: any) => {
         console.error("Error al obtener información del usuario:", error);
-      },
-      complete: () => {
-        this.subscription?.unsubscribe();
-      },
-    });
+      });
+
+    // this.subscription = this._authService.getUserInfo().subscribe({
+    //   next: (user: any) => {
+    //     this.currentUser = user;
+    //     console.log("Usuario actual en Prestamos: ", this.currentUser);
+    //   },
+    //   error: (error: any) => {
+    //     console.error("Error al obtener información del usuario:", error);
+    //   },
+    //   complete: () => {
+    //     this.subscription?.unsubscribe();
+    //   },
+    // });
 
     //console.log("Usuario actual: ", this.currentUser);
   }
@@ -198,6 +197,7 @@ export class PrestamosPage implements OnInit {
       {
         key: "cliente.usuarioCliente.usuarioId",
         alias: "Código Asesor",
+        type: "code",
       },
       {
         key: "cliente.nombres",
@@ -584,14 +584,16 @@ export class PrestamosPage implements OnInit {
 
   async onSearchData(event: any): Promise<void> {
     //console.log("Evento de búsqueda:", event);
-    const idUser = this.currentUser?.id
+    const idUser = this.currentUser?.id;
     try {
       if (event === "") {
         await this.getCountElements();
       } else {
         await firstValueFrom(
           this._globalService
-            .Get(`prestamos/search/${idUser}?query=${event}&state=${this.state}`)
+            .Get(
+              `prestamos/search/${idUser}?query=${event}&state=${this.state}`
+            )
             .pipe(
               tap((res: any) => {
                 this.elements = res;
@@ -611,7 +613,7 @@ export class PrestamosPage implements OnInit {
   }
 
   private async getElementsPag(): Promise<void> {
-    const idUser = this.currentUser?.id
+    const idUser = this.currentUser?.id;
     this.elements = [];
     const skip = this.currentPage * this.currentPageSize - this.currentPageSize;
     const limit = this.currentPageSize;
@@ -640,21 +642,26 @@ export class PrestamosPage implements OnInit {
   }
 
   private async getCountElements(): Promise<void> {
-    const idUser = this.currentUser?.id
+    const idUser = this.currentUser?.id;
     try {
       await firstValueFrom(
-        this._globalService.Get(`prestamos/count/${idUser}?state=${this.state}`).pipe(
-          tap((res: any) => {
-            //console.log("Cantidad de elementos:", res.count);
-            const totalElements = res.count;
-            this.totalPages = Math.ceil(totalElements / this.currentPageSize);
-            //console.log("Total de páginas:", this.totalPages);
-          }),
-          catchError((error) => {
-            console.error("Error al obtener la cantidad de elementos:", error);
-            throw error;
-          })
-        )
+        this._globalService
+          .Get(`prestamos/count/${idUser}?state=${this.state}`)
+          .pipe(
+            tap((res: any) => {
+              //console.log("Cantidad de elementos:", res.count);
+              const totalElements = res.count;
+              this.totalPages = Math.ceil(totalElements / this.currentPageSize);
+              //console.log("Total de páginas:", this.totalPages);
+            }),
+            catchError((error) => {
+              console.error(
+                "Error al obtener la cantidad de elementos:",
+                error
+              );
+              throw error;
+            })
+          )
       );
 
       // Llamar a getElementsPag después de obtener el conteo

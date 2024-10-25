@@ -6,7 +6,7 @@ import {
   ViewChild,
 } from "@angular/core";
 import { Router } from "@angular/router";
-import { firstValueFrom, Subscription } from "rxjs";
+import { catchError, firstValueFrom, Subscription, tap } from "rxjs";
 import { Pagos } from "src/app/shared/interfaces/pago";
 import { Column } from "src/app/shared/interfaces/table";
 import { GlobalService } from "src/app/shared/services/global.service";
@@ -34,7 +34,9 @@ import { ModalConfig } from "src/app/shared/utils/extra";
           [context]="'Pago'"
           (currentPageOut)="onPageChange($event)"
           (openButtonClicked)="onOpenButtonClicked($event)"
-          (uploadButtonClicked)="onUploadButtonClicked($event)">
+          (uploadButtonClicked)="onUploadButtonClicked($event)"
+          (searchOut)="onSearchData($event)"
+          >
         </app-view-data>
 
         <app-reusable-modal
@@ -109,7 +111,36 @@ export class PagosPage implements OnInit {
     this.modalSelected = this.modalUpload;
   }
 
-  ngOnInit() {}
+  ngOnInit() { }
+  
+  async onSearchData(event: any): Promise<void> {
+    //console.log("Evento de búsqueda:", event);
+    try {
+      if (event === "") {
+        await this.getCountElements();
+      } else {
+        await firstValueFrom(
+          this._globalService
+            .Get(
+              `pagos/search?query=${event}`
+            )
+            .pipe(
+              tap((res: any) => {
+                this.elements = res;
+                // console.log("Elementos obtenidos:", res);
+              }),
+              catchError((error) => {
+                console.error("Error al obtener los elementos:", error);
+                throw error;
+              })
+            )
+        );
+      }
+    } catch (error) {
+      console.error("Error en onSearchData:", error);
+      // Aquí puedes manejar el error, por ejemplo, mostrando un mensaje al usuario
+    }
+  }
 
   onSaveData() {
     //console.log("Se guardara el archivo:", this.uploadedFile);
@@ -218,15 +249,15 @@ export class PagosPage implements OnInit {
         type: "date",
       },
       {
-        key: "cuota.planPago.prestamos.cliente.nombres",
+        key: "cuota.planPago.prestamo.cliente.nombres",
         alias: "Nombre del Cliente",
       },
       {
-        key: "cuota.planPago.prestamos.cliente.apellidos",
+        key: "cuota.planPago.prestamo.cliente.apellidos",
         alias: "Apellidos del Cliente",
       },
       {
-        key: "cuota.planPago.prestamos.cliente.dni",
+        key: "cuota.planPago.prestamo.cliente.dni",
         alias: "DNI",
         type: "dni",
       },
@@ -237,7 +268,7 @@ export class PagosPage implements OnInit {
         options: ["Pagado", "Pendiente"],
       },
       {
-        key: "cuota.planPago.prestamos.totalMonto",
+        key: "cuota.planPago.prestamo.totalMonto",
         alias: "Monto Total del Préstamo",
       },
       {
@@ -299,13 +330,9 @@ export class PagosPage implements OnInit {
       this._globalService.Get(`pagos/paginated?skip=${skip}&limit=${limit}`)
     )
       .then((response: any) => {
-        //console.log("Element os obtenidos:", response);
+        // console.log("Element os obtenidos:", response);
         this.elements = response;
 
-        this.elements.forEach((element: any) => {
-          element.cuota.planPago.prestamos =
-            element.cuota.planPago.prestamos[0];
-        });
       })
       .catch((error) => {
         console.error("Error al obtener los elementos:", error);

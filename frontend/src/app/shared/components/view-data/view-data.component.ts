@@ -14,6 +14,7 @@ import {
   distinctUntilChanged,
   firstValueFrom,
   Subject,
+  Subscription,
 } from "rxjs";
 import { AuthService } from "../../services/auth.service";
 import { Router } from "@angular/router";
@@ -64,6 +65,8 @@ export class ViewDataComponent implements OnInit {
 
   userLogged: any = {};
 
+  subscription: Subscription = new Subscription();
+
   private _alertController = inject(AlertController);
   private _authService = inject(AuthService);
   private _router = inject(Router);
@@ -73,20 +76,38 @@ export class ViewDataComponent implements OnInit {
 
   ngOnInit() {
     this.getUserLoggedIn();
+    this.initSearcher();
+    this.updateVisiblePages();
   }
 
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+    console.log("TableDataComponent destroyed");
+  }
+
+  ionViewWillEnter() {}
+
   getUserLoggedIn() {
-    firstValueFrom(this._authService.getUserInfo())
-      .then((user: any) => {
+    // firstValueFrom(this._authService.getUserInfo())
+    //   .then((user: any) => {
+    //     this.userLogged = user;
+    //     console.log("User logged Table View: ", this.userLogged);
+    //   })
+    //   .catch((error) => {
+    //     console.error("Error al obtener usuario logueado", error);
+    //     this._router.navigate(["/login"]);
+    //   });
+    this.subscription.unsubscribe();
+
+    this.subscription = this._authService.getUserInfo().subscribe({
+      next: (user: any) => {
         this.userLogged = user;
-        //console.log("User logged: ", this.userLogged);
-        this.initSearcher();
-        this.updateVisiblePages();
-      })
-      .catch((error) => {
-        console.error("Error al obtener usuario logueado", error);
-        this._router.navigate(["/login"]);
-      });
+        console.log("Usuario actual en Table View: ", this.userLogged);
+      },
+      error: (error: any) => {
+        console.error("Error al obtener información del usuario:", error);
+      },
+    });
   }
 
   ngOnChanges(changes: SimpleChanges) {

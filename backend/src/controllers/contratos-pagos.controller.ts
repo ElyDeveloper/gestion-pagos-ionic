@@ -90,7 +90,7 @@ export class ContratosPagosController {
       limit: 1,
     });
 
-    // //console.log(lastContrato);
+    //console.log(lastContrato);
 
     if (lastContrato.length === 0) {
       return {correlativo: 'CON-1'};
@@ -274,6 +274,12 @@ export class ContratosPagosController {
         ],
       },
     });
-    return contratos;
+
+    let copiaSpread = contratos.map(contrato => ({
+      ...contrato,
+      idPrestamoEncrypted: this.jwtService.encryptId(contrato.idPrestamo|| 0),
+    }));
+
+    return copiaSpread;
   }
 }

@@ -27,8 +27,10 @@ import { environment } from "src/environments/environment";
         <ion-buttons slot="end">
           <ion-button (click)="setOpen(true)">
             <span class="ion-hide-md-down"
-              >{{ user.nombre }} (Cód - {{ user.id }})
+              >{{ user.nombre }} 
+              
             </span>
+            <ion-badge slot="end">COD: {{ user.id }}</ion-badge>
             <ion-icon name="ellipsis-vertical-outline"></ion-icon>
           </ion-button>
         </ion-buttons>

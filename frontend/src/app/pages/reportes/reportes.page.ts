@@ -75,7 +75,7 @@ export class ReportesPage implements OnInit {
   selectedCliente: any = null;
   currentUser: any = null;
 
-  private subscriptions: Subscription[] = [];
+  private subscription: Subscription = new Subscription();
 
   private _globalService = inject(GlobalService);
   private _printService = inject(NgxPrintService);
@@ -89,12 +89,10 @@ export class ReportesPage implements OnInit {
     this.initSearcher();
   }
 
-  ionViewDidLeave() {
-    this.subscriptions.forEach((sub) => sub.unsubscribe());
-  }
   ngOnDestroy() {
     this.searchClientes$.complete();
     this.searchAsesores$.complete();
+    this.subscription.unsubscribe();
   }
   scrollToElement(section: string): void {
     const element = document.getElementById(section);
@@ -146,13 +144,14 @@ export class ReportesPage implements OnInit {
   }
 
   searchDataClients() {
+    const idUser = this.currentUser?.id;
     firstValueFrom(
       this._globalService.Get(
-        `personas/clientes/search?query=${this.searchClient}`
+        `personas/clientes/search/${idUser}?query=${this.searchClient}`
       )
     )
       .then((data: any) => {
-        //console.log(`Clientes encontrados para ${this.searchClient}:`, data);
+        console.log(`Clientes encontrados para ${this.searchClient}:`, data);
         this.filteredClientes = data;
       })
       .catch((error) => {
@@ -176,7 +175,16 @@ export class ReportesPage implements OnInit {
   }
 
   getCurrentUser() {
-    firstValueFrom(this._authService.getUserInfo()).then((user) => {
+    // firstValueFrom(this._authService.getUserInfo()).then((user) => {
+    //   this.currentUser = user;
+    //   if (user?.rolid === 3) {
+    //     this.selectedAsesor = user;
+    //     //console.log("User es asesor:", user);
+    //   }
+    // });
+    this.subscription.unsubscribe();
+
+    this.subscription = this._authService.getUserInfo().subscribe((user) => {
       this.currentUser = user;
       if (user?.rolid === 3) {
         this.selectedAsesor = user;
@@ -228,6 +236,10 @@ export class ReportesPage implements OnInit {
   }
 
   showOpenModal(value: boolean, type: string) {
+    this.searchClient = "";
+    this.searchAsesor = "";
+    this.filteredAsesores = [];
+    this.filteredClientes = [];
     switch (type) {
       case "asesor":
         this.selectedAsesor = null;
@@ -273,11 +285,6 @@ export class ReportesPage implements OnInit {
     }
 
     // this.scrollToElement("current-report");
-  }
-
-  clearsubscriptions() {
-    this.subscriptions.forEach((sub) => sub.unsubscribe());
-    this.subscriptions = [];
   }
 
   selectAsesor(asesor: any) {

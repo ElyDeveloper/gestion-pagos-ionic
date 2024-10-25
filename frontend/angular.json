@@ -90,7 +90,9 @@
               "buildTarget": "app:build:production"
             },
             "development": {
-              "buildTarget": "app:build:development"
+              "buildTarget": "app:build:development",
+              "servePath": "/FICRE/"
+
             },
             "ci": {
               "progress": false

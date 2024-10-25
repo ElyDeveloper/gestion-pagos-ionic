@@ -687,6 +687,7 @@ export class PersonasController {
                 'recordCrediticio',
                 'estadoCivil',
                 'tipoPersona',
+                'usuarioCliente'
               ],
             },
           },
@@ -717,6 +718,7 @@ export class PersonasController {
         'recordCrediticio',
         'estadoCivil',
         'tipoPersona',
+        'usuarioCliente'
       ],
     });
 
@@ -738,8 +740,9 @@ export class PersonasController {
     return copiaSpread;
   }
 
-  @get('/personas/avales/search')
+  @get('/personas/avales/search/{idUser}')
   async dataAvalesSearch(
+    @param.path.number('idUser') userId: number,
     @param.query.string('query') search: string,
   ): Promise<any> {
     // let PersonasSearch = await this.getPersonasSearch(search);

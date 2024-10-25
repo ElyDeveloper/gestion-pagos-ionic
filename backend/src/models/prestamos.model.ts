@@ -1,4 +1,4 @@
-import {Entity, model, property, belongsTo, hasMany} from '@loopback/repository';
+import {Entity, model, property, belongsTo, hasMany, hasOne} from '@loopback/repository';
 import {Personas} from './personas.model';
 import {Productos} from './productos.model';
 import {PlanesPago} from './planes-pago.model';
@@ -98,6 +98,8 @@ export class Prestamos extends Entity {
   @belongsTo(() => Personas, {name: 'aval'})
   idAval: number;
 
+  @hasOne(() => Personas, {keyTo: 'id'})
+  clientePrestamo: Personas;
   // Define well-known properties here
 
   // Indexer property to allow additional data

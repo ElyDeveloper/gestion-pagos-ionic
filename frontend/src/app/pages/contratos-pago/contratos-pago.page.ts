@@ -264,7 +264,7 @@ export class ContratosPagoPage implements OnInit {
         this._globalService.Get(`contratos-pagos/search?query=${event}`)
       ).then((response: any) => {
         this.elements = response;
-        //console.log("Elementos obtenidos:", response);
+        // console.log("Elementos obtenidos Search:", response);
       }).catch((error) => {
         console.error("Error al obtener los elementos:", error);
       });
@@ -280,7 +280,7 @@ export class ContratosPagoPage implements OnInit {
       this._globalService.Get(`contratos-pagos/paginated?skip=${skip}&limit=${limit}`)
     ).then((response: any) => {
       this.elements = response;
-      //console.log("Elementos obtenidos:", response);
+      // console.log("Elementos obtenidos Paginate:", response);
     }).catch((error) => {
       console.error("Error al obtener los elementos:", error);
     });

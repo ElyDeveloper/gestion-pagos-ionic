@@ -276,6 +276,7 @@ export class GestionContractPage implements OnInit {
   }
 
   private updatePrestamoState(prestamo: any): void {
+    // console.log("Prestamo seleccionado:", prestamo);
     this.prestamoSeleccionado = prestamo;
     this.clienteSeleccionado = prestamo.cliente;
     this.avalSeleccionado = prestamo.aval;
@@ -284,7 +285,7 @@ export class GestionContractPage implements OnInit {
     this.setTitle();
     this.verifyExist();
 
-    if (prestamo.estadoInterno.id === 2) {
+    if (prestamo.estadoInterno.id !==1 && prestamo.estadoInterno.id!== 3) {
       this.isAprobado = true;
     }
   }
