@@ -199,7 +199,7 @@ export class PersonasPage implements OnInit {
     this.subscription = this._authService.getUserInfo().subscribe({
       next: (user: any) => {
         this.currentUser = user;
-        console.log("Usuario actual en Personas: ", this.currentUser);
+        // console.log("Usuario actual en Personas: ", this.currentUser);
       },
       error: (error: any) => {
         console.error("Error al obtener información del usuario:", error);
@@ -608,7 +608,7 @@ export class PersonasPage implements OnInit {
         )
         .pipe(
           tap((response: any) => {
-            console.log("Elementos obtenidos:", response);
+            // console.log("Elementos obtenidos:", response);
             this.elements = response; // Asumiendo que la respuesta tiene una propiedad 'data'
           }),
           catchError((error) => {

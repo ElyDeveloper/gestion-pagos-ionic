@@ -157,19 +157,18 @@
                   </ng-container>
                 </ng-container>
                 <ng-template #actionsTemplate>
-                  <div class="d-flex justify-content-around">
+                  <div class="row d-flex justify-content-center" style="width: 200px;">
                     <ng-container
                       *ngFor="let action of column.lstActions; let i = index">
                       @if (!action.rolesAuthorized || (userLogged.rolid &&
                       action.rolesAuthorized.includes(userLogged.rolid))) {
-                      <div>
+                      <div class="col-4">
                         <ion-button
                           [id]="'action-button-' + i"
                           [color]="action.color"
                           (click)="onActionClick(row, action.action)"
                           [attr.aria-label]="action.alias"
                           shape="round"
-                          class="me-2"
                           data-bs-toggle="tooltip"
                           data-bs-placement="top"
                           [title]="

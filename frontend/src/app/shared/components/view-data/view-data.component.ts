@@ -102,7 +102,7 @@ export class ViewDataComponent implements OnInit {
     this.subscription = this._authService.getUserInfo().subscribe({
       next: (user: any) => {
         this.userLogged = user;
-        console.log("Usuario actual en Table View: ", this.userLogged);
+        // console.log("Usuario actual en Table View: ", this.userLogged);
       },
       error: (error: any) => {
         console.error("Error al obtener información del usuario:", error);

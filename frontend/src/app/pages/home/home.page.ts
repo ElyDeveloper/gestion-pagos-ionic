@@ -94,7 +94,7 @@ export class HomePage {
     this.subscription = this._authService.getUserInfo().subscribe({
       next: (user: any) => {
         this.userLogged = user;
-        console.log("Usuario actual en Home: ", this.userLogged);
+        // console.log("Usuario actual en Home: ", this.userLogged);
         this.updateFolderCounts();
       },
       error: (error) => {

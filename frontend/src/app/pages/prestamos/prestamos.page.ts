@@ -124,7 +124,7 @@ export class PrestamosPage implements OnInit {
     firstValueFrom(this._authService.getUserInfo())
       .then((user: any) => {
         this.currentUser = user;
-        console.log("Usuario actual en Prestamos: ", this.currentUser);
+        // console.log("Usuario actual en Prestamos: ", this.currentUser);
         this.getEstadosAprobacion();
         this.getCountElements();
         this.buildColumns();
@@ -627,7 +627,7 @@ export class PrestamosPage implements OnInit {
           .pipe(
             tap((res: any) => {
               this.elements = res;
-              console.log("Elementos obtenidos:", res);
+              // console.log("Elementos obtenidos:", res);
             }),
             catchError((error) => {
               console.error("Error al obtener los elementos:", error);
