@@ -158,8 +158,10 @@ export class GestionPagoPage implements OnInit {
 
   async save(data: any) {
     if (await this._preventAbuseService.registerClick()) {
+      // console.log("Monto: ", Number(data.monto).toFixed(2));
+      // console.log("Adeudo Total: ", this.adeudoTotal.toFixed(2));
       // return;
-      if (data.monto > this.adeudoTotal) {
+      if (Number(data.monto).toFixed(2) > this.adeudoTotal.toFixed(2)) {
         this.toastColor = "danger";
         this.toastMessage = "El monto no puede ser mayor al adeudo total";
         this.isToastOpen = true;
