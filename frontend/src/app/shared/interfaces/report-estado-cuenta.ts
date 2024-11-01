@@ -4,6 +4,7 @@ export interface EncabezadoEstadoCuenta {
   estadoPtmo: boolean | string;
   mtoPrestamo: number;
   saldoPtmo: number;
+  SaldoTotPtmo: number;
   asesor: number | string;
   nombreAsesor: string;
   tMora: string;

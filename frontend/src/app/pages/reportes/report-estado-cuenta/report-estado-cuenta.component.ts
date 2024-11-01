@@ -25,6 +25,7 @@ export class ReportEstadoCuentaComponent implements OnInit {
     estadoPtmo: false,
     mtoPrestamo: 0,
     saldoPtmo: 0,
+    SaldoTotPtmo: 0,
     asesor: "N/A",
     nombreAsesor: "N/A",
     tMora: "N/A",
@@ -99,7 +100,7 @@ export class ReportEstadoCuentaComponent implements OnInit {
         )
         .pipe(
           tap((data: any) => {
-            // console.log("Estado de cuenta:", data);
+            console.log("Estado de cuenta:", data);
 
             if (data.encabezados.length > 0) {
               this.encabezado = data.encabezados[0];
