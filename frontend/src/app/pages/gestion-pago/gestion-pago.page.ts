@@ -156,10 +156,16 @@ export class GestionPagoPage implements OnInit {
     this.buildColumns();
   }
 
+  roundToTwoDecimals = (num: number): number => {
+    return Math.round((num + Number.EPSILON) * 100) / 100;
+  }
+
   async save(data: any) {
     if (await this._preventAbuseService.registerClick()) {
+      console.log("Monto: ", this.roundToTwoDecimals(Number(data.monto)));
+      console.log("Adeudo Total: ", this.roundToTwoDecimals(this.adeudoTotal));
       // return;
-      if (data.monto > this.adeudoTotal) {
+      if (this.roundToTwoDecimals(Number(data.monto)) > this.roundToTwoDecimals(this.adeudoTotal)) {
         this.toastColor = "danger";
         this.toastMessage = "El monto no puede ser mayor al adeudo total";
         this.isToastOpen = true;
