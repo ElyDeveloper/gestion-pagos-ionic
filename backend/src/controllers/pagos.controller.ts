@@ -31,6 +31,7 @@ import {
   MorasRepository,
   PagosRepository,
   PlanesPagoRepository,
+  PrestamosRepository,
 } from '../repositories';
 
 @authenticate('jwt')
@@ -42,6 +43,8 @@ export class PagosController {
     public morasRepository: MorasRepository,
     @repository(PlanesPagoRepository)
     public planesPagoRepository: PlanesPagoRepository,
+    @repository(PrestamosRepository)
+    public prestamosRepository: PrestamosRepository,
     @repository(FechasPagosRepository)
     public fechasPagosRepository: FechasPagosRepository,
     @repository(DocumentosRepository)
@@ -153,7 +156,7 @@ export class PagosController {
       ],
       skip,
       limit,
-      order:['id DESC'],
+      order: ['id DESC'],
     });
   }
 
@@ -281,7 +284,7 @@ export class PagosController {
       await this.documentosTipoDocRepository.deleteById(documentoTipoDoc.id);
     }
 
-    //INFO ELIMINAR PRESTAMO POR ID
+    //INFO ELIMINAR PAGO POR ID
     await this.pagosRepository.deleteById(id);
 
     //INFO OBTENER FECHAS PAGOS CON PAGO
@@ -302,6 +305,22 @@ export class PagosController {
         cuotaPagadas: countCuotasPagadas.count,
       });
     }
+
+    //INFO ACTIVAR PRESTAMO
+    //Actualizar el estado del prestamo a true y el idEstadoInterno
+    const prestamo = await this.prestamosRepository.findOne({
+      where: {
+        idPlan: fechaPago.planId,
+      },
+    });
+
+    if (prestamo?.idEstadoInterno === 4) {
+      // console.log('Prestamo:', prestamo);
+      await this.prestamosRepository.updateById(prestamo.id, {
+        idEstadoInterno: 2,
+        estado: true,
+      });
+    }
   }
 
   @get('/pagos/search')
@@ -311,7 +330,7 @@ export class PagosController {
     console.log('Buscando pagos por código de cuota:', search);
     const pagos = await this.pagosRepository.find({
       where: {
-        idFechaPago: { like: `%${search}%` },
+        idFechaPago: {like: `%${search}%`},
       },
       include: [
         {
