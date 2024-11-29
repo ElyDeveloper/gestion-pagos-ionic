@@ -84,9 +84,11 @@ export class JWTService {
       let cryptPass = await this.encriptDecryptService.Encrypt(
         credentials.password,
       );
+
       if (user.hash === cryptPass) {
         return user;
       }
+
     }
     return false;
   }

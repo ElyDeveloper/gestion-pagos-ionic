@@ -61,6 +61,8 @@ export class GestionPagoPage implements OnInit {
   adeudoMora: number = 0;
   adeudoTotal: number = 0;
   daysLate: number = 0;
+  estadoPrestamo: number = 0;
+  idEstadoInterno: number = 0;
 
   formModels: FormModels;
   pagoForm: FormGroup;
@@ -162,8 +164,8 @@ export class GestionPagoPage implements OnInit {
 
   async save(data: any) {
     if (await this._preventAbuseService.registerClick()) {
-      console.log("Monto: ", this.roundToTwoDecimals(Number(data.monto)));
-      console.log("Adeudo Total: ", this.roundToTwoDecimals(this.adeudoTotal));
+    //   console.log("Monto: ", this.roundToTwoDecimals(Number(data.monto)));
+    //   console.log("Adeudo Total: ", this.roundToTwoDecimals(this.adeudoTotal));
       // return;
       if (this.roundToTwoDecimals(Number(data.monto)) > this.roundToTwoDecimals(this.adeudoTotal)) {
         this.toastColor = "danger";
@@ -316,8 +318,13 @@ export class GestionPagoPage implements OnInit {
       this._globalService.GetId("prestamos", idDecrypted).pipe(
         tap((prestamo: any) => {
           prestamo = this._globalService.parseObjectDates(prestamo);
-          //console.log("Prestamo:", prestamo);
+          console.log('prestamo: ', prestamo);
           //console.log("Plan de Pago:", prestamo.planPago);
+
+          this.estadoPrestamo = prestamo.estado;
+          this.idEstadoInterno = prestamo.idEstadoInterno;
+
+          console.log('estadoPrestamo: ', this.estadoPrestamo, ', idEstadoInterno: ', this.idEstadoInterno);
         }),
         catchError((error) => {
           console.error("Error fetching prestamo:", error);
@@ -392,7 +399,10 @@ export class GestionPagoPage implements OnInit {
     this.resetPaymentValues();
     // //console.log("Elemento seleccionado:", data);
     this.pagoSeleccionado = data;
+    this.estadoPrestamo = data.estado;
+    this.idEstadoInterno = data.idEstadoInterno;
 
+    console.log('Data: ', data);
     this.calculatePaymentDetails(data);
 
     this.hasMora = data.mora > 0;
@@ -408,12 +418,18 @@ export class GestionPagoPage implements OnInit {
   }
 
   onDeleteButtonClicked(data: any) {
-    //console.log("Elemento eliminado:", data);
+    console.log("Elemento eliminado:", data);
     firstValueFrom(this._globalService.Delete("pagos", data.id))
-      .then(async () => {
+    .then(async () => {
         this.toastColor = "success";
         this.toastMessage = "Pago eliminado exitosamente.";
         this.isToastOpen = true;
+
+        if(this.estadoPrestamo == 0 && this.idEstadoInterno == 4){
+          console.log('Se cumple la condicion')
+          this._globalService.Patch(`prestamos`, this.prestamoSeleccionado.id, { estado: 1, idEstadoInterno: 2 })
+          .subscribe((response: any) => {});
+        }
 
         const prestamo = await this.fetchPrestamo(this.prestamoSeleccionado.id);
         this.updatePrestamoState(prestamo);
