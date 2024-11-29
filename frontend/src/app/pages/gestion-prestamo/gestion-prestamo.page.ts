@@ -424,10 +424,11 @@ export class GestionPrestamoPage implements OnInit {
       idCliente: this.clienteSeleccionado.id,
       idProducto: this.prestamoForm.get("idProducto")?.value,
       idPeriodoCobro: this.prestamoForm.get("idPeriodoCobro")?.value,
-      idEstadoInterno: this.prestamoForm.get("idEstadoInterno")?.value,
+      idEstadoInterno: 1,
       idPlan: idPlan,
       idMoneda: this.prestamoForm.get("idMoneda")?.value,
       idAval: this.avalSeleccionado?.id || null,
+      
     };
   }
 
