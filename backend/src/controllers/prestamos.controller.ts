@@ -26,7 +26,9 @@ import {inject, service} from '@loopback/core';
 import {JWTService} from '../services';
 import {SecurityBindings, securityId, UserProfile} from '@loopback/security';
 import {
+  FechasPagosRepository,
   PersonasRepository,
+  PlanesPagoRepository,
   UsuarioClienteRepository,
   UsuarioRepository,
 } from '../repositories';
@@ -36,6 +38,8 @@ export class PrestamosController {
   constructor(
     @repository(UsuarioClienteRepository)
     public usuarioClienteRepository: UsuarioClienteRepository,
+    @repository(FechasPagosRepository)
+    public fechasPagosRepository: FechasPagosRepository,
     @repository(PersonasRepository)
     public personasRepository: PersonasRepository,
     @repository(UsuarioRepository)
@@ -351,7 +355,67 @@ export class PrestamosController {
     @param.path.number('id') id: number,
     @requestBody() prestamos: any,
   ): Promise<void> {
+    const currentPrestamo = await this.prestamosRepository.findById(id);
+    // console.log('Current Prestamo: ', currentPrestamo);
+
+    if (currentPrestamo) {
+      delete currentPrestamo.id;
+      prestamos.fechaSolicitud = new Date(prestamos.fechaSolicitud);
+      prestamos.fechaAprobacion =
+        prestamos.fechaAprobacion !== null
+          ? new Date(prestamos.fechaAprobacion)
+          : null;
+      // console.log('Data Received: ', prestamos);
+      if (!this.areObjectsEqual(currentPrestamo, prestamos)) {
+        if (prestamos.idPlan) {
+          await this.fechasPagosRepository.deleteAll({
+            planId: prestamos.idPlan,
+          });
+        }
+
+        prestamos.idEstadoInterno = 1;
+      }
+    }
     await this.prestamosRepository.replaceById(id, prestamos);
+  }
+
+  areObjectsEqual(obj1: any, obj2: any): boolean {
+    // Si ambos son null o undefined, son iguales
+    if (obj1 === null && obj2 === null) return true;
+    if (obj1 === undefined && obj2 === undefined) return true;
+
+    // Si uno es null/undefined y el otro no, son diferentes
+    if (obj1 === null || obj2 === null) return false;
+    if (obj1 === undefined || obj2 === undefined) return false;
+
+    // Si no son objetos, comparación directa
+    if (typeof obj1 !== 'object' || typeof obj2 !== 'object') {
+      return obj1 === obj2;
+    }
+
+    // Si son arrays
+    if (Array.isArray(obj1) && Array.isArray(obj2)) {
+      if (obj1.length !== obj2.length) return false;
+      return obj1.every((item, index) =>
+        this.areObjectsEqual(item, obj2[index]),
+      );
+    }
+
+    // Si uno es array y el otro no, son diferentes
+    if (Array.isArray(obj1) || Array.isArray(obj2)) return false;
+
+    // Obtener las keys de ambos objetos
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+
+    // Si tienen diferente número de propiedades, son diferentes
+    if (keys1.length !== keys2.length) return false;
+
+    // Comparar cada propiedad recursivamente
+    return keys1.every(key => {
+      if (!obj2.hasOwnProperty(key)) return false;
+      return this.areObjectsEqual(obj1[key], obj2[key]);
+    });
   }
 
   @del('/prestamos/{id}')
