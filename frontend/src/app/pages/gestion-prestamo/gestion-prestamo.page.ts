@@ -419,7 +419,7 @@ export class GestionPrestamoPage implements OnInit {
       fechaSolicitud: new Date(
         this.prestamoForm.get("fechaSolicitud")?.value || new Date()
       ),
-      fechaAprobacion: this.prestamoForm.get("fechaAprobacion")?.value || null,
+      fechaAprobacion: new Date(this.prestamoForm.get("fechaAprobacion")?.value) || null,
       estado: this.prestamoForm.get("estado")?.value,
       idCliente: this.clienteSeleccionado.id,
       idProducto: this.prestamoForm.get("idProducto")?.value,
